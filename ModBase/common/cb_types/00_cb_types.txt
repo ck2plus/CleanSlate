@@ -107,7 +107,7 @@ claim = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -446,7 +446,7 @@ other_claim = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -814,7 +814,7 @@ claim_on_liege = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -1080,7 +1080,7 @@ claim_on_liege_plot = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -1283,7 +1283,7 @@ claim_on_vassal_plot = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 	}
 
 	on_success = {
@@ -1510,7 +1510,7 @@ other_claim_on_liege = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -1834,6 +1834,7 @@ claim_all = {
 	sort_priority = 1100
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			total_claims = {
 				who = FROM
@@ -1848,6 +1849,7 @@ claim_all = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			total_claims = {
 				who = FROM
@@ -1858,6 +1860,7 @@ claim_all = {
 	}
 
 	on_add = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			any_claim = {
@@ -1874,7 +1877,8 @@ claim_all = {
 				press_claim = ROOT
 			}
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -1885,8 +1889,11 @@ claim_all = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
+			participation_scaled_prestige = 100
+
 			any_claim = {
 				show_scope_change = no
 				limit = {
@@ -1907,12 +1914,13 @@ claim_all = {
 					hidden_tooltip = { conquest_culture = ROOT }
 				}
 			}
+
 			if = { #China with no land calculates what to do with nomad provinces
 				limit = {
 					is_offmap_governor = yes
 					offmap_power = { is_offmap_tag = offmap_china }
 					offmap_china = { has_offmap_tmp_flag = WP_is_not_on_map }
-					NOT = { wealth = 2500 } #unless already rich from tributes
+					wealth < 2500  #unless already rich from tributes
 				}
 				set_variable = { which = "WP_nomad_provinces" value = 0 }
 				any_realm_province = {
@@ -1924,9 +1932,8 @@ claim_all = {
 				}
 				character_event = { id = JD.60101 days = 1 } #calculate gold sent from china for building holdings
 			}
-		}
-		hidden_tooltip = {
-			ROOT = {
+
+			hidden_tooltip = {
 				if = {
 					limit = {
 						has_dlc = "Legacy of Rome"
@@ -1940,13 +1947,9 @@ claim_all = {
 							religion = hellenic_pagan_reformed
 						}
 					}
-					character_event = { id = LoR.30 days = 12 }
+					character_event = { id = LoR.30 days = 12 } # Victory Triumph
 				}
 			}
-		}
-		ROOT = {
-			show_scope_change = no
-			participation_scaled_prestige = 100
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
@@ -1971,10 +1974,13 @@ claim_all = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -150
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 75
@@ -1986,6 +1992,7 @@ claim_all = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -2004,8 +2011,12 @@ claim_all = {
 					}
 					ROOT = { has_strong_claim = PREV }
 				}
-				ROOT = { show_scope_change = no remove_claim = PREV }
+				ROOT = {
+					show_scope_change = no
+					remove_claim = PREV
+				}
 			}
+
 			hidden_effect = {
 				if = { #Makes China have a chance of leaving Expanionist policy...
 					limit = {
@@ -2028,6 +2039,8 @@ claim_all = {
 				}
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 200
@@ -2044,7 +2057,7 @@ claim_all = {
 						religion = hellenic_pagan_reformed
 					}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 		}
 		any_defender = {
@@ -2127,7 +2140,7 @@ change_seniority_succession_law = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -2142,7 +2155,7 @@ change_seniority_succession_law = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -2330,7 +2343,7 @@ change_primogeniture_succession_law = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -2345,7 +2358,7 @@ change_primogeniture_succession_law = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -2541,7 +2554,7 @@ change_feudal_elective_succession_law = {
 
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -2745,7 +2758,7 @@ invasion = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -2811,7 +2824,7 @@ invasion = {
 							religion = hellenic_pagan_reformed
 						}
 					}
-					character_event = { id = LoR.30 days = 12 }
+					character_event = { id = LoR.30 days = 12 } # Victory Triumph
 				}
 			}
 		}
@@ -3046,7 +3059,7 @@ invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 		}
 		any_defender = {
@@ -3175,7 +3188,7 @@ tribal_invasion = {
 
 	on_add = {
 		ROOT = { show_scope_change = no prestige = -500 }
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -3502,7 +3515,7 @@ tribal_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 200
 		}
@@ -3816,7 +3829,7 @@ crusade = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -4093,7 +4106,7 @@ crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 
 			hidden_tooltip = {
@@ -4165,7 +4178,7 @@ crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			hidden_tooltip = {
 				if = {
@@ -4406,7 +4419,7 @@ new_crusade = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -5613,7 +5626,7 @@ new_crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 
 			hidden_tooltip = {
@@ -5687,7 +5700,7 @@ new_crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			hidden_tooltip = {
 				if = {
@@ -5854,7 +5867,7 @@ religious = {
 				piety = -250
 			}
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -6505,7 +6518,7 @@ excommunicated_ruler = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -6779,7 +6792,7 @@ bid_for_independence = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -6851,7 +6864,7 @@ bid_for_independence = {
 
 		FROM = {
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -7022,7 +7035,7 @@ depose_liege = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -7036,7 +7049,7 @@ depose_liege = {
 		FROM = {
 			prestige = -500
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -7178,7 +7191,7 @@ overthrow_ruler = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -7201,7 +7214,7 @@ overthrow_ruler = {
 				modifier = declared_war
 			}
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -7230,7 +7243,7 @@ overthrow_ruler = {
 				}
 			}
 			if = {
-				limit = { has_dlc = "Zeus" }
+				limit = { has_dlc = "Conclave" }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -7388,7 +7401,7 @@ overthrow_ruler_no_calls = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -7412,7 +7425,7 @@ overthrow_ruler_no_calls = {
 				modifier = declared_war
 			}
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -7556,7 +7569,7 @@ change_gavelkind_succession_law = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = { detract_grace_super_huge_effect = yes }
@@ -7567,7 +7580,7 @@ change_gavelkind_succession_law = {
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					if = {
 						limit = {
@@ -7715,7 +7728,7 @@ lower_crown_authority_law = {
 		ROOT = {
 			vassal_of = FROM
 		}
-		NOT = { has_dlc = "Zeus" }
+		NOT = { has_dlc = "Conclave" }
 	}
 
 	can_use_title = {
@@ -7757,7 +7770,7 @@ lower_crown_authority_law = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -7950,7 +7963,7 @@ lower_tribal_organization_law = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -8163,7 +8176,7 @@ coastal_republic = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -8374,7 +8387,7 @@ coastal_county_republic = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -8521,7 +8534,7 @@ weaken_vassal_plot = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -8543,7 +8556,7 @@ weaken_vassal_plot = {
 		}
 		FROM = {
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -8674,7 +8687,7 @@ decadence_invasion = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -8713,7 +8726,7 @@ decadence_invasion = {
 
 		FROM = {
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					if = {
 						limit = {
@@ -8903,7 +8916,7 @@ muslim_invasion = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		ROOT = { piety = -1000 }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
@@ -9101,7 +9114,7 @@ muslim_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			hidden_effect = {
 				if = {
@@ -9184,7 +9197,7 @@ muslim_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			hidden_effect = {
 				if = {
@@ -9341,7 +9354,7 @@ cb_faction_independence = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -9406,7 +9419,7 @@ cb_faction_independence = {
 
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
@@ -9645,7 +9658,7 @@ imperial_reconquest = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -9828,7 +9841,7 @@ embargo_cb = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -10078,7 +10091,7 @@ seize_trade_post = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -10214,7 +10227,7 @@ viking_invasion = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -10357,7 +10370,7 @@ viking_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 250
 		}
@@ -10475,7 +10488,7 @@ pagan_subjugation = {
 				hidden = yes
 			}
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -10583,7 +10596,7 @@ pagan_subjugation = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 100
 		}
@@ -10672,7 +10685,7 @@ peasant_revolt = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -10787,7 +10800,7 @@ heretic_revolt = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -10952,7 +10965,7 @@ religious_revolt = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -11126,7 +11139,7 @@ liberation_revolt = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -11274,7 +11287,7 @@ duchy_adventure = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -11463,7 +11476,7 @@ kingdom_adventure = { # Used mainly for Muslims adventuring into India
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -11890,7 +11903,7 @@ pagan_holy_war = {
 
 	on_add = {
 		ROOT = { piety = -100 }
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -12245,7 +12258,7 @@ caliphal_subjugation = {
 
 	on_add = {
 		ROOT = { piety = -200 }
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -12382,7 +12395,7 @@ caliphal_subjugation = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 100
 		}
@@ -12438,7 +12451,7 @@ muslim_county_conquest = {
 
 	on_add = {
 		ROOT = { piety = -50 }
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -12784,7 +12797,7 @@ pagan_county_conquest = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -13280,7 +13293,7 @@ dejure_county_claim = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -13628,7 +13641,7 @@ dejure_barony_claim = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -13968,7 +13981,7 @@ other_dejure_county_claim = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -14132,7 +14145,7 @@ shia_caliphate_rising = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -14393,7 +14406,7 @@ depose_antipope = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -14590,7 +14603,7 @@ cb_install_antiking = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -14874,7 +14887,7 @@ buddhist_holy_war = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -15093,7 +15106,7 @@ indian_subjugation = {
 
 	on_add = {
 		ROOT = { piety = -500 }
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -15495,7 +15508,7 @@ manifest_destiny_invasion = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -15591,7 +15604,7 @@ manifest_destiny_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 100
 		}
@@ -15637,7 +15650,7 @@ manifest_destiny_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 200
 		}
@@ -15737,7 +15750,7 @@ cb_decadence_usurption = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -15851,7 +15864,7 @@ rivalry_cb = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -16102,7 +16115,7 @@ tributary_cb = {
 			set_character_flag = surrender_tributary_cb
 			character_event = { id = JD.2500 days = 5 tooltip = surrender_tributary_tt }
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -16528,7 +16541,7 @@ free_tributary_cb = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -16849,7 +16862,7 @@ cb_install_khan = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -16998,7 +17011,7 @@ nomad_dispute = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -17201,7 +17214,7 @@ cb_liberate_nomad_duchy = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -17410,7 +17423,7 @@ cb_minor_clan_revolt = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -17644,7 +17657,7 @@ nomad_subjugation = {
 				}
 			}
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -17837,7 +17850,7 @@ nomad_subjugation = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 100
 		}
@@ -17905,7 +17918,7 @@ nomad_invasion = {
 
 	on_add = {
 		ROOT = { prestige = -100 }
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -18122,7 +18135,7 @@ nomad_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
 			}
 			participation_scaled_prestige = 200
 		}
@@ -18295,7 +18308,7 @@ nomad_expansion = {
 
 	on_add = {
 		ROOT = { prestige = -300 }
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -18642,7 +18655,7 @@ increase_council_power_war = { # Started from faction
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -18850,7 +18863,7 @@ nomad_humiliate_cb = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -19113,7 +19126,7 @@ powerful_vassal_takeover_war = { # Started from faction
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
