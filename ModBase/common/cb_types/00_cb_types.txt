@@ -118,27 +118,24 @@ claim = {
 	}
 
 	on_success_title = {
-		usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
+		usurp_title_plus_barony_if_unlanded = { target = attacker type = claim }
 
-		# Attackers
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
-			limit = { NOT = { character = ROOT } }
+			limit = { NOT = { character = attacker } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
 
-		# Defender
-		FROM = {
+		defender = {
 			show_scope_change = no
 			prestige = -100
 		}
 
 		hidden_tooltip = {
-			# Attacker
-			ROOT = {
+			attacker = {
 				clr_character_flag = claimant_adventurer
 				if = {
 					limit = {
@@ -152,17 +149,16 @@ claim = {
 				}
 			}
 
-			# Defender
-			FROM = {
+			defender = {
 				landless_pope_effect = yes
 			}
 
 			if = {
 				limit = {
 					higher_tier_than = BARON
-					NOT = { culture = ROOT }
+					NOT = { culture = attacker }
 				}
-				conquest_culture = ROOT
+				conquest_culture = attacker
 			}
 
 			check_war_effect = yes
@@ -170,8 +166,7 @@ claim = {
 	}
 
 	on_fail_title = {
-		# Attacker
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = -100
 			hidden_tooltip = {
@@ -180,46 +175,43 @@ claim = {
 			}
 		}
 
-		# Defenders
-		FROM = {
+		defender = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
-			limit = { NOT = { character = FROM } }
+			limit = { NOT = { character = defender } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
 	}
 
 	on_reverse_demand = {
-		# Attacker
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = -150
 			transfer_scaled_wealth = {
-				to = FROM
+				to = defender
 				value = 4.0
 			}
 			if = {
 				limit = { has_character_flag = claimant_adventurer }
-				imprison = FROM
+				imprison = defender
 			}
 		}
 
-		# Defenders
-		FROM = {
+		defender = {
 			show_scope_change = no
 			participation_scaled_prestige = 150
 		}
 		any_defender = {
-			limit = { NOT = { character = FROM } }
+			limit = { NOT = { character = defender } }
 			hidden_tooltip = { participation_scaled_prestige = 150 }
 		}
 
 		# China stuff
 		hidden_effect = {
 			# Attacker
-			ROOT = {
+			attacker = {
 				if = {
 					limit = {
 						has_landed_title = e_china_west_governor
@@ -249,8 +241,7 @@ claim = {
 	}
 
 	on_reverse_demand_title = {
-		# Attacker
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			remove_claim = PREV
 			hidden_tooltip = {
@@ -263,13 +254,12 @@ claim = {
 	on_attacker_leader_death = {
 		if = {
 			limit = {
-				ROOT = { has_character_flag = EoD_prophet_attacker }
+				attacker = { has_character_flag = EoD_prophet_attacker }
 			}
-			FROM = { narrative_event = { id = RIP.15116 } }
+			defender = { narrative_event = { id = RIP.15116 } }
 		}
 
-		# Attacker
-		ROOT = {
+		attacker = {
 			if = {
 				limit = {
 					OR = {
@@ -770,7 +760,7 @@ claim_on_liege = {
 			OR = {
 				has_landed_title = PREV
 				any_realm_lord = {
-					limit = { NOT = { character = ROOT } }
+					NOT = { character = ROOT }
 					has_landed_title = PREVPREV
 				}
 			}
@@ -801,7 +791,7 @@ claim_on_liege = {
 			OR = {
 				has_landed_title = PREV
 				any_realm_lord = {
-					limit = { NOT = { character = ROOT } }
+					NOT = { character = ROOT }
 					has_landed_title = PREVPREV
 				}
 			}
@@ -1400,6 +1390,9 @@ other_claim_on_liege = {
 		check_if_crusader_trigger = yes
 	}
 
+	# ROOT is claimant for contested title
+	# FROM is defender
+	# FROMFROM is attacker
 	can_use_title = {
 		# Defender
 		FROM = {
@@ -1409,27 +1402,33 @@ other_claim_on_liege = {
 		is_vice_royalty = no
 
 		OR = {
-			# Attacker
+			# Claimant
 			ROOT = { is_female = no }
 			NOT = { has_law = agnatic_succession }
 			AND = {
 				lower_tier_than = KING
 				is_primary_holder_title = no
 			}
-			# Claimant
-			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken } # Faction war. Ignore title requirements.
+
+			# Attacker
+			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken2 } # Faction war. Ignore title requirements.
 		}
 
 		OR = {
+			# Claimant
 			ROOT = { has_strong_claim = PREV }
-			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken } # Faction war. Ignore claim strength.
+
+			# Attacker
+			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken2 } # Faction war. Ignore claim strength.
 			AND = {
+				# Claimant
 				ROOT = { has_weak_claim = PREV }
 				OR = {
 					is_pretender = yes # Checks vs ROOT character
 					is_contested = yes # Is already being contested in some form of Claim or Succession War
 					holder_scope = { has_regent = yes }
 					AND = {
+						# Claimant
 						ROOT = {
 							OR = {
 								is_female = no
@@ -1477,11 +1476,9 @@ other_claim_on_liege = {
 			OR = {
 				has_landed_title = PREV
 				any_realm_lord = {
-					limit = {
-						NOR = {
-							character = ROOT
-							character = FROMFROM
-						}
+					NOR = {
+						character = ROOT
+						character = FROMFROM
 					}
 					has_landed_title = PREVPREV
 				}
@@ -2214,8 +2211,8 @@ change_seniority_succession_law = {
 			prisoner = FROM
 		}
 		any_attacker = {
+			limit = { liege = { character = FROM } }
 			hidden_tooltip = {
-				limit = { liege = { character = FROM } }
 				prisoner = FROM
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
@@ -2609,8 +2606,8 @@ change_feudal_elective_succession_law = {
 			prisoner = FROM
 		}
 		any_attacker = {
+			limit = { liege = { character = FROM } }
 			hidden_tooltip = {
-				limit = { liege = { character = FROM } }
 				prisoner = FROM
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
@@ -3068,38 +3065,18 @@ tribal_invasion = {
 	sort_priority = 2000
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
-			prestige = 500
+			prestige >= 500
 		}
 		check_if_crusader_trigger = yes
 	}
 
-	on_add = {
-		ROOT = { show_scope_change = no prestige = -500 }
-		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-		if = {
-			limit = {
-				attacker = {
-					any_owned_bloodline = {
-						has_bloodline_flag = bloodline_great_conquerors
-					}
-				}
-			}
-			attacker = {
-				set_character_flag = flag_declared_bloodline_invasion
-			}
-		}
-	}
-
 	can_use_title = {
+		# Attacker
 		ROOT = {
+			NOT = { same_realm = FROM }
+			is_nomadic = no
 			OR = {
 				ai = yes
 				multiplayer = no
@@ -3110,7 +3087,6 @@ tribal_invasion = {
 					}
 				}
 			}
-			is_nomadic = no
 			OR = {
 				AND = {
 					has_dlc = "Horse Lords"
@@ -3125,6 +3101,7 @@ tribal_invasion = {
 								culture_group = magyar
 								culture_group = mesoamerican
 							}
+							# Defender
 							FROM = {
 								NOT = { religion_group = pagan_group } # Should subjugate these instead
 							}
@@ -3175,9 +3152,7 @@ tribal_invasion = {
 				}
 				AND = {
 					mercenary = yes
-					NOT = {
-						num_of_titles = 2
-					}
+					num_of_titles < 2
 				}
 				AND = {
 					has_character_flag = is_child_of_destiny
@@ -3194,20 +3169,17 @@ tribal_invasion = {
 			}
 		}
 
-		ROOT = {
-			NOT = { same_realm = FROM }
-		}
-
 		OR = { # This ensures that the AI doesn't declare this type of war against someone who only holds a few counties within the targeted title...
+			# Attacker
 			ROOT = {
 				ai = no
-			}
-			ROOT = {
 				OR = {
 					has_landed_title = e_mongol_empire
 					has_landed_title = e_mexikha
 				}
 			}
+
+			# Defender
 			FROM = {
 				num_of_realm_counties = {
 					value = 3
@@ -3218,6 +3190,7 @@ tribal_invasion = {
 	}
 
 	is_valid_title = {
+		# Defender
 		FROM = {
 			any_realm_province = {
 				de_jure_liege_or_above = PREVPREV
@@ -3225,22 +3198,39 @@ tribal_invasion = {
 		}
 	}
 
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -500
+			if = {
+				limit = {
+					any_owned_bloodline = {
+						has_bloodline_flag = bloodline_great_conquerors
+					}
+				}
+				set_character_flag = flag_declared_bloodline_invasion
+			}
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
+		}
+	}
+
 	on_success = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = 200
 			participation_scaled_prestige = 200
-		}
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 200 }
-		}
-		FROM = {
-			show_scope_change = no
-			prestige = -200
-		}
-		hidden_tooltip = {
-			ROOT = {
+
+			hidden_tooltip = {
 				occupy_minors_of_occupied_settlements = FROM
 				gain_all_occupied_titles = { who = FROM type = invasion }
 
@@ -3259,54 +3249,54 @@ tribal_invasion = {
 				}
 			}
 		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = { participation_scaled_prestige = 200 }
+		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = -200
+		}
 	}
 
 	on_success_title = {
-
-		if = {
-			limit = {
-				ROOT = {
+		# Attacker
+		ROOT = {
+			if = {
+				limit = {
 					OR = {
-						character = 159136
-						character = 159137
+						character = 159136 # Árpád
+						character = 159137 # Álmos
 					}
-				}
-			}
-			ROOT = {
-				if = {
-					limit = {
-						has_dlc = "Holy Fury"
-						NOT = {
-							any_owned_bloodline = {
-								has_bloodline_flag = arpad_bloodline
-							}
+					has_dlc = "Holy Fury"
+					NOT = {
+						any_owned_bloodline = {
+							has_bloodline_flag = arpad_bloodline
 						}
 					}
-					create_bloodline = {
-						type = arpad
-					}
+				}
+				create_bloodline = {
+					type = arpad
 				}
 			}
-		}
 
-		custom_tooltip = {
-			text = tribal_invasion_succ_tip
-			hidden_tooltip = {
-				ROOT = {
+			custom_tooltip = {
+				text = tribal_invasion_succ_tip
+				hidden_tooltip = {
 					vassalize_or_take_under_title_destroy_duchies = {
 						title = PREV
 						enemy = FROM
 						is_crusade = yes # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
 						type = invasion
 					}
-				}
-				if = {
-					limit = {
-						e_mexikha = {
-							holder = ROOT
+					if = {
+						limit = {
+							e_mexikha = {
+								holder = ROOT
+							}
 						}
-					}
-					ROOT = {
 						any_realm_province = {
 							limit = {
 								OR = {
@@ -3333,6 +3323,13 @@ tribal_invasion = {
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -200
+		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			prestige = 100
@@ -3357,13 +3354,10 @@ tribal_invasion = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-		ROOT = {
-			show_scope_change = no
-			prestige = -200
-		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -3372,9 +3366,12 @@ tribal_invasion = {
 				value = 4.0
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			prestige = 200
+			participation_scaled_prestige = 200
 			hidden_tooltip = {
 				if = {
 					limit = {
@@ -3388,24 +3385,22 @@ tribal_invasion = {
 						10 = { give_nickname = nick_the_bold }
 					}
 				}
-			}
-
-			if = {
-				limit = {
-					has_dlc = "Legacy of Rome"
-					OR = {
-						has_landed_title = e_byzantium
-						has_landed_title = e_roman_empire
-					}
+				if = {
+					limit = {
+						has_dlc = "Legacy of Rome"
 						OR = {
-							religion_group = christian
-							religion = hellenic_pagan
-							religion = hellenic_pagan_reformed
+							has_landed_title = e_byzantium
+							has_landed_title = e_roman_empire
 						}
+							OR = {
+								religion_group = christian
+								religion = hellenic_pagan
+								religion = hellenic_pagan_reformed
+							}
+					}
+					character_event = { id = LoR.30 days = 12 } # Victory Triumph
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
-			participation_scaled_prestige = 200
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
@@ -3435,6 +3430,7 @@ tribal_invasion = {
 		modifier = {
 			factor = 0.9 # Prefer using CB's without on_add costs
 		}
+
 		modifier = { #Focus on Coronation first.
 			factor = 0.1
 			has_dlc = "Holy Fury"
@@ -3465,17 +3461,15 @@ tribal_invasion = {
 			}
 			OR = {
 				empire = {
-					NOT = {
-						OR = {
-							title = e_persia
-							title = e_byzantium
-							title = e_arabia
-						}
+					NOR = {
+						title = e_persia
+						title = e_byzantium
+						title = e_arabia
 					}
 				}
 				FROM = {
 					primary_title = { title = e_golden_horde }
-					NOT = { year = 1300 }
+					year < 1300
 				}
 			}
 		}
@@ -3494,7 +3488,7 @@ tribal_invasion = {
 				}
 				FROM = {
 					primary_title = { title = e_il-khanate }
-					NOT = { year = 1300 }
+					year < 1300
 				}
 			}
 		}
@@ -3521,7 +3515,7 @@ tribal_invasion = {
 			ROOT = {
 				has_character_flag = is_temujin
 				has_landed_title = e_mongol_empire
-				demesne_size = 1
+				demesne_size >= 1
 			}
 			FROM = {
 				has_landed_title = e_china_west_governor
@@ -3534,17 +3528,13 @@ tribal_invasion = {
 			}
 			ROOT = {
 				is_nomadic = no
-				NOT = {
-					is_tribal = yes
-				}
+				is_tribal = no
 			}
-			NOT = {
+			any_direct_de_jure_vassal_title = {
 				any_direct_de_jure_vassal_title = {
-					any_direct_de_jure_vassal_title = {
-						OR = {
-							holding_type = castle
-							holding_type = city
-						}
+					NOR = {
+						holding_type = castle
+						holding_type = city
 					}
 				}
 			}
@@ -3557,14 +3547,12 @@ tribal_invasion = {
 			ROOT = {
 				is_tribal = yes
 			}
-			NOT = {
+			any_direct_de_jure_vassal_title = {
 				any_direct_de_jure_vassal_title = {
-					any_direct_de_jure_vassal_title = {
-						OR = {
-							holding_type = castle
-							holding_type = city
-							holding_type = tribal
-						}
+					NOR = {
+						holding_type = castle
+						holding_type = city
+						holding_type = tribal
 					}
 				}
 			}
