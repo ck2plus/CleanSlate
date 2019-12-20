@@ -1000,17 +1000,17 @@ claim_on_liege_plot = {
 	}
 
 	can_use_title = {
-		OR = {
-			FROM = {
+		# Defender
+		FROM = {
+			OR = {
 				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
+				any_realm_lord = { has_landed_title = PREVPREV }
 			}
 		}
 	}
 
 	is_valid = {
+		# Defender
 		FROM = {
 			in_revolt = no
 			liege_before_war = {
@@ -1020,27 +1020,19 @@ claim_on_liege_plot = {
 				}
 			}
 		}
+
+		# Attacker
 		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
+			liege_before_war = { character = FROM }
 		}
 	}
 
 	is_valid_title = {
-		OR = {
-			FROM = {
+		# Defender
+		FROM = {
+			OR = {
 				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
+				any_realm_lord = { has_landed_title = PREVPREV }
 			}
 		}
 	}
@@ -1057,50 +1049,43 @@ claim_on_liege_plot = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 			}
 		}
+
+		# Attacker's allies
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
 			hidden_tooltip = {
+				participation_scaled_prestige = 100
 				disband_event_forces = faction_revolters
 			}
 		}
 
+		# Defender
 		FROM = {
-
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
 			if = {
-				limit = { NOT = { has_dlc = "Zeus" } }
+				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
-							tier = king
-							tier = emperor
+							tier = KING
+							tier = EMPEROR
 						}
-						#is_titular = no
 						NOT = { has_law = crown_authority_0 }
 					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
 			}
@@ -1108,7 +1093,10 @@ claim_on_liege_plot = {
 	}
 
 	on_success_title = {
-		usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
+		usurp_title_plus_barony_if_unlanded = {
+			target = ROOT
+			type = claim
+		}
 
 		if = {
 			limit = {
@@ -1117,34 +1105,35 @@ claim_on_liege_plot = {
 			}
 			hidden_tooltip = { conquest_culture = ROOT }
 		}
+
+		# Attacker
 		ROOT = {
 			plot_succeeds = yes
 		}
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			prestige = -100
 		}
+
+		# Defender
 		FROM = {
 			participation_scaled_prestige = 50
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
+				disband_event_forces = faction_loyalists
+				landless_pope_effect = yes
 			}
 		}
+
+		# Defending allies
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
-			}
-		}
-
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
-
-		hidden_tooltip = {
-			FROM = {
-				landless_pope_effect = yes
 			}
 		}
 	}
@@ -1156,16 +1145,18 @@ claim_on_liege_plot = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			prestige = -200
 			imprison = FROM
 		}
+
+		# Defender
 		FROM = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
-			}
-			hidden_tooltip = {
+				disband_event_forces = faction_loyalists
 				if = {
 					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
 					opinion = {
@@ -1175,6 +1166,8 @@ claim_on_liege_plot = {
 				}
 			}
 		}
+
+		# Defender's allies
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
@@ -1182,8 +1175,6 @@ claim_on_liege_plot = {
 				disband_event_forces = faction_revolters
 			}
 		}
-
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
 	on_attacker_leader_death = {
