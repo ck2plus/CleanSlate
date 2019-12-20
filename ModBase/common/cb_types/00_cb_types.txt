@@ -2285,24 +2285,18 @@ change_primogeniture_succession_law = {
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = { character = FROM }
+		}
+
+		# Defender
 		FROM = {
 			in_revolt = no
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
 					in_revolt = no
-				}
-			}
-		}
-		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
 				}
 			}
 		}
@@ -2313,8 +2307,7 @@ change_primogeniture_succession_law = {
 			has_law = succ_primogeniture
 		}
 		OR = {
-			tier = emperor
-			tier = king
+			higher_tier_than = DUKE
 			is_primary_holder_title = yes
 		}
 	}
@@ -2331,40 +2324,7 @@ change_primogeniture_succession_law = {
 	}
 
 	on_success = {
-		FROM = {
-			hidden_tooltip = { disband_event_forces = faction_loyalists }
-
-			if = {
-				limit = { NOT = { has_dlc = "Conclave" } }
-				any_demesne_title = { # All titles
-					limit = {
-						OR = {
-							tier = king
-							tier = emperor
-						}
-						#is_titular = no
-						NOT = { has_law = crown_authority_0 }
-					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
-					}
-				}
-			}
-		}
-
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -2379,6 +2339,29 @@ change_primogeniture_succession_law = {
 				disband_event_forces = faction_revolters
 			}
 		}
+
+		# Defender
+		FROM = {
+			hidden_tooltip = { disband_event_forces = faction_loyalists }
+
+			if = {
+				limit = { NOT = { has_dlc = "Conclave" } }
+				any_demesne_title = { # All titles
+					limit = {
+						higher_tier_than = DUKE
+						#is_titular = no
+						NOT = { has_law = crown_authority_0 }
+					}
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
+					}
+				}
+			}
+		}
 	}
 
 	on_success_title = {
@@ -2386,21 +2369,13 @@ change_primogeniture_succession_law = {
 	}
 
 	on_fail = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
-		FROM = {
-			show_scope_change = no
-			participation_scaled_prestige = 50
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
-		}
-
-		hidden_tooltip = {
-			any_attacker = {
+		any_attacker = {
+			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
 					name = faction_succ_primogeniture_ultimatum_timer
@@ -2410,21 +2385,53 @@ change_primogeniture_succession_law = {
 			}
 		}
 
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
+		# Defenders
+		FROM = {
+			show_scope_change = no
+			participation_scaled_prestige = 50
+			hidden_tooltip = { disband_event_forces = faction_loyalists }
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 50 }
+		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
 			prisoner = FROM
 		}
+		any_attacker = {
+			limit = { liege = { character = FROM } }
+			hidden_tooltip = {
+				prisoner = FROM
+				disband_event_forces = faction_revolters
+				add_character_modifier = {
+					name = faction_succ_primogeniture_ultimatum_timer
+					hidden = yes
+					duration = 3650
+				}
+			}
+		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
-				if = {
-					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
+				disband_event_forces = faction_loyalists
+				if = { # Allow free revocation of a title
+					limit = {
+						NOT = {
+							has_opinion_modifier = {
+								modifier = opinion_traitor
+								who = ROOT
+							}
+						}
+					}
 					opinion = {
 						who = ROOT
 						modifier = opinion_traitor
@@ -2436,21 +2443,6 @@ change_primogeniture_succession_law = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				prisoner = FROM
-				disband_event_forces = faction_revolters
-				add_character_modifier = {
-					name = faction_succ_primogeniture_ultimatum_timer
-					hidden = yes
-					duration = 3650
-				}
-			}
-		}
-
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
 	attacker_ai_victory_worth = {
@@ -2491,24 +2483,18 @@ change_feudal_elective_succession_law = {
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = { character = FROM }
+		}
+
+		# Defender
 		FROM = {
 			in_revolt = no
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
 					in_revolt = no
-				}
-			}
-		}
-		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
 				}
 			}
 		}
@@ -2520,47 +2506,14 @@ change_feudal_elective_succession_law = {
 			has_law = succ_hre_elective
 		}
 		OR = {
-			tier = emperor
-			tier = king
+			higher_tier_than = DUKE
 			is_primary_holder_title = yes
 		}
 
 	}
 
 	on_success = {
-		FROM = {
-
-			hidden_tooltip = { disband_event_forces = faction_loyalists }
-			if = {
-				limit = { NOT = { has_dlc = "Conclave" } }
-				any_demesne_title = { # All titles
-					limit = {
-						OR = {
-							tier = king
-							tier = emperor
-						}
-	#					is_titular = no
-						NOT = { has_law = crown_authority_0 }
-					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
-					}
-				}
-			}
-		}
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -2575,6 +2528,27 @@ change_feudal_elective_succession_law = {
 				disband_event_forces = faction_revolters
 			}
 		}
+
+		# Defender
+		FROM = {
+			hidden_tooltip = { disband_event_forces = faction_loyalists }
+			if = {
+				limit = { NOT = { has_dlc = "Conclave" } }
+				any_demesne_title = { # All titles
+					limit = {
+						higher_tier_than = DUKE
+						NOT = { has_law = crown_authority_0 }
+					}
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
+					}
+				}
+			}
+		}
 	}
 
 	on_success_title = {
@@ -2586,12 +2560,8 @@ change_feudal_elective_succession_law = {
 				}
 			}
 			add_law_w_cooldown = succ_feudal_elective
-			#succession_w_cooldown = {
-			#	base_type = feudal_elective
-			#	voting_rules = feudal_elective
-			# }
 		}
-		if = {
+		else_if = {
 			limit = {
 				OR = {
 					title = e_hre
@@ -2599,29 +2569,17 @@ change_feudal_elective_succession_law = {
 				}
 			}
 			add_law_w_cooldown = succ_hre_elective
-			#succession_w_cooldown = {
-			#	base_type = feudal_elective
-			#	voting_rules = hre_feudal_elective
-			# }
 		}
 	}
 
 	on_fail = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
-		FROM = {
-			show_scope_change = no
-			participation_scaled_prestige = 50
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
-		}
-
-		hidden_tooltip = {
-			any_attacker = {
+		any_attacker = {
+			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
 					name = faction_succ_feudal_elective_ultimatum_timer
@@ -2630,19 +2588,45 @@ change_feudal_elective_succession_law = {
 				}
 			}
 		}
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
+
+		# Defenders
+		FROM = {
+			show_scope_change = no
+			participation_scaled_prestige = 50
+			hidden_tooltip = { disband_event_forces = faction_loyalists }
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 50 }
+		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
 			prisoner = FROM
 		}
+		any_attacker = {
+			hidden_tooltip = {
+				limit = { liege = { character = FROM } }
+				prisoner = FROM
+				disband_event_forces = faction_revolters
+				add_character_modifier = {
+					name = faction_succ_feudal_elective_ultimatum_timer
+					hidden = yes
+					duration = 3650
+				}
+			}
+		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
+				disband_event_forces = faction_loyalists
 				if = {
 					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
 					opinion = {
@@ -2656,21 +2640,6 @@ change_feudal_elective_succession_law = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				prisoner = FROM
-				disband_event_forces = faction_revolters
-				add_character_modifier = {
-					name = faction_succ_feudal_elective_ultimatum_timer
-					hidden = yes
-					duration = 3650
-				}
-			}
-		}
-
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
 	attacker_ai_victory_worth = {
