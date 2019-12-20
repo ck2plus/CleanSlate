@@ -83,6 +83,7 @@ claim = {
 				}
 			}
 		}
+
 		# Defender
 		FROM = {
 			OR = {
@@ -93,13 +94,16 @@ claim = {
 	}
 
 	is_valid_title = {
+		# Attacker
+		ROOT = { has_claim = PREV }
+
+		# Defender
 		FROM = {
 			OR = {
 				has_landed_title = PREV
 				any_realm_lord = { has_landed_title = PREVPREV }
 			}
 		}
-		ROOT = { has_claim = PREV }
 	}
 
 	on_add = {
@@ -114,7 +118,26 @@ claim = {
 	}
 
 	on_success_title = {
+		usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
+
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+			participation_scaled_prestige = 100
+		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = { participation_scaled_prestige = 100 }
+		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = -100
+		}
+
 		hidden_tooltip = {
+			# Attacker
 			ROOT = {
 				clr_character_flag = claimant_adventurer
 				if = {
@@ -128,41 +151,26 @@ claim = {
 					}
 				}
 			}
-		}
 
-		usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
-
-		if = {
-			limit = {
-				higher_tier_than = BARON
-				NOT = { culture = ROOT }
-			}
-			hidden_tooltip = { conquest_culture = ROOT }
-		}
-
-		ROOT = {
-			show_scope_change = no
-			participation_scaled_prestige = 100
-		}
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
-		}
-
-		FROM = {
-			show_scope_change = no
-			prestige = -100
-		}
-
-		hidden_tooltip = {
-			check_war_effect = yes
+			# Defender
 			FROM = {
 				landless_pope_effect = yes
 			}
+
+			if = {
+				limit = {
+					higher_tier_than = BARON
+					NOT = { culture = ROOT }
+				}
+				conquest_culture = ROOT
+			}
+
+			check_war_effect = yes
 		}
 	}
 
 	on_fail_title = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
@@ -171,6 +179,8 @@ claim = {
 				clr_character_flag = claimant_adventurer
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -182,6 +192,7 @@ claim = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -150
@@ -194,6 +205,8 @@ claim = {
 				imprison = FROM
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 150
@@ -202,29 +215,32 @@ claim = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 150 }
 		}
+
+		# China stuff
 		hidden_effect = {
+			# Attacker
 			ROOT = {
 				if = {
 					limit = {
 						has_landed_title = e_china_west_governor
 					}
 					log = "China War Logging: China lost a claim war against [From.GetBestName]"
-				}
-				if = { #Makes China have a chance of leaving Expanionist policy...
-					limit = {
-						has_landed_title = e_china_west_governor
-						offmap_china = {
-							has_policy = china_expansionist
+
+					if = { #Makes China have a chance of leaving Expanionist policy...
+						limit = {
+							offmap_china = {
+								has_policy = china_expansionist
+							}
 						}
-					}
-					random = {
-						chance = 50
-						offmap_china = {
-							set_policy = china_open
-							log = "-------------------------------------"
-							log = "China Policy Logging:"
-							log = "Chinas new Policy is now OPEN"
-							log = "-------------------------------------"
+						random = {
+							chance = 50
+							offmap_china = {
+								set_policy = china_open
+								log = "-------------------------------------"
+								log = "China Policy Logging:"
+								log = "China's new Policy is now OPEN"
+								log = "-------------------------------------"
+							}
 						}
 					}
 				}
@@ -233,6 +249,7 @@ claim = {
 	}
 
 	on_reverse_demand_title = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			remove_claim = PREV
@@ -250,6 +267,8 @@ claim = {
 			}
 			FROM = { narrative_event = { id = RIP.15116 } }
 		}
+
+		# Attacker
 		ROOT = {
 			if = {
 				limit = {
@@ -303,6 +322,7 @@ other_claim = {
 	sort_priority = 900
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			mercenary = no
 		}
@@ -376,6 +396,7 @@ other_claim = {
 				}
 			}
 		}
+
 		# Defender
 		FROM = {
 			OR = {
@@ -383,6 +404,7 @@ other_claim = {
 				any_realm_lord = { has_landed_title = PREVPREV }
 			}
 		}
+
 		# War Check
 		NOT = {
 			any_war = { # when used in title scope, checks all wars for that title
@@ -391,6 +413,7 @@ other_claim = {
 				}
 			}
 		}
+
 		# Third-party Claim Check
 		OR = {
 			multiplayer = no
@@ -410,13 +433,16 @@ other_claim = {
 	}
 
 	is_valid_title = {
+		# Attacker
+		ROOT = { has_claim = PREV }
+
+		# Defender
 		FROM = {
 			OR = {
 				has_landed_title = PREV
 				any_realm_lord = { has_landed_title = PREVPREV }
 			}
 		}
-		ROOT = { has_claim = PREV }
 	}
 
 	on_add = {
@@ -431,6 +457,7 @@ other_claim = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -446,6 +473,8 @@ other_claim = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = -100
@@ -506,6 +535,7 @@ other_claim = {
 				ROOT = { set_defacto_liege = FROMFROM }
 			}
 		}
+
 		# Vassalize to third party
 		else_if = {
 			limit = {
@@ -523,6 +553,7 @@ other_claim = {
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
 			ROOT = { set_defacto_liege = FROMFROM }
 		}
+
 		# Retain vassalage to title's current liege
 		else_if = {
 			limit = {
@@ -539,6 +570,7 @@ other_claim = {
 				}
 			}
 		}
+
 		# Retain current vassalage if already a ruler
 		else_if = {
 			limit = {
@@ -549,6 +581,7 @@ other_claim = {
 			}
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
 		}
+
 		# FREEDOM!
 		else = {
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
@@ -606,15 +639,18 @@ other_claim = {
 	}
 
 	on_fail_title = {
-		# Attackers
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
+
+		# Third-party claimant
 		FROMFROM = {
 			show_scope_change = no
 			prestige = -100
 		}
+
 		# Defenders
 		FROM = {
 			show_scope_change = no
@@ -632,11 +668,15 @@ other_claim = {
 			to = FROM
 			value = 4.0
 		}
+
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -150
 			imprison = FROM
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 150
@@ -692,6 +732,7 @@ claim_on_liege = {
 
 	can_use_title = {
 		is_vice_royalty = no
+
 		# Attacker
 		ROOT = {
 			OR = {
@@ -723,6 +764,7 @@ claim_on_liege = {
 				}
 			}
 		}
+
 		# Defender
 		FROM = {
 			OR = {
@@ -736,6 +778,12 @@ claim_on_liege = {
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = { character = FROM }
+		}
+
+		# Defender
 		FROM = {
 			in_revolt = no
 			liege_before_war = {
@@ -745,12 +793,10 @@ claim_on_liege = {
 				}
 			}
 		}
-		ROOT = {
-			liege_before_war = { character = FROM }
-		}
 	}
 
 	is_valid_title = {
+		# Defender
 		FROM = {
 			OR = {
 				has_landed_title = PREV
@@ -779,6 +825,7 @@ claim_on_liege = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
@@ -793,6 +840,7 @@ claim_on_liege = {
 			}
 		}
 
+		# Defender
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 			if = {
@@ -800,30 +848,23 @@ claim_on_liege = {
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
-							tier = king
-							tier = emperor
+							tier = KING
+							tier = EMPEROR
 						}
 						NOT = { has_law = crown_authority_0 }
 					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					else_if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					else_if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					else_if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
 			}
 		}
+
+		# Attacker (ROOT) is freed from Defender (FROM)
 		if = {
 			limit = {
 				ROOT = {
@@ -866,13 +907,13 @@ claim_on_liege = {
 			}
 		}
 
-		# Give The Usurper nickname
 		hidden_tooltip = {
+			# Give The Usurper nickname
 			ROOT = {
 				if = {
 					limit = {
 						has_nickname = no
-						PREV = { higher_tier_than = count }
+						PREV = { higher_tier_than = COUNT }
 					}
 					random = {
 						chance = 50
@@ -880,9 +921,7 @@ claim_on_liege = {
 					}
 				}
 			}
-		}
 
-		hidden_tooltip = {
 			check_war_effect = yes
 			FROM = {
 				landless_pope_effect = yes
@@ -891,10 +930,19 @@ claim_on_liege = {
 	}
 
 	on_fail = {
+		# Attackers
 		ROOT = {
 			prestige = -100
 			hidden_tooltip = { disband_event_forces = faction_revolters }
 		}
+		hidden_tooltip = {
+			any_attacker = {
+				limit = { liege = { character = FROM } }
+				disband_event_forces = faction_revolters
+			}
+		}
+
+		# Defenders
 		FROM = {
 			participation_scaled_prestige = 50
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
@@ -903,23 +951,25 @@ claim_on_liege = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
 		}
-
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				disband_event_forces = faction_revolters
-			}
-		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
 			prestige = -150
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 			}
 		}
+		hidden_tooltip = {
+			any_attacker = {
+				limit = { liege = { character = FROM } }
+				disband_event_forces = faction_revolters
+				prisoner = FROM
+			}
+		}
 
+		# Defenders
 		FROM = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
@@ -938,13 +988,6 @@ claim_on_liege = {
 			hidden_tooltip = {
 				participation_scaled_prestige = 100
 				disband_event_forces = faction_loyalists
-			}
-		}
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				disband_event_forces = faction_revolters
-				prisoner = FROM
 			}
 		}
 	}
@@ -1010,6 +1053,11 @@ claim_on_liege_plot = {
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = { character = FROM }
+		}
+
 		# Defender
 		FROM = {
 			in_revolt = no
@@ -1019,11 +1067,6 @@ claim_on_liege_plot = {
 					in_revolt = no
 				}
 			}
-		}
-
-		# Attacker
-		ROOT = {
-			liege_before_war = { character = FROM }
 		}
 	}
 
@@ -1049,15 +1092,13 @@ claim_on_liege_plot = {
 	}
 
 	on_success = {
-		# Attacker
+		# Attackers
 		ROOT = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 			}
 		}
-
-		# Attacker's allies
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = {
@@ -1118,7 +1159,7 @@ claim_on_liege_plot = {
 			prestige = -100
 		}
 
-		# Defender
+		# Defenders
 		FROM = {
 			participation_scaled_prestige = 50
 			hidden_tooltip = {
@@ -1127,8 +1168,6 @@ claim_on_liege_plot = {
 				landless_pope_effect = yes
 			}
 		}
-
-		# Defending allies
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
@@ -1151,7 +1190,7 @@ claim_on_liege_plot = {
 			imprison = FROM
 		}
 
-		# Defender
+		# Defenders
 		FROM = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
@@ -1166,8 +1205,6 @@ claim_on_liege_plot = {
 				}
 			}
 		}
-
-		# Defender's allies
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
