@@ -847,10 +847,7 @@ claim_on_liege = {
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
-						OR = {
-							tier = KING
-							tier = EMPEROR
-						}
+						higher_tier_than = DUKE
 						NOT = { has_law = crown_authority_0 }
 					}
 					trigger_switch = {
@@ -1114,10 +1111,7 @@ claim_on_liege_plot = {
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
-						OR = {
-							tier = KING
-							tier = EMPEROR
-						}
+						higher_tier_than = DUKE
 						NOT = { has_law = crown_authority_0 }
 					}
 					trigger_switch = {
@@ -1557,10 +1551,7 @@ other_claim_on_liege = {
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
-						OR = {
-							tier = KING
-							tier = EMPEROR
-						}
+						higher_tier_than = DUKE
 						NOT = { has_law = crown_authority_0 }
 					}
 					trigger_switch = {
@@ -2057,14 +2048,13 @@ claim_all = {
 						religion = hellenic_pagan_reformed
 					}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 200 }
 		}
-
 	}
 
 	attacker_ai_victory_worth = {
@@ -2084,7 +2074,7 @@ claim_all = {
 	}
 }
 
-
+# 7
 change_seniority_succession_law = {
 	name = CB_NAME_SENIORITY_SUCCESSION_LAW
 	war_name = WAR_NAME_SENIORITY_SUCCESSION_LAW
@@ -2105,24 +2095,18 @@ change_seniority_succession_law = {
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = { character = FROM }
+		}
+
+		# Defender
 		FROM = {
 			in_revolt = no
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
 					in_revolt = no
-				}
-			}
-		}
-		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
 				}
 			}
 		}
@@ -2133,8 +2117,7 @@ change_seniority_succession_law = {
 			has_law = succ_seniority
 		}
 		OR = {
-			tier = emperor
-			tier = king
+			higher_tier_than = DUKE
 			is_primary_holder_title = yes
 		}
 	}
@@ -2151,40 +2134,9 @@ change_seniority_succession_law = {
 	}
 
 	on_success = {
-		FROM = {
-			hidden_tooltip = { disband_event_forces = faction_loyalists }
-
-			if = {
-				limit = { NOT = { has_dlc = "Conclave" } }
-				any_demesne_title = { # All titles
-					limit = {
-						OR = {
-							tier = king
-							tier = emperor
-						}
-						#is_titular = no
-						NOT = { has_law = crown_authority_0 }
-					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
-					}
-				}
-			}
-		}
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
@@ -2197,6 +2149,28 @@ change_seniority_succession_law = {
 				disband_event_forces = faction_revolters
 			}
 		}
+
+		# Defender
+		FROM = {
+			hidden_tooltip = { disband_event_forces = faction_loyalists }
+
+			if = {
+				limit = { NOT = { has_dlc = "Conclave" } }
+				any_demesne_title = { # All titles
+					limit = {
+						higher_tier_than = DUKE
+						NOT = { has_law = crown_authority_0 }
+					}
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
+					}
+				}
+			}
+		}
 	}
 
 	on_success_title = {
@@ -2204,21 +2178,13 @@ change_seniority_succession_law = {
 	}
 
 	on_fail = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
-		FROM = {
-			show_scope_change = no
-			participation_scaled_prestige = 50
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
-		}
-
-		hidden_tooltip = {
-			any_attacker = {
+		any_attacker = {
+			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
 					name = faction_succ_seniority_ultimatum_timer
@@ -2227,19 +2193,45 @@ change_seniority_succession_law = {
 				}
 			}
 		}
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
+
+		# Defenders
+		FROM = {
+			show_scope_change = no
+			participation_scaled_prestige = 50
+			hidden_tooltip = { disband_event_forces = faction_loyalists }
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 50 }
+		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
 			prisoner = FROM
 		}
+		any_attacker = {
+			hidden_tooltip = {
+				limit = { liege = { character = FROM } }
+				prisoner = FROM
+				disband_event_forces = faction_revolters
+				add_character_modifier = {
+					name = faction_succ_seniority_ultimatum_timer
+					hidden = yes
+					duration = 3650
+				}
+			}
+		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
+				disband_event_forces = faction_loyalists
 				if = {
 					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
 					opinion = {
@@ -2253,21 +2245,6 @@ change_seniority_succession_law = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				prisoner = FROM
-				disband_event_forces = faction_revolters
-				add_character_modifier = {
-					name = faction_succ_seniority_ultimatum_timer
-					hidden = yes
-					duration = 3650
-				}
-			}
-		}
-
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
 	attacker_ai_victory_worth = {
@@ -2287,7 +2264,7 @@ change_seniority_succession_law = {
 	}
 }
 
-
+# 8
 change_primogeniture_succession_law = {
 	name = CB_NAME_PRIMOGENITURE_SUCCESSION_LAW
 	war_name = WAR_NAME_PRIOGENITURE_SUCCESSION_LAW
@@ -2493,6 +2470,7 @@ change_primogeniture_succession_law = {
 	}
 }
 
+# 9
 change_feudal_elective_succession_law = {
 	name = CB_NAME_FEUDAL_ELECTIVE_SUCCESSION_LAW
 	war_name = WAR_NAME_FEUDAL_ELECTIVE_SUCCESSION_LAW
@@ -2712,7 +2690,7 @@ change_feudal_elective_succession_law = {
 	}
 }
 
-
+# 10
 invasion = {
 	name = CB_NAME_INVASION
 	war_name = WAR_NAME_INVASION
@@ -3059,7 +3037,7 @@ invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 		}
 		any_defender = {
@@ -3165,6 +3143,7 @@ invasion = {
 	}
 }
 
+# 11
 tribal_invasion = {
 	name = CB_NAME_INVASION
 	war_name = WAR_NAME_INVASION
@@ -3515,7 +3494,7 @@ tribal_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 200
 		}
@@ -3684,6 +3663,7 @@ tribal_invasion = {
 	}
 }
 
+# 12
 crusade = {
 	name = CB_NAME_CRUSADE
 	war_name = WAR_NAME_CRUSADE
@@ -4106,7 +4086,7 @@ crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 
 			hidden_tooltip = {
@@ -4178,7 +4158,7 @@ crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			hidden_tooltip = {
 				if = {
@@ -4265,7 +4245,7 @@ crusade = {
 	}
 }
 
-# Crusade using the new crusade system. See crusades.info in the religion folder for documentation
+# 13: Crusade using the new crusade system. See crusades.info in the religion folder for documentation
 new_crusade = {
 	name = CB_NAME_CRUSADE
 	war_name = WAR_NAME_CRUSADE
@@ -5626,7 +5606,7 @@ new_crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 
 			hidden_tooltip = {
@@ -5700,7 +5680,7 @@ new_crusade = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			hidden_tooltip = {
 				if = {
@@ -5834,7 +5814,7 @@ new_crusade = {
 	}
 }
 
-# Regular Holy War CB
+# 14: Regular Holy War CB
 religious = {
 	name = CB_NAME_RELIGIOUS
 	war_name = WAR_NAME_RELIGIOUS
@@ -6465,6 +6445,7 @@ religious = {
 	}
 }
 
+# 15
 excommunicated_ruler = {
 	name = CB_NAME_EXCOMMUNICATED_RULER
 	war_name = WAR_NAME_EXCOMMUNICATED_RULER
@@ -6682,6 +6663,7 @@ excommunicated_ruler = {
 	}
 }
 
+# 16
 bid_for_independence = {
 	name = CB_NAME_INDEPENDENCE
 	war_name = WAR_NAME_INDEPENDENCE
@@ -6957,6 +6939,7 @@ bid_for_independence = {
 	}
 }
 
+# 17
 depose_liege = {
 	name = CB_NAME_DEPOSE_LIEGE
 	war_name = WAR_NAME_DEPOSE_LIEGE
@@ -7142,6 +7125,7 @@ depose_liege = {
 	}
 }
 
+# 18
 overthrow_ruler = {
 	name = CB_NAME_OVERTHROWRULER
 	war_name = WAR_NAME_OVERTHROWRULER
@@ -7357,6 +7341,7 @@ overthrow_ruler = {
 	}
 }
 
+# 19
 overthrow_ruler_no_calls = {
 	name = CB_NAME_OVERTHROWRULER_NC
 	war_name = WAR_NAME_OVERTHROWRULER_NC
@@ -7514,6 +7499,7 @@ overthrow_ruler_no_calls = {
 	}
 }
 
+# 20
 change_gavelkind_succession_law = {
 	name = CB_NAME_GAVELKIND_SUCCESSION_LAW
 	war_name = WAR_NAME_GAVELKIND_SUCCESSION_LAW
@@ -7711,6 +7697,7 @@ change_gavelkind_succession_law = {
 	}
 }
 
+# 21
 lower_crown_authority_law = {
 	name = CB_NAME_LOWER_CROWN_AUTHORITY_LAW
 	war_name = WAR_NAME_LOWER_CROWN_AUTHORITY_LAW
@@ -7902,7 +7889,7 @@ lower_crown_authority_law = {
 	}
 }
 
-
+# 22
 lower_tribal_organization_law = {
 	name = CB_NAME_LOWER_TRIBAL_ORGANIZATION_LAW
 	war_name = WAR_NAME_LOWER_TRIBAL_ORGANIZATION_LAW
@@ -8095,6 +8082,7 @@ lower_tribal_organization_law = {
 	}
 }
 
+# 23
 coastal_republic = {
 	name = CB_NAME_COASTAL_REPUBLIC
 	war_name = WAR_NAME_COASTAL_REPUBLIC
@@ -8271,6 +8259,7 @@ coastal_republic = {
 	}
 }
 
+# 24
 coastal_county_republic = {
 	name = CB_NAME_COASTAL_COUNTY_REPUBLIC
 	war_name = WAR_NAME_COASTAL_COUNTY_REPUBLIC
@@ -8495,7 +8484,7 @@ coastal_county_republic = {
 	}
 }
 
-
+# 25
 weaken_vassal_plot = {
 	name = CB_NAME_WEAKEN_VASSAL
 	war_name = WAR_NAME_WEAKEN_VASSAL
@@ -8672,6 +8661,7 @@ weaken_vassal_plot = {
 	}
 }
 
+# 26
 decadence_invasion = {
 	name = CB_NAME_INVASION
 	war_name = WAR_NAME_DEC_INVASION
@@ -8894,6 +8884,7 @@ decadence_invasion = {
 	}
 }
 
+# 27
 muslim_invasion = {
 	name = CB_NAME_INVASION
 	war_name = WAR_NAME_INVASION
@@ -9114,7 +9105,7 @@ muslim_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			hidden_effect = {
 				if = {
@@ -9197,7 +9188,7 @@ muslim_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			hidden_effect = {
 				if = {
@@ -9301,6 +9292,7 @@ muslim_invasion = {
 	}
 }
 
+# 28
 cb_faction_independence = {
 	name = CB_NAME_INDEPENDENCE
 	war_name = WAR_NAME_FACTION_INDEPENDENCE
@@ -9560,6 +9552,7 @@ cb_faction_independence = {
 	}
 }
 
+# 29
 imperial_reconquest = {
 	name = CB_NAME_IMPERIAL
 	war_name = WAR_NAME_IMPERIAL
@@ -9764,7 +9757,7 @@ imperial_reconquest = {
 	}
 }
 
-# Embargo Merchant Republic CB
+# 30: Embargo Merchant Republic CB
 embargo_cb = {
 	name = CB_NAME_EMBARGO
 	war_name = WAR_NAME_EMBARGO
@@ -10001,6 +9994,7 @@ embargo_cb = {
 	}
 }
 
+# 31
 seize_trade_post = {
 	name = CB_NAME_SEIZE_TRADE_POST
 	war_name = WAR_NAME_SEIZE_TRADE_POST
@@ -10189,7 +10183,7 @@ seize_trade_post = {
 	}
 }
 
-# The Prepared Invasion CB of Norse Heathens
+# 32: The Prepared Invasion CB of Norse Heathens
 viking_invasion = {
 	name = CB_NAME_VIKING_INVASION
 	war_name = WAR_NAME_VIKING_INVASION
@@ -10370,7 +10364,7 @@ viking_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 250
 		}
@@ -10397,7 +10391,7 @@ viking_invasion = {
 	}
 }
 
-# Pagans can subjugate other pagans
+# 33: Pagans can subjugate other pagans
 pagan_subjugation = {
 	name = CB_NAME_PAGAN_SUBJUGATION
 	war_name = WAR_NAME_PAGAN_SUBJUGATION
@@ -10596,7 +10590,7 @@ pagan_subjugation = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 100
 		}
@@ -10644,7 +10638,7 @@ pagan_subjugation = {
 	}
 }
 
-# The CB used by "Peasant revolter" characters
+# 34: The CB used by "Peasant revolter" characters
 peasant_revolt = {
 	name = CB_NAME_PEASANT_CONQUEST
 	war_name = WAR_NAME_PEASANT_CONQUEST
@@ -10777,7 +10771,7 @@ peasant_revolt = {
 	}
 }
 
-# The CB used by "Heretic revolter" characters
+# 35: The CB used by "Heretic revolter" characters
 heretic_revolt = {
 	name = CB_NAME_HERETIC_UPRISING
 	war_name = WAR_NAME_HERETIC_UPRISING
@@ -10942,7 +10936,7 @@ heretic_revolt = {
 	}
 }
 
-# The CB used by "Religious revolter" characters
+# 36: The CB used by "Religious revolter" characters
 religious_revolt = {
 	name = CB_NAME_HERETIC_UPRISING
 	war_name = WAR_NAME_HERETIC_UPRISING
@@ -11107,7 +11101,7 @@ religious_revolt = {
 	}
 }
 
-# The CB used by "Nationalist Revolter" characters
+# 37: The CB used by "Nationalist Revolter" characters
 liberation_revolt = {
 	name = CB_NAME_LIBERATION_REVOLT
 	war_name = WAR_NAME_LIBERATION_REVOLT
@@ -11270,6 +11264,7 @@ liberation_revolt = {
 	}
 }
 
+# 38
 duchy_adventure = {
 	name = CB_NAME_DUCHY_ADVENTURE
 	war_name = WAR_DUCHY_ADVENTURE
@@ -11454,7 +11449,8 @@ duchy_adventure = {
 	}
 }
 
-kingdom_adventure = { # Used mainly for Muslims adventuring into India
+# 39: Used mainly for Muslims adventuring into India
+kingdom_adventure = {
 	name = CB_NAME_DUCHY_ADVENTURE
 	war_name = WAR_DUCHY_ADVENTURE
 	sprite = 9
@@ -11883,6 +11879,7 @@ kingdom_adventure = { # Used mainly for Muslims adventuring into India
 	}
 }
 
+# 40
 pagan_holy_war = {
 	name = CB_NAME_RELIGIOUS
 	war_name = WAR_NAME_RELIGIOUS
@@ -12236,7 +12233,7 @@ pagan_holy_war = {
 	}
 }
 
-# Caliphs can subjugate people of their own religion
+# 41: Caliphs can subjugate people of their own religion
 caliphal_subjugation = {
 	name = CB_NAME_PAGAN_SUBJUGATION
 	war_name = WAR_NAME_PAGAN_SUBJUGATION
@@ -12395,7 +12392,7 @@ caliphal_subjugation = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 100
 		}
@@ -12430,6 +12427,7 @@ caliphal_subjugation = {
 	}
 }
 
+# 42
 muslim_county_conquest = {
 	name = CB_NAME_COUNTY_CONQUEST
 	war_name = WAR_NAME_COUNTY_CONQUEST
@@ -12680,7 +12678,7 @@ muslim_county_conquest = {
 	}
 }
 
-# 42
+# 43
 pagan_county_conquest = {
 	name = CB_NAME_COUNTY_CONQUEST
 	war_name = WAR_NAME_COUNTY_CONQUEST
@@ -13087,7 +13085,7 @@ pagan_county_conquest = {
 	}
 }
 
-# 43
+# 44
 dejure_county_claim = {
 	name = CB_NAME_DEJURECLAIM
 	war_name = WAR_NAME_DEJURECLAIM
@@ -13459,7 +13457,7 @@ dejure_county_claim = {
 	}
 }
 
-# 44
+# 45
 dejure_barony_claim = {
 	name = CB_NAME_DEJUREBARONYCLAIM
 	war_name = WAR_NAME_DEJUREBARONYCLAIM
@@ -13730,7 +13728,7 @@ dejure_barony_claim = {
 	}
 }
 
-# 45 - OBSOLETE AND TURNED OFF
+# 46 - OBSOLETE AND TURNED OFF
 other_dejure_barony_claim = {
 	name = CB_NAME_DEJUREBARONYCLAIM
 	war_name = WAR_NAME_OTHER_DEJUREBARONYCLAIM
@@ -13775,7 +13773,7 @@ other_dejure_barony_claim = {
 	}
 }
 
-# 46
+# 47
 other_dejure_county_claim = {
 	name = CB_NAME_DEJURECLAIM
 	war_name = WAR_NAME_OTHER_DEJURECLAIM
@@ -14114,7 +14112,7 @@ other_dejure_county_claim = {
 	}
 }
 
-# The special CB for the Rise of the Shi'a Caliphate
+# 48: The special CB for the Rise of the Shi'a Caliphate
 shia_caliphate_rising = {
 	name = CB_NAME_SHIA_CALIPHATE_RISING
 	war_name = WAR_NAME_SHIA_CALIPHATE_RISING
@@ -14339,6 +14337,7 @@ shia_caliphate_rising = {
 	}
 }
 
+# 49
 depose_antipope = {
 	name = CB_NAME_DEPOSE_ANTIPOPE
 	war_name = WAR_NAME_DEPOSE_ANTIPOPE
@@ -14545,6 +14544,7 @@ depose_antipope = {
 	}
 }
 
+# 50
 # Faction cb to install antiking
 cb_install_antiking = {
 	name = CB_NAME_INSTALL_ANTIKING
@@ -14742,6 +14742,7 @@ cb_install_antiking = {
 	}
 }
 
+# 51
 buddhist_holy_war = {
 	name = CB_NAME_RELIGIOUS_MINOR
 	war_name = WAR_NAME_RELIGIOUS
@@ -15084,7 +15085,7 @@ buddhist_holy_war = {
 	}
 }
 
-# 51: The Indian religions can subjugate each other
+# 52: The Indian religions can subjugate each other
 indian_subjugation = {
 	name = CB_NAME_PAGAN_SUBJUGATION
 	war_name = WAR_NAME_PAGAN_SUBJUGATION
@@ -15410,7 +15411,7 @@ indian_subjugation = {
 	}
 }
 
-# 52: This can be used for various special cases; the great conquerors
+# 53: This can be used for various special cases; the great conquerors
 manifest_destiny_invasion = {
 	name = CB_NAME_INVASION
 	war_name = WAR_NAME_INVASION
@@ -15604,7 +15605,7 @@ manifest_destiny_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 100
 		}
@@ -15650,7 +15651,7 @@ manifest_destiny_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 200
 		}
@@ -15698,7 +15699,7 @@ manifest_destiny_invasion = {
 	}
 }
 
-# 53: Decadence Usurption
+# 54: Decadence Usurption
 cb_decadence_usurption = {
 	name = CB_NAME_DECADENCE_USURPTION
 	war_name = WAR_NAME_DECADENCE_USURPTION
@@ -15825,7 +15826,7 @@ cb_decadence_usurption = {
 	}
 }
 
-# 54
+# 55
 rivalry_cb = {
 	name = CB_NAME_RIVALRY
 	war_name = WAR_NAME_RIVALRY
@@ -15978,7 +15979,7 @@ rivalry_cb = {
 	}
 }
 
-# 55
+# 56
 tributary_cb = {
 	name = CB_NAME_TRIBUTARY
 	war_name = WAR_NAME_TRIBUTARY
@@ -16423,7 +16424,7 @@ tributary_cb = {
 	}
 }
 
-# 56
+# 57
 free_tributary_cb = {
 	name = CB_NAME_FREE_TRIBUTARY
 	war_name = WAR_NAME_FREE_TRIBUTARY
@@ -16813,7 +16814,7 @@ free_tributary_cb = {
 	}
 }
 
-# 57
+# 58
 cb_install_khan = {
 	name = CB_NAME_INSTALLKHAN
 	war_name = WAR_NAME_INSTALLKHAN
@@ -16953,7 +16954,7 @@ cb_install_khan = {
 	}
 }
 
-# 58
+# 59
 nomad_dispute = {
 	name = CB_NAME_DISPUTE
 	war_name = CB_NAME_DISPUTE
@@ -17115,7 +17116,7 @@ nomad_dispute = {
 
 }
 
-# 59: CB for non-nomads to seize a duchy off a nomad horde
+# 60: CB for non-nomads to seize a duchy off a nomad horde
 cb_liberate_nomad_duchy = {
 	name = CB_NAME_LIBERATE_NOMAD
 	war_name = WAR_NAME_LIBERATE_NOMAD
@@ -17381,7 +17382,7 @@ cb_liberate_nomad_duchy = {
 	}
 }
 
-# 60: The CB used by "Minor Clan" revolters in Horse Lords
+# 61: The CB used by "Minor Clan" revolters in Horse Lords
 cb_minor_clan_revolt = {
 	name = CB_NAME_MINOR_CLAN_REVOLT
 	war_name = WAR_NAME_MINOR_CLAN_REVOLT
@@ -17531,7 +17532,7 @@ cb_minor_clan_revolt = {
 	}
 }
 
-# 61: Nomads can subjugate non-Nomads
+# 62: Nomads can subjugate non-Nomads
 nomad_subjugation = {
 	name = CB_NAME_PAGAN_SUBJUGATION
 	war_name = WAR_NAME_PAGAN_SUBJUGATION
@@ -17850,7 +17851,7 @@ nomad_subjugation = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 100
 		}
@@ -17892,7 +17893,7 @@ nomad_subjugation = {
 	}
 }
 
-# 62:
+# 63:
 nomad_invasion = {
 	name = CB_NAME_INVASION
 	war_name = WAR_NAME_INVASION
@@ -18135,7 +18136,7 @@ nomad_invasion = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } # Victory Triumph }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
 			participation_scaled_prestige = 200
 		}
@@ -18275,7 +18276,7 @@ nomad_invasion = {
 	}
 }
 
-# 63: Nomads can grab entire duchies, if they have the Prestige
+# 64: Nomads can grab entire duchies, if they have the Prestige
 nomad_expansion = {
 	name = CB_NAME_NOMAD_EXPANSION
 	war_name = WAR_NAME_NOMAD_EXPANSION
@@ -18596,8 +18597,8 @@ nomad_expansion = {
 	}
 }
 
-#64
-increase_council_power_war = { # Started from faction
+# 65: Started from faction
+increase_council_power_war = {
 	name = CB_NAME_INCREASE_COUNCIL_POWER
 	war_name = WAR_NAME_INCREASE_COUNCIL_POWER
 	sprite = 6
@@ -18773,7 +18774,7 @@ increase_council_power_war = { # Started from faction
 	}
 }
 
-# 55
+# 66
 nomad_humiliate_cb = {
 	name = CB_NAME_HUMILIATE
 	war_name = WAR_NAME_HUMILIATE
@@ -19081,7 +19082,7 @@ nomad_humiliate_cb = {
 	}
 }
 
-#64
+# 67
 powerful_vassal_takeover_war = { # Started from faction
 	name = CB_NAME_POWERFUL_VASSAL_TAKEOVER
 	war_name = WAR_NAME_POWERFUL_VASSAL_TAKEOVER
@@ -19353,7 +19354,7 @@ powerful_vassal_takeover_war = { # Started from faction
 }
 
 ### Reconquista Wars ###
-# Leon & Asturia #
+# 68: Leon & Asturia #
 reconquista_leon = {
 	name = CB_NAME_RECONQUISTA_LEON
 	war_name = WAR_NAME_RECONQUISTA_LEON
@@ -19573,7 +19574,7 @@ reconquista_leon = {
 	}
 }
 
-# Castille & Toledo #
+# 69: Castille & Toledo #
 reconquista_castille = {
 	name = CB_NAME_RECONQUISTA_CASTILLE
 	war_name = WAR_NAME_RECONQUISTA_CASTILLE
@@ -19780,7 +19781,7 @@ reconquista_castille = {
 	}
 }
 
-# Aragon & Barcelona #
+# 70: Aragon & Barcelona #
 reconquista_aragon = {
 	name = CB_NAME_RECONQUISTA_ARAGON
 	war_name = WAR_NAME_RECONQUISTA_ARAGON
@@ -19987,7 +19988,7 @@ reconquista_aragon = {
 	}
 }
 
-# Galicia & Porto #
+# 71: Galicia & Porto #
 reconquista_galicia = {
 	name = CB_NAME_RECONQUISTA_GALICIA
 	war_name = WAR_NAME_RECONQUISTA_GALICIA
@@ -20201,7 +20202,7 @@ reconquista_galicia = {
 	}
 }
 
-# Beja & Algarve #
+# 72: Beja & Algarve #
 reconquista_beja = {
 	name = CB_NAME_RECONQUISTA_BEJA
 	war_name = WAR_NAME_RECONQUISTA_BEJA
@@ -20410,7 +20411,7 @@ reconquista_beja = {
 	}
 }
 
-# Granada & Sevilla #
+# 73: Granada & Sevilla #
 reconquista_granada = {
 	name = CB_NAME_RECONQUISTA_GRANADA
 	war_name = WAR_NAME_RECONQUISTA_GRANADA
@@ -20615,7 +20616,7 @@ reconquista_granada = {
 	}
 }
 
-# Cordoba & Badajoz #
+# 74: Cordoba & Badajoz #
 reconquista_cordoba = {
 	name = CB_NAME_RECONQUISTA_CORDOBA
 	war_name = WAR_NAME_RECONQUISTA_CORDOBA
@@ -20820,7 +20821,7 @@ reconquista_cordoba = {
 	}
 }
 
-# Valencia & Murcia #
+# 75: Valencia & Murcia #
 reconquista_valencia = {
 	name = CB_NAME_RECONQUISTA_VALENCIA
 	war_name = WAR_NAME_RECONQUISTA_VALENCIA
@@ -21025,7 +21026,7 @@ reconquista_valencia = {
 	}
 }
 
-# Navarra #
+# 76: Navarra #
 reconquista_navarra = {
 	name = CB_NAME_RECONQUISTA_NAVARRA
 	war_name = WAR_NAME_RECONQUISTA_NAVARRA
@@ -21229,7 +21230,7 @@ reconquista_navarra = {
 	}
 }
 
-# Balearic Islands #
+# 77: Balearic Islands #
 reconquista_balearic = {
 	name = CB_NAME_RECONQUISTA_BALEARIC
 	war_name = WAR_NAME_RECONQUISTA_BALEARIC
@@ -21426,6 +21427,7 @@ reconquista_balearic = {
 }
 
 ### Otto Specific CBs
+# 78
 thankmars_rebellion = {
 	name = CB_NAME_THANKMARS_REBELLION
 	war_name = WAR_NAME_THANKMARS_REBELLION
