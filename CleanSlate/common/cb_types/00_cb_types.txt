@@ -2412,7 +2412,6 @@ change_primogeniture_succession_law = {
 				any_demesne_title = { # All titles
 					limit = {
 						higher_tier_than = DUKE
-						#is_titular = no
 						NOT = { has_law = crown_authority_0 }
 					}
 					trigger_switch = {
@@ -3153,66 +3152,67 @@ tribal_invasion = {
 					}
 				}
 			}
+
 			OR = {
 				AND = {
-					has_dlc = "Horse Lords"
 					higher_tier_than = COUNT
-					OR = {
-						has_character_flag = horde_invader
-						AND = {
-							independent = yes
-							religion_group = pagan_group
-							OR = {
-								culture_group = altaic
-								culture_group = magyar
-								culture_group = mesoamerican
+
+					trigger_if = {
+						limit = { has_dlc = "Horse Lords" }
+						OR = {
+							has_character_flag = horde_invader
+							AND = {
+								independent = yes
+								religion_group = pagan_group
+								OR = {
+									culture_group = altaic
+									culture_group = magyar
+									culture_group = mesoamerican
+								}
+								FROM = { # Defender
+									NOT = { religion_group = pagan_group } # Should subjugate these instead
+								}
+								OR = {
+									is_tribal = yes
+									primary_title = {
+										has_law = succ_elective_gavelkind
+									}
+									has_landed_title = e_mongol_empire
+									has_landed_title = e_mexikha
+								}
 							}
-							# Defender
-							FROM = {
+						}
+					}
+					trigger_else = {
+						independent = yes
+						OR = {
+							religion_group = pagan_group
+							AND = {
+								OR = {
+									has_horde_culture = yes
+									has_character_flag = horde_invader
+								}
+								NOT = { religion_group = christian }
+							}
+						}
+						OR = {
+							culture_group = altaic
+							culture_group = magyar
+							culture_group = mesoamerican
+						}
+						OR = {
+							has_horde_culture = yes
+							has_character_flag = horde_invader
+							FROM = { # Defender
 								NOT = { religion_group = pagan_group } # Should subjugate these instead
 							}
-							OR = {
-								is_tribal = yes
-								primary_title = {
-									has_law = succ_elective_gavelkind
-								}
-								has_landed_title = e_mongol_empire
-								has_landed_title = e_mexikha
+						}
+						OR = {
+							has_character_flag = horde_invader
+							is_tribal = yes
+							primary_title = {
+								has_law = succ_elective_gavelkind
 							}
-						}
-					}
-				}
-				AND = {
-					NOT = { has_dlc = "Horse Lords" }
-					independent = yes
-					higher_tier_than = COUNT
-					OR = {
-						religion_group = pagan_group
-						AND = {
-							OR = {
-								has_horde_culture = yes
-								has_character_flag = horde_invader
-							}
-							NOT = { religion_group = christian }
-						}
-					}
-					OR = {
-						culture_group = altaic
-						culture_group = magyar
-						culture_group = mesoamerican
-					}
-					OR = {
-						has_horde_culture = yes
-						has_character_flag = horde_invader
-						FROM = {
-							NOT = { religion_group = pagan_group } # Should subjugate these instead
-						}
-					}
-					OR = {
-						has_character_flag = horde_invader
-						is_tribal = yes
-						primary_title = {
-							has_law = succ_elective_gavelkind
 						}
 					}
 				}
@@ -6767,10 +6767,7 @@ bid_for_independence = {
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
-						OR = {
-							tier = KING
-							tier = EMPEROR
-						}
+						higher_tier_than = DUKE
 						NOT = { has_law = crown_authority_0 }
 					}
 					trigger_switch = {
@@ -6871,10 +6868,13 @@ depose_liege = {
 
 	can_use = {
 		always = no # v2.21 - Disabled - not working well
+
+		# Attacker
 		ROOT = {
 			de_facto_liege = FROM
 		}
 
+		# Defender
 		FROM = {
 			is_feudal = yes
 			primary_title = {
@@ -6905,18 +6905,12 @@ depose_liege = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
+			liege_before_war = { character = FROM }
 		}
+
+		# Defender
 		FROM = {
 			any_demesne_title = {
 				NOT = { lower_tier_than = ROOT }
@@ -6944,46 +6938,39 @@ depose_liege = {
 	}
 
 	on_success = {
-		FROM = {
-			prestige = -500
-			if = {
-				limit = { NOT = { has_dlc = "Conclave" } }
-				any_demesne_title = { # All titles
-					limit = {
-						OR = {
-							tier = king
-							tier = emperor
-						}
-						#is_titular = no
-						NOT = { has_law = crown_authority_0 }
-					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
-					}
-				}
-			}
-
-			abdicate_to_most_liked_by = ROOT
-		}
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 250
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 250 }
+		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = -500
+
+			if = { # lower crown authority
+				limit = { NOT = { has_dlc = "Conclave" } }
+				any_demesne_title = { # All titles
+					limit = {
+						higher_tier_than = DUKE
+						NOT = { has_law = crown_authority_0 }
+					}
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
+					}
+				}
+			}
+
+			abdicate_to_most_liked_by = ROOT
 		}
 
 		hidden_tooltip = {
@@ -6995,17 +6982,28 @@ depose_liege = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			prisoner = FROM
 		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 50 }
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 			hidden_tooltip = {
 				if = {
@@ -7016,10 +7014,6 @@ depose_liege = {
 					}
 				}
 			}
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
 		}
 	}
 
@@ -7058,29 +7052,26 @@ overthrow_ruler = {
 	}
 
 	can_use = {
+		# Attacker
+		ROOT = {
+			de_facto_liege = FROM
+		}
+
+		# Defender
 		FROM = {
 			primary_title = {
 				is_vice_royalty = no
 			}
 		}
-		ROOT = {
-			de_facto_liege = FROM
-		}
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
+			liege_before_war = { character = FROM }
 		}
+
+		# Defender
 		FROM = {
 			any_demesne_title = {
 				NOT = { lower_tier_than = ROOT }
@@ -7101,65 +7092,50 @@ overthrow_ruler = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			primary_title = {
+				show_scope_change = no
 				add_pressed_claim = FROM
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -500
 			remove_opinion = {
 				who = ROOT
 				modifier = declared_war
 			}
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
-						OR = {
-							tier = king
-							tier = emperor
-						}
-						#is_titular = no
+						higher_tier_than = DUKE
 						NOT = { has_law = crown_authority_0 }
 					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_2
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
 			}
-			if = {
+			if = { # lower title revocation
 				limit = { has_dlc = "Conclave" }
 				any_demesne_title = { # All titles
 					limit = {
+						higher_tier_than = COUNT
 						OR = {
-							tier = duke
-							tier = king
-							tier = emperor
+							has_law = revoke_title_law_1
+							has_law = revoke_title_law_2
 						}
-						NOT = { has_law = revoke_title_law_0 }
 					}
-					if = {
-						limit = { has_law = revoke_title_law_1 }
-						add_law = revoke_title_law_0
-					}
-					if = {
-						limit = { has_law = revoke_title_law_2 }
-						add_law = revoke_title_law_0
-					}
+					add_law = revoke_title_law_0
 				}
 			}
 			abdicate = yes
