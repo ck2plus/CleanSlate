@@ -22,33 +22,37 @@ claim = {
 	can_use_title = {
 		# Attacker
 		ROOT = {
-			OR = {
-				AND = {
-					is_female = yes
-					NOR = {
-						religion_group = muslim
-						has_religion_feature = religion_patriarchal
-					}
-				}
-				AND = {
-					is_female = no
-					NOT = { has_religion_feature = religion_matriarchal }
+			# gender requirements
+			trigger_if = {
+				limit = { is_female = yes }
+				NOR = {
+					religion_group = muslim
+					has_religion_feature = religion_patriarchal
 				}
 			}
-			OR = {
-				has_strong_claim = PREV
-				has_character_flag = claimant_adventurer
-				AND = {
-					has_weak_claim = PREV
-					OR = {
-						PREV = {
-							OR = {
-								is_pretender = yes
+			trigger_else = {
+				NOT = { has_religion_feature = religion_matriarchal }
+			}
+
+			trigger_if = {
+				limit = {
+					NOR = {
+						has_strong_claim = PREV
+						has_character_flag = claimant_adventurer
+					}
+				}
+				has_weak_claim = PREV
+
+				PREV = { # claimed title
+					trigger_if = {
+						limit = {
+							NOR = {
+								is_pretender = yes # Checks vs ROOT character
+								is_contested = yes # Already being contested in some war
 								holder_scope = { has_regent = yes }
-								is_contested = yes
 							}
 						}
-						AND = {
+						ROOT = { # attacking claimant
 							OR = {
 								is_female = no
 								has_law = status_of_women_4
@@ -56,24 +60,26 @@ claim = {
 								has_religion_feature = religion_equal
 								has_religion_feature = religion_feature_bon
 							}
-							PREV = {
-								holder_scope = {
-									is_female = yes
-									NOR = {
-										has_religion_feature = religion_matriarchal
-										has_religion_feature = religion_equal
-										has_religion_feature = religion_feature_bon
-										has_law = status_of_women_4
-										has_game_rule = { name = gender value = all }
-									}
+						}
+						holder_scope = { # title holder
+							is_female = yes
+							NOR = {
+								has_religion_feature = religion_matriarchal
+								has_religion_feature = religion_equal
+								has_religion_feature = religion_feature_bon
+								has_law = status_of_women_4
+								has_game_rule = {
+									name = gender
+									value = all
 								}
 							}
 						}
 					}
 				}
 			}
+
 			OR = {
-				is_ruler = no
+				is_ruler = no # unlanded adventurers, holy orders, mercenaries, religious heads, etc.
 				primary_title = {
 					OR = {
 						is_primary_type_title = no # Static Mercs, the Pope, Holy Orders, etc
@@ -156,7 +162,7 @@ claim = {
 			if = {
 				limit = {
 					higher_tier_than = BARON
-					NOT = { culture = attacker }
+					NOT = { culture = ROOT }
 				}
 				conquest_culture = attacker
 			}
@@ -311,70 +317,94 @@ other_claim = {
 
 	sort_priority = 900
 
+	# Starting scope is attacker
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	can_use = {
-		# Attacker
+		# Third-party claimant
 		ROOT = {
 			mercenary = no
 		}
 	}
 
+	# Starting scope is attacker
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	can_use_gui = {
 		check_if_crusader_trigger = yes
 	}
 
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	can_use_title = {
-		# Attacker
+		# Claimant
 		ROOT = {
-			OR = {
-				AND = {
-					is_female = yes
-					NOR = {
-						religion_group = muslim
-						has_religion_feature = religion_patriarchal
-						PREV = { succ_law_title = { has_law = agnatic_succession } }
-					}
-				}
-				AND = {
-					is_female = no
-					NOR = {
-						has_religion_feature = religion_matriarchal
-						PREV = { succ_law_title = { has_law = enatic_succession } }
+			# gender requirements
+			trigger_if = {
+				limit = { is_female = yes }
+				NOR = {
+					religion_group = muslim
+					has_religion_feature = religion_patriarchal
+					PREV = { # claimed title
+						succ_law_title = {
+							has_law = agnatic_succession
+						}
 					}
 				}
 			}
-			OR = {
-				has_strong_claim = PREV
-				AND = {
-					has_weak_claim = PREV
-					OR = {
-						PREV = {
-							OR = {
+			trigger_else = {
+				NOR = {
+					has_religion_feature = religion_matriarchal
+					PREV = { # claimed title
+						succ_law_title = {
+							has_law = enatic_succession
+						}
+					}
+				}
+			}
+
+			# claimant requirements
+			trigger_if = {
+				limit = {
+					NOT = {
+						has_strong_claim = PREV
+					}
+				}
+				has_weak_claim = PREV
+
+				PREV = { # claimed title
+					trigger_if = {
+						limit = {
+							NOR = {
 								is_pretender = yes # Checks vs ROOT character
+								is_contested = yes # Already being contested in some war
 								holder_scope = { has_regent = yes }
-								is_contested = yes # Is already being contested in some form of Claim or Succession War
 							}
 						}
-						AND = {
+						ROOT = { # claimant
 							OR = {
 								is_female = no
 								has_law = status_of_women_4
 							}
-							PREV = {
-								holder_scope = {
-									is_female = yes
-									NOR = {
-										has_law = status_of_women_4
-										has_game_rule = {
-											name = gender
-											value = all
-										}
-									}
+						}
+						holder_scope = { # title holder
+							is_female = yes
+							NOR = {
+								has_law = status_of_women_4
+								has_game_rule = {
+									name = gender
+									value = all
 								}
 							}
 						}
 					}
 				}
 			}
+
 			OR = {
 				is_ruler = no
 				primary_title = {
@@ -422,8 +452,12 @@ other_claim = {
 		}
 	}
 
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	is_valid_title = {
-		# Attacker
+		# Third-party claimant
 		ROOT = { has_claim = PREV }
 
 		# Defender
@@ -446,8 +480,12 @@ other_claim = {
 		}
 	}
 
+	# Starting scope is attacker
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	on_success = {
-		# Attackers
+		# Third-party claimant
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -459,6 +497,7 @@ other_claim = {
 				}
 			}
 		}
+
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
@@ -471,6 +510,10 @@ other_claim = {
 		}
 	}
 
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	on_success_title = {
 		hidden_tooltip = {
 			# Granting a Nickname
@@ -526,21 +569,26 @@ other_claim = {
 			}
 		}
 
-		# Vassalize to third party
+		# Vassalize to attacker
 		else_if = {
 			limit = {
+				# Third-party claimant
 				ROOT = {
 					OR = {
-						AND = {
+						AND = { # Already vassal of attacker
 							is_ruler = yes
 							is_liege_or_above = FROMFROM
 						}
-						PREV = { holder_scope = { de_jure_liege_or_above = FROMFROM } }
-						dynasty = FROMFROM
+						PREV = { # or claimed title is de jure part of attacker's realm
+							holder_scope = { de_jure_liege_or_above = FROMFROM }
+						}
+						dynasty = FROMFROM # or of attacker's dynasty
 					}
 				}
 			}
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
+
+			# Third-party claimant
 			ROOT = { set_defacto_liege = FROMFROM }
 		}
 
@@ -552,6 +600,8 @@ other_claim = {
 				}
 			}
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
+
+			# Attacker
 			FROMFROM = {
 				top_liege = {
 					ROOT = {
@@ -564,7 +614,7 @@ other_claim = {
 		# Retain current vassalage if already a ruler
 		else_if = {
 			limit = {
-				ROOT = {
+				ROOT = { # Third-party claimant
 					is_ruler = yes
 					NOT = { is_liege_or_above = FROMFROM }
 				}
@@ -580,6 +630,7 @@ other_claim = {
 
 		# Keep the family together
 		hidden_tooltip = {
+			# Third-party claimant
 			ROOT = {
 				any_child = {
 					limit = {
@@ -628,14 +679,18 @@ other_claim = {
 		}
 	}
 
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	on_fail_title = {
-		# Attacker
+		# Third-party claimant
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
 
-		# Third-party claimant
+		# Attacker
 		FROMFROM = {
 			show_scope_change = no
 			prestige = -100
@@ -652,14 +707,19 @@ other_claim = {
 		}
 	}
 
+	# Starting scope is attacker
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	on_reverse_demand = {
+		# Attacker
 		prestige = -150
 		transfer_scaled_wealth = {
 			to = FROM
 			value = 4.0
 		}
 
-		# Attacker
+		# Third-party claimant
 		ROOT = {
 			show_scope_change = no
 			prestige = -150
@@ -677,8 +737,16 @@ other_claim = {
 		}
 	}
 
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFORM is attacker
 	on_reverse_demand_title = {
-		ROOT = { show_scope_change = no remove_claim = PREV }
+		# Third-party claimant
+		ROOT = {
+			show_scope_change = no
+			remove_claim = PREV
+		}
 	}
 
 	attacker_ai_victory_worth = {
@@ -1390,7 +1458,8 @@ other_claim_on_liege = {
 		check_if_crusader_trigger = yes
 	}
 
-	# ROOT is claimant for contested title
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
 	# FROM is defender
 	# FROMFROM is attacker
 	can_use_title = {
@@ -1402,7 +1471,7 @@ other_claim_on_liege = {
 		is_vice_royalty = no
 
 		OR = {
-			# Claimant
+			# Third-party claimant
 			ROOT = { is_female = no }
 			NOT = { has_law = agnatic_succession }
 			AND = {
@@ -1415,13 +1484,13 @@ other_claim_on_liege = {
 		}
 
 		OR = {
-			# Claimant
+			# Third-party claimant
 			ROOT = { has_strong_claim = PREV }
 
 			# Attacker
 			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken2 } # Faction war. Ignore claim strength.
 			AND = {
-				# Claimant
+				# Third-party claimant
 				ROOT = { has_weak_claim = PREV }
 				OR = {
 					is_pretender = yes # Checks vs ROOT character
@@ -1452,8 +1521,9 @@ other_claim_on_liege = {
 	}
 
 	# Starting scope is attacker
-	# FROMFROM is contested title
-	# ROOT is claimant for contested title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFROM attacker
 	is_valid = {
 		# Attacker
 		liege_before_war = { character = FROM }
@@ -1470,6 +1540,10 @@ other_claim_on_liege = {
 		}
 	}
 
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFROM is attacker
 	is_valid_title = {
 		# Defender
 		FROM = {
@@ -1500,6 +1574,10 @@ other_claim_on_liege = {
 		}
 	}
 
+	# Starting scope is attacker
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFROM is attacker
 	on_add = {
 		fire_haruspicy_event_effect = yes
 		if = {
@@ -1512,8 +1590,9 @@ other_claim_on_liege = {
 	}
 
 	# Starting scope is attacker
-	# FROMFROM is targeted title
-	# ROOT is claimant
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFROM is attacker
 	on_success = {
 		# Attacker
 		participation_scaled_prestige = 100
@@ -1573,6 +1652,10 @@ other_claim_on_liege = {
 		}
 	}
 
+	# Starting scope is claimed title
+	# ROOT is third-party claimant
+	# FROM is defender
+	# FROMFROM is attacker
 	on_success_title = {
 		if = {
 			limit = {
@@ -1584,7 +1667,7 @@ other_claim_on_liege = {
 		}
 
 		hidden_tooltip = {
-			# Claimant
+			# Third-party claimant may get a nickname
 			ROOT = {
 				if = {
 					limit = {
@@ -1646,78 +1729,68 @@ other_claim_on_liege = {
 		}
 	}
 
-	# Starting scope is attacker
-	# FROMFROM is targeted title
+	# Starting scope is claimed title
 	# ROOT is claimant
+	# FROM is defender
+	# FROMFROM is attacker
 	on_success_posttitle = {
 		hidden_tooltip = {
-			if = {
-				limit = {
-					top_liege = {
-						ROOT = {
-							NOT = {
+			ROOT = {
+				if = {
+					limit = {
+						top_liege = {
+							ROOT = {
 								top_liege = {
-									character = PREVPREV
+									NOT = {
+										character = PREVPREV
+									}
 								}
 							}
 						}
 					}
-				}
 
-				ROOT = {
 					set_defacto_liege = PREV
 				}
-			}
 
-			if = {
-				limit = {
-					top_liege = {
-						ROOT = {
-							NOT = {
+				if = {
+					limit = {
+						top_liege = {
+							ROOT = {
 								top_liege = {
-									character = PREVPREV
+									NOT = {
+										character = PREVPREV
+									}
 								}
 							}
 						}
 					}
-				}
 
-				ROOT = {
 					set_defacto_liege = ROOT
 				}
 			}
 
-			if = {
-				limit = {
-					FROM = {
+			# Defender
+			FROM = {
+				if = {
+					limit = {
 						has_character_flag = temp_other_claim_on_liege_prison
 						lower_tier_than = PREV
 					}
-				}
-				FROM = {
 					imprison = ROOT
+					clr_character_flag = temp_other_claim_on_liege_prison
 				}
 			}
-			FROM = { clr_character_flag = temp_other_claim_on_liege_prison }
 		}
 	}
 
+	# Starting scope is attacker
+	# ROOT is claimant
+	# FROM is defender
+	# FROMFROM is attacker
 	on_fail = {
-		# Claimant
+		# Third-party claimant
 		prestige = -100
 		imprison = FROM
-
-		#if = { #Issue CKTWO-233
-		#	limit = {
-		#		OR = {
-		#			is_liege_of = ROOT
-		#			ROOT = { is_liege_or_above = FROM }
-		#		}
-		#	}
-		#	ROOT = {
-		#		imprison = FROM
-		#	}
-		# }
 
 		# Defender
 		FROM = {
@@ -1738,28 +1811,22 @@ other_claim_on_liege = {
 		}
 	}
 
+	# Starting scope is attacker
+	# ROOT is claimant
+	# FROM is defender
+	# FROMFROM is attacker
 	on_reverse_demand = {
 		# Claimant
 		prestige = -200
 		imprison = FROM
 
-		#if = { #Issue CKTWO-233
-		#	limit = {
-		#		OR = {
-		#			is_liege_of = ROOT
-		#			ROOT = { is_liege_or_above = FROM }
-		#		}
-		#	}
-		#	ROOT = {
-		#		imprison = FROM
-		#	}
-		# }
-
 		# Defender
 		FROM = {
 			participation_scaled_prestige = 100
-			hidden_tooltip = { # Allow free revocation of a title
-				if = {
+			hidden_tooltip = {
+				disband_event_forces = faction_loyalists
+
+				if = { # Allow free revocation of a title
 					limit = {
 						NOT = {
 							has_opinion_modifier = {
@@ -1786,7 +1853,6 @@ other_claim_on_liege = {
 				limit = { NOT = { character = FROM } }
 				participation_scaled_prestige = 100
 			}
-			FROM = { disband_event_forces = faction_loyalists }
 		}
 	}
 
