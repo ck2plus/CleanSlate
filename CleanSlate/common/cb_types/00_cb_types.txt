@@ -5799,6 +5799,15 @@ religious = {
 			trigger_else_if = { # requirements for Muslims
 				limit = { religion_group = muslim }
 				NOT = { religion = FROM }
+				FROM = {
+					NOT = { # not fighting religious enemies
+						any_current_enemy = {
+							NOT = {
+								religion_group = muslim
+							}
+						}
+					}
+				}
 			}
 
 			top_liege = {
@@ -6331,6 +6340,13 @@ excommunicated_ruler = {
 	sort_priority = 750
 
 	can_use = {
+		# Attacker
+		ROOT = {
+			NOT = { excommunicated_for = ROOT }
+			mercenary = no
+		}
+
+		# Defender
 		FROM = {
 			excommunicated_for = ROOT
 			in_revolt = no
@@ -6342,10 +6358,6 @@ excommunicated_ruler = {
 				}
 			}
 		}
-		ROOT = {
-			NOT = { excommunicated_for = ROOT }
-			mercenary = no
-		}
 	}
 
 	can_use_gui = {
@@ -6353,17 +6365,20 @@ excommunicated_ruler = {
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			OR = {
+				has_character_flag = flag_excommunicated_for_coronation
+				NOT = { excommunicated_for = ROOT }
+			}
+		}
+
+		# Defender
 		FROM = {
 			custom_tooltip = {
 				text = tooltip_is_excommunicated_for
-				hidden_tooltip = {
-					excommunicated_for = ROOT
-				}
+				excommunicated_for = ROOT
 			}
-		}
-		OR = {
-			ROOT = { has_character_flag = flag_excommunicated_for_coronation }
-			ROOT = { NOT = { excommunicated_for = ROOT } }
 		}
 	}
 
@@ -6378,97 +6393,73 @@ excommunicated_ruler = {
 		}
 	}
 	on_invalidation = {
-		# Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever.
-		hidden_tooltip = {
-			if = {
-				limit = {
-					ROOT = { has_character_flag = flag_excommunicated_for_coronation }
-				}
-				ROOT = {
-					character_event = { id = HF.20220 } #Papal Coronation may proceed.
+		# Attacker
+		ROOT = {
+			hidden_tooltip = {
+				if = { # Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever
+					limit = { has_character_flag = flag_excommunicated_for_coronation }
+					character_event = { id = HF.20220 } #Papal Coronation may proceed
 				}
 			}
 		}
 	}
 
 	on_success = {
-		if = {
-			limit = {
-				ROOT = { has_character_flag = flag_excommunicated_for_coronation }
-				}
-			ROOT = {
-				character_event = { id = HF.20220 } #Papal Coronation may proceed.
-			}
-		}
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			if = {
-				limit = {
-					FROM = {
-						primary_title = {
-							tier = BARON
-						}
-					}
-				}
-				ROOT = {
-					piety = 10
-					prestige = 50
-				}
+				limit = { has_character_flag = flag_excommunicated_for_coronation }
+				character_event = { id = HF.20220 } #Papal Coronation may proceed
 			}
-			if = {
-				limit = {
-					FROM = {
-						primary_title = {
-							tier = COUNT
+			FROM = {
+				show_scope_change = no
+				primary_title = {
+					show_scope_change = no
+					trigger_switch = {
+						on_trigger = tier
+						BARON = {
+							ROOT = {
+								show_scope_change = no
+								piety = 10
+								prestige = 50
+							}
+						}
+						COUNT = {
+							ROOT = {
+								show_scope_change = no
+								piety = 20
+								prestige = 100
+							}
+						}
+						DUKE = {
+							ROOT = {
+								show_scope_change = no
+								piety = 30
+								prestige = 150
+							}
+						}
+						KING = {
+							ROOT = {
+								piety = 50
+								prestige = 200
+							}
+						}
+						EMPEROR = {
+							ROOT = {
+								show_scope_change = no
+								piety = 70
+								prestige = 400
+							}
 						}
 					}
-				}
-				ROOT = {
-					piety = 20
-					prestige = 100
-				}
-			}
-			if = {
-				limit = {
-					FROM = {
-						primary_title = {
-							tier = DUKE
-						}
-					}
-				}
-				ROOT = {
-					piety = 30
-					prestige = 150
-				}
-			}
-			if = {
-				limit = {
-					FROM = {
-						primary_title = {
-							tier = KING
-						}
-					}
-				}
-				ROOT = {
-					piety = 50
-					prestige = 200
-				}
-			}
-			if = {
-				limit = {
-					FROM = {
-						primary_title = {
-							tier = EMPEROR
-						}
-					}
-				}
-				ROOT = {
-					piety = 70
-					prestige = 400
 				}
 			}
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			excommunicate = no
 			prestige = -200
 			rightful_religious_head_scope = {
@@ -6482,35 +6473,35 @@ excommunicated_ruler = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -50
 			prestige = -100
-		}
-		# Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever.
-		hidden_tooltip = {
-			ROOT = {
-				clr_character_flag = flag_excommunicated_for_coronation
-			}
 		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -100
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
-		}
-		FROM = {
-			prestige = 200
-		}
-		# Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever.
-		hidden_tooltip = {
-			ROOT = {
-				clr_character_flag = flag_excommunicated_for_coronation
+			hidden_tooltip = { # Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever
+				ROOT = {
+					clr_character_flag = flag_excommunicated_for_coronation
+				}
 			}
+		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = 200
 		}
 	}
 
