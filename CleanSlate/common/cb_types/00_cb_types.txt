@@ -5723,116 +5723,103 @@ religious = {
 	sort_priority = 800
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
 			OR = {
 				NOT = { religion = buddhist }
-				piety = 250
-			}
-		}
-	}
-
-	on_add = {
-		ROOT = {
-			show_scope_change = no
-			if = {
-				limit = {
-					religion = buddhist
-				}
-				piety = -250
-			}
-		}
-		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
+				piety >= 250
 			}
 		}
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
-			is_nomadic = no
-			NOT = { religion_group = pagan_group }
-			NOT = { pacifist = yes }
-			NOT = { religion = taoist }
-			NAND = {
+			NOR = { # general requirements
+				is_nomadic = yes
+				mercenary = yes
+				religion_group = pagan_group
+				pacifist = yes
+				religion = taoist
+				same_realm = FROM
+			}
+
+			NAND = { # Northern Crusade
 				OR = {
 					has_landed_title = k_teutonic_state
 					has_landed_title = d_teutonic_order
 				}
 				has_global_flag = northern_crusades_active
 			}
-			NOR = {
+
+			NOR = { # Reconquista check
 				has_character_flag = currently_reconquering_iberia
 				reconquista_check_trigger = yes
 			}
-			OR = {
-				NOT = { religion = hindu }
-				FROM = { NOT = { has_dharmic_religion_trigger = yes } }
-				AND = {
-					religion_group = FROM
-					FROM = {
-						has_character_modifier = known_satanist
-					}
-					NOT = {
-						has_character_modifier = known_satanist
-					}
-				}
-			}
-			NOT = { same_realm = FROM }
-			OR = {
-				NOT = { religion_group = FROM }
-				is_heresy_of = FROM
-				is_parent_religion = FROM
-				AND = {
-					has_dharmic_religion_trigger = yes
-					FROM = { religion = taoist }
-				}
-				AND = {
-					religion_group = muslim
-					NOT = { religion = FROM }
-					FROM = {
-						NOT = {
-							any_current_enemy = {
-								NOT = {
-									religion_group = muslim
-								}
-							}
-						}
-					}
-				}
-				AND = {
-					religion_group = FROM
-					FROM = {
-						has_character_modifier = known_satanist
-					}
-					NOT = {
-						has_character_modifier = known_satanist
-					}
-				}
-			}
-			top_liege = {
-				religion_group = ROOT
+
+			trigger_if = { # Hindu check
+				limit = { religion = hindu }
 				OR = {
-					NOT = { religion = FROM }
+					FROM = { has_dharmic_religion_trigger = no }
 					AND = {
-						religion = FROM
+						religion_group = FROM
 						FROM = {
 							has_character_modifier = known_satanist
 						}
 						NOT = {
 							has_character_modifier = known_satanist
 						}
-						ROOT = {
-							NOT = {
-								has_character_modifier = known_satanist
-							}
+					}
+				}
+			}
+
+			trigger_if = { # requirements for holy war in same religion group
+				limit = { religion_group = FROM }
+				OR = {
+					# one is a heretic of the other
+					is_heresy_of = FROM
+					is_parent_religion = FROM
+
+					AND = { # Dharmics can fight Taoists
+						has_dharmic_religion_trigger = yes
+						FROM = { religion = taoist }
+					}
+
+					AND = { # can holy war known demon worshippers in he same religion group
+						FROM = {
+							has_character_modifier = known_satanist
+						}
+						NOT = {
+							has_character_modifier = known_satanist
 						}
 					}
 				}
-				OR = {
+			}
+
+			trigger_else_if = { # requirements for Muslims
+				limit = { religion_group = muslim }
+				NOT = { religion = FROM }
+			}
+
+			top_liege = {
+				religion_group = ROOT
+
+				trigger_if = { # can holy war known devil worshippers of top liege's religion
+					limit = { religion = FROM }
+					FROM = {
+							has_character_modifier = known_satanist
+						}
+					NOT = {
+						has_character_modifier = known_satanist
+					}
+					ROOT = {
+						NOT = {
+							has_character_modifier = known_satanist
+						}
+					}
+				}
+
+				OR = { # religion must match, or both must be non-heretics in the same group
 					religion = ROOT
 					AND = {
 						is_heretic = no
@@ -5840,15 +5827,14 @@ religious = {
 					}
 				}
 			}
-			mercenary = no
 		}
 	}
 
 	can_use_title = {
-		# The attacker needs at least one county in the target kingdom, or a border, or be only two sea zones away from one of your counties
+		# The attacker needs at least one county in the target duchy, or a border, or be only two sea zones away from one of your counties
 		any_direct_de_jure_vassal_title = {
 			OR = {
-				holder_scope = {
+				holder_scope = { # attacker owns a county in target duchy
 					OR = {
 						character = ROOT
 						is_liege_or_above = ROOT
@@ -5857,8 +5843,8 @@ religious = {
 				location = {
 					any_neighbor_province = {
 						OR = {
-							AND = {
-								has_owner = yes
+							AND = { # attacker owns a county bordering target duchy
+								has_owner = yes # not wasteland or sea zone
 								owner = {
 									OR = {
 										character = ROOT
@@ -5868,7 +5854,7 @@ religious = {
 							}
 							AND = {
 								is_land = no
-								OR = {
+								OR = { # religion requirements for attack across sea zones
 									ROOT = { religion_group = muslim }
 									FROM = { religion_group = muslim }
 									AND = {
@@ -5884,10 +5870,10 @@ religious = {
 										has_global_flag = muslim_jihads_unlocked
 									}
 								}
-								any_neighbor_province = {
+								any_neighbor_province = { # county one sea zone away
 									OR = {
 										AND = {
-											has_owner = yes
+											has_owner = yes # not wasteland or sea zone
 											owner = {
 												OR = {
 													character = ROOT
@@ -5897,7 +5883,7 @@ religious = {
 										}
 										AND = {
 											is_land = no
-											any_neighbor_province = {
+											any_neighbor_province = { # county two sea zones away
 												owner = {
 													OR = {
 														character = ROOT
@@ -5917,21 +5903,49 @@ religious = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			NOT = { religion_group = pagan_group }
-			NOT = { pacifist = yes }
-			NOT = { same_realm = FROM }
-			OR = {
-				NOT = { religion_group = FROM }
-				is_heresy_of = FROM
-				is_parent_religion = FROM
-				AND = {
-					has_dharmic_religion_trigger = yes
-					FROM = { religion = taoist }
+			NOR = {
+				religion_group = pagan_group
+				pacifist = yes
+				same_realm = FROM
+			}
+
+			trigger_if = { # requirements for holy war in same religion group
+				limit = { religion_group = FROM }
+				OR = {
+					# one is a heretic of the other
+					is_heresy_of = FROM
+					is_parent_religion = FROM
+
+					AND = { # Dharmics can fight Taoists
+						has_dharmic_religion_trigger = yes
+						FROM = { religion = taoist }
+					}
+
+					AND = { # can holy war known demon worshippers in he same religion group
+						FROM = {
+							has_character_modifier = known_satanist
+						}
+						NOT = {
+							has_character_modifier = known_satanist
+						}
+					}
 				}
-				AND = {
-					religion_group = FROM
+			}
+
+			trigger_else_if = { # requirements for Muslims
+				limit = { religion_group = muslim }
+				NOT = { religion = FROM }
+			}
+
+			top_liege = {
+				trigger_if = {
+					limit = { religion = FROM }
 					FROM = {
+						has_character_modifier = known_satanist
+					}
+					NOT = {
 						has_character_modifier = known_satanist
 					}
 					ROOT = {
@@ -5940,57 +5954,35 @@ religious = {
 						}
 					}
 				}
-				AND = {
-					religion_group = muslim
-					NOT = { religion = FROM }
-				}
 			}
-			top_liege = {
-				OR = {
-					NOT = { religion = FROM }
-					AND = {
-						religion = FROM
-						FROM = {
-							has_character_modifier = known_satanist
-						}
-						NOT = {
-							has_character_modifier = known_satanist
-						}
-						ROOT = {
-							NOT = {
-								has_character_modifier = known_satanist
-							}
-						}
-					}
+		}
+	}
+
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			if = {
+				limit = {
+					religion = buddhist
 				}
+				piety = -250
+			}
+		}
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
 			}
 		}
 	}
 
 	on_success = {
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = {
-				participation_scaled_piety = 100
-				participation_scaled_prestige = 50
-				if = {
-					limit = {
-						uses_decadence = yes
-					}
-					participation_scaled_decadence = -10
-				}
-				hidden_tooltip = {
-					if = {
-						limit = {
-							has_ambition = obj_strengthen_religion
-						}
-						change_variable = { which = strengthen_religion value = 1 }
-					}
-				}
-			}
-		}
-
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_piety = 100
 			participation_scaled_prestige = 50
 			if = {
@@ -6012,7 +6004,32 @@ religious = {
 				}
 			}
 		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = {
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 50
+				if = {
+					limit = {
+						uses_decadence = yes
+					}
+					participation_scaled_decadence = -10
+				}
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
+					}
+					change_variable = { which = strengthen_religion value = 1 }
+				}
+			}
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
+			piety = -100
+			prestige = -50
+
 			if = {
 				limit = {
 					NOT = {
@@ -6025,67 +6042,40 @@ religious = {
 				}
 			}
 		}
-		FROM = { show_scope_change = no piety = -100 }
-		FROM = { show_scope_change = no prestige = -50 }
 	}
 
 	on_success_title = {
-		if = { # Standard Holy War behaviour for Non-Muslims and Muslims fighting other Muslims
+		# Attacker
+		ROOT = {
 			show_scope_change = no
-			limit = {
-				OR = {
-					ROOT = {
+			if = { # Standard Holy War behaviour for Non-Muslims and Muslims fighting other Muslims
+				limit = {
+					OR = {
 						NOT = {
 							religion_group = muslim
 						}
-					}
-					AND = {
-						ROOT = {
-							religion_group = muslim
-						}
-						FROM = {
-							religion_group = muslim
-						}
+						religion_group = FROM
 					}
 				}
-			}
-			custom_tooltip = {
-				text = religious_cb_succ_tip
-				hidden_tooltip = {
-					ROOT = {
-						vassalize_or_take_under_title = {
-							title = PREV
-							enemy = FROM
-							same_religion = yes # Only vassalize rulers of my religion
-							is_religious = yes
-							type = holy_war
-						}
+				custom_tooltip = {
+					text = religious_cb_succ_tip
+					vassalize_or_take_under_title = {
+						title = PREV
+						enemy = FROM
+						same_religion = yes # Only vassalize rulers of my religion
+						is_religious = yes
+						type = holy_war
 					}
 				}
 			}
-		}
-		if = { # Muslims fighting Non-Muslims preserve vassals
-			show_scope_change = no
-			limit = {
-				ROOT = {
-					religion_group = muslim
-				}
-				FROM = {
-					NOT = {
-						religion_group = muslim
-					}
-				}
-			}
-			custom_tooltip = {
-				text = religious_cb_succ_muslim_tip
-				hidden_tooltip = {
-					ROOT = {
-						vassalize_or_take_under_title = {
-							title = PREV
-							enemy = FROM
-							is_religious = yes
-							type = holy_war
-						}
+			else = { # Muslims fighting Non-Muslims preserve vassals
+				custom_tooltip = {
+					text = religious_cb_succ_muslim_tip
+					vassalize_or_take_under_title = {
+						title = PREV
+						enemy = FROM
+						is_religious = yes
+						type = holy_war
 					}
 				}
 			}
@@ -6100,6 +6090,7 @@ religious = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			piety = -50
@@ -6108,6 +6099,7 @@ religious = {
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			transfer_scaled_wealth = {
@@ -6116,7 +6108,26 @@ religious = {
 			}
 			piety = -75
 			prestige = -150
+			religion_authority = {
+				modifier = lost_holy_war
+				years = 20
+			}
 		}
+		any_attacker = {
+			limit = {
+				uses_decadence = yes
+				NOT = {
+					any_liege = {
+						dynasty = PREV
+					}
+				}
+			}
+			hidden_tooltip = {
+				participation_scaled_decadence = 20
+			}
+		}
+
+		# Defenders
 		FROM = {
 			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
@@ -6125,6 +6136,18 @@ religious = {
 					uses_decadence = yes
 				}
 				participation_scaled_decadence = -10
+			}
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
+					}
+					change_variable = { which = strengthen_religion value = 1 }
+				}
 			}
 		}
 		any_defender = {
@@ -6138,54 +6161,6 @@ religious = {
 					}
 					participation_scaled_decadence = -10
 				}
-				hidden_tooltip = {
-					if = {
-						limit = {
-							has_ambition = obj_strengthen_religion
-						}
-						change_variable = { which = strengthen_religion value = 1 }
-					}
-				}
-			}
-		}
-		any_attacker = {
-			limit = {
-				character = ROOT
-				uses_decadence = yes
-				NOT = {
-					any_liege = {
-						dynasty = PREV
-					}
-				}
-			}
-			participation_scaled_decadence = 20
-		}
-		any_attacker = {
-			limit = {
-				NOT = { character = ROOT }
-				uses_decadence = yes
-				NOT = {
-					any_liege = {
-						dynasty = PREV
-					}
-				}
-			}
-			hidden_tooltip = {
-				participation_scaled_decadence = 20
-			}
-		}
-		ROOT = {
-			religion_authority = {
-				modifier = lost_holy_war
-				years = 20
-			}
-		}
-		FROM = {
-			religion_authority = {
-				modifier = won_holy_war
-				years = 20
-			}
-			hidden_tooltip = {
 				if = {
 					limit = {
 						has_ambition = obj_strengthen_religion
