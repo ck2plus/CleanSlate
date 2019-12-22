@@ -833,7 +833,7 @@ claim_on_liege = {
 		# Defender
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
@@ -1097,7 +1097,7 @@ claim_on_liege_plot = {
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
@@ -1544,7 +1544,7 @@ other_claim_on_liege = {
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
@@ -2151,7 +2151,7 @@ change_seniority_succession_law = {
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
@@ -2341,7 +2341,7 @@ change_primogeniture_succession_law = {
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
@@ -2529,7 +2529,7 @@ change_feudal_elective_succession_law = {
 		# Defender
 		FROM = {
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
@@ -6441,6 +6441,7 @@ excommunicated_ruler = {
 						}
 						KING = {
 							ROOT = {
+								show_scope_change = no
 								piety = 50
 								prestige = 200
 							}
@@ -6540,28 +6541,33 @@ bid_for_independence = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			de_facto_liege = FROM
-
 			higher_tier_than = BARON
+			mercenary = no
+
 			OR = {
 				ai = yes
 				is_feudal = yes
 				is_tribal = yes
 				higher_tier_than = COUNT
 			}
-			mercenary = no
 
-			OR = {
-				is_nomadic = no
-				NOT = {
-					clan_opinion = { who = FROM value = 0 }
+			trigger_if = {
+				limit = { is_nomadic = yes }
+				clan_opinion = {
+					who = FROM
+					value <= 0
 				}
 			}
 		}
 
+		# Defender
 		FROM = {
-			NOT = {
+			in_revolt = no
+
+			NOT = { # isn't attacking liege with one of these CBs
 				any_war = {
 					attacker = {
 						character = PREVPREV
@@ -6572,11 +6578,13 @@ bid_for_independence = {
 					}
 				}
 			}
+
 			any_demesne_title = {
 				NOT = { lower_tier_than = ROOT }
 				temporary = no
 			}
-			in_revolt = no
+
+			# No above liege is revolting
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
@@ -6585,50 +6593,40 @@ bid_for_independence = {
 			}
 
 			# No independence factions in merchant republics
-			NOT = {
-				AND = {
-					is_merchant_republic = yes
-					liege = {
-						is_merchant_republic = yes
-					}
-				}
+			trigger_if = {
+				limit = { is_merchant_republic = yes }
+				liege = { is_merchant_republic = no }
 			}
 		}
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
+			liege_before_war = { character = FROM }
 		}
+
+		# Defender
 		FROM = {
+			in_revolt = no
+
 			any_demesne_title = {
 				NOT = { lower_tier_than = ROOT }
 				temporary = no
 			}
-			in_revolt = no
+
+			# No above liege is revolting
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
 					in_revolt = no
 				}
 			}
+
 			# No independence factions in merchant republics
-			NOT = {
-				AND = {
-					is_merchant_republic = yes
-					liege_before_war = {
-						is_merchant_republic = yes
-					}
-				}
+			trigger_if = {
+				limit = { is_merchant_republic = yes }
+				liege = { is_merchant_republic = no }
 			}
 		}
 	}
@@ -6645,92 +6643,76 @@ bid_for_independence = {
 	}
 
 	on_success = {
-		if = {
-			limit = {
-				FROM = {
-					independent = no
-				}
-			}
+		# Attackers
+		ROOT = {
+			show_scope_change = no
 			FROM = {
+				show_scope_change = no
 				if = {
+					limit = {
+						independent = yes
+					}
+					ROOT = {
+						show_scope_change = no
+						set_defacto_liege = ROOT
+					}
+				}
+				else_if = {
 					limit = {
 						in_revolt = yes
 					}
-					liege_before_war = {
+					liege_before_war = { # attacker becomes vassal of defender's liege
+						show_scope_change = no
 						ROOT = {
+							show_scope_change = no
 							set_defacto_liege = PREV
 						}
 					}
 				}
-				if = {
-					limit = {
-						in_revolt = no
-					}
-					liege = {
+				else = {
+					liege = { # attacker becomes vassal of defender's liege
+						show_scope_change = no
 						ROOT = {
+							show_scope_change = no
 							set_defacto_liege = PREV
 						}
 					}
 				}
 			}
-		}
 
-		if = {
-			limit = {
-				FROM = {
-					independent = yes
-				}
-			}
-			ROOT = {
-				set_defacto_liege = ROOT
-			}
-		}
-
-		hidden_tooltip = {
-			ROOT = {
+			participation_scaled_prestige = 100
+			hidden_tooltip = {
 				prestige = 100
 				any_demesne_title = {
 					add_pressed_claim = FROM
 				}
 				set_character_flag = ai_flag_never_transfer
 			}
-		}
 
-		ROOT = {
-			participation_scaled_prestige = 100
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
 
+		# Defender
 		FROM = {
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
 						OR = {
-							tier = king
-							tier = emperor
+							tier = KING
+							tier = EMPEROR
 						}
-						#is_titular = no
 						NOT = { has_law = crown_authority_0 }
 					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
 			}
@@ -6745,7 +6727,9 @@ bid_for_independence = {
 	}
 
 	on_fail = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -50
 			participation_scaled_prestige = -50
 		}
@@ -6756,7 +6740,9 @@ bid_for_independence = {
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 			prisoner = FROM
 			participation_scaled_prestige = -100
@@ -6765,7 +6751,10 @@ bid_for_independence = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = -100 }
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 50
 		}
 	}
