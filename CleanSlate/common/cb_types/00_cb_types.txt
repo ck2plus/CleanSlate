@@ -4142,7 +4142,7 @@ crusade = {
 	}
 }
 
-# 13: Crusade using the new crusade system. See crusades.info in the religion folder for documentation
+# 13: Crusade using the new crusade system. See crusade.info in the religion folder for documentation
 new_crusade = {
 	name = CB_NAME_CRUSADE
 	war_name = WAR_NAME_CRUSADE
@@ -4162,10 +4162,13 @@ new_crusade = {
 	sort_priority = 3000
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
 			uses_new_crusade = yes
 			has_called_crusade = no
-			religion_authority = 0.05
+			religion_authority >= 0.05
+			mercenary = no
+
 			conditional_tooltip = {
 				trigger = {
 					is_alternate_start = yes
@@ -4181,6 +4184,7 @@ new_crusade = {
 					has_global_flag = christian_crusades_unlocked
 				}
 			}
+
 			conditional_tooltip = {
 				trigger = {
 					NOT = {
@@ -4196,73 +4200,77 @@ new_crusade = {
 					has_global_flag = christian_crusades_unlocked
 				}
 			}
-			mercenary = no
 		}
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			uses_new_crusade = yes
 			can_call_crusade = yes
 			hidden_tooltip = {
 				NOT = { has_character_modifier = cancel_crusade_cooldown }
 			}
+
+			# Religion check
+			OR = {
+				NOT = { religion_group = FROM }
+
+				# One is a heretic of the other
+				is_heresy_of = FROM
+				is_parent_religion = FROM
+
+				AND = {
+					religion_group = pagan_group
+					NOT = { religion = FROM }
+				}
+			}
 		}
 
+		# Defender
 		FROM = {
-			NOT = { religion = ROOT }
 			OR = {
-				NOT = { religion_group = ROOT }
 				AND = {
 					has_character_flag = fourth_crusade_target
-					NOR = {
+					NOT = {
 						has_character_flag = fourth_crusade_recipient
-						religion = ROOT
 					}
 				}
 				AND = {
 					has_global_flag = 4th_crusade_official
 					has_landed_title = e_byzantium
-					NOT = { religion = ROOT }
-				}
-				is_heresy_of = ROOT
-				is_parent_religion = ROOT
-				AND = {
-					religion_group = pagan_group
-					NOT = { religion = ROOT }
 				}
 			}
 		}
 
-		NOT = { # Not if the Schism has been mended
-			AND = {
-				OR = {
-					religion = catholic
-					religion = fraticelli
-				}
-				has_global_flag = schism_mended
+		NAND = { # Not if the Schism has been mended
+			OR = {
+				religion = catholic
+				religion = fraticelli
 			}
+			has_global_flag = schism_mended
 		}
 	}
 
 	can_use_title = {
+		# Defender
 		FROM = {
-			any_realm_title = {
-				de_jure_liege_or_above = PREVPREV
-			}
-
 			independent = yes # Don't declare Crusades on revolters - chances are high the war will invalidate
 
 			OR = {
 				num_of_realm_counties = {
-					value = 6
+					value >= 6
 					title = PREV
 				}
-				PREV = {
-					title = k_thrace
+				AND = {
+					PREV = { title = k_thrace }
 					FROM = {
 						has_landed_title = e_byzantium
 						religion_group = christian
+					}
+					num_of_realm_counties = {
+						value >= 1
+						title = PREV
 					}
 				}
 			}
@@ -4270,27 +4278,32 @@ new_crusade = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			can_call_crusade = yes
-		}
-		FROM = {
-			NOT = { religion = ROOT }
+
+			# Religion check
 			OR = {
-				NOT = { religion = ROOT }
-				is_heresy_of = ROOT
-				is_parent_religion = ROOT
+				NOT = { religion_group = FROM }
+
+				# One is a heretic of the other
+				is_heresy_of = FROM
+				is_parent_religion = FROM
+
 				AND = {
 					religion_group = pagan_group
-					NOT = { religion = ROOT }
+					NOT = { religion = FROM }
 				}
 			}
 		}
 	}
 
 	is_valid_title = {
+		# Defender
 		FROM = {
-			any_realm_province = {
-				de_jure_liege_or_above = PREVPREV
+			num_of_realm_counties = {
+				value >= 1
+				title = PREV
 			}
 		}
 	}
@@ -4307,27 +4320,6 @@ new_crusade = {
 	}
 
 	on_success_title = {
-		ROOT = {
-			crusade_target_title = {
-				save_event_target_as = new_crusade_title
-			}
-		}
-
-		ROOT = {
-			official_crusade_recipient = {
-				save_event_target_as = new_crusade_recipient
-			}
-		}
-
-		most_participating_crusader = {
-			save_event_target_as = new_crusade_most_participating_member
-		}
-
-		ROOT = {
-			crusade_target_char = {
-				save_event_target_as = new_crusade_target_char
-			}
-		}
 
 		custom_tooltip = {
 			text = new_crusade_win_TT
@@ -4336,12 +4328,30 @@ new_crusade = {
 		# Religion Authority and Prestige/Piety for the winner (Pope)
 		ROOT = {
 			show_scope_change = no
+
 			participation_scaled_prestige = 500
 			participation_scaled_piety = 1000
+
 			religion_authority = {
 				modifier = won_crusade
 				years = 20
 			}
+
+			crusade_target_title = {
+				save_event_target_as = new_crusade_title
+			}
+
+			official_crusade_recipient = {
+				save_event_target_as = new_crusade_recipient
+			}
+
+			crusade_target_char = {
+				save_event_target_as = new_crusade_target_char
+			}
+		}
+
+		most_participating_crusader = {
+			save_event_target_as = new_crusade_most_participating_member
 		}
 
 		# Religion Authority and Prestige/Piety loss for the loser (Target of Crusade)
@@ -4380,7 +4390,7 @@ new_crusade = {
 							}
 						}
 					}
-					character_event = { id = HFP.41007 }
+					character_event = { id = HFP.41007 } # Beneficiary event - AI only
 				}
 			}
 
@@ -4806,7 +4816,7 @@ new_crusade = {
 					}
 				}
 				save_event_target_as = crusade_attacker
-				character_event = { id = HFP.41007 }
+				character_event = { id = HFP.41007 } # Beneficiary event - AI only
 			}
 
 			# Make sure selfish Crusaders get as little as possible (reduce the pot for Selfish Crusaders)
@@ -4829,7 +4839,7 @@ new_crusade = {
 							}
 						}
 					}
-					character_event = { id = HFP.41060 }
+					character_event = { id = HFP.41060 } # Pre-event to play as a Beneficiary
 				}
 				distribute_crusade_pot = {
 					amount = 1
@@ -4860,7 +4870,7 @@ new_crusade = {
 						}
 					}
 					any_playable_ruler = {
-						narrative_event = { id = HFP.41160 }
+						narrative_event = { id = HFP.41160 } # Winning Crusade
 					}
 				}
 				# If it is a Fourth Crusade
@@ -4891,10 +4901,8 @@ new_crusade = {
 						owner = {
 							if = {
 								limit = {
-									NOT = {
-										any_playable_ruler = {
-											has_landed_title = k_trebizond
-										}
+									k_trebizond = {
+										has_holder = no
 									}
 								}
 								random_vassal = {
@@ -4967,7 +4975,7 @@ new_crusade = {
 									de_jure_liege = k_cyprus
 								}
 								set_defacto_liege = THIS
-								character_event = { id = HFP.41090 days = 1 }
+								character_event = { id = HFP.41090 days = 1 } # Refill the levy, and remove the negative modifiers
 								if = {
 									limit = {
 										NOR = {
@@ -4979,7 +4987,7 @@ new_crusade = {
 									add_trait = crusader
 								}
 							}
-							character_event = { id = HFP.41007 }
+							character_event = { id = HFP.41007 } # Beneficiary event - AI only
 						}
 					}
 					distribute_crusade_target_title = yes
@@ -5151,7 +5159,7 @@ new_crusade = {
 					}
 					# Narrative event explaining that Byzantium has been taken out
 					any_character = {
-						narrative_event = { id = HF.49008 }
+						narrative_event = { id = HF.49008 } # Byzantium falls
 					}
 					event_target:byzantine_refugee = {
 						death = {
@@ -5181,7 +5189,7 @@ new_crusade = {
 						save_event_target_as = crusade_king_recipient
 					}
 					any_playable_ruler = {
-						narrative_event = { id = HFP.41160 }
+						narrative_event = { id = HFP.41160 } # Winning Crusade
 					}
 				}
 				crusader_king = {
@@ -5207,7 +5215,7 @@ new_crusade = {
 			crusader_king = {
 				if = {
 					limit = {
-						wealth = 2000
+						wealth >= 2000
 						ai = yes
 						any_vassal = {
 							always = yes
@@ -5216,14 +5224,12 @@ new_crusade = {
 					set_variable = { which = count value = 20 }
 					while = {
 						limit = {
-							wealth = 2000
+							wealth >= 2000
 							check_variable = { which = count value = 1 }
 						}
 						random_vassal = {
 							limit = {
-								NOT = {
-									wealth = 1000
-								}
+								wealth <= 1000
 							}
 							wealth = 350
 							crusader_king = {
@@ -5310,7 +5316,7 @@ new_crusade = {
 					}
 				}
 				most_participating_crusader = {
-					narrative_event = { id = HFP.41054 days = 3 }
+					narrative_event = { id = HFP.41054 days = 3 } # Play as Crusader King / Queen
 				}
 			}
 
@@ -5325,13 +5331,7 @@ new_crusade = {
 					}
 					set_character_flag = grandCrusader
 				}
-				else_if = {
-					limit = {
-						OR = {
-							has_character_flag = grandCrusader
-							trait = crusader_king
-						}
-					}
+				else = {
 					narrative_event = { id = HF.49020 }
 				}
 			}
@@ -5458,13 +5458,11 @@ new_crusade = {
 	}
 
 	on_fail = {
-		ROOT = {
-			character_event = { id = HFP.41199 }
-		}
-
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			piety = -100
+			character_event = { id = HFP.41199 } # Cleanup Event
 		}
 
 		any_defender = {
@@ -5481,6 +5479,7 @@ new_crusade = {
 			}
 		}
 
+		# Defenders
 		FROM = {
 			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
@@ -5490,22 +5489,6 @@ new_crusade = {
 				}
 				participation_scaled_decadence = -50
 			}
-			if = {
-				limit = {
-					has_dlc = "Legacy of Rome"
-					OR = {
-						has_landed_title = e_byzantium
-						has_landed_title = e_roman_empire
-					}
-						OR = {
-							religion_group = christian
-							religion = hellenic_pagan
-							religion = hellenic_pagan_reformed
-						}
-				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
-			}
-
 			hidden_tooltip = {
 				if = {
 					limit = {
@@ -5529,15 +5512,28 @@ new_crusade = {
 						}
 					}
 				}
+
+				if = {
+					limit = {
+						has_dlc = "Legacy of Rome"
+						OR = {
+							has_landed_title = e_byzantium
+							has_landed_title = e_roman_empire
+						}
+							OR = {
+								religion_group = christian
+								religion = hellenic_pagan
+								religion = hellenic_pagan_reformed
+							}
+					}
+					character_event = { id = LoR.30 days = 12 } # Victory Triumph
+				}
 			}
 		}
 	}
 
 	on_reverse_demand = {
-		ROOT = {
-			character_event = { id = HFP.41199 }
-		}
-
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			transfer_scaled_wealth = {
@@ -5549,73 +5545,7 @@ new_crusade = {
 				modifier = lost_crusade
 				years = 20
 			}
-		}
-		FROM = {
-			piety = 100
-			religion_authority = {
-				modifier = won_crusade
-				years = 20
-			}
-			participation_scaled_piety = 300
-			participation_scaled_prestige = 150
-			if = {
-				limit = {
-					uses_decadence = yes
-				}
-				participation_scaled_decadence = -100
-			}
-			if = {
-				limit = {
-					has_dlc = "Legacy of Rome"
-					OR = {
-						has_landed_title = e_byzantium
-						has_landed_title = e_roman_empire
-					}
-						OR = {
-							religion_group = christian
-							religion = hellenic_pagan
-							religion = hellenic_pagan_reformed
-						}
-				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						OR = {
-							this_has_lame_nickname_trigger = yes
-							has_nickname = no
-						}
-					}
-					random_list = {
-						10 = { give_nickname = nick_the_holy }
-						10 = { give_nickname = nick_the_glorious }
-						10 = { give_nickname = nick_the_lionheart }
-						10 = { give_nickname = nick_the_great }
-						10 = { give_nickname = nick_the_hammer }
-						20 = {
-							modifier = {
-								factor = 0
-								religion_group = christian
-							}
-							give_nickname = nick_the_sword_of_god
-						}
-					}
-				}
-			}
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = {
-				participation_scaled_piety = 300
-				participation_scaled_prestige = 150
-				if = {
-					limit = {
-						uses_decadence = yes
-					}
-					participation_scaled_decadence = -100
-				}
-			}
+			character_event = { id = HFP.41199 } # Cleanup Event
 		}
 		any_attacker = {
 			limit = {
@@ -5644,6 +5574,77 @@ new_crusade = {
 			}
 		}
 
+		# Defenders
+		FROM = {
+			piety = 100
+			religion_authority = {
+				modifier = won_crusade
+				years = 20
+			}
+			participation_scaled_piety = 300
+			participation_scaled_prestige = 150
+			if = {
+				limit = {
+					uses_decadence = yes
+				}
+				participation_scaled_decadence = -100
+			}
+
+			hidden_tooltip = {
+				if = {
+					limit = {
+						OR = {
+							this_has_lame_nickname_trigger = yes
+							has_nickname = no
+						}
+					}
+					random_list = {
+						10 = { give_nickname = nick_the_holy }
+						10 = { give_nickname = nick_the_glorious }
+						10 = { give_nickname = nick_the_lionheart }
+						10 = { give_nickname = nick_the_great }
+						10 = { give_nickname = nick_the_hammer }
+						20 = {
+							modifier = {
+								factor = 0
+								religion_group = christian
+							}
+							give_nickname = nick_the_sword_of_god
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						has_dlc = "Legacy of Rome"
+						OR = {
+							has_landed_title = e_byzantium
+							has_landed_title = e_roman_empire
+						}
+							OR = {
+								religion_group = christian
+								religion = hellenic_pagan
+								religion = hellenic_pagan_reformed
+							}
+					}
+					character_event = { id = LoR.30 days = 12 } # Victory Triumph
+				}
+			}
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = {
+				participation_scaled_piety = 300
+				participation_scaled_prestige = 150
+				if = {
+					limit = {
+						uses_decadence = yes
+					}
+					participation_scaled_decadence = -100
+				}
+			}
+		}
+
 		# Checks if First Crusade
 		if = {
 			limit = {
@@ -5662,34 +5663,30 @@ new_crusade = {
 		}
 
 		# Chance to start a Shepherd's Crusade
-		random = {
-			chance = 15
-			if = {
-				limit = {
-					has_game_rule = {
-						name = shepherds_crusade
-						value = on
-					}
-					ROOT = {
+		ROOT = {
+			random = {
+				chance = 15
+				if = {
+					limit = {
+						has_game_rule = {
+							name = shepherds_crusade
+							value = on
+						}
 						religion = catholic
 					}
+					set_global_flag = catholic_shepherds_crusade
 				}
-				set_global_flag = catholic_shepherds_crusade
-			}
-			else_if = {
-				limit = {
-					has_game_rule = {
-						name = shepherds_crusade
-						value = on
-					}
-					ROOT = {
+				else_if = {
+					limit = {
+						has_game_rule = {
+							name = shepherds_crusade
+							value = on
+						}
 						religion = fraticelli
 					}
+					set_global_flag = fraticelli_shepherds_crusade
 				}
-				set_global_flag = fraticelli_shepherds_crusade
-			}
-			ROOT = {
-				character_event = { id = HFP.42300 days = 3 }
+				character_event = { id = HFP.42300 days = 3 } # Start of event chain
 			}
 		}
 	}
