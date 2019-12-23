@@ -8767,14 +8767,20 @@ muslim_invasion = {
 	sort_priority = 2000
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
 			piety = 1000
 		}
 	}
 
 	on_add = {
+		# Attacker
+		ROOT = {
+			piety = -1000
+		}
+
 		fire_haruspicy_event_effect = yes
-		ROOT = { piety = -1000 }
+
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -8785,7 +8791,12 @@ muslim_invasion = {
 	}
 
 	can_use = {
+		# Attack
 		ROOT = {
+			religion_group = muslim
+			mercenary = no
+			NOT = { is_liege_or_above = FROM }
+
 			OR = {
 				ai = yes
 				multiplayer = no
@@ -8796,7 +8807,6 @@ muslim_invasion = {
 					}
 				}
 			}
-			religion_group = muslim
 
 			# These use 'tribal_invasion' instead:
 			NOR = {
@@ -8814,11 +8824,9 @@ muslim_invasion = {
 			}
 		}
 
-		FROM = { NOT = { religion = ROOT } }
-
-		ROOT = {
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+		# Defender
+		FROM = {
+			NOT = { religion = ROOT }
 		}
 	}
 
@@ -8830,18 +8838,19 @@ muslim_invasion = {
 				title = PREV
 			}
 		}
+
 		# The attacker needs at least one county in the target kingdom, or a border
-		any_direct_de_jure_vassal_title = {
-			any_direct_de_jure_vassal_title = {
+		any_direct_de_jure_vassal_title = {		# duchy level
+			any_direct_de_jure_vassal_title = {	# county level
 				OR = {
-					holder_scope = {
+					holder_scope = { # Own a county
 						OR = {
 							character = ROOT
 							is_liege_or_above = ROOT
 						}
 					}
 					location = {
-						any_neighbor_province = {
+						any_neighbor_province = { # or share a border
 							owner = {
 								OR = {
 									character = ROOT
@@ -8856,13 +8865,19 @@ muslim_invasion = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			religion_group = muslim
 		}
-		FROM = { NOT = { religion = ROOT } }
+
+		# Defender
+		FROM = {
+			NOT = { religion = ROOT }
+		}
 	}
 
 	is_valid_title = {
+		# Attacker
 		FROM = {
 			any_realm_province = {
 				de_jure_liege_or_above = PREVPREV
@@ -8871,9 +8886,20 @@ muslim_invasion = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			prestige = 200
+			participation_scaled_prestige = 200
+
+			if = {
+				limit = {
+					uses_decadence = yes
+					FROM = { NOT = { uses_decadence = yes } }
+				}
+				participation_scaled_decadence = -20
+			}
+
 			hidden_tooltip = {
 				if = {
 					limit = {
@@ -8882,18 +8908,10 @@ muslim_invasion = {
 					change_variable = { which = strengthen_religion value = 1 }
 				}
 			}
-			participation_scaled_prestige = 200
-			if = {
-				limit = {
-					uses_decadence = yes
-					FROM = { NOT = { uses_decadence = yes } }
-				}
-				participation_scaled_decadence = -20
-			}
 		}
-
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
+
 			hidden_tooltip = {
 				participation_scaled_prestige = 200
 				if = {
@@ -8903,16 +8921,16 @@ muslim_invasion = {
 					}
 					participation_scaled_decadence = -20
 				}
-				hidden_tooltip = {
-					if = {
-						limit = {
-							has_ambition = obj_strengthen_religion
-						}
-						change_variable = { which = strengthen_religion value = 1 }
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
 					}
+					change_variable = { which = strengthen_religion value = 1 }
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = -200
@@ -8922,29 +8940,27 @@ muslim_invasion = {
 	on_success_title = {
 		custom_tooltip = {
 			text = other_invasion_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					vassalize_or_take_under_title_destroy_duchies = {
-						title = PREV
-						enemy = FROM
-						is_crusade = no # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
-						type = invasion
+			ROOT = {
+				vassalize_or_take_under_title_destroy_duchies = {
+					title = PREV
+					enemy = FROM
+					is_crusade = no # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
+					type = invasion
+				}
+				if = {
+					limit = {
+						OR = {
+							this_has_lame_nickname_trigger = yes
+							has_nickname = no
+						}
 					}
-					if = {
-						limit = {
-							OR = {
-								this_has_lame_nickname_trigger = yes
-								has_nickname = no
-							}
-						}
-						random_list = {
-							10 = { give_nickname = nick_the_holy }
-							10 = { give_nickname = nick_the_glorious }
-							10 = { give_nickname = nick_the_lionheart }
-							10 = { give_nickname = nick_the_great }
-							10 = { give_nickname = nick_the_hammer }
-							10 = { give_nickname = nick_the_magnificent }
-						}
+					random_list = {
+						10 = { give_nickname = nick_the_holy }
+						10 = { give_nickname = nick_the_glorious }
+						10 = { give_nickname = nick_the_lionheart }
+						10 = { give_nickname = nick_the_great }
+						10 = { give_nickname = nick_the_hammer }
+						10 = { give_nickname = nick_the_magnificent }
 					}
 				}
 			}
@@ -8952,28 +8968,34 @@ muslim_invasion = {
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -200
+		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			prestige = 100
-		}
-		FROM = {
-			show_scope_change = no
-			if = {
-				limit = {
-					has_dlc = "Legacy of Rome"
-					OR = {
-						has_landed_title = e_byzantium
-						has_landed_title = e_roman_empire
-					}
-						OR = {
-							religion_group = christian
-							religion = hellenic_pagan
-							religion = hellenic_pagan_reformed
-						}
-				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
-			}
+			participation_scaled_prestige = 100
+
 			hidden_effect = {
+				if = {
+					limit = {
+						has_dlc = "Legacy of Rome"
+						OR = {
+							has_landed_title = e_byzantium
+							has_landed_title = e_roman_empire
+						}
+							OR = {
+								religion_group = christian
+								religion = hellenic_pagan
+								religion = hellenic_pagan_reformed
+							}
+					}
+					character_event = { id = LoR.30 days = 12 } # Victory Triumph
+				}
 				if = {
 					limit = {
 						OR = {
@@ -8992,19 +9014,15 @@ muslim_invasion = {
 					}
 				}
 			}
-			participation_scaled_prestige = 100
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-		ROOT = {
-			show_scope_change = no
-			prestige = -200
-		}
 	}
 
 	on_invalidation = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			piety = 1000
@@ -9012,6 +9030,7 @@ muslim_invasion = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -9030,33 +9049,35 @@ muslim_invasion = {
 				decadence = 10
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			prestige = 200
-			hidden_tooltip = {
+			participation_scaled_prestige = 200
+
+			hidden_effect = {
+				if = {
+					limit = {
+						has_dlc = "Legacy of Rome"
+						OR = {
+							has_landed_title = e_byzantium
+							has_landed_title = e_roman_empire
+						}
+							OR = {
+								religion_group = christian
+								religion = hellenic_pagan
+								religion = hellenic_pagan_reformed
+							}
+					}
+					character_event = { id = LoR.30 days = 12 } # Victory Triumph
+				}
 				if = {
 					limit = {
 						has_ambition = obj_strengthen_religion
 					}
 					change_variable = { which = strengthen_religion value = 1 }
 				}
-			}
-			if = {
-				limit = {
-					has_dlc = "Legacy of Rome"
-					OR = {
-						has_landed_title = e_byzantium
-						has_landed_title = e_roman_empire
-					}
-						OR = {
-							religion_group = christian
-							religion = hellenic_pagan
-							religion = hellenic_pagan_reformed
-						}
-				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
-			}
-			hidden_effect = {
 				if = {
 					limit = {
 						OR = {
@@ -9075,12 +9096,11 @@ muslim_invasion = {
 					}
 				}
 			}
-			participation_scaled_prestige = 200
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 200 }
 			hidden_tooltip = {
+				participation_scaled_prestige = 200
 				if = {
 					limit = {
 						has_ambition = obj_strengthen_religion
