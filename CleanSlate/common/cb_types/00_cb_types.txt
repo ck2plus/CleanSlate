@@ -83,18 +83,17 @@ claim = {
 				primary_title = {
 					OR = {
 						is_primary_type_title = no # Static Mercs, the Pope, Holy Orders, etc
-						higher_tier_than = PREVPREV
-						tier = PREVPREV
+						NOT = { lower_tier_than = PREVPREV }
 					}
 				}
 			}
 		}
 
 		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
@@ -104,10 +103,10 @@ claim = {
 		ROOT = { has_claim = PREV }
 
 		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
@@ -418,10 +417,10 @@ other_claim = {
 		}
 
 		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 
@@ -461,10 +460,10 @@ other_claim = {
 		ROOT = { has_claim = PREV }
 
 		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
@@ -824,13 +823,10 @@ claim_on_liege = {
 		}
 
 		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = {
-					NOT = { character = ROOT }
-					has_landed_title = PREVPREV
-				}
+				character = FROM
+				is_vassal_or_below_of = FROM
 			}
 		}
 	}
@@ -855,15 +851,13 @@ claim_on_liege = {
 
 	is_valid_title = {
 		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = {
-					NOT = { character = ROOT }
-					has_landed_title = PREVPREV
-				}
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
+
 		OR = {
 			ROOT = { has_claim = PREV }
 			has_law = succ_feudal_elective
@@ -1097,11 +1091,10 @@ claim_on_liege_plot = {
 	}
 
 	can_use_title = {
-		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
@@ -1125,11 +1118,10 @@ claim_on_liege_plot = {
 	}
 
 	is_valid_title = {
-		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
@@ -1545,17 +1537,10 @@ other_claim_on_liege = {
 	# FROM is defender
 	# FROMFROM is attacker
 	is_valid_title = {
-		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = {
-					NOR = {
-						character = ROOT
-						character = FROMFROM
-					}
-					has_landed_title = PREVPREV
-				}
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 
@@ -1565,7 +1550,7 @@ other_claim_on_liege = {
 			has_law = succ_hre_elective
 		}
 
-		NOT = {
+		NOT = { # claimant isn't already attacking for the same claim
 			any_war = { # when used in title scope, checks all wars for that title
 				attacker = {
 					character = ROOT
@@ -1923,7 +1908,7 @@ claim_all = {
 					holder_scope = {
 						OR = {
 							character = FROM
-							is_liege_or_above = FROM
+							is_vassal_or_below_of = FROM
 						}
 					}
 					ROOT = { has_strong_claim = PREV }
@@ -1954,7 +1939,7 @@ claim_all = {
 					holder_scope = {
 						OR = {
 							character = FROM
-							is_liege_or_above = FROM
+							is_vassal_or_below_of = FROM
 						}
 					}
 					ROOT = { has_strong_claim = PREV }
@@ -2060,7 +2045,7 @@ claim_all = {
 					holder_scope = {
 						OR = {
 							character = FROM
-							is_liege_or_above = FROM
+							is_vassal_or_below_of = FROM
 						}
 					}
 					ROOT = { has_strong_claim = PREV }
@@ -2745,21 +2730,19 @@ invasion = {
 	}
 
 	can_use_title = {
-		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
 
 	is_valid_title = {
-		# Defender
-		FROM = {
+		owner = {
 			OR = {
-				has_landed_title = PREV
-				any_realm_lord = { has_landed_title = PREVPREV }
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
@@ -2850,7 +2833,7 @@ invasion = {
 				set_defacto_liege = ROOT
 				if = {
 					limit = {
-						is_liege_or_above = ROOT
+						is_vassal_or_below_of = ROOT
 					}
 					imprison = ROOT
 				}
@@ -4579,7 +4562,7 @@ new_crusade = {
 								preferred_gender_based_on_laws_trigger = yes
 							}
 							preferred_limit = {
-								is_liege_or_above = PREV
+								is_vassal_or_below_of = PREV
 								culture = PREV
 								NOT = {
 									age = 45
@@ -4587,14 +4570,14 @@ new_crusade = {
 								preferred_gender_based_on_laws_trigger = yes
 							}
 							preferred_limit = {
-								is_liege_or_above = PREV
+								is_vassal_or_below_of = PREV
 								NOT = {
 									age = 45
 								}
 								preferred_gender_based_on_laws_trigger = yes
 							}
 							preferred_limit = {
-								is_liege_or_above = PREV
+								is_vassal_or_below_of = PREV
 								preferred_gender_based_on_laws_trigger = yes
 							}
 							preferred_limit = {
@@ -4614,20 +4597,20 @@ new_crusade = {
 								is_child_of = PREV
 							}
 							preferred_limit = {
-								is_liege_or_above = PREV
+								is_vassal_or_below_of = PREV
 								culture = PREV
 								NOT = {
 									age = 45
 								}
 							}
 							preferred_limit = {
-								is_liege_or_above = PREV
+								is_vassal_or_below_of = PREV
 								NOT = {
 									age = 45
 								}
 							}
 							preferred_limit = {
-								is_liege_or_above = PREV
+								is_vassal_or_below_of = PREV
 							}
 							preferred_limit = {
 								culture = PREV
@@ -5912,7 +5895,7 @@ religious = {
 				holder_scope = { # attacker owns a county in target duchy
 					OR = {
 						character = ROOT
-						is_liege_or_above = ROOT
+						is_vassal_or_below_of = ROOT
 					}
 				}
 				location = {
@@ -5923,7 +5906,7 @@ religious = {
 								owner = {
 									OR = {
 										character = ROOT
-										is_liege_or_above = ROOT
+										is_vassal_or_below_of = ROOT
 									}
 								}
 							}
@@ -5952,7 +5935,7 @@ religious = {
 											owner = {
 												OR = {
 													character = ROOT
-													is_liege_or_above = ROOT
+													is_vassal_or_below_of = ROOT
 												}
 											}
 										}
@@ -5962,7 +5945,7 @@ religious = {
 												owner = {
 													OR = {
 														character = ROOT
-														is_liege_or_above = ROOT
+														is_vassal_or_below_of = ROOT
 													}
 												}
 											}
