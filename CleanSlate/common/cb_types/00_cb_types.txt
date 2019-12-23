@@ -8538,6 +8538,7 @@ decadence_invasion = {
 	can_ask_to_join_war = no
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			has_character_flag = decadence_invader
 		}
@@ -8555,51 +8556,9 @@ decadence_invasion = {
 	}
 
 	on_success = {
-		any_playable_ruler = {
-			limit = {
-				ai = no
-				NOT = { character = FROM }
-				NOT = { dynasty = FROM }
-				NOT = {
-					any_liege = {
-						character = FROM
-					}
-				}
-				OR = {
-					FROM = { higher_tier_than = DUKE }
-					any_realm_province = {
-						any_neighbor_province = {
-							owner = {
-								any_liege = {
-									character = FROM
-								}
-							}
-						}
-					}
-				}
-			}
-			narrative_event = { id = 91241 }
-		}
-
-		FROM = {
-			if = {
-				limit = { NOT = { has_dlc = "Conclave" } }
-				any_demesne_title = { # All titles
-					if = {
-						limit = {
-							OR = {
-								tier = king
-								tier = emperor
-							}
-							NOT = { has_law = crown_authority_0 }
-						}
-						add_law = crown_authority_0
-					}
-				}
-			}
-		}
-
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = 200
 			piety = 100
 			occupy_minors_of_occupied_settlements = FROM
@@ -8607,6 +8566,9 @@ decadence_invasion = {
 			give_nickname = nick_the_conqueror
 			participation_scaled_prestige = 200
 			participation_scaled_piety = 100
+			hidden_tooltip = {
+				disband_event_forces = decadence_revolters
+			}
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
@@ -8616,11 +8578,25 @@ decadence_invasion = {
 			}
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -200
+			if = { # reset crown authority to minimum
+				limit = { NOT = { has_dlc = "Conclave" } }
+				any_demesne_title = { # All titles
+					if = {
+						limit = {
+							higher_tier_than = DUKE
+							NOT = { has_law = crown_authority_0 }
+						}
+						add_law = crown_authority_0
+					}
+				}
+			}
 			primary_title = {
 				holder_scope = {
-					any_demesne_title = {
+					any_demesne_title = { # eligible duke and king tier titles usurped
 						limit = {
 							higher_tier_than = COUNT
 							NOT = {
@@ -8636,7 +8612,7 @@ decadence_invasion = {
 							hidden_tooltip = { conquest_culture = ROOT }
 						}
 					}
-					any_demesne_title = {
+					any_demesne_title = { # top titles destroyed
 						limit = {
 							tier = PREVPREV
 						}
@@ -8659,23 +8635,34 @@ decadence_invasion = {
 						10 = { give_nickname = nick_the_ill_ruler }
 					}
 				}
+
 			}
 		}
 
-		hidden_tooltip = {
-			ROOT = {
-				disband_event_forces = decadence_revolters
+		any_player = { # inform human players
+			limit = {
+				NOR = {
+					character = FROM
+					dynasty = FROM
+					any_liege = {
+						character = FROM
+					}
+				}
 
-				# Powerful vassals can choose independence
-				#any_vassal = {
-				#	limit = {
-				#		NOT = { character = FROM }
-				#		higher_tier_than = COUNT
-				#		prisoner = no
-				#	}
-				#	character_event = { id = 91240 }
-				# }
+				OR = {
+					FROM = { higher_tier_than = DUKE }	# don't bother with insignificant overthrowals
+					any_realm_province = { 				# unless the player borders them
+						any_neighbor_province = {
+							owner = {
+								any_liege = {
+									character = FROM
+								}
+							}
+						}
+					}
+				}
 			}
+			narrative_event = { id = 91241 }
 		}
 
 		hidden_tooltip = {
@@ -8687,10 +8674,19 @@ decadence_invasion = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
+
+			hidden_tooltip = {
+				disband_event_forces = decadence_revolters
+			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			participation_scaled_prestige = 100
 		}
@@ -8698,40 +8694,43 @@ decadence_invasion = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-		hidden_tooltip = {
-			ROOT = { disband_event_forces = decadence_revolters }
-		}
 	}
 
 	on_reverse_demand = {
-		ROOT = { set_defacto_liege = FROM }
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
+			set_defacto_liege = FROM
+			imprison = FROM
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 8.0
 			}
+			hidden_tooltip = {
+				disband_event_forces = decadence_revolters
+			}
 		}
+
+		# Defender
 		FROM = {
 			prestige = 200
-		}
-		ROOT = {
-			imprison = FROM
-			disband_event_forces = decadence_revolters
-		}
-		if = {
-			limit = {
-				FROM = {
+			if = {
+				limit = {
 					ai = no
 					NOT = { has_character_flag = achievement_decadent_warrior }
 				}
+				set_character_flag = achievement_decadent_warrior
 			}
-			FROM = { set_character_flag = achievement_decadent_warrior }
 		}
 	}
 
 	on_reverse_demand_title = {
-		ROOT = { show_scope_change = no remove_claim = PREV }
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			remove_claim = PREV
+		}
 	}
 
 	attacker_ai_victory_worth = {
