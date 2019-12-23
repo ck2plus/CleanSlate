@@ -8369,22 +8369,18 @@ weaken_vassal_plot = {
 	}
 
 	can_use_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
+		owner = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
 	}
 
 	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
+		owner = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
@@ -8402,7 +8398,9 @@ weaken_vassal_plot = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
@@ -8411,33 +8409,22 @@ weaken_vassal_plot = {
 			}
 			participation_scaled_prestige = 100
 		}
+
+		# Defender
 		FROM = {
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
-						OR = {
-							tier = king
-							tier = emperor
-						}
-	#					is_titular = no
+						higher_tier_than = DUKE
 						NOT = { has_law = crown_authority_0 }
 					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
 			}
@@ -8445,12 +8432,13 @@ weaken_vassal_plot = {
 	}
 
 	on_success_title = {
+		# Defender
 		FROM = {
-			random_vassal = {
+			random_vassal = { # give title to a count vassal who holds a title that is de jure part of contested title
 				limit = {
-					tier = count
+					tier = COUNT
 					any_demesne_title = {
-						tier = count
+						tier = COUNT
 						dejure_liege_title = {
 							ROOT = {
 								plot_target_title = {
@@ -8466,11 +8454,16 @@ weaken_vassal_plot = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 			cancel_plot = plot_weaken_fellow_vassal
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
@@ -8480,6 +8473,7 @@ weaken_vassal_plot = {
 	}
 
 	on_invalidation = {
+		# Attacker
 		ROOT = {
 			cancel_plot = plot_weaken_fellow_vassal
 		}
@@ -8487,12 +8481,17 @@ weaken_vassal_plot = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			imprison = FROM
 			cancel_plot = plot_weaken_fellow_vassal
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
