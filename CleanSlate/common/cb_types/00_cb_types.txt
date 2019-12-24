@@ -10323,23 +10323,33 @@ pagan_subjugation = {
 	sort_priority = 2000
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			religion_group = pagan_group
-			is_reformed_religion = no
-			NOT = { religion = hellenic_pagan }
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
-			OR = {
-				AND = {
-					has_dlc = "Horse Lords"
-					is_nomadic = no
-				}
-				AND = {
-					NOT = { has_dlc = "Horse Lords" }
-					has_horde_culture = no # Should use tribal invasion instead
-				}
+
+			NOR = {
+				is_reformed_religion = yes
+				religion = hellenic_pagan
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
 			}
+
+			trigger_if = { # Aztecs can only subjugate other Aztecs
+				limit = {
+					religion = aztec
+				}
+				FROM = { religion = aztec }
+			}
+
+			trigger_if = {
+				limit = { has_dlc = "Horse Lords" }
+				is_nomadic = no
+			}
+			trigger_else = {
+				has_horde_culture = no # Should use tribal invasion instead
+			}
+
 			OR = {
 				is_tribal = yes
 				primary_title = {
@@ -10347,17 +10357,15 @@ pagan_subjugation = {
 				}
 			}
 
-			OR = {
-				NOT = { has_character_modifier = launched_subjugation }
-				AND = {
-					has_ambition = obj_become_king
-					capital_scope = {
-						kingdom = {
-							FROM = {
-								any_realm_title = {
-									kingdom = {
-										title = PREVPREVPREV
-									}
+			trigger_if = { # can only do it once, except in de jure kingdom of current capital with the right ambition
+				limit = { has_character_modifier = launched_subjugation }
+				has_ambition = obj_become_king
+				capital_scope = {
+					kingdom = {
+						FROM = {
+							any_realm_title = {
+								kingdom = {
+									title = PREVPREVPREV
 								}
 							}
 						}
@@ -10366,21 +10374,19 @@ pagan_subjugation = {
 			}
 		}
 
-		OR = {
-			NOT = { ROOT = { religion = aztec } }
-			FROM = { religion = aztec }
-		}
-
+		# Defender
 		FROM = {
-			in_revolt = no
 			religion_group = pagan_group
-			is_nomadic = no
-			NOT = { is_offmap_governor = yes }
-			OR = {
+
+			OR = { # can subjugate unreformed pagans and reformed pagans of the same religion
 				is_reformed_religion = no
 				is_reformed_religion = ROOT
 			}
-			NOT = {
+
+			NOR = {
+				in_revolt = yes
+				is_nomadic = yes
+				is_offmap_governor = yes
 				any_war = {
 					defender = { character = PREVPREV }
 					OR = {
@@ -10393,6 +10399,7 @@ pagan_subjugation = {
 	}
 
 	on_add = {
+		# Attacker
 		ROOT = {
 			add_character_modifier = {
 				name = launched_subjugation
@@ -10411,7 +10418,9 @@ pagan_subjugation = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			piety = 100
 			participation_scaled_prestige = 100
 		}
@@ -10419,7 +10428,10 @@ pagan_subjugation = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = -100
 			prestige = -100
 
@@ -10433,9 +10445,7 @@ pagan_subjugation = {
 
 			custom_tooltip = {
 				text = tribal_subjugation_tip
-			}
 
-			hidden_tooltip = {
 				opinion = {
 					modifier = opinion_subjugated
 					who = ROOT
@@ -10448,14 +10458,10 @@ pagan_subjugation = {
 				}
 				any_demesne_title = {
 					limit = {
-						higher_tier_than = ROOT
-					}
-					ROOT = { usurp_title = { target = PREV type = invasion } }
-					add_pressed_claim = PREV
-				}
-				any_demesne_title = {
-					limit = {
-						tier = ROOT
+						OR = {
+							higher_tier_than = ROOT
+							tier = ROOT
+						}
 					}
 					ROOT = { usurp_title = { target = PREV type = invasion } }
 					add_pressed_claim = PREV
@@ -10466,16 +10472,21 @@ pagan_subjugation = {
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -100
+		}
+
+		# Defenders
 		FROM = {
-			piety = 50
+			show_scope_change = no
 			participation_scaled_prestige = 50
+			piety = 50
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
-		}
-		ROOT = {
-			piety = -100
 		}
 	}
 
@@ -10486,15 +10497,22 @@ pagan_subjugation = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 2.0
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
+			participation_scaled_prestige = 100
 			piety = 100
+
 			if = {
 				limit = {
 					has_dlc = "Legacy of Rome"
@@ -10510,7 +10528,6 @@ pagan_subjugation = {
 				}
 				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
-			participation_scaled_prestige = 100
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
