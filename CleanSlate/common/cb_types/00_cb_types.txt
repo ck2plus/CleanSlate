@@ -12421,58 +12421,35 @@ muslim_county_conquest = {
 	sort_priority = 700
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
 			piety = 50
 		}
 	}
 
-	on_add = {
-		ROOT = { piety = -50 }
-		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
-
 	can_use = {
+		# Attacker
 		ROOT = {
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
-			is_nomadic = no # Use the 'pagan_county_conquest' CB instead
+			religion_group = muslim
+			NOR = {
+				is_liege_or_above = FROM
+				mercenary = yes
+				is_nomadic = yes # Use the 'pagan_county_conquest' CB instead
+			}
 		}
 	}
 
 	can_use_title = {
-		tier = count
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
-				#NOT = { same_realm = ROOT }
-			}
-		}
+		tier = COUNT
 
-		ROOT = {
-			religion_group = muslim
-		}
-
-		NOT = {
+		owner = {
 			OR = {
-				ROOT = {
-					has_landed_title = PREV
-				}
-				holder_scope = {
-					is_liege_or_above = ROOT
-				}
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 
+		# Only bordering counties
 		location = {
 			any_neighbor_province = {
 				owner = {
@@ -12486,22 +12463,37 @@ muslim_county_conquest = {
 	}
 
 	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
+		owner = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
 	}
 
-	on_success_title = {
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -50
+		}
+
+		fire_haruspicy_event_effect = yes
 		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
+		}
+	}
+
+	on_success_title = {
+		if = { # Vassalise a one county count
 			limit = {
 				holder_scope = {
-					tier = count
-					NOT = { num_of_count_titles = 2 }
+					tier = COUNT
+					num_of_count_titles <= 1
 					lower_tier_than = ROOT
 				}
 			}
@@ -12511,12 +12503,12 @@ muslim_county_conquest = {
 			}
 		}
 
-		if = {
+		if = { # Usurp title under other circumstances
 			limit = {
 				holder_scope = {
 					OR = {
-						higher_tier_than = count
-						num_of_count_titles = 2
+						higher_tier_than = COUNT
+						num_of_count_titles >= 2
 						NOT = { lower_tier_than = ROOT }
 					}
 				}
@@ -12525,7 +12517,6 @@ muslim_county_conquest = {
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = invasion }
 			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
 				limit = {
-					has_holder = yes
 					NOT = {
 						de_facto_liege = PREV
 					}
@@ -12540,7 +12531,10 @@ muslim_county_conquest = {
 				usurp_title_plus_barony_if_unlanded = { target = ROOT type = invasion }
 			}
 		}
+
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
@@ -12550,10 +12544,15 @@ muslim_county_conquest = {
 	}
 
 	on_fail_title = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
@@ -12563,14 +12562,19 @@ muslim_county_conquest = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
@@ -12606,7 +12610,7 @@ muslim_county_conquest = {
 			ROOT = {
 				has_character_flag = is_temujin
 				has_landed_title = e_mongol_empire
-				demesne_size = 1
+				demesne_size >= 1
 			}
 			FROM = {
 				has_landed_title = e_china_west_governor
