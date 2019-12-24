@@ -9196,6 +9196,7 @@ cb_faction_independence = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			vassal_of = FROM
 			mercenary = no
@@ -9203,25 +9204,21 @@ cb_faction_independence = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
+			liege_before_war = { character = FROM }
 		}
+
+		# Defender
 		FROM = {
-			any_demesne_title = {
+			independent = yes
+			in_revolt = no
+
+			any_demesne_title = { # need a proper title of at least equal tier to possibly have ROOT as a vassal at all
 				NOT = { lower_tier_than = ROOT }
 				temporary = no
 			}
-			independent = yes
-			in_revolt = no
+
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
@@ -9243,42 +9240,36 @@ cb_faction_independence = {
 	}
 
 	on_success = {
-		if = {
+		any_attacker = {
 			limit = {
-				FROM = {
-					independent = yes
+				OR = {
+					vassal_of = FROM
+					liege_before_war = {
+						character = FROM
+					}
 				}
 			}
-			any_attacker = {
-				limit = {
-					OR = {
-						vassal_of = FROM
-						liege_before_war = {
-							character = FROM
-						}
-					}
-				}
-				set_defacto_liege = THIS
-				hidden_tooltip = {
-					prestige = 100
-					any_demesne_title = {
-						limit = {
-							controls_religion = no
-							higher_tier_than = BARON
-							FROM = {
-								OR = { # If the old liege can use the subjugation CB, give no claims
-									NOT = { religion_group = pagan_group }
-									NOT = { culture_group = PREVPREV }
-								}
+			set_defacto_liege = THIS
+			hidden_tooltip = {
+				prestige = 100
+				any_demesne_title = {
+					limit = {
+						controls_religion = no
+						higher_tier_than = BARON
+						FROM = {
+							NAND = { # If the old liege can use the subjugation CB, give no claims
+								religion_group = pagan_group
+								culture_group = PREVPREV
 							}
 						}
-						add_weak_pressed_claim = FROM
 					}
-					set_character_flag = ai_flag_never_transfer
+					add_weak_pressed_claim = FROM
 				}
+				set_character_flag = ai_flag_never_transfer
 			}
 		}
 
+		# Attackers
 		ROOT = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
@@ -9293,34 +9284,22 @@ cb_faction_independence = {
 			}
 		}
 
+		# Defender
 		FROM = {
-
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
-			if = {
+			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
 					limit = {
-						OR = {
-							tier = king
-							tier = emperor
-						}
+						higher_tier_than = DUKE
 						NOT = { has_law = crown_authority_0 }
 					}
-					if = {
-						limit = { has_law = crown_authority_1 }
-						add_law = crown_authority_0
-					}
-					if = {
-						limit = { has_law = crown_authority_2 }
-						add_law = crown_authority_1
-					}
-					if = {
-						limit = { has_law = crown_authority_3 }
-						add_law = crown_authority_2
-					}
-					if = {
-						limit = { has_law = crown_authority_4 }
-						add_law = crown_authority_3
+					trigger_switch = {
+						on_trigger = has_law
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
 			}
@@ -9335,48 +9314,59 @@ cb_faction_independence = {
 	}
 
 	on_fail = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -50
+			participation_scaled_prestige = -50
+
 			add_character_modifier = {
 				name = faction_independence_ultimatum_timer
 				hidden = yes
 				duration = 3650
 			}
+
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 			}
-			participation_scaled_prestige = -50
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
+
+			add_character_modifier = {
+				name = faction_independence_ultimatum_timer
+				hidden = yes
+				duration = 3650
+			}
+
 			hidden_tooltip = {
 				participation_scaled_prestige = -50
 				disband_event_forces = faction_revolters
 			}
-			add_character_modifier = {
-				name = faction_independence_ultimatum_timer
-				hidden = yes
-				duration = 3650
-			}
 		}
+
+		# Defender
 		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
+			participation_scaled_prestige = -100
 			prisoner = FROM
+
 			add_character_modifier = {
 				name = faction_independence_ultimatum_timer
 				hidden = yes
 				duration = 3650
 			}
+
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 			}
-			participation_scaled_prestige = -100
 		}
-
 		any_attacker = {
 			limit = {
 				NOT = { character = ROOT }
@@ -9384,6 +9374,7 @@ cb_faction_independence = {
 			}
 			prisoner = FROM
 			participation_scaled_prestige = -100
+
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
@@ -9394,10 +9385,13 @@ cb_faction_independence = {
 			}
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 50
-			hidden_tooltip = { disband_event_forces = faction_loyalists }
+
 			hidden_tooltip = {
+				disband_event_forces = faction_loyalists
 				if = {
 					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
 					opinion = {
