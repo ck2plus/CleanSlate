@@ -9675,38 +9675,25 @@ embargo_cb = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			independent = yes
-			NOT = { has_embargo = FROM }
 			mercenary = no
+			NOT = { has_embargo = FROM }
 		}
+
+		# Defender
 		FROM = {
-			OR = {
-				AND = {
+			any_realm_lord = {
+				OR = {
+					is_patrician = yes
 					is_merchant_republic = yes
-					any_trade_post = {
-						owner = {
-							OR = {
-								character = ROOT
-								is_liege_or_above = ROOT
-							}
-						}
-					}
 				}
-				AND = {
-					OR = {
-						is_merchant_republic = yes
-						higher_tier_than = DUKE
-					}
-					any_realm_lord = {
-						is_patrician = yes
-						any_trade_post = {
-							owner = {
-								OR = {
-									character = ROOT
-									is_liege_or_above = ROOT
-								}
-							}
+				any_trade_post = {
+					owner = {
+						OR = {
+							character = ROOT
+							is_liege_or_above = ROOT
 						}
 					}
 				}
@@ -9715,12 +9702,15 @@ embargo_cb = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			independent = yes
 			NOT = { has_embargo = FROM }
 		}
+
+		# Defender
 		FROM = {
-			OR = {
+			OR = { # is (liege of) a merchant republic
 				is_merchant_republic = yes
 				AND = {
 					higher_tier_than = DUKE
@@ -9744,7 +9734,9 @@ embargo_cb = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			embargo = FROM
 			if = {
 				limit = {
@@ -9756,53 +9748,51 @@ embargo_cb = {
 	}
 
 	on_fail = {
-		if = {
-			limit = {
-				NOT = {
-					any_attacker = {
-						NOT = { character = ROOT }
-						is_merchant_republic = yes
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+			if = { # only lose prestige if not instigated by another merchant republic
+				limit = {
+					NOT = {
+						any_attacker = {
+							NOT = { character = ROOT }
+							is_merchant_republic = yes
+						}
 					}
 				}
 			}
-			ROOT = {
-				prestige = -100
-			}
+			prestige = -100
 		}
-
-		if = {
+		any_attacker = { # attacking merchant republics pay dearly for not winning
 			limit = {
-				any_attacker = {
-					NOT = { character = ROOT }
-					is_merchant_republic = yes
-				}
+				NOT = { character = ROOT }
+				is_merchant_republic = yes
 			}
-			any_attacker = {
-				limit = {
-					NOT = { character = ROOT }
-					is_merchant_republic = yes
-				}
-				prestige = -100
-			}
+			show_scope_change = no
+			prestige = -1000
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 50
 		}
 	}
 
 	on_reverse_demand = {
-		if = {
-			limit = {
-				NOT = {
-					any_attacker = {
-						NOT = { character = ROOT }
-						is_merchant_republic = yes
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+
+			if = { # only lose prestige and pay reparations if not instigated by another merchant republic
+				limit = {
+					NOT = {
+						any_attacker = {
+							NOT = { character = ROOT }
+							is_merchant_republic = yes
+						}
 					}
 				}
-			}
-
-			ROOT = {
 				prestige = -200
 				transfer_scaled_wealth = {
 					to = FROM
@@ -9810,28 +9800,21 @@ embargo_cb = {
 				}
 			}
 		}
-
-		if = {
+		any_attacker = { # attacking merchant republics also pay dearly
 			limit = {
-				any_attacker = {
-					NOT = { character = ROOT }
-					is_merchant_republic = yes
-				}
+				NOT = { character = ROOT }
+				is_merchant_republic = yes
 			}
-			any_attacker = {
-				limit = {
-					NOT = { character = ROOT }
-					is_merchant_republic = yes
-				}
-				prestige = -200
-				transfer_scaled_wealth = {
-					to = FROM
-					value = 4.0
-				}
+			prestige = -200
+			transfer_scaled_wealth = {
+				to = FROM
+				value = 4.0
 			}
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 		}
 	}
@@ -9875,19 +9858,19 @@ embargo_cb = {
 		modifier = {
 			factor = 0
 			ROOT = {
-				opinion = { who = FROM value = 25 }
+				opinion = { who = FROM value >= 25 }
 			}
 		}
 		modifier = {
 			factor = 0.5
 			ROOT = {
-				opinion = { who = FROM value = 0 }
+				opinion = { who = FROM value >= 0 }
 			}
 		}
 		modifier = {
 			factor = 0.5
 			ROOT = {
-				opinion = { who = FROM value = -25 }
+				opinion = { who = FROM value >= -25 }
 			}
 		}
 	}
