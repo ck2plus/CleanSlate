@@ -15526,10 +15526,12 @@ manifest_destiny_invasion = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			OR = {
 				ai = yes
 				multiplayer = no
+
 				NOT = {
 					has_game_rule = {
 						name = multiplayer_invasions
@@ -15537,6 +15539,7 @@ manifest_destiny_invasion = {
 					}
 				}
 			}
+
 			OR = {
 				AND = {
 					dynasty = 613 # Seljuks
@@ -15544,11 +15547,11 @@ manifest_destiny_invasion = {
 				}
 				dynasty = 800 # Timurids
 			}
-		}
 
-		ROOT = {
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
 		}
 	}
 
@@ -15564,7 +15567,7 @@ manifest_destiny_invasion = {
 		# Target must have at least 3 counties within the target kingdom
 		FROM = {
 			num_of_realm_counties = {
-				value = 3
+				value >= 3
 				title = PREV
 			}
 		}
@@ -15599,7 +15602,8 @@ manifest_destiny_invasion = {
 	}
 
 	is_valid_title = {
-		FROM = {
+		# Defender
+		FROM = { # Controls any title in target title
 			any_realm_title = {
 				de_jure_liege_or_above = PREVPREV
 			}
@@ -15618,8 +15622,11 @@ manifest_destiny_invasion = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = 200
+			participation_scaled_prestige = 200
 
 			hidden_tooltip = {
 				if = {
@@ -15634,7 +15641,6 @@ manifest_destiny_invasion = {
 					}
 				}
 			}
-			participation_scaled_prestige = 200
 
 			if = {
 				limit = {
@@ -15657,7 +15663,10 @@ manifest_destiny_invasion = {
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -200
 		}
 	}
@@ -15665,14 +15674,14 @@ manifest_destiny_invasion = {
 	on_success_title = {
 		custom_tooltip = {
 			text = other_invasion_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					vassalize_or_take_under_title_destroy_duchies = {
-						title = PREV
-						enemy = FROM
-						is_crusade = yes # Even if the kingdom title holder is not participating in the war, gain holdings occupied by all participants
-						type = invasion
-					}
+
+			# Attacker
+			ROOT = {
+				vassalize_or_take_under_title_destroy_duchies = {
+					title = PREV
+					enemy = FROM
+					is_crusade = yes # Even if the kingdom title holder is not participating in the war, gain holdings occupied by all participants
+					type = invasion
 				}
 			}
 		}
@@ -15686,10 +15695,18 @@ manifest_destiny_invasion = {
 	}
 
 	on_fail = {
-		FROM = {
-			prestige = 100
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -200
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
+			prestige = 100
+			participation_scaled_prestige = 100
+
 			if = {
 				limit = {
 					has_dlc = "Legacy of Rome"
@@ -15705,19 +15722,17 @@ manifest_destiny_invasion = {
 				}
 				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
-			participation_scaled_prestige = 100
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-		ROOT = {
-			prestige = -200
-		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
@@ -15734,8 +15749,12 @@ manifest_destiny_invasion = {
 				decadence = 10
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			prestige = 200
+			participation_scaled_prestige = 200
 			if = {
 				limit = {
 					has_dlc = "Legacy of Rome"
@@ -15751,7 +15770,6 @@ manifest_destiny_invasion = {
 				}
 				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
-			participation_scaled_prestige = 200
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
