@@ -12195,25 +12195,17 @@ caliphal_subjugation = {
 	sort_priority = 1000
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
 			piety = 200
 		}
 	}
 
-	on_add = {
-		ROOT = { piety = -200 }
-		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
-
 	can_use = {
+		# Attacker
 		ROOT = {
+			religion_group = muslim
+
 			OR = {
 				ai = yes
 				multiplayer = no
@@ -12224,7 +12216,7 @@ caliphal_subjugation = {
 					}
 				}
 			}
-			religion_group = muslim
+
 			OR = {
 				has_landed_title = d_sunni
 				has_landed_title = d_shiite
@@ -12233,21 +12225,28 @@ caliphal_subjugation = {
 				has_landed_title = d_yazidi
 				has_landed_title = d_hurufi
 			}
-			is_nomadic = no
+
 			OR = {
 				has_horde_culture = no # Should use tribal invasion instead
 				has_dlc = "Horse Lords"
 			}
-			NOT = { has_character_modifier = launched_subjugation }
-			mercenary = no
+
+			NOR = {
+				has_character_modifier = launched_subjugation
+				mercenary = yes
+				is_nomadic = yes
+			}
 		}
+
+		# Defender
 		FROM = {
 			religion = ROOT
-			NOT = { is_offmap_governor = yes }
+			is_offmap_governor = no
 		}
 	}
 
 	can_use_title = {
+		# Defender
 		FROM = {
 			any_realm_province = {
 				de_jure_liege_or_above = PREVPREV
@@ -12256,6 +12255,7 @@ caliphal_subjugation = {
 	}
 
 	is_valid_title = {
+		# Defender
 		FROM = {
 			any_realm_province = {
 				de_jure_liege_or_above = PREVPREV
@@ -12263,7 +12263,25 @@ caliphal_subjugation = {
 		}
 	}
 
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -200
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
+		}
+	}
+
 	on_add_title = {
+		# Attacker
 		ROOT = {
 			add_character_modifier = {
 				name = launched_subjugation
@@ -12274,16 +12292,21 @@ caliphal_subjugation = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = 100
-			decadence = -5
 			participation_scaled_prestige = 100
+			decadence = -5
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -200
 		}
 	}
@@ -12291,19 +12314,26 @@ caliphal_subjugation = {
 	on_success_title = {
 		custom_tooltip = {
 			text = pagan_subjugation_tip
-			hidden_tooltip = {
-				ROOT = {
-					subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
-						title = PREV
-						enemy = FROM
-					}
+			# Attacker
+			ROOT = {
+				subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
+					title = PREV
+					enemy = FROM
 				}
 			}
 		}
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -100
+		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			prestige = 50
 			participation_scaled_prestige = 50
 		}
@@ -12311,21 +12341,24 @@ caliphal_subjugation = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
 		}
-		ROOT = {
-			prestige = -100
-		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 2.0
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			prestige = 100
+			participation_scaled_prestige = 100
 			if = {
 				limit = {
 					has_dlc = "Legacy of Rome"
@@ -12341,7 +12374,6 @@ caliphal_subjugation = {
 				}
 				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
-			participation_scaled_prestige = 100
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
