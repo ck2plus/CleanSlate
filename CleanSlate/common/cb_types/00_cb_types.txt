@@ -11278,6 +11278,7 @@ duchy_adventure = {
 	check_de_jure_tier = DUKE # this scans all dejure duchies for the counties which are held by or vassals(or below) of selected character
 
 	can_use = {
+		#	 Attacker
 		ROOT = { has_character_flag = duchy_adventurer }
 	}
 
@@ -11312,19 +11313,13 @@ duchy_adventure = {
 	on_success_title = {
 		custom_tooltip = {
 			text = other_invasion_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					vassalize_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-						type = host
-					}
+			ROOT = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = FROM
+					type = host
 				}
-			}
-		}
 
-		ROOT = {
-			hidden_tooltip = {
 				# Special case: Seljuk succeeds in his first conquest
 				if = {
 					limit = {
@@ -11337,7 +11332,7 @@ duchy_adventure = {
 				}
 
 				# Special case: Timur succeeds in his first conquest
-				if = {
+				else_if = {
 					limit = {
 						has_character_flag = timur_himself
 					}
@@ -11348,7 +11343,7 @@ duchy_adventure = {
 				}
 
 				# Special case: Sabuktigin succeeds in his first conquest
-				if = {
+				else_if = {
 					limit = {
 						has_character_flag = sabuktigin_himself
 					}
@@ -11359,7 +11354,7 @@ duchy_adventure = {
 				}
 
 				# Special case: Sultanate of Rum creator succeeds in his first conquest
-				if = {
+				else_if = {
 					limit = {
 						has_character_flag = rum_creator
 					}
@@ -11381,7 +11376,21 @@ duchy_adventure = {
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -100
+			clear_wealth = yes
+			imprison = FROM
+			hidden_tooltip = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+			}
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			hidden_tooltip = {
 				opinion = {
@@ -11391,42 +11400,34 @@ duchy_adventure = {
 				}
 			}
 		}
-		ROOT = {
-			clear_wealth = yes
-			imprison = FROM
-			hidden_tooltip = {
-				disband_event_forces = yes
-				clr_character_flag = duchy_adventurer
-			}
-		}
-
-		ROOT = { prestige = -100 }
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
+			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
-		}
-
-		FROM = {
-			prestige = 200
-		}
-
-		ROOT = {
 			clear_wealth = yes
 			imprison = FROM
-			prestige = -200
 			hidden_tooltip = {
 				disband_event_forces = yes
 				clr_character_flag = duchy_adventurer
 			}
 		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = 200
+		}
 	}
 
 	on_attacker_leader_death = {
+		# Attacker
 		ROOT = {
 			hidden_tooltip = {
 				disband_event_forces = yes
@@ -11463,6 +11464,7 @@ kingdom_adventure = {
 	check_de_jure_tier = KING # this scans all dejure duchies for the counties which are held by or vassals(or below) of selected character
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			OR = {
 				has_character_flag = duchy_adventurer
@@ -11487,7 +11489,9 @@ kingdom_adventure = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 500
 			piety = 250
 			hidden_tooltip = {
@@ -11528,7 +11532,10 @@ kingdom_adventure = {
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -500
 			piety = -250
 		}
@@ -11537,12 +11544,11 @@ kingdom_adventure = {
 	on_success_title = {
 		custom_tooltip = {
 			text = other_invasion_succ_tip
-			hidden_tooltip = {
 
+			# Attacker
+			ROOT = {
 				if = { # Special stuff for player Child of Destiny (AI Children do not have this flag)
-					limit = {
-						ROOT = { has_character_flag = child_of_destiny_outwards_focus }
-					}
+					limit = { has_character_flag = child_of_destiny_outwards_focus }
 					FROM = { # Ensure that the Child of Destiny always gets one County in the targeted Kingdom (mainly useful when testing with yesmen, but can also happen in rare occurences where the target is imprisoned)
 						random_realm_title = {
 							limit = {
@@ -11552,143 +11558,114 @@ kingdom_adventure = {
 							usurp_title = { target = ROOT type = host }
 						}
 					}
-					ROOT = {
-						liege = { save_event_target_as = old_liege_target }
-						if = { # Abandon all old titles if you were a vassal
-							limit = {
-								independent = no
-							}
-							any_demesne_title = {
-								limit = {
-									NOR = {
-										title = PREVPREV
-										de_jure_liege_or_above = PREVPREV
-									}
-								}
-								grant_title = event_target:old_liege_target
-							}
-							any_vassal = {
-								limit = {
-									capital_scope = {
-										NOR = {
-											title = PREVPREVPREV
-											de_jure_liege_or_above = PREVPREVPREV
-										}
-									}
-								}
-								set_defacto_liege = event_target:old_liege_target
-							}
-						}
-					}
-				}
-
-				FROM = { # The adventurer takes ANY demesne title, including the targeted Kingdom, within the area of the targeted kingdom
-					any_demesne_title = {
+					liege = { save_event_target_as = old_liege_target }
+					if = { # Abandon all old titles if you were a vassal
 						limit = {
-							OR = {
-								title = PREVPREV
-								de_jure_liege_or_above = PREVPREV
-							}
-							NOT = { ROOT = { has_character_flag = rum_creator } }
+							independent = no
 						}
-						usurp_title = { target = ROOT type = host }
+						any_demesne_title = {
+							limit = {
+								NOR = {
+									title = PREVPREV
+									de_jure_liege_or_above = PREVPREV
+								}
+							}
+							grant_title = event_target:old_liege_target
+						}
+						any_vassal = {
+							limit = {
+								capital_scope = {
+									NOR = {
+										title = PREVPREVPREV
+										de_jure_liege_or_above = PREVPREVPREV
+									}
+								}
+							}
+							set_defacto_liege = event_target:old_liege_target
+						}
 					}
 				}
+			}
 
-				if = { # Claim the targeted Kingdom if it isn't held by anyone
+			# Defender
+			FROM = { # The adventurer takes ANY demesne title, including the targeted Kingdom, within the area of the targeted kingdom
+				any_demesne_title = {
 					limit = {
-						has_holder = no
+						OR = {
+							title = PREVPREV
+							de_jure_liege_or_above = PREVPREV
+						}
+						NOT = { ROOT = { has_character_flag = rum_creator } }
 					}
 					usurp_title = { target = ROOT type = host }
 				}
+			}
 
+			if = { # Claim the targeted Kingdom if it isn't held by anyone
+				limit = {
+					has_holder = no
+				}
+				usurp_title = { target = ROOT type = host }
+			}
+
+			# Attacker
+			ROOT = {
 				if = { # Create a Kingdom if the adventurer does not have one by this point
 					limit = {
-						ROOT = {
-							NOR = {
-								any_demesne_title = {
-									tier = KING
-								}
-								has_character_flag = rum_creator
+						NOR = {
+							any_demesne_title = {
+								tier = KING
 							}
 						}
 					}
 					if = {
 						limit = {
-							ROOT = {
-								NOT = {
-									has_character_flag = is_child_of_destiny
-								}
-							}
+							has_character_flag = rum_creator
 						}
-						ROOT = {
-							create_title = {
-								tier = KING
-								landless = no
-								temporary = no
-								custom_created = yes
-								culture = ROOT
-								holder = ROOT
-								name = "INDIAN_MUSLIM_KINGDOM"
-								base_title = PREV
-								copy_title_laws = yes
-							}
+						k_rum = {
+							grant_title = ROOT
 						}
-					}
-					else = {
-						ROOT = {
-							save_event_target_as = target_name
-							create_title = {
-								tier = KING
-								landless = no
-								temporary = no
-								custom_created = yes
-								culture = ROOT
-								holder = ROOT
-								name = "DESTINY_KINGDOM"
-								base_title = PREV
-								copy_title_laws = yes
-							}
-							capital_scope = {
-								county = {
-									save_event_target_as = coa_target
-								}
-							}
-							primary_title = {
-								set_coa = event_target:coa_target
-							}
+						capital_scope = {
+							culture = ROOT
 						}
-					}
-				}
-				if = {
-					limit = {
-						ROOT = { has_character_flag = rum_creator }
-					}
-					k_rum = {
-						grant_title = ROOT
-					}
-				}
 
-				ROOT = { # Preserve Vassals under the targeted kingdom
-					vassalize_or_take_under_title = { # Take all vassals held by the target under the title
-						title = PREV
-						enemy = FROM
-						type = host
+						# Special case: Sultanate of Rum might start yet another war
+						character_event = {
+							id = 60610
+							days = 600
+							random = 300
+						}
 					}
-					set_defacto_liege = ROOT # Always go Independent
-				}
-
-				hidden_effect = {
-					if = {
+					else_if = {
 						limit = {
-							ROOT = {
-								has_character_flag = is_child_of_destiny
+							has_character_flag = is_child_of_destiny
+						}
+						save_event_target_as = target_name
+						create_title = {
+							tier = KING
+							landless = no
+							temporary = no
+							custom_created = yes
+							culture = ROOT
+							holder = ROOT
+							name = "DESTINY_KINGDOM"
+							base_title = PREV
+							copy_title_laws = yes
+						}
+						capital_scope = {
+							county = {
+								save_event_target_as = coa_target
+							}
+						}
+						primary_title = {
+							set_coa = event_target:coa_target
+						}
+						if = {
+							limit = {
 								NOT = {
 									religion_group = muslim
 								}
 							}
-						}
-						ROOT = {
 							any_demesne_title = {
 								limit = {
 									higher_tier_than = COUNT
@@ -11696,72 +11673,58 @@ kingdom_adventure = {
 								add_law = succ_primogeniture
 							}
 						}
-					}
-				}
-			}
-		}
-
-		ROOT = {
-			hidden_tooltip = {
-				if = {
-					limit = {
-						has_character_flag = rum_creator
-					}
-					capital_scope = {
-						culture = ROOT
-					}
-				}
-				else_if = {
-					limit = {
-						has_character_flag = is_child_of_destiny
-					}
-					character_event = { id = HF.303 days = 3 }
-				}
-				else = {
-					capital_scope = {
-						reverse_culture = ROOT
-					}
-					any_child = {
-						limit = {
-							is_ruler = no
-							ai = yes
-							#liege = { character = ROOT }
-						}
-						culture = ROOT
-					}
-					any_courtier = {
-						limit = {
-							is_ruler = no
-							ai = yes
-						}
-						culture = ROOT
-					}
-				}
-
-				if = { # Give bloodline to Child of Destiny
-					limit = {
-						has_character_flag = is_child_of_destiny
-						higher_real_tier_than = DUKE
-						NOT = {
-							any_owned_bloodline = {
-								has_bloodline_flag = created_bloodline
+						character_event = { id = HF.303 days = 3 } # Child of Destiny can choose to adopt culture/religion of newly conquered land.
+						if = { # Give bloodline to Child of Destiny
+							limit = {
+								higher_real_tier_than = DUKE
+								NOT = {
+									any_owned_bloodline = {
+										has_bloodline_flag = created_bloodline
+									}
+								}
 							}
+							character_event = { id = HF.304 days = 14 } # Bloodline event
 						}
 					}
-					character_event = { id = HF.304 days = 14 }
+					else = {
+						create_title = {
+							tier = KING
+							landless = no
+							temporary = no
+							custom_created = yes
+							culture = ROOT
+							holder = ROOT
+							name = "INDIAN_MUSLIM_KINGDOM"
+							base_title = PREV
+							copy_title_laws = yes
+						}
+						capital_scope = {
+							reverse_culture = ROOT
+						}
+						any_child = {
+							limit = {
+								is_ruler = no
+								ai = yes
+							}
+							culture = ROOT
+						}
+						any_courtier = {
+							limit = {
+								is_ruler = no
+								ai = yes
+							}
+							culture = ROOT
+						}
+					}
 				}
 
-				# Special case: Sultanate of Rum might start yet another war
-				if = {
-					limit = {
-						has_character_flag = rum_creator
-					}
-					character_event = {
-						id = 60610
-						days = 600
-						random = 300
-					}
+				# Preserve Vassals under the targeted kingdom
+				vassalize_or_take_under_title = { # Take all vassals held by the target under the title
+					title = PREV
+					enemy = FROM
+					type = host
 				}
+				set_defacto_liege = ROOT # Always go Independent
 			}
 		}
 
@@ -11774,6 +11737,7 @@ kingdom_adventure = {
 	}
 
 	on_invalidation = {
+		# Attacker
 		ROOT = {
 			clr_character_flag = child_of_destiny_made_player_choice
 			clr_character_flag = child_of_destiny_adventure
@@ -11781,6 +11745,26 @@ kingdom_adventure = {
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -100
+			clear_wealth = yes
+			imprison = FROM
+			hidden_tooltip = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+				if = {
+					limit = {
+						has_character_flag = is_child_of_destiny
+					}
+					remove_trait = disinherited
+					set_global_flag = child_of_destiny_invasion_fail@ROOT
+				}
+			}
+		}
+
+		# Defender
 		FROM = {
 			prestige = 100
 			hidden_tooltip = {
@@ -11791,49 +11775,20 @@ kingdom_adventure = {
 				}
 			}
 		}
-		ROOT = {
-			clear_wealth = yes
-			imprison = FROM
-			hidden_tooltip = {
-				disband_event_forces = yes
-				clr_character_flag = duchy_adventurer
-				if = {
-					limit = {
-						has_character_flag = is_child_of_destiny
-					}
-					remove_trait = disinherited
-				}
-			}
-		}
-
-		ROOT = { prestige = -100 }
-
-		if = {
-			limit = {
-				ROOT = {
-					has_character_flag = is_child_of_destiny
-				}
-			}
-			set_global_flag = child_of_destiny_invasion_fail@ROOT
-		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
+			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
-		}
-
-		FROM = {
-			prestige = 200
-		}
-
-		ROOT = {
 			clear_wealth = yes
 			imprison = FROM
-			prestige = -200
+
 			hidden_tooltip = {
 				disband_event_forces = yes
 				clr_character_flag = duchy_adventurer
@@ -11842,21 +11797,20 @@ kingdom_adventure = {
 						has_character_flag = is_child_of_destiny
 					}
 					remove_trait = disinherited
+					set_global_flag = child_of_destiny_invasion_reverse_demand@ROOT
 				}
 			}
 		}
 
-		if = {
-			limit = {
-				ROOT = {
-					has_character_flag = is_child_of_destiny
-				}
-			}
-			set_global_flag = child_of_destiny_invasion_reverse_demand@ROOT
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = 200
 		}
 	}
 
 	on_attacker_leader_death = {
+		# Attacker
 		ROOT = {
 			hidden_tooltip = {
 				disband_event_forces = yes
