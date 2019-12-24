@@ -89,8 +89,7 @@ claim = {
 			}
 		}
 
-		# Defender
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -102,8 +101,7 @@ claim = {
 		# Attacker
 		ROOT = { has_claim = PREV }
 
-		# Defender
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -416,8 +414,7 @@ other_claim = {
 			}
 		}
 
-		# Defender
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -459,8 +456,7 @@ other_claim = {
 		# Third-party claimant
 		ROOT = { has_claim = PREV }
 
-		# Defender
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -850,8 +846,7 @@ claim_on_liege = {
 	}
 
 	is_valid_title = {
-		# Defender
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -1091,7 +1086,7 @@ claim_on_liege_plot = {
 	}
 
 	can_use_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -1118,7 +1113,7 @@ claim_on_liege_plot = {
 	}
 
 	is_valid_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -1537,7 +1532,7 @@ other_claim_on_liege = {
 	# FROM is defender
 	# FROMFROM is attacker
 	is_valid_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -2730,7 +2725,7 @@ invasion = {
 	}
 
 	can_use_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -2739,7 +2734,7 @@ invasion = {
 	}
 
 	is_valid_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -8369,7 +8364,7 @@ weaken_vassal_plot = {
 	}
 
 	can_use_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -8378,7 +8373,7 @@ weaken_vassal_plot = {
 	}
 
 	is_valid_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -10606,7 +10601,7 @@ peasant_revolt = {
 	}
 
 	is_valid_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -12442,7 +12437,7 @@ muslim_county_conquest = {
 	can_use_title = {
 		tier = COUNT
 
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -12463,7 +12458,7 @@ muslim_county_conquest = {
 	}
 
 	is_valid_title = {
-		owner = {
+		holder_scope = {
 			OR = {
 				character = FROM
 				is_liege_or_above = FROM
@@ -12728,7 +12723,7 @@ pagan_county_conquest = {
 						}
 					}
 				}
-				location = { is_coastal }
+				location = { is_coastal = yes }
 				has_global_flag = viking_age_started
 			}
 			location = { # Otherwise any county neighbouring attacker's subrealm
@@ -13076,183 +13071,168 @@ dejure_county_claim = {
 	}
 
 	can_use_title = {
-		tier = count
+		tier = COUNT
 
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
+		holder_scope = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
 
-		OR = {
-			kingdom = {
-				holder = ROOT
-			}
-			empire = {
-				holder = ROOT
-			}
-			dejure_liege_title = {
-				holder = ROOT
-			}
-		}
+		any_de_jure_liege_title = { holder = ROOT }
 
-		NOT = {
-			OR = {
-				ROOT = {
-					has_landed_title = PREV
-				}
-				holder_scope = {
-					is_liege_or_above = ROOT
-				}
-			}
-		}
-
+		# Defender
 		FROM = {
 			OR = {
 				holy_order = no
 				NOT = { religion = ROOT }
-				NOT = { has_dlc = "Sons of Abraham" }
-				OR = {
-					AND = {
-						primary_title = { title = d_knights_templar }
-						ROOT = {
-							has_character_modifier = expelled_d_knights_templar
+
+				trigger_if = {
+					limit = { has_dlc = "Sons of Abraham" }
+
+					# Can only attack holy orders of own religion if expelled by attacker
+					OR = {
+						AND = {
+							primary_title = { title = d_knights_templar }
+							ROOT = {
+								has_character_modifier = expelled_d_knights_templar
+							}
+						}
+						AND = {
+							primary_title = { title = d_knights_hospitaler }
+							ROOT = {
+								has_character_modifier = expelled_d_knights_hospitaler
+							}
+						}
+						AND = {
+							primary_title = { title = d_teutonic_order }
+							ROOT = {
+								has_character_modifier = expelled_d_teutonic_order
+							}
+						}
+						AND = {
+							primary_title = { title = d_jomsvikings }
+							ROOT = {
+								has_character_modifier = expelled_d_jomsvikings
+							}
+						}
+						AND = {
+							primary_title = { title = d_hashshashin }
+							ROOT = {
+								has_character_modifier = expelled_d_hashshashin
+							}
+						}
+						AND = {
+							primary_title = { title = d_bektashi }
+							ROOT = {
+								has_character_modifier = expelled_d_bektashi
+							}
+						}
+						AND = {
+							primary_title = { title = d_haruriyyah }
+							ROOT = {
+								has_character_modifier = expelled_d_haruriyyah
+							}
+						}
+						AND = {
+							primary_title = { title = d_holy_sepulchre }
+							ROOT = {
+								has_character_modifier = expelled_d_holy_sepulchre
+							}
+						}
+						AND = {
+							primary_title = { title = d_saint_anthony }
+							ROOT = {
+								has_character_modifier = expelled_d_saint_anthony
+							}
+						}
+						AND = {
+							primary_title = { title = d_immortals }
+							ROOT = {
+								has_character_modifier = expelled_d_immortals
+							}
+						}
+						AND = {
+							primary_title = { title = d_zealots }
+							ROOT = {
+								has_character_modifier = expelled_d_zealots
+							}
+						}
+						AND = {
+							primary_title = { title = d_sky_lords }
+							ROOT = {
+								has_character_modifier = expelled_d_sky_lords
+							}
+						}
+						AND = {
+							primary_title = { title = d_spirit_guardians }
+							ROOT = {
+								has_character_modifier = expelled_d_spirit_guardians
+							}
+						}
+						AND = {
+							primary_title = { title = d_warriors_perun }
+							ROOT = {
+								has_character_modifier = expelled_d_warriors_perun
+							}
+						}
+						AND = {
+							primary_title = { title = d_chosen_perkunas }
+							ROOT = {
+								has_character_modifier = expelled_d_chosen_perkunas
+							}
+						}
+						AND = {
+							primary_title = { title = d_sons_kaleva }
+							ROOT = {
+								has_character_modifier = expelled_d_sons_kaleva
+							}
+						}
+						AND = {
+							primary_title = { title = d_huitzilopochtli }
+							ROOT = {
+								has_character_modifier = expelled_d_huitzilopochtli
+							}
+						}
+						AND = {
+							primary_title = { title = d_knights_santiago }
+							ROOT = {
+								has_character_modifier = expelled_d_knights_santiago
+							}
+						}
+						AND = {
+							primary_title = { title = d_knights_calatrava }
+							ROOT = {
+								has_character_modifier = expelled_d_knights_calatrava
+							}
+						}
+						AND = {
+							primary_title = { title = d_saint_addai }
+							ROOT = {
+								has_character_modifier = expelled_d_saint_addai
+							}
+						}
+						AND = {
+							primary_title = { title = d_zun_warriors }
+							ROOT = {
+								has_character_modifier = expelled_d_zun_warriors
+							}
 						}
 					}
-					AND = {
-						primary_title = { title = d_knights_hospitaler }
-						ROOT = {
-							has_character_modifier = expelled_d_knights_hospitaler
-						}
-					}
-					AND = {
-						primary_title = { title = d_teutonic_order }
-						ROOT = {
-							has_character_modifier = expelled_d_teutonic_order
-						}
-					}
-					AND = {
-						primary_title = { title = d_jomsvikings }
-						ROOT = {
-							has_character_modifier = expelled_d_jomsvikings
-						}
-					}
-					AND = {
-						primary_title = { title = d_hashshashin }
-						ROOT = {
-							has_character_modifier = expelled_d_hashshashin
-						}
-					}
-					AND = {
-						primary_title = { title = d_bektashi }
-						ROOT = {
-							has_character_modifier = expelled_d_bektashi
-						}
-					}
-					AND = {
-						primary_title = { title = d_haruriyyah }
-						ROOT = {
-							has_character_modifier = expelled_d_haruriyyah
-						}
-					}
-					AND = {
-						primary_title = { title = d_holy_sepulchre }
-						ROOT = {
-							has_character_modifier = expelled_d_holy_sepulchre
-						}
-					}
-					AND = {
-						primary_title = { title = d_saint_anthony }
-						ROOT = {
-							has_character_modifier = expelled_d_saint_anthony
-						}
-					}
-					AND = {
-						primary_title = { title = d_immortals }
-						ROOT = {
-							has_character_modifier = expelled_d_immortals
-						}
-					}
-					AND = {
-						primary_title = { title = d_zealots }
-						ROOT = {
-							has_character_modifier = expelled_d_zealots
-						}
-					}
-					AND = {
-						primary_title = { title = d_sky_lords }
-						ROOT = {
-							has_character_modifier = expelled_d_sky_lords
-						}
-					}
-					AND = {
-						primary_title = { title = d_spirit_guardians }
-						ROOT = {
-							has_character_modifier = expelled_d_spirit_guardians
-						}
-					}
-					AND = {
-						primary_title = { title = d_warriors_perun }
-						ROOT = {
-							has_character_modifier = expelled_d_warriors_perun
-						}
-					}
-					AND = {
-						primary_title = { title = d_chosen_perkunas }
-						ROOT = {
-							has_character_modifier = expelled_d_chosen_perkunas
-						}
-					}
-					AND = {
-						primary_title = { title = d_sons_kaleva }
-						ROOT = {
-							has_character_modifier = expelled_d_sons_kaleva
-						}
-					}
-					AND = {
-						primary_title = { title = d_huitzilopochtli }
-						ROOT = {
-							has_character_modifier = expelled_d_huitzilopochtli
-						}
-					}
-					AND = {
-						primary_title = { title = d_knights_santiago }
-						ROOT = {
-							has_character_modifier = expelled_d_knights_santiago
-						}
-					}
-					AND = {
-						primary_title = { title = d_knights_calatrava }
-						ROOT = {
-							has_character_modifier = expelled_d_knights_calatrava
-						}
-					}
-					AND = {
-						primary_title = { title = d_saint_addai }
-						ROOT = {
-							has_character_modifier = expelled_d_saint_addai
-						}
-					}
-					AND = {
-						primary_title = { title = d_zun_warriors }
-						ROOT = {
-							has_character_modifier = expelled_d_zun_warriors
-						}
-					}
+				}
+				trigger_else = {
+					always = yes # If Sons of Abraham is not active
 				}
 			}
 		}
 	}
 
 	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
+		any_de_jure_liege_title = { holder = ROOT }
+		holder_scope = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
@@ -13270,14 +13250,12 @@ dejure_county_claim = {
 	}
 
 	on_success_title = {
-		if = {
+		if = { # Vassalise one county counts
 			limit = {
 				holder_scope = {
-					tier = count
+					tier = COUNT
 					is_patrician = no
-					NOT = {
-						num_of_count_titles = 2
-					}
+					num_of_count_titles <= 1
 				}
 			}
 
@@ -13286,12 +13264,12 @@ dejure_county_claim = {
 			}
 		}
 
-		if = {
+		if = { # Usurp title under all other circumstances
 			limit = {
 				holder_scope = {
 					OR = {
-						higher_tier_than = count
-						num_of_count_titles = 2
+						higher_tier_than = COUNT
+						num_of_count_titles >= 2
 						is_patrician = yes
 					}
 				}
@@ -13300,7 +13278,6 @@ dejure_county_claim = {
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
 			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
 				limit = {
-					has_holder = yes
 					NOT = {
 						de_facto_liege = PREV
 					}
@@ -13315,7 +13292,10 @@ dejure_county_claim = {
 				usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
 			}
 		}
+
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
@@ -13332,10 +13312,15 @@ dejure_county_claim = {
 	}
 
 	on_fail_title = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
@@ -13345,14 +13330,19 @@ dejure_county_claim = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
@@ -13416,7 +13406,7 @@ dejure_county_claim = {
 			ROOT = {
 				has_character_flag = is_temujin
 				has_landed_title = e_mongol_empire
-				demesne_size = 1
+				demesne_size >= 1
 			}
 			FROM = {
 				has_landed_title = e_china_west_governor
