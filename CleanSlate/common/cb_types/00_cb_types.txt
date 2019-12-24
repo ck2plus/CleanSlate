@@ -14131,15 +14131,21 @@ shia_caliphate_rising = {
 	apply_short_occ_mod = no # Do not apply the 'recently_conquered' modifier to Holdings
 
 	can_use = {
+		# Attacker
+		ROOT = {
+			has_character_flag = shia_caliphate_pretender
+		}
+	}
+
+	is_valid = {
+		# Attacker
 		ROOT = {
 			has_character_flag = shia_caliphate_pretender
 		}
 	}
 
 	is_valid_title = {
-		ROOT = {
-			has_character_flag = shia_caliphate_pretender
-		}
+		# Defender
 		FROM = {
 			any_realm_title = {
 				de_jure_liege_or_above = PREVPREV
@@ -14162,59 +14168,36 @@ shia_caliphate_rising = {
 	}
 
 	on_success = {
-		clr_global_flag = shia_caliphate_revolt_ongoing
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = 500
 			religion_authority = {
 				modifier = rise_of_the_shia_caliphate
 			}
 			clr_character_flag = shia_caliphate_pretender
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = -500
 		}
+
+		clr_global_flag = shia_caliphate_revolt_ongoing
 	}
 
 	on_success_title = {
 		custom_tooltip = {
 			text = tribal_invasion_succ_tip
-			hidden_tooltip = {
-				d_shiite = {
-					usurp_title = { target = ROOT type = holy_war }
-				}
-				FROM = {
-					random_realm_province = {
-						limit = {
-							de_jure_liege_or_above = PREVPREV
-							NOT = { religion = ROOT }
-							religion_group = muslim
-						}
-						religion = ROOT
-					}
-					random_realm_province = {
-						limit = {
-							de_jure_liege_or_above = PREVPREV
-							NOT = { religion = ROOT }
-							religion_group = muslim
-						}
-						religion = ROOT
-					}
-					random_realm_province = {
-						limit = {
-							de_jure_liege_or_above = PREVPREV
-							NOT = { religion = ROOT }
-							religion_group = muslim
-						}
-						religion = ROOT
-					}
-					random_realm_province = {
-						limit = {
-							de_jure_liege_or_above = PREVPREV
-							NOT = { religion = ROOT }
-							religion_group = muslim
-						}
-						religion = ROOT
-					}
+			d_shiite = {
+				usurp_title = { target = ROOT type = holy_war }
+			}
+
+			# Defender
+			FROM = {
+				while = {
+					count = 5
 					random_realm_province = {
 						limit = {
 							de_jure_liege_or_above = PREVPREV
@@ -14224,89 +14207,101 @@ shia_caliphate_rising = {
 						religion = ROOT
 					}
 				}
-				ROOT = {
-					occupy_minors_of_occupied_settlements = FROM
-					gain_all_occupied_titles = { who = FROM type = revolt }
-					if = {
-						limit = {
-							PREV = {
-								OR = {
-									has_holder = no
-									holder_scope = {
-										character = FROM
-									}
-								}
-							}
-						}
-						usurp_title = { target = PREV type = revolt }
-					}
-					if = {
-						limit = {
-							NOT = {
-								ROOT = {
-									any_demesne_title = {
-										tier = KING
-									}
-								}
-							}
-						}
-						create_title = {
-							tier = KING
-							landless = no
-							temporary = no
-							custom_created = yes
-							culture = ROOT
-							holder = ROOT
-							name = "SHIA_CUSTOM_FALLBACK"
-							base_title = PREV
-							copy_title_laws = yes
-						}
-					}
+			}
 
-					vassalize_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-						is_religious = yes
-						type = revolt
-					}
-
-					any_demesne_title = {
-						limit = { tier = BARON }
-						remove_holding_modifier = recently_conquered
-						refill_holding_levy = yes
-					}
-					wealth = 500
-				}
-
+			# Attacker
+			ROOT = {
+				occupy_minors_of_occupied_settlements = FROM
+				gain_all_occupied_titles = { who = FROM type = revolt }
 				if = {
 					limit = {
-						FROM = { is_liege_or_above = ROOT }
+						PREV = {
+							OR = {
+								has_holder = no
+								holder_scope = {
+									character = FROM
+								}
+							}
+						}
 					}
-					FROM = { imprison = ROOT }
+					usurp_title = { target = PREV type = revolt }
 				}
+				if = {
+					limit = {
+						NOT = {
+							ROOT = {
+								any_demesne_title = {
+									tier = KING
+								}
+							}
+						}
+					}
+					create_title = {
+						tier = KING
+						landless = no
+						temporary = no
+						custom_created = yes
+						culture = ROOT
+						holder = ROOT
+						name = "SHIA_CUSTOM_FALLBACK"
+						base_title = PREV
+						copy_title_laws = yes
+					}
+				}
+
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = FROM
+					is_religious = yes
+					type = revolt
+				}
+
+				any_demesne_title = {
+					limit = { tier = BARON }
+					remove_holding_modifier = recently_conquered
+					refill_holding_levy = yes
+				}
+				wealth = 500
+			}
+
+			if = {
+				limit = {
+					FROM = { is_liege_or_above = ROOT }
+				}
+				FROM = { imprison = ROOT }
 			}
 		}
 	}
 
 	on_fail = {
-		clr_global_flag = shia_caliphate_revolt_ongoing
-		FROM = {
-			piety = 250
-		}
+		#Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -250
 			clr_character_flag = shia_caliphate_pretender
 		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			piety = 250
+		}
+
+		clr_global_flag = shia_caliphate_revolt_ongoing
 	}
 
 	on_reverse_demand = {
-		clr_global_flag = shia_caliphate_revolt_ongoing
+		# Attacker
 		ROOT = {
 			piety = -500
+			show_scope_change = no
 			clr_character_flag = shia_caliphate_pretender
 			imprison = FROM
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 250
 			participation_scaled_piety = 250
 		}
@@ -14314,13 +14309,17 @@ shia_caliphate_rising = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_piety = 250 }
 		}
+
+		clr_global_flag = shia_caliphate_revolt_ongoing
 	}
 
 	on_attacker_leader_death = {
-		clr_global_flag = shia_caliphate_revolt_ongoing
+		# Attacker
 		ROOT = {
 			clr_character_flag = shia_caliphate_pretender
 		}
+		clr_global_flag = shia_caliphate_revolt_ongoing
+
 		end_war = invalid
 	}
 
