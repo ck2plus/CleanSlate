@@ -13937,7 +13937,7 @@ other_dejure_county_claim = {
 
 		holder_scope = {
 			OR = {
-				holder = FROM
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
@@ -13952,7 +13952,7 @@ other_dejure_county_claim = {
 
 		holder_scope = {
 			OR = {
-				holder = FROM
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
@@ -14365,18 +14365,25 @@ depose_antipope = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
+			mercenary = no
 			religion = FROM
+
 			OR = {
 				religion = catholic
 				religion = fraticelli
 			}
+
 			rightful_religious_head_scope = {
-				NOT = { has_claim = k_papal_state }
-				NOT = { has_claim = d_fraticelli }
+				NOR = {
+					has_claim = k_papal_state
+					has_claim = d_fraticelli
+				}
 			}
-			mercenary = no
 		}
+
+		# Defender
 		FROM = {
 			rightful_religious_head_scope = {
 				is_liege_or_above = PREV
@@ -14389,6 +14396,7 @@ depose_antipope = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			religion = FROM
 			OR = {
@@ -14396,10 +14404,14 @@ depose_antipope = {
 				religion = fraticelli
 			}
 			rightful_religious_head_scope = {
-				NOT = { has_claim = k_papal_state }
-				NOT = { has_claim = d_fraticelli }
+				NOR = {
+					has_claim = k_papal_state
+					has_claim = d_fraticelli
+				}
 			}
 		}
+
+		# Defender
 		FROM = {
 			rightful_religious_head_scope = {
 				is_liege_or_above = PREV
@@ -14425,9 +14437,12 @@ depose_antipope = {
 	on_invalidation = {
 		# Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever.
 		hidden_tooltip = {
+			# Attacker
 			ROOT = {
 				clr_character_flag = flag_antipope_for_coronation
 			}
+
+			# Defender
 			FROM = {
 				clr_character_flag = flag_antipope_for_coronation
 			}
@@ -14435,27 +14450,12 @@ depose_antipope = {
 	}
 
 	on_success = {
-	if = {
-		limit = {
-			ROOT = {
-				has_character_flag = flag_antipope_for_coronation
-			}
-		}
+		# Attackers
 		ROOT = {
-			character_event = { id = HF.20220 } #Papal Coronation may proceed.
-		}
-	}
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = {
-				participation_scaled_piety = 500
-				participation_scaled_prestige = 250
-			}
-		}
-
-		ROOT = {
+			show_scope_change = no
 			participation_scaled_piety = 500
 			participation_scaled_prestige = 250
+
 			religion_authority = {
 				modifier = deposed_antipope
 				years = 50
@@ -14472,6 +14472,11 @@ depose_antipope = {
 				excommunicate = no
 			}
 
+			if = {
+				limit = { has_character_flag = flag_antipope_for_coronation }
+				character_event = { id = HF.20220 } # Papal Coronation may proceed
+			}
+
 			rightful_religious_head_scope = {
 				opinion = {
 					who = ROOT
@@ -14479,8 +14484,17 @@ depose_antipope = {
 				}
 			}
 		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = {
+				participation_scaled_piety = 500
+				participation_scaled_prestige = 250
+			}
+		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = -500
 			prestige = -250
 
@@ -14492,45 +14506,54 @@ depose_antipope = {
 	}
 
 	on_fail = {
-		hidden_tooltip = {
-			FROM = {
-				clr_character_flag = flag_antipope_for_coronation
-			}
-			ROOT = {
-				clr_character_flag = flag_antipope_for_coronation
-			}
-		}
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -250
 			prestige = -125
+
+			hidden_tooltip = {
+				clr_character_flag = flag_antipope_for_coronation
+			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = 100
 			prestige = 50
+
+			hidden_tooltip = {
+				clr_character_flag = flag_antipope_for_coronation
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		hidden_tooltip = {
-			FROM = {
-				clr_character_flag = flag_antipope_for_coronation
-			}
-			ROOT = {
-				clr_character_flag = flag_antipope_for_coronation
-			}
-		}
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 			piety = -500
 			prestige = -250
+
+			hidden_tooltip = {
+				clr_character_flag = flag_antipope_for_coronation
+			}
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = 500
 			prestige = 250
+
+			hidden_tooltip = {
+				clr_character_flag = flag_antipope_for_coronation
+			}
 		}
 	}
 
