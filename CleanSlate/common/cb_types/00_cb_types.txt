@@ -8182,7 +8182,7 @@ coastal_county_republic = {
 					is_land = no # first sea zone
 
 					any_neighbor_province = {
-						trigger_if = { # part of attaacker's realm
+						trigger_if = { # part of attacker's realm
 							limit = {
 								has_owner = yes # not wasteland or sea zone
 							}
@@ -8195,7 +8195,7 @@ coastal_county_republic = {
 						}
 						trigger_else = {
 							is_land = no # second sea zone
-							any_neighbor_province = { # part of attaacker's realm
+							any_neighbor_province = { # part of attacker's realm
 								owner = {
 									OR = {
 										character = ROOT
@@ -11851,45 +11851,26 @@ pagan_holy_war = {
 	sort_priority = 800
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
 			piety = 100
 		}
 	}
 
-	on_add = {
-		ROOT = { piety = -100 }
-		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
-
 	can_use = {
+		# Attacker
 		ROOT = {
-			OR = {
-				religion = bon_reformed
-				religion = hellenic_pagan_reformed
-				religion = norse_pagan_reformed
-				religion = tengri_pagan_reformed
-				religion = baltic_pagan_reformed
-				religion = slavic_pagan_reformed
-				religion = finnish_pagan_reformed
-				religion = aztec_reformed
-				religion = aztec
-				religion = west_african_pagan_reformed
-				religion = zun_pagan_reformed
+			is_reformed_religion = yes
+			NOR = {
+				has_religion_feature = religion_peaceful
+				same_realm = FROM
+				religion = FROM
+				mercenary = yes
 			}
-			NOT = { has_religion_feature = religion_peaceful }
-			NOT = { same_realm = FROM }
-			NOT = { religion = FROM }
 			top_liege = {
 				religion = ROOT
 			}
-			mercenary = no
+
 		}
 	}
 
@@ -11897,46 +11878,42 @@ pagan_holy_war = {
 		# The attacker needs at least one county in the target kingdom, or a border, or be only two sea zones away from one of your counties
 		any_direct_de_jure_vassal_title = {
 			OR = {
-				holder_scope = {
+				holder_scope = { # part of attacker's realm
 					OR = {
 						character = ROOT
 						is_liege_or_above = ROOT
 					}
 				}
 				location = {
-					any_neighbor_province = {
-						OR = {
-							AND = {
-								has_owner = yes
-								owner = {
-									OR = {
-										character = ROOT
-										is_liege_or_above = ROOT
-									}
+					any_neighbor_province = { # bordering province
+						trigger_if = {
+							limit = { has_owner = yes }
+							owner = { # part of attacker's realm
+								OR = {
+									character = ROOT
+									is_liege_or_above = ROOT
 								}
 							}
-							AND = {
-								is_land = no
-								any_neighbor_province = {
-									OR = {
-										AND = {
-											has_owner = yes
-											owner = {
-												OR = {
-													character = ROOT
-													is_liege_or_above = ROOT
-												}
-											}
+						}
+						trigger_else = {
+							is_land = no # first sea zone
+							any_neighbor_province = {
+								trigger_if = {
+									limit = { has_owner = yes }
+									owner = { # part of attacker's realm
+										OR = {
+											character = ROOT
+											is_liege_or_above = ROOT
 										}
-										AND = {
-											is_land = no
-											any_neighbor_province = {
-												owner = {
-													OR = {
-														character = ROOT
-														is_liege_or_above = ROOT
-													}
-												}
+									}
+								}
+								trigger_else = {
+									is_land = no # second sea zone
+									any_neighbor_province = {
+										owner = { # part of attacker's realm
+											OR = {
+												character = ROOT
+												is_liege_or_above = ROOT
 											}
 										}
 									}
@@ -11950,45 +11927,36 @@ pagan_holy_war = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			OR = {
-				religion = bon_reformed
-				religion = hellenic_pagan_reformed
-				religion = norse_pagan_reformed
-				religion = tengri_pagan_reformed
-				religion = baltic_pagan_reformed
-				religion = slavic_pagan_reformed
-				religion = finnish_pagan_reformed
-				religion = aztec_reformed
-				religion = aztec
-				religion = west_african_pagan_reformed
-				religion = zun_pagan_reformed
+			is_reformed_religion = yes
+			NOR = {
+				same_realm = FROM
+				religion = FROM
+				top_liege = { religion = FROM }
 			}
-			NOT = { same_realm = FROM }
-			NOT = { religion = FROM }
-			top_liege = {
-				NOT = { religion = FROM }
+		}
+	}
+
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -100
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
 			}
 		}
 	}
 
 	on_success = {
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = {
-				participation_scaled_piety = 100
-				participation_scaled_prestige = 50
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						has_ambition = obj_strengthen_religion
-					}
-					change_variable = { which = strengthen_religion value = 1 }
-				}
-			}
-		}
-
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_piety = 100
@@ -12004,8 +11972,7 @@ pagan_holy_war = {
 					}
 					change_variable = { which = strengthen_religion value = 1 }
 				}
-			}
-			hidden_tooltip = {
+
 				if = {
 					limit = {
 						OR = {
@@ -12024,54 +11991,82 @@ pagan_holy_war = {
 			}
 		}
 
+		# Attacker
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = {
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 50
+
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
+					}
+					change_variable = { which = strengthen_religion value = 1 }
+				}
+			}
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
+			prestige = -50
+			piety = -100
 			religion_authority = {
 				modifier = lost_holy_war
 				years = 20
 			}
 		}
-		FROM = { show_scope_change = no piety = -100 }
-		FROM = { show_scope_change = no prestige = -50 }
 	}
 
 	on_success_title = {
 		custom_tooltip = {
 			text = religious_cb_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					vassalize_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-						same_religion = yes # Only vassalize rulers of my religion
-						is_religious = yes
-						type = holy_war
-					}
+
+			# Attacker
+			ROOT = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = FROM
+					same_religion = yes # Only vassalize rulers of my religion
+					is_religious = yes
+					type = holy_war
 				}
 			}
 		}
 	}
 
 	on_fail = {
-		ROOT = { piety = -50 }
-		ROOT = { prestige = -100 }
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -50
+			prestige = -100
+		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
+			religion_authority = {
+				modifier = lost_holy_war
+				years = 20
+			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = {
-				participation_scaled_piety = 200
-				participation_scaled_prestige = 100
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
 			}
 			hidden_tooltip = {
 				if = {
@@ -12082,18 +12077,12 @@ pagan_holy_war = {
 				}
 			}
 		}
-		ROOT = {
-			religion_authority = {
-				modifier = lost_holy_war
-				years = 20
-			}
-		}
-		FROM = {
-			religion_authority = {
-				modifier = won_holy_war
-				years = 20
-			}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
 			hidden_tooltip = {
+				participation_scaled_piety = 200
+				participation_scaled_prestige = 100
+
 				if = {
 					limit = {
 						has_ambition = obj_strengthen_religion
