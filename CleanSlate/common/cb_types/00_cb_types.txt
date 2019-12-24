@@ -10590,24 +10590,25 @@ peasant_revolt = {
 	is_independence = yes
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			primary_title = { temporary = yes } # Revolter or adventurer trigger
-			war = no
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				war = yes
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
 		}
 	}
 
 	can_use_title = {
-		tier = count
+		tier = COUNT
 	}
 
 	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
+		owner = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
@@ -10626,8 +10627,16 @@ peasant_revolt = {
 
 	on_success_title = {
 		usurp_title_plus_barony_if_unlanded = { target = ROOT type = revolt }
-		ROOT = { set_defacto_liege = ROOT }
+
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			set_defacto_liege = ROOT
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -100
 		}
 
@@ -10640,17 +10649,9 @@ peasant_revolt = {
 	}
 
 	on_fail_title = {
-		FROM = {
-			prestige = 10
-			hidden_tooltip = {
-				opinion = {
-					modifier = opinion_rebel_traitor
-					who = ROOT
-					months = 1200
-				}
-			}
-		}
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			clear_wealth = yes
 			imprison = FROM
 			hidden_tooltip = {
@@ -10660,10 +10661,38 @@ peasant_revolt = {
 				}
 			}
 		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = 10
+			hidden_tooltip = {
+				opinion = {
+					modifier = opinion_rebel_traitor
+					who = ROOT
+					months = 1200
+				}
+			}
+		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			clear_wealth = yes
+			imprison = FROM
+			hidden_tooltip = {
+				add_character_modifier = {
+					name = broken_spirit
+					days = -1
+				}
+			}
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 20
 			hidden_tooltip = {
 				opinion = {
@@ -10674,16 +10703,6 @@ peasant_revolt = {
 				add_character_modifier = {
 					name = crushed_revolt
 					days = 3650
-				}
-			}
-		}
-		ROOT = {
-			clear_wealth = yes
-			imprison = FROM
-			hidden_tooltip = {
-				add_character_modifier = {
-					name = broken_spirit
-					days = -1
 				}
 			}
 		}
@@ -10719,10 +10738,12 @@ heretic_revolt = {
 	check_de_jure_tier = DUKE
 
 	can_use = {
+		# Attacker
 		ROOT = { has_character_flag = heretic_revolter }
 	}
 
 	is_valid = {
+		# Defender
 		FROM = {
 			NOT = { religion = ROOT }
 		}
@@ -10740,7 +10761,9 @@ heretic_revolt = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 200
 			piety = 100
 			occupy_minors_of_occupied_settlements = FROM
@@ -10748,7 +10771,9 @@ heretic_revolt = {
 			clr_character_flag = heretic_revolter
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -500
 			piety = -500
 			religion_authority = {
@@ -10758,6 +10783,7 @@ heretic_revolt = {
 	}
 
 	on_success_title = {
+		# Attacker
 		ROOT = {
 			vassalize_or_take_under_title = {
 				title = PREV
@@ -10769,19 +10795,18 @@ heretic_revolt = {
 		}
 		if = {
 			limit = {
-				controls_religion = no
-				holder_scope = {
-					OR = {
-						character = FROM
-						is_liege_or_above = FROM
+				OR = {
+					AND = {
+						controls_religion = no # Don't usurp religious leadership titles
+						holder_scope = {
+							OR = {
+								character = FROM
+								is_liege_or_above = FROM
+							}
+						}
 					}
+					has_holder = no # Create title if it doesn't exist
 				}
-			}
-			usurp_title = { target = ROOT type = holy_war }
-		}
-		if = {
-			limit = {
-				has_holder = no
 			}
 			usurp_title = { target = ROOT type = holy_war }
 		}
@@ -10795,7 +10820,9 @@ heretic_revolt = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			clear_wealth = yes
 			imprison = FROM
 			clr_character_flag = heretic_revolter
@@ -10806,9 +10833,15 @@ heretic_revolt = {
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 50
 			piety = 100
+			religion_authority = {
+				modifier = won_heretic_revolt
+			}
 			hidden_tooltip = {
 				opinion = {
 					modifier = opinion_rebel_traitor
@@ -10816,14 +10849,13 @@ heretic_revolt = {
 					months = 1200
 				}
 			}
-			religion_authority = {
-				modifier = won_heretic_revolt
-			}
 		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			clear_wealth = yes
 			imprison = FROM
 			clr_character_flag = heretic_revolter
@@ -10834,9 +10866,15 @@ heretic_revolt = {
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			piety = 200
+			religion_authority = {
+				modifier = won_heretic_revolt
+			}
 			hidden_tooltip = {
 				opinion = {
 					modifier = opinion_rebel_traitor
@@ -10847,9 +10885,6 @@ heretic_revolt = {
 					name = crushed_revolt
 					days = 3650
 				}
-			}
-			religion_authority = {
-				modifier = won_heretic_revolt
 			}
 		}
 	}
@@ -10884,10 +10919,12 @@ religious_revolt = {
 	check_de_jure_tier = DUKE
 
 	can_use = {
+		# Attacker
 		ROOT = { has_character_flag = religious_revolter }
 	}
 
 	is_valid = {
+		# Defender
 		FROM = {
 			NOT = { religion = ROOT }
 		}
@@ -10905,7 +10942,9 @@ religious_revolt = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 200
 			piety = 100
 			occupy_minors_of_occupied_settlements = FROM
@@ -10913,7 +10952,9 @@ religious_revolt = {
 			clr_character_flag = religious_revolter
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -500
 			piety = -500
 			religion_authority = {
@@ -10923,7 +10964,9 @@ religious_revolt = {
 	}
 
 	on_success_title = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			vassalize_or_take_under_title = {
 				title = PREV
 				enemy = FROM
@@ -10934,19 +10977,18 @@ religious_revolt = {
 		}
 		if = {
 			limit = {
-				controls_religion = no
-				holder_scope = {
-					OR = {
-						character = FROM
-						is_liege_or_above = FROM
+				OR = {
+					AND = {
+						controls_religion = no # Don't usurp religious leadership titles
+						holder_scope = {
+							OR = {
+								character = FROM
+								is_liege_or_above = FROM
+							}
+						}
 					}
+					has_holder = no # Create title if it doesn't exist
 				}
-			}
-			usurp_title = { target = ROOT type = holy_war }
-		}
-		if = {
-			limit = {
-				has_holder = no
 			}
 			usurp_title = { target = ROOT type = holy_war }
 		}
@@ -10960,7 +11002,9 @@ religious_revolt = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			clear_wealth = yes
 			imprison = FROM
 			clr_character_flag = religious_revolter
@@ -10971,9 +11015,15 @@ religious_revolt = {
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 50
 			piety = 100
+			religion_authority = {
+				modifier = won_religious_revolt
+			}
 			hidden_tooltip = {
 				opinion = {
 					modifier = opinion_rebel_traitor
@@ -10981,14 +11031,13 @@ religious_revolt = {
 					months = 1200
 				}
 			}
-			religion_authority = {
-				modifier = won_religious_revolt
-			}
 		}
 	}
 
 	on_reverse_demand = {
+		# Attackr
 		ROOT = {
+			show_scope_change = no
 			clear_wealth = yes
 			imprison = FROM
 			clr_character_flag = religious_revolter
@@ -10999,9 +11048,15 @@ religious_revolt = {
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			piety = 200
+			religion_authority = {
+				modifier = won_religious_revolt
+			}
 			hidden_tooltip = {
 				opinion = {
 					modifier = opinion_rebel_traitor
@@ -11012,9 +11067,6 @@ religious_revolt = {
 					name = crushed_revolt
 					days = 3650
 				}
-			}
-			religion_authority = {
-				modifier = won_religious_revolt
 			}
 		}
 	}
@@ -11049,15 +11101,17 @@ liberation_revolt = {
 	is_independence = yes
 
 	can_use = {
+		# Attacker
 		ROOT = { has_character_flag = nationalist_rebel }
 	}
 
 	can_use_title = {
-		tier = king
+		tier = KING
 		has_holder = no
 	}
 
 	is_valid = {
+		# Defender
 		FROM = {
 			NOT = { culture = ROOT }
 		}
@@ -11079,14 +11133,19 @@ liberation_revolt = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 1000
 			occupy_minors_of_occupied_settlements = FROM
 			gain_all_occupied_titles = { who = FROM type = revolt }
 			clr_character_flag = nationalist_rebel
 			give_nickname = nick_the_liberator
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -500
 		}
 	}
@@ -11094,28 +11153,28 @@ liberation_revolt = {
 	on_success_title = {
 		custom_tooltip = {
 			text = tribal_invasion_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					vassalize_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-						is_revolt = yes
-						type = revolt
-					}
-					if = {
-						limit = {
-							num_of_count_titles = 5
-							PREV = {
-								OR = {
-									has_holder = no
-									holder_scope = {
-										character = FROM
-									}
+
+			# Attacker
+			ROOT = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = FROM
+					is_revolt = yes
+					type = revolt
+				}
+				if = { # Usurp or create kingdom title if enough land was taken
+					limit = {
+						num_of_count_titles >= 5
+						PREV = {
+							OR = {
+								has_holder = no
+								holder_scope = {
+									character = FROM
 								}
 							}
 						}
-						usurp_title = { target = PREV type = revolt }
 					}
+					usurp_title = { target = PREV type = revolt }
 				}
 			}
 		}
@@ -11129,17 +11188,9 @@ liberation_revolt = {
 	}
 
 	on_fail_title = {
-		FROM = {
-			prestige = 100
-			hidden_tooltip = {
-				opinion = {
-					modifier = opinion_rebel_traitor
-					who = ROOT
-					months = 1200
-				}
-			}
-		}
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			clear_wealth = yes
 			imprison = FROM
 			clr_character_flag = nationalist_rebel
@@ -11151,10 +11202,40 @@ liberation_revolt = {
 				remove_trait = inspiring_leader
 			}
 		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = 100
+			hidden_tooltip = {
+				opinion = {
+					modifier = opinion_rebel_traitor
+					who = ROOT
+					months = 1200
+				}
+			}
+		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			clear_wealth = yes
+			imprison = FROM
+			clr_character_flag = nationalist_rebel
+			hidden_tooltip = {
+				add_character_modifier = {
+					name = broken_spirit
+					days = -1
+				}
+				remove_trait = inspiring_leader
+			}
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 200
 			hidden_tooltip = {
 				opinion = {
@@ -11166,18 +11247,6 @@ liberation_revolt = {
 					name = crushed_major_revolt
 					days = 3650
 				}
-			}
-		}
-		ROOT = {
-			clear_wealth = yes
-			imprison = FROM
-			clr_character_flag = nationalist_rebel
-			hidden_tooltip = {
-				add_character_modifier = {
-					name = broken_spirit
-					days = -1
-				}
-				remove_trait = inspiring_leader
 			}
 		}
 	}
