@@ -10367,6 +10367,9 @@ pagan_subjugation = {
 					}
 				}
 			}
+			trigger_else = {
+				always = yes
+			}
 		}
 
 		# Defender
@@ -15169,13 +15172,19 @@ indian_subjugation = {
 	sort_priority = 1000
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
 			piety = 500
 		}
 	}
 
 	on_add = {
-		ROOT = { piety = -500 }
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -500
+		}
+
 		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
@@ -15187,19 +15196,26 @@ indian_subjugation = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			has_dharmic_religion_trigger = yes
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			has_horde_culture = no # Should use tribal invasion instead
-			is_nomadic = no
-			mercenary = no
+
+			NOR = {
+				same_realm = FROM
+				is_liege_or_above = FROM
+				has_horde_culture = yes # Should use tribal invasion instead
+				is_nomadic = yes
+				mercenary = yes
+			}
 		}
+
+		# Defender
 		FROM = {
-			NOT = { is_offmap_governor = yes }
 			has_dharmic_religion_trigger = yes
 			culture_group = ROOT
-			NOT = {
+
+			NOR = {
+				is_offmap_governor = yes
 				any_war = {
 					defender = { character = PREVPREV }
 					using_cb = indian_subjugation
@@ -15209,40 +15225,38 @@ indian_subjugation = {
 	}
 
 	can_use_title = {
+		# Attacker
 		ROOT = {
-			OR = {
-				NOT = { has_character_modifier = launched_subjugation }
-				AND = {
-					has_ambition = obj_become_king
-					capital_scope = {
-						kingdom = {
-							title = PREVPREVPREV
+			trigger_if = { # can only do it once, except in de jure kingdom of current capital with the right ambition
+				limit = { has_character_modifier = launched_subjugation }
+				has_ambition = obj_become_king
+				capital_scope = {
+					kingdom = {
+						FROM = {
+							any_realm_title = {
+								kingdom = {
+									title = PREVPREVPREV
+								}
+							}
 						}
 					}
 				}
 			}
+			trigger_else = {
+				always = yes
+			}
 		}
 
+		# Defender
 		FROM = {
 			any_realm_province = {
 				de_jure_liege_or_above = PREVPREV
 			}
 		}
-
-		#OR = { # This ensures that the AI doesn't declare this type of war against someone who only holds a few counties within the targeted title...
-		#	ROOT = {
-		#		ai = no
-		#	}
-		#	FROM = {
-		#		num_of_realm_counties = {
-		#			value = 5
-		#			title = PREV
-		#		}
-		#	}
-		# }
 	}
 
 	is_valid_title = {
+		# Defender
 		FROM = {
 			any_realm_province = {
 				de_jure_liege_or_above = PREVPREV
@@ -15251,6 +15265,7 @@ indian_subjugation = {
 	}
 
 	on_add_title = {
+		# Attacker
 		ROOT = {
 			if = {
 				limit = {
@@ -15273,14 +15288,19 @@ indian_subjugation = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 200
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 200 }
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -200
 		}
 	}
@@ -15292,7 +15312,7 @@ indian_subjugation = {
 				holder_scope = {
 					character = FROM
 				}
-				NOT = { ROOT = { tier = EMPEROR } }
+				ROOT = { lower_tier_than = EMPEROR }
 			}
 			ROOT = { usurp_title = { target = PREV type = invasion } }
 		}
@@ -15333,31 +15353,35 @@ indian_subjugation = {
 		# Vassalize the rest
 		custom_tooltip = {
 			text = pagan_subjugation_tip
-			hidden_tooltip = {
-				ROOT = {
-					subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
-						title = PREV
-						enemy = FROM
-					}
+			ROOT = {
+				subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
+					title = PREV
+					enemy = FROM
 				}
 			}
 		}
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -100
+		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-		ROOT = {
-			prestige = -100
-		}
 	}
 
 	on_invalidation = {
+		# Attacker
 		ROOT = {
 			remove_character_modifier = launched_subjugation
 			piety = 500
@@ -15365,14 +15389,19 @@ indian_subjugation = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 2.0
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 200
 		}
 		any_defender = {
