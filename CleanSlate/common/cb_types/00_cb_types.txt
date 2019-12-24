@@ -14801,13 +14801,21 @@ buddhist_holy_war = {
 	sort_priority = 800
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			religion = buddhist
-			NOT = { same_realm = FROM }
+
+			NOR = {
+				same_realm = FROM
+				mercenary = yes
+				is_nomadic = yes
+			}
+
 			OR = {
 				NOT = { religion_group = FROM }
 				FROM = { religion = taoist }
-				AND = {
+
+				AND = { # Can always attack known devil worshippers of the same religion
 					religion_group = FROM
 					FROM = {
 						has_character_modifier = known_satanist
@@ -14817,12 +14825,15 @@ buddhist_holy_war = {
 					}
 				}
 			}
+
 			top_liege = {
 				religion_group = ROOT
+
 				OR = {
 					NOT = { religion = FROM }
 					FROM = { religion = taoist }
-					AND = {
+
+					AND = { # Can always attack known devil worshippers of the same religion
 						religion_group = FROM
 						FROM = {
 							has_character_modifier = known_satanist
@@ -14838,20 +14849,18 @@ buddhist_holy_war = {
 					}
 				}
 			}
-			mercenary = no
-			is_nomadic = no
 		}
 	}
 
 	can_use_title = {
-		tier = count
+		tier = COUNT
 
 		# The attacker needs a border or be at the most two sea zones away
 		location = {
 			any_neighbor_province = {
 				OR = {
-					AND = {
-						has_owner = yes
+					trigger_if = {
+						limit = { has_owner = yes }
 						owner = {
 							OR = {
 								character = ROOT
@@ -14859,12 +14868,12 @@ buddhist_holy_war = {
 							}
 						}
 					}
-					AND = {
-						is_land = no
+					trigger_else = {
+						is_land = no # first sea zone
 						any_neighbor_province = {
 							OR = {
-								AND = {
-									has_owner = yes
+								trigger_if = {
+									limit = { has_owner = yes }
 									owner = {
 										OR = {
 											character = ROOT
@@ -14872,8 +14881,8 @@ buddhist_holy_war = {
 										}
 									}
 								}
-								AND = {
-									is_land = no
+								trigger_else = {
+									is_land = no # second sea zone
 									any_neighbor_province = {
 										owner = {
 											OR = {
@@ -14895,10 +14904,12 @@ buddhist_holy_war = {
 		ROOT = {
 			religion = buddhist
 			NOT = { same_realm = FROM }
+
 			OR = {
 				NOT = { religion_group = FROM }
 				FROM = { religion = taoist }
-				AND = {
+
+				AND = { # Can always attack known devil worshippers of the same religion
 					religion_group = FROM
 					FROM = {
 						has_character_modifier = known_satanist
@@ -14908,11 +14919,13 @@ buddhist_holy_war = {
 					}
 				}
 			}
+
 			top_liege = {
 				OR = {
 					NOT = { religion = FROM }
 					FROM = { religion = taoist }
-					AND = {
+
+					AND = { # Can always attack known devil worshippers of the same religion
 						religion_group = FROM
 						FROM = {
 							has_character_modifier = known_satanist
@@ -14943,7 +14956,8 @@ buddhist_holy_war = {
 	}
 
 	on_success = {
-		any_attacker = {
+		# Attackers
+		ROOT = {
 			hidden_tooltip = {
 				if = {
 					limit = {
@@ -14953,8 +14967,7 @@ buddhist_holy_war = {
 				}
 			}
 		}
-
-		ROOT = {
+		any_attacker = {
 			hidden_tooltip = {
 				if = {
 					limit = {
@@ -14967,11 +14980,11 @@ buddhist_holy_war = {
 	}
 
 	on_success_title = {
-		if = {
+		if = { # Vassalise one county counts
 			limit = {
 				holder_scope = {
-					tier = count
-					NOT = { num_of_count_titles = 2 }
+					tier = COUNT
+					num_of_count_titles <= 1
 					lower_tier_than = ROOT
 				}
 			}
@@ -14981,12 +14994,12 @@ buddhist_holy_war = {
 			}
 		}
 
-		if = {
+		if = { # Usurp title in all other circumstances
 			limit = {
 				holder_scope = {
 					OR = {
-						higher_tier_than = count
-						num_of_count_titles = 2
+						higher_tier_than = COUNT
+						num_of_count_titles >= 2
 						NOT = { lower_tier_than = ROOT }
 					}
 				}
@@ -15010,7 +15023,10 @@ buddhist_holy_war = {
 				usurp_title_plus_barony_if_unlanded = { target = ROOT type = holy_war }
 			}
 		}
+
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
@@ -15020,10 +15036,15 @@ buddhist_holy_war = {
 	}
 
 	on_fail_title = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
@@ -15033,13 +15054,17 @@ buddhist_holy_war = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 		}
+
+		# Defenders
 		FROM = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
