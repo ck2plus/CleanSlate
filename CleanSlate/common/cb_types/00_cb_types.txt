@@ -12678,13 +12678,17 @@ pagan_county_conquest = {
 	sort_priority = 700
 
 	can_use = {
+		# Attacker
 		ROOT = {
-			mercenary = no
-		}
-		OR = {
-			ROOT = {
-				is_nomadic = yes
-				NOT = { same_realm = FROM }
+			NOR = {
+				mercenary = yes
+				same_realm = FROM
+			}
+
+			trigger_if = {
+				limit = { is_nomadic = yes }
+
+				# Defender
 				FROM = {
 					OR = {
 						is_nomadic = yes
@@ -12692,11 +12696,10 @@ pagan_county_conquest = {
 					}
 				}
 			}
-			AND = {
-				ROOT = {
-					religion_group = pagan_group
-					NOT = { same_realm = FROM }
-				}
+			trigger_else = {
+				religion_group = pagan_group
+
+				# Defender
 				FROM = {
 					NOT = { religion = ROOT }
 				}
@@ -12705,40 +12708,30 @@ pagan_county_conquest = {
 	}
 
 	can_use_title = {
-		tier = count
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
-				NOT = { same_realm = ROOT }
-			}
-		}
+		tier = COUNT
 
-		NOT = {
+		holder_scope = {
+			NOT = { same_realm = ROOT }
 			OR = {
-				ROOT = {
-					has_landed_title = PREV
-				}
-				holder_scope = {
-					is_liege_or_above = ROOT
-				}
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 
 		OR = {
-			AND = {
-				OR = {
-					ROOT = { religion = norse_pagan }
-					ROOT = { religion = norse_pagan_reformed }
+			trigger_if = { # Special condition for Norse pagans
+				limit = {
+					ROOT = {
+						OR = {
+							religion = norse_pagan
+							religion = norse_pagan_reformed
+						}
+					}
 				}
-				location = {
-					port = yes
-				}
+				location = { is_coastal }
 				has_global_flag = viking_age_started
 			}
-			location = {
+			location = { # Otherwise any county neighbouring attacker's subrealm
 				any_neighbor_province = {
 					owner = {
 						OR = {
@@ -12751,27 +12744,23 @@ pagan_county_conquest = {
 		}
 	}
 
-	is_valid_title = {
+	is_valid = {
 		OR = {
-			ROOT = {
-				is_nomadic = yes
-			}
-			AND = {
-				ROOT = {
-					religion_group = pagan_group
-					NOT = { same_realm = FROM }
-				}
+			trigger_if = {
+				limit = { religion_group = pagan_group }
+				NOT = { same_realm = FROM }
 				FROM = {
 					NOT = { religion = ROOT }
 				}
 			}
+			is_nomadic = yes
 		}
+	}
 
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
+	is_valid_title = {
+		holder_scope = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
@@ -12810,28 +12799,26 @@ pagan_county_conquest = {
 			usurp_title = ROOT
 		}
 
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 			participation_scaled_piety = 50
+
+			if = {
+				limit = {
+					NOT = { FROM = { religion = ROOT } }
+				}
+				religion_authority = {
+					modifier = won_county_conquest
+				}
+			}
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = {
 				participation_scaled_prestige = 100
 				participation_scaled_piety = 50
-			}
-		}
-
-		if = {
-			limit = {
-				NOT = { FROM = { religion = ROOT } }
-			}
-			ROOT = {
-				show_scope_change = no
-				religion_authority = {
-					modifier = won_county_conquest
-				}
 			}
 		}
 
@@ -12853,24 +12840,23 @@ pagan_county_conquest = {
 		}
 	}
 
-	on_fail_title = { #white peace
+	on_fail_title = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
-		}
 
-		if = {
-			limit = {
-				NOT = { FROM = { religion = ROOT } }
-			}
-			ROOT = {
-				show_scope_change = no
+			if = {
+				limit = {
+					NOT = { FROM = { religion = ROOT } }
+				}
 				religion_authority = {
 					modifier = lost_county_conquest
 				}
 			}
 		}
 
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 50
@@ -12898,7 +12884,8 @@ pagan_county_conquest = {
 		}
 	}
 
-	on_reverse_demand = { #losing the war
+	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -12906,20 +12893,18 @@ pagan_county_conquest = {
 				to = FROM
 				value = 4.0
 			}
-		}
 
-		if = {
-			limit = {
-				NOT = { FROM = { religion = ROOT } }
-			}
-			ROOT = {
-				show_scope_change = no
+			if = {
+				limit = {
+					NOT = { FROM = { religion = ROOT } }
+				}
 				religion_authority = {
 					modifier = lost_county_conquest
 				}
 			}
 		}
 
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
