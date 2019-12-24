@@ -9898,12 +9898,17 @@ seize_trade_post = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			OR = {
 				is_merchant_republic = yes
 				is_patrician = yes
 			}
-			NOT = { is_liege_or_above = FROM }
+
+			NOR = {
+				is_liege_or_above = FROM # Can't attack liege
+				is_vassal_or_below = FROM # and vassals
+			}
 
 			OR = {
 				NOT = { same_realm = FROM }
@@ -9912,21 +9917,17 @@ seize_trade_post = {
 				NOT = {
 					num_of_trade_post_diff = {
 						character = FROM
-						value = 3
+						value >= 3
 					}
 				}
 			}
-			mercenary = no
-		}
-		FROM = {
-			NOT = { is_liege_or_above = ROOT }
 		}
 	}
 
 	can_use_title = {
 		tier = COUNT
 		location = {
-			port = yes
+			is_coastal = yes
 		}
 		has_trade_post = yes
 		trade_post_owner = {
@@ -9941,15 +9942,16 @@ seize_trade_post = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			OR = {
 				is_merchant_republic = yes
 				is_patrician = yes
 			}
-			NOT = { is_liege_or_above = FROM }
-		}
-		FROM = {
-			NOT = { is_liege_or_above = ROOT }
+			NOR = {
+				is_liege_or_above = FROM # Can't attack liege
+				is_vassal_or_below = FROM # and vassals
+			}
 		}
 	}
 
@@ -9978,10 +9980,11 @@ seize_trade_post = {
 	}
 
 	on_success_title = {
-
 		seize_trade_post = ROOT
 
+		#Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_attacker = {
@@ -9991,10 +9994,15 @@ seize_trade_post = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -50
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 25
 		}
 		any_defender = {
@@ -10004,14 +10012,19 @@ seize_trade_post = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 2.0
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
