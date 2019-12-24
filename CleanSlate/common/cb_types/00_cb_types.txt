@@ -10096,8 +10096,12 @@ viking_invasion = {
 	sort_priority = 3000
 
 	can_use = {
+		# Attacker
 		ROOT = {
-			has_opinion_modifier = { who = FROM modifier = preparing_to_invade }
+			has_opinion_modifier = {
+				who = FROM
+				modifier = preparing_to_invade
+			}
 			NOT = { is_liege_or_above = FROM }
 			mercenary = no
 		}
@@ -10108,6 +10112,7 @@ viking_invasion = {
 	}
 
 	is_valid_title = {
+		# Defender
 		FROM = {
 			any_realm_province = {
 				de_jure_liege_or_above = PREVPREV
@@ -10127,8 +10132,11 @@ viking_invasion = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = 500
+			participation_scaled_prestige = 300
 			piety = 250
 			religion_authority = {
 				modifier = won_viking_invasion
@@ -10151,14 +10159,15 @@ viking_invasion = {
 					}
 				}
 			}
-			participation_scaled_prestige = 300
 		}
-
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 300 }
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -500
 		}
 	}
@@ -10166,58 +10175,55 @@ viking_invasion = {
 	on_success_title = {
 		custom_tooltip = {
 			text = tribal_invasion_succ_tip
-			hidden_tooltip = {
-				FROM = {
-					random_realm_province = {
-						limit = {
-							de_jure_liege_or_above = PREVPREV
-							OR = {
-								NOT = { culture = ROOT }
-								NOT = { religion = ROOT }
-							}
-						}
-						culture = ROOT
-						religion = ROOT
-					}
-				}
-				ROOT = {
-					occupy_minors_of_occupied_settlements = FROM
-					gain_all_occupied_titles = { who = FROM type = invasion }
-					vassalize_or_take_under_title_destroy_duchies = {
-						title = PREV
-						enemy = FROM
-						type = invasion
-					}
 
-					# Settle the special invasion forces
-					disband_event_forces = prepared_invasion
-					any_demesne_title = {
-						limit = { tier = BARON }
-						remove_holding_modifier = recently_conquered
-						refill_holding_levy = yes
-					}
-				}
-
-				if = {
+			# Defender
+			FROM = {
+				random_realm_province = {
 					limit = {
-						FROM = { is_liege_or_above = ROOT }
+						de_jure_liege_or_above = PREVPREV
+						NAND = {
+							culture = ROOT
+							religion = ROOT
+						}
 					}
-					FROM = { imprison = ROOT }
+					culture = ROOT
+					religion = ROOT
+				}
+			}
+
+			# Attacker
+			ROOT = {
+				occupy_minors_of_occupied_settlements = FROM
+				gain_all_occupied_titles = { who = FROM type = invasion }
+				vassalize_or_take_under_title_destroy_duchies = {
+					title = PREV
+					enemy = FROM
+					type = invasion
+				}
+
+				# Settle the special invasion forces
+				disband_event_forces = prepared_invasion
+				any_demesne_title = {
+					limit = { tier = BARON }
+					remove_holding_modifier = recently_conquered
+					refill_holding_levy = yes
+				}
+			}
+
+			# Defender
+			FROM = {
+				if = {
+					limit = { is_liege_or_above = ROOT }
+					imprison = ROOT
 				}
 			}
 		}
 	}
 
 	on_fail = {
-		FROM = {
-			prestige = 200
-			participation_scaled_prestige = 200
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 200 }
-		}
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -300
 			piety = -100
 			hidden_tooltip = {
@@ -10227,10 +10233,23 @@ viking_invasion = {
 				modifier = lost_viking_invasion
 			}
 		}
+
+		# Defenders
+		FROM = {
+			show_scope_change = no
+			prestige = 200
+			participation_scaled_prestige = 200
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 200 }
+		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -500
 			piety = -250
 			transfer_scaled_wealth = {
@@ -10244,8 +10263,13 @@ viking_invasion = {
 				modifier = lost_viking_invasion
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			prestige = 300
+			participation_scaled_prestige = 250
+
 			if = {
 				limit = {
 					has_dlc = "Legacy of Rome"
@@ -10261,7 +10285,6 @@ viking_invasion = {
 				}
 				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
-			participation_scaled_prestige = 250
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
