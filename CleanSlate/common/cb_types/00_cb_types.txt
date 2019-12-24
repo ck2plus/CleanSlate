@@ -16128,75 +16128,73 @@ tributary_cb = {
 	can_use = {
 		has_dlc = "Horse Lords"
 
+		# Attacker
 		ROOT = {
-			mercenary = no
+			independent = yes
+
 			OR = {
 				is_tributary = no
 				is_tributary = {
 					type = offmap
 				}
 			}
-			NOT = { is_vassal_or_below = FROM }
-			NOT = { is_liege_or_above = FROM }
-			NOT = {
+			NOR = {
+				mercenary = no
+				is_vassal_or_below = FROM
+				is_liege_or_above = FROM
 				rightful_religious_head_scope = {
 					character = FROM
 				}
 			}
+
 			NAND = {
 				holy_order = yes
 				religion = FROM
 			}
-			independent = yes
 		}
+
+		# Defender
 		FROM = {
+			independent = yes
 			higher_tier_than = BARON
-			NOT = {
-				is_offmap_governor = yes
-			}
+			is_offmap_governor = no
+
 			NAND = {
 				holy_order = yes
 				religion = ROOT
 			}
-			independent = yes
-		}
 
-		# The attacker needs a border, or be at most two sea zones away from one of the target's counties
-		FROM = {
+			# The attacker needs a border, or be at most two sea zones away from one of the target's counties
 			any_realm_province = {
 				any_neighbor_province = {
-					OR = {
-						AND = {
-							has_owner = yes
-							owner = {
-								OR = {
-									character = ROOT
-									is_liege_or_above = ROOT
-								}
+					trigger_if = {
+						limit = { has_owner = yes }
+						owner = {
+							OR = {
+								character = ROOT
+								is_liege_or_above = ROOT
 							}
 						}
-						AND = {
-							is_land = no
-							any_neighbor_province = {
-								OR = {
-									AND = {
-										has_owner = yes
-										owner = {
-											OR = {
-												character = ROOT
-												is_liege_or_above = ROOT
-											}
-										}
+					}
+					trigger_else = {
+						is_land = no # first sea zone
+						any_neighbor_province = {
+							trigger_if = {
+								limit = { has_owner = yes }
+								owner = {
+									OR = {
+										character = ROOT
+										is_liege_or_above = ROOT
 									}
-									AND = {
-										is_land = no
-										any_neighbor_province = {
-											owner = {
-												OR = {
-													character = ROOT
-													is_liege_or_above = ROOT
-												}
-											}
+								}
+							}
+							trigger_else = {
+								is_land = no # second sea zone
+								any_neighbor_province = {
+									owner = {
+										OR = {
+											character = ROOT
+											is_liege_or_above = ROOT
 										}
 									}
 								}
@@ -16205,10 +16203,8 @@ tributary_cb = {
 					}
 				}
 			}
-		}
 
-		# The defender is not in any tributary war
-		FROM = {
+			# The defender is not in any tributary war
 			NOR = {
 				any_war = {
 					using_cb = tributary_cb
@@ -16236,12 +16232,15 @@ tributary_cb = {
 	on_add = {
 		# Chance to surrender early
 		ROOT = { save_event_target_as = tribute_war_suzerain }
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			save_event_target_as = tribute_war_target
 			set_character_flag = surrender_tributary_cb
 			character_event = { id = JD.2500 days = 5 tooltip = surrender_tributary_tt }
 		}
+
 		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
@@ -16253,45 +16252,26 @@ tributary_cb = {
 	}
 
 	on_success = {
-		FROM = {
-			show_scope_change = no
-			save_event_target_as = target_loser
-			prestige = -100
-			custom_tooltip = {
-				text = "REMOVE_PREVIOUS_SUZERAIN"
-				hidden_tooltip = {
-					any_suzerain = {
-						event_target:target_loser = {
-							remove_tributary = PREV
-						}
-					}
-				}
-			}
-		}
-
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = 200
-			make_tributary = { who = FROM percentage = 0.4 }
-		}
+			make_tributary = {
+				who = FROM
+				percentage = 0.4
+			}
 
-		if = {
-			limit = {
-				ROOT = {
+			if = {
+				limit = {
 					uses_decadence = yes
 				}
-			}
-			ROOT = {
 				decadence = -10
 			}
-		}
-		if = {
-			limit = {
-				ROOT = {
+
+			if = {
+				limit = {
 					is_nomadic = yes
 				}
-			}
-			ROOT = {
 				clan_title = {
 					ROOT = {
 						any_vassal = {
@@ -16307,15 +16287,10 @@ tributary_cb = {
 					}
 				}
 			}
-		}
-
-		if = {
-			limit = {
-				ROOT = {
+			else_if = {
+				limit = {
 					is_tribal = yes
 				}
-			}
-			ROOT = {
 				any_vassal = {
 					limit = { is_tribal = yes }
 					opinion = {
@@ -16326,13 +16301,32 @@ tributary_cb = {
 				}
 			}
 		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			save_event_target_as = target_loser
+			prestige = -100
+
+			custom_tooltip = {
+				text = "REMOVE_PREVIOUS_SUZERAIN"
+				any_suzerain = {
+					event_target:target_loser = {
+						remove_tributary = PREV
+					}
+				}
+			}
+		}
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = 100
@@ -16340,6 +16334,7 @@ tributary_cb = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -16349,6 +16344,7 @@ tributary_cb = {
 			}
 		}
 
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = 200
