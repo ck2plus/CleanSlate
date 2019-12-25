@@ -16641,58 +16641,52 @@ free_tributary_cb = {
 	sort_priority = 1100
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			OR = {
-				AND = {
-					is_tributary = yes
-					OR = {
-						AND = {
-							has_dlc = "Horse Lords"
-							OR = {
-								is_tributary = { type = nomadic }
-								is_tributary = { type = default }
-							}
-						}
-						AND = {
-							has_dlc = "Jade Dragon"
-							OR = {
-								is_tributary = { type = permanent }
-								is_tributary = { type = offmap }
-							}
+				trigger_if = {
+					limit = { is_tributary = yes }
+
+					trigger_if = {
+						limit = { has_dlc = "Horse Lords" }
+						OR = {
+							is_tributary = { type = nomadic }
+							is_tributary = { type = default }
 						}
 					}
-					suzerain = {
+					trigger_else_if = {
+						limit = { has_dlc = "Jade Dragon" }
 						OR = {
-							character = FROM
-							any_liege = {
-								character = FROM
-							}
+							is_tributary = { type = permanent }
+							is_tributary = { type = offmap }
 						}
 					}
 				}
-				any_vassal = {
-					is_tributary = yes
-					OR = {
-						AND = {
-							has_dlc = "Horse Lords"
+				trigger_else = {
+					any_vassal = {
+						is_tributary = yes
+
+						trigger_if = {
+							limit = { has_dlc = "Horse Lords" }
 							OR = {
 								is_tributary = { type = nomadic }
 								is_tributary = { type = default }
 							}
 						}
-						AND = {
-							has_dlc = "Jade Dragon"
+						trigger_else_if = {
+							limit = { has_dlc = "Jade Dragon" }
 							OR = {
 								is_tributary = { type = permanent }
 								is_tributary = { type = offmap }
 							}
 						}
-					}
-					suzerain = {
-						OR = {
-							character = FROM
-							any_liege = {
+
+						suzerain = {
+							OR = {
 								character = FROM
+								any_liege = {
+									character = FROM
+								}
 							}
 						}
 					}
@@ -16703,6 +16697,8 @@ free_tributary_cb = {
 
 	can_use_gui = {
 		check_if_crusader_trigger = yes
+
+		# Attacker
 		ROOT = { #Cannot use CB if can take decision to stop paying tribute
 			conditional_tooltip = {
 				trigger = { is_decision_potential = tributary_independence_china }
@@ -16716,19 +16712,20 @@ free_tributary_cb = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			OR = {
-				AND = {
-					is_tributary = yes
-					suzerain = {
-						OR = {
+			trigger_if = {
+				limit = { is_tributary = yes }
+				suzerain = {
+					OR = {
+						character = FROM
+						any_liege = {
 							character = FROM
-							any_liege = {
-								character = FROM
-							}
 						}
 					}
 				}
+			}
+			trigger_else = {
 				any_vassal = {
 					is_tributary = yes
 					suzerain = {
@@ -16756,11 +16753,7 @@ free_tributary_cb = {
 	}
 
 	on_success = {
-		FROM = {
-			show_scope_change = no
-			prestige = -100
-		}
-
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = 100
@@ -16792,18 +16785,29 @@ free_tributary_cb = {
 						}
 					}
 				}
+				show_scope_change = no
 				suzerain = {
+					show_scope_change = no
 					remove_tributary = PREV
 				}
 			}
 		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = -100
+		}
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = 100
@@ -16811,6 +16815,7 @@ free_tributary_cb = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
@@ -16820,6 +16825,7 @@ free_tributary_cb = {
 			}
 		}
 
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = 100
