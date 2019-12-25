@@ -874,14 +874,23 @@ claim_on_liege = {
 	on_success = {
 		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
-			hidden_tooltip = {
-				disband_event_forces = faction_revolters
+
+			# Attacker (ROOT) is freed from Defender (FROM)
+			if = {
+				limit = {
+					prisoner = yes
+					host = { character = FROM }
+				}
+				prisoner = no
 			}
+
+			hidden_tooltip = { disband_event_forces = faction_revolters }
 		}
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { NOT = { character = ROOT } }
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = {
 				participation_scaled_prestige = 100
 				disband_event_forces = faction_revolters
 			}
@@ -907,25 +916,23 @@ claim_on_liege = {
 				}
 			}
 		}
-
-		# Attacker (ROOT) is freed from Defender (FROM)
-		if = {
-			limit = {
-				ROOT = {
-					prisoner = yes
-					host = { character = FROM }
-				}
-			}
-			ROOT = { prisoner = no }
-		}
 	}
 
 	on_success_title = {
 		# Defender (FROM) is imprisoned by Attacker (ROOT)
 		FROM = {
+			show_scope_change = no
 			if = {
 				limit = { primary_title = { title = PREVPREV } }
 				prisoner = ROOT
+			}
+			# If ROOT is now higher tier than FROM, ROOT becomes the liege of FROM
+			if = {
+				limit = {
+					PREV = { higher_tier_than = FROM }
+				}
+
+				set_defacto_liege = ROOT
 			}
 		}
 
@@ -938,17 +945,6 @@ claim_on_liege = {
 				NOT = { culture = ROOT }
 			}
 			hidden_tooltip = { conquest_culture = ROOT }
-		}
-
-		# If ROOT is now higher tier than FROM, ROOT becomes the liege of FROM
-		if = {
-			limit = {
-				higher_tier_than = FROM
-			}
-
-			FROM = {
-				set_defacto_liege = ROOT
-			}
 		}
 
 		hidden_tooltip = {
@@ -976,18 +972,18 @@ claim_on_liege = {
 	on_fail = {
 		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 			hidden_tooltip = { disband_event_forces = faction_revolters }
 		}
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				disband_event_forces = faction_revolters
-			}
+		any_attacker = {
+			limit = { liege = { character = FROM } }
+			hidden_tooltip = { disband_event_forces = faction_revolters }
 		}
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 		}
@@ -1000,14 +996,15 @@ claim_on_liege = {
 	on_reverse_demand = {
 		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -150
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 			}
 		}
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
+		any_attacker = {
+			limit = { liege = { character = FROM } }
+			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 				prisoner = FROM
 			}
@@ -1015,10 +1012,11 @@ claim_on_liege = {
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				if = {
-					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
+					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } # Allow free revocation of a title
 					opinion = {
 						who = ROOT
 						modifier = opinion_traitor
@@ -1135,6 +1133,7 @@ claim_on_liege_plot = {
 	on_success = {
 		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
@@ -1172,6 +1171,7 @@ claim_on_liege_plot = {
 	}
 
 	on_success_title = {
+		# Attacker
 		usurp_title_plus_barony_if_unlanded = {
 			target = ROOT
 			type = claim
@@ -1187,6 +1187,7 @@ claim_on_liege_plot = {
 
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			plot_succeeds = yes
 		}
 	}
@@ -1194,11 +1195,13 @@ claim_on_liege_plot = {
 	on_fail = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
@@ -1208,8 +1211,8 @@ claim_on_liege_plot = {
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
 			hidden_tooltip = {
+				participation_scaled_prestige = 50
 				disband_event_forces = faction_revolters
 			}
 		}
@@ -1224,12 +1227,14 @@ claim_on_liege_plot = {
 	on_reverse_demand = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			imprison = FROM
 		}
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
@@ -1245,8 +1250,8 @@ claim_on_liege_plot = {
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
 			hidden_tooltip = {
+				participation_scaled_prestige = 100
 				disband_event_forces = faction_revolters
 			}
 		}
@@ -1328,13 +1333,19 @@ claim_on_vassal_plot = {
 	on_success = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 50
 		}
 	}
 
 	on_success_title = {
+		# Attacker
 		usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
-		ROOT = { plot_succeeds = yes }
+
+		ROOT = {
+			show_scope_change = no
+			plot_succeeds = yes
+		}
 
 		hidden_tooltip = {
 			check_if_reconquista_finished_effect = yes
@@ -1347,12 +1358,14 @@ claim_on_vassal_plot = {
 	on_fail = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 			cancel_plot = plot_gain_vassal_title
 		}
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
@@ -1364,6 +1377,7 @@ claim_on_vassal_plot = {
 	on_invalidation = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			cancel_plot = plot_gain_vassal_title
 		}
 
@@ -1372,12 +1386,14 @@ claim_on_vassal_plot = {
 	on_reverse_demand = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			cancel_plot = plot_gain_vassal_title
 		}
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
@@ -1401,6 +1417,7 @@ claim_on_vassal_plot = {
 	on_defender_leader_death = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			cancel_plot = plot_gain_vassal_title
 		}
 	}
@@ -1580,12 +1597,21 @@ other_claim_on_liege = {
 
 		# Claimant
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {  disband_event_forces = faction_revolters }
 
 			opinion = {
 				modifier = pressed_my_claim
 				who = PREV
+			}
+
+			if = {
+				limit = {
+					prisoner = yes
+					host = { character = FROM }
+				}
+				prisoner = no
 			}
 		}
 		any_attacker = {
@@ -1619,16 +1645,6 @@ other_claim_on_liege = {
 					}
 				}
 			}
-		}
-
-		if = {
-			limit = {
-				ROOT = {
-					prisoner = yes
-					host = { character = FROM }
-				}
-			}
-			ROOT = { prisoner = no }
 		}
 	}
 
@@ -1715,6 +1731,7 @@ other_claim_on_liege = {
 	# FROMFROM is attacker
 	on_success_posttitle = {
 		hidden_tooltip = {
+			# Third-party claimant
 			ROOT = {
 				if = {
 					limit = {
@@ -1774,6 +1791,7 @@ other_claim_on_liege = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 
@@ -1802,6 +1820,7 @@ other_claim_on_liege = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_loyalists
@@ -2195,6 +2214,7 @@ change_seniority_succession_law = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
 			if = { # lower crown authority
@@ -2385,6 +2405,7 @@ change_primogeniture_succession_law = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
 			if = { # lower crown authority
@@ -2573,6 +2594,7 @@ change_feudal_elective_succession_law = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
@@ -2852,6 +2874,7 @@ invasion = {
 
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			if = {
 				limit = {
 					character = 140 # William 'the Conqueror'
@@ -3308,6 +3331,7 @@ tribal_invasion = {
 	on_success_title = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			if = {
 				limit = {
 					OR = {
@@ -3377,6 +3401,7 @@ tribal_invasion = {
 		FROM = {
 			show_scope_change = no
 			prestige = 100
+			participation_scaled_prestige = 100
 
 			hidden_tooltip = {
 				if = {
@@ -3392,7 +3417,6 @@ tribal_invasion = {
 					}
 				}
 			}
-			participation_scaled_prestige = 100
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
@@ -3725,7 +3749,7 @@ crusade = {
 	}
 
 	is_valid = {
-
+		# Attacker
 		ROOT = {
 			can_call_crusade = yes
 
@@ -3963,6 +3987,7 @@ crusade = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = -100
 			religion_authority = {
 				modifier = lost_crusade
@@ -4001,6 +4026,7 @@ crusade = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
 			if = {
@@ -4078,6 +4104,7 @@ crusade = {
 					}
 				}
 			}
+			show_scope_change = no
 			participation_scaled_decadence = 35
 		}
 		any_attacker = {
@@ -4400,6 +4427,7 @@ new_crusade = {
 
 		# Religion Authority and Prestige/Piety loss for the loser (Target of Crusade)
 		FROM = {
+			show_scope_change = no
 			piety = -100
 			religion_authority = {
 				modifier = lost_crusade
@@ -5265,11 +5293,11 @@ new_crusade = {
 							always = yes
 						}
 					}
-					set_variable = { which = count value = 20 }
+
 					while = {
+						count = 20
 						limit = {
 							wealth >= 2000
-							check_variable = { which = count value = 1 }
 						}
 						random_vassal = {
 							limit = {
@@ -5280,7 +5308,6 @@ new_crusade = {
 								wealth = -350
 							}
 						}
-						subtract_variable = { which = count value = 1 }
 					}
 				}
 			}
@@ -5525,6 +5552,7 @@ new_crusade = {
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
 			if = {
@@ -5601,6 +5629,7 @@ new_crusade = {
 					}
 				}
 			}
+			show_scope_change = no
 			participation_scaled_decadence = 35
 		}
 		any_attacker = {
@@ -5620,6 +5649,7 @@ new_crusade = {
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 100
 			religion_authority = {
 				modifier = won_crusade
@@ -5708,6 +5738,7 @@ new_crusade = {
 
 		# Chance to start a Shepherd's Crusade
 		ROOT = {
+			show_scope_change = no
 			random = {
 				chance = 15
 				if = {
@@ -6182,6 +6213,7 @@ religious = {
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
 			if = {
@@ -6741,6 +6773,7 @@ bid_for_independence = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
@@ -7070,13 +7103,18 @@ overthrow_ruler = {
 	}
 
 	on_success = {
-		# Attacker
+		# Attackers
 		ROOT = {
 			show_scope_change = no
+			participation_scaled_prestige = 250
 			primary_title = {
 				show_scope_change = no
 				add_pressed_claim = FROM
 			}
+		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = { participation_scaled_prestige = 250 }
 		}
 
 		# Defender
@@ -7118,13 +7156,6 @@ overthrow_ruler = {
 			}
 			abdicate = yes
 		}
-		ROOT = {
-			participation_scaled_prestige = 250
-		}
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 250 }
-		}
 
 		hidden_tooltip = {
 			check_if_reconquista_finished_effect = yes
@@ -7135,10 +7166,15 @@ overthrow_ruler = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			remove_opinion = {
 				who = ROOT
 				modifier = declared_war
@@ -7147,11 +7183,28 @@ overthrow_ruler = {
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			prisoner = FROM
 		}
+		any_attacker = {
+			limit = { liege = { character = FROM } }
+			hidden_tooltip = {
+				prisoner = FROM
+				disband_event_forces = faction_revolters
+				add_character_modifier = {
+					name = faction_council_power_ultimatum_timer
+					hidden = yes
+					duration = 3650
+				}
+			}
+		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 			hidden_tooltip = {
 				if = {
@@ -7166,18 +7219,6 @@ overthrow_ruler = {
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
-		}
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				prisoner = FROM
-				disband_event_forces = faction_revolters
-				add_character_modifier = {
-					name = faction_council_power_ultimatum_timer
-					hidden = yes
-					duration = 3650
-				}
-			}
 		}
 	}
 
@@ -7448,6 +7489,7 @@ change_gavelkind_succession_law = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 
 			if = { # lower crown authority
@@ -7643,6 +7685,8 @@ lower_crown_authority_law = {
 				disband_event_forces = faction_revolters
 			}
 		}
+
+		# Defender
 		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
@@ -7675,6 +7719,7 @@ lower_crown_authority_law = {
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 		}
@@ -8042,7 +8087,9 @@ coastal_republic = {
 				}
 			}
 			location = {
+				show_scope_change = no
 				trade_post_owner = {
+					show_scope_change = no
 					usurp_title = { target = PREVPREV type = invasion }
 				}
 			}
@@ -8265,7 +8312,9 @@ coastal_county_republic = {
 						is_liege_or_above = ROOT
 					}
 				}
+				show_scope_change = no
 				holder_scope = {
+					show_scope_change = no
 					usurp_title = PREVPREV
 					set_defacto_liege = ROOT
 				}
@@ -8402,11 +8451,13 @@ weaken_vassal_plot = {
 			limit = {
 				NOT = { character = ROOT }
 			}
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
 				any_demesne_title = { # All titles
@@ -8443,6 +8494,7 @@ weaken_vassal_plot = {
 						}
 					}
 				}
+				show_scope_change = no
 				grant_title = PREVPREV
 			}
 		}
@@ -8470,6 +8522,7 @@ weaken_vassal_plot = {
 	on_invalidation = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			cancel_plot = plot_weaken_fellow_vassal
 		}
 
@@ -8590,7 +8643,9 @@ decadence_invasion = {
 				}
 			}
 			primary_title = {
+			show_scope_change = no
 				holder_scope = {
+				show_scope_change = no
 					any_demesne_title = { # eligible duke and king tier titles usurped
 						limit = {
 							higher_tier_than = COUNT
@@ -8598,6 +8653,7 @@ decadence_invasion = {
 								tier = PREVPREV
 							}
 						}
+						show_scope_change = no
 						usurp_title_plus_barony_if_unlanded = { target = ROOT type = revolt }
 
 						if = {
@@ -8611,6 +8667,7 @@ decadence_invasion = {
 						limit = {
 							tier = PREVPREV
 						}
+						show_scope_change = no
 						destroy_landed_title = THIS
 					}
 				}
@@ -8634,33 +8691,33 @@ decadence_invasion = {
 			}
 		}
 
-		any_player = { # inform human players
-			limit = {
-				NOR = {
-					character = FROM
-					dynasty = FROM
-					any_liege = {
+		hidden_tooltip = {
+			any_player = { # inform human players
+				limit = {
+					NOR = {
 						character = FROM
+						dynasty = FROM
+						any_liege = {
+							character = FROM
+						}
 					}
-				}
 
-				OR = {
-					FROM = { higher_tier_than = DUKE }	# don't bother with insignificant overthrowals
-					any_realm_province = { 				# unless the player borders them
-						any_neighbor_province = {
-							owner = {
-								any_liege = {
-									character = FROM
+					OR = {
+						FROM = { higher_tier_than = DUKE }	# don't bother with insignificant overthrowals
+						any_realm_province = { 				# unless the player borders them
+							any_neighbor_province = {
+								owner = {
+									any_liege = {
+										character = FROM
+									}
 								}
 							}
 						}
 					}
 				}
+				narrative_event = { id = 91241 }
 			}
-			narrative_event = { id = 91241 }
-		}
 
-		hidden_tooltip = {
 			check_if_reconquista_finished_effect = yes
 			FROM = {
 				landless_pope_effect = yes
@@ -8709,6 +8766,7 @@ decadence_invasion = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 200
 			if = {
 				limit = {
@@ -8765,23 +8823,6 @@ muslim_invasion = {
 		# Attacker
 		ROOT = {
 			piety = 1000
-		}
-	}
-
-	on_add = {
-		# Attacker
-		ROOT = {
-			piety = -1000
-		}
-
-		fire_haruspicy_event_effect = yes
-
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
 		}
 	}
 
@@ -8880,6 +8921,24 @@ muslim_invasion = {
 		}
 	}
 
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -1000
+		}
+
+		fire_haruspicy_event_effect = yes
+
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
+		}
+	}
+
 	on_success = {
 		# Attackers
 		ROOT = {
@@ -8935,6 +8994,8 @@ muslim_invasion = {
 	on_success_title = {
 		custom_tooltip = {
 			text = other_invasion_succ_tip
+
+			# Attacker
 			ROOT = {
 				vassalize_or_take_under_title_destroy_duchies = {
 					title = PREV
@@ -9244,6 +9305,7 @@ cb_faction_independence = {
 					}
 				}
 			}
+			show_scope_change = no
 			set_defacto_liege = THIS
 			hidden_tooltip = {
 				prestige = 100
@@ -9266,6 +9328,7 @@ cb_faction_independence = {
 
 		# Attackers
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
@@ -9281,6 +9344,7 @@ cb_faction_independence = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			hidden_tooltip = { disband_event_forces = faction_loyalists }
 			if = { # lower crown authority
 				limit = { NOT = { has_dlc = "Conclave" } }
@@ -9327,6 +9391,7 @@ cb_faction_independence = {
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
+			show_scope_change = no
 
 			add_character_modifier = {
 				name = faction_independence_ultimatum_timer
@@ -9367,6 +9432,7 @@ cb_faction_independence = {
 				NOT = { character = ROOT }
 				liege = { character = FROM }
 			}
+			show_scope_change = no
 			prisoner = FROM
 			participation_scaled_prestige = -100
 
@@ -9564,13 +9630,13 @@ imperial_reconquest = {
 	on_success_title = {
 		custom_tooltip = {
 			text = other_invasion_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					vassalize_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-						type = invasion
-					}
+
+			# Attacker
+			ROOT = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = FROM
+					type = invasion
 				}
 			}
 		}
@@ -9610,6 +9676,7 @@ imperial_reconquest = {
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_piety = 100
 			participation_scaled_prestige = 200
 			if = {
@@ -9800,6 +9867,7 @@ embargo_cb = {
 				NOT = { character = ROOT }
 				is_merchant_republic = yes
 			}
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
@@ -10399,6 +10467,7 @@ pagan_subjugation = {
 	on_add = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			add_character_modifier = {
 				name = launched_subjugation
 				years = 100
@@ -11296,14 +11365,19 @@ duchy_adventure = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 250
 			hidden_tooltip = {
 				clr_character_flag = duchy_adventurer
 				give_nickname = nick_the_conqueror
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -250
 		}
 	}
@@ -11311,6 +11385,8 @@ duchy_adventure = {
 	on_success_title = {
 		custom_tooltip = {
 			text = other_invasion_succ_tip
+
+			# Attacker
 			ROOT = {
 				vassalize_or_take_under_title = {
 					title = PREV
@@ -11764,6 +11840,7 @@ kingdom_adventure = {
 
 		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			hidden_tooltip = {
 				opinion = {
@@ -12281,6 +12358,7 @@ caliphal_subjugation = {
 	on_add_title = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			add_character_modifier = {
 				name = launched_subjugation
 				days = 3650
@@ -12312,6 +12390,7 @@ caliphal_subjugation = {
 	on_success_title = {
 		custom_tooltip = {
 			text = pagan_subjugation_tip
+
 			# Attacker
 			ROOT = {
 				subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
@@ -12497,6 +12576,7 @@ muslim_county_conquest = {
 			}
 
 			holder_scope = {
+				show_scope_change = no
 				set_defacto_liege = ROOT
 			}
 		}
@@ -12525,6 +12605,7 @@ muslim_county_conquest = {
 						}
 					}
 				}
+				show_scope_change = no
 
 				usurp_title_plus_barony_if_unlanded = { target = ROOT type = invasion }
 			}
@@ -13263,6 +13344,7 @@ dejure_county_claim = {
 			}
 
 			holder_scope = {
+				show_scope_change = no
 				set_defacto_liege = ROOT
 			}
 		}
@@ -13291,6 +13373,7 @@ dejure_county_claim = {
 						}
 					}
 				}
+				show_scope_change = no
 
 				usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
 			}
@@ -13633,6 +13716,7 @@ dejure_barony_claim = {
 					}
 				}
 			}
+			show_scope_change = no
 
 			usurp_title_plus_barony_if_unlanded = { target = event_target:target_taker type = claim }
 		}
@@ -14027,7 +14111,6 @@ other_dejure_county_claim = {
 			show_scope_change = no
 			usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
 			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
-				show_scope_change = no
 				limit = {
 					NOT = {
 						de_facto_liege = PREV
@@ -14039,6 +14122,7 @@ other_dejure_county_claim = {
 						}
 					}
 				}
+				show_scope_change = no
 
 				usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
 			}
@@ -14296,8 +14380,8 @@ shia_caliphate_rising = {
 	on_reverse_demand = {
 		# Attacker
 		ROOT = {
-			piety = -500
 			show_scope_change = no
+			piety = -500
 			clr_character_flag = shia_caliphate_pretender
 			imprison = FROM
 		}
@@ -14960,16 +15044,6 @@ buddhist_holy_war = {
 
 	on_success = {
 		# Attackers
-		ROOT = {
-			hidden_tooltip = {
-				if = {
-					limit = {
-						has_ambition = obj_strengthen_religion
-					}
-					change_variable = { which = strengthen_religion value = 1 }
-				}
-			}
-		}
 		any_attacker = {
 			hidden_tooltip = {
 				if = {
@@ -15069,6 +15143,7 @@ buddhist_holy_war = {
 
 		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				if = {
@@ -15081,8 +15156,8 @@ buddhist_holy_war = {
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
 			hidden_tooltip = {
+				participation_scaled_prestige = 100
 				if = {
 					limit = {
 						has_ambition = obj_strengthen_religion
@@ -15178,23 +15253,6 @@ indian_subjugation = {
 		}
 	}
 
-	on_add = {
-		# Attacker
-		ROOT = {
-			show_scope_change = no
-			piety = -500
-		}
-
-		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
-
 	can_use = {
 		# Attacker
 		ROOT = {
@@ -15264,9 +15322,27 @@ indian_subjugation = {
 		}
 	}
 
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -500
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
+		}
+	}
+
 	on_add_title = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			if = {
 				limit = {
 					OR = {
@@ -15353,6 +15429,8 @@ indian_subjugation = {
 		# Vassalize the rest
 		custom_tooltip = {
 			text = pagan_subjugation_tip
+
+			# Attacker
 			ROOT = {
 				subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
 					title = PREV
@@ -15383,6 +15461,7 @@ indian_subjugation = {
 	on_invalidation = {
 		# Attacker
 		ROOT = {
+			show_scope_change = no
 			remove_character_modifier = launched_subjugation
 			piety = 500
 		}
@@ -15876,7 +15955,8 @@ cb_decadence_usurption = {
 
 		# Defender
 		FROM = {
-			prisoner = ROOT
+			show_scope_change = no
+			imprison = ROOT
 		}
 	}
 
@@ -16138,6 +16218,7 @@ tributary_cb = {
 					type = offmap
 				}
 			}
+
 			NOR = {
 				mercenary = no
 				is_vassal_or_below = FROM
