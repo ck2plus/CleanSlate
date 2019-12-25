@@ -17370,19 +17370,24 @@ cb_liberate_nomad_duchy = {
 	}
 
 	can_use = {
+		# Attacker
+		ROOT = {
+			NOR = {
+				pacifist = yes
+				is_nomadic = yes
+				mercenary = yes
+				same_realm = FROM
+			}
+		}
+
+		# Defender
 		FROM = {
 			is_nomadic = yes
-		}
-		ROOT = {
-			is_nomadic = no
-			NOT = { pacifist = yes }
-			NOT = { same_realm = FROM }
-			mercenary = no
 		}
 	}
 
 	can_use_title = {
-		# The attacker needs at least one county in the target kingdom, or a border, or be only two sea zones away from one of your counties
+		# The attacker needs at least one county in the target kingdom, or a border
 		any_direct_de_jure_vassal_title = {
 			OR = {
 				holder_scope = {
@@ -17405,25 +17410,20 @@ cb_liberate_nomad_duchy = {
 			}
 		}
 
-		any_de_jure_vassal_title = { # Can only liberate Duchies that are either outside of the Steppe region, or contains a Castle/City/Tribe
+		# Can only liberate Duchies that are either outside of the Steppe region, or contains a Castle/City/Tribe
+		any_de_jure_vassal_title = {
 			tier = COUNT
-			OR = {
-				holder_scope = {
+			holder_scope = {
+				OR = {
 					character = FROM
-				}
-				holder_scope = {
-					any_liege = {
-						character = FROM
-					}
+					is_liege_or_above = FROM
 				}
 			}
-			OR = {
-				location = {
+			location = {
+				OR = {
 					NOT = {
 						region = world_steppe
 					}
-				}
-				location = {
 					any_province_holding = {
 						OR = {
 							holding_type = city
@@ -17437,14 +17437,19 @@ cb_liberate_nomad_duchy = {
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			NOR = {
+				pacifist = yes
+				is_nomadic = yes
+				mercenary = yes
+				same_realm = FROM
+			}
+		}
+
+		# Defender
 		FROM = {
 			is_nomadic = yes
-		}
-		ROOT = {
-			is_nomadic = no
-			NOT = { pacifist = yes }
-			NOT = { same_realm = FROM }
-			mercenary = no
 		}
 	}
 
@@ -17460,6 +17465,7 @@ cb_liberate_nomad_duchy = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_prestige = 200
@@ -17483,7 +17489,11 @@ cb_liberate_nomad_duchy = {
 			}
 		}
 
-		FROM = { show_scope_change = no prestige = -200 }
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = -200
+		}
 	}
 
 	on_success_title = {
@@ -17491,20 +17501,21 @@ cb_liberate_nomad_duchy = {
 
 		custom_tooltip = {
 			text = liberate_nomad_cb_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					vassalize_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-						anti_nomad = yes # Vassalize non-nomadic rulers
-						type = invasion
-					}
+
+			# Attacker
+			ROOT = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = FROM
+					anti_nomad = yes # Vassalize non-nomadic rulers
+					type = invasion
 				}
 			}
 		}
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -17512,6 +17523,7 @@ cb_liberate_nomad_duchy = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			transfer_scaled_wealth = {
@@ -17520,7 +17532,10 @@ cb_liberate_nomad_duchy = {
 			}
 			prestige = -200
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 300
 			if = {
 				limit = {
