@@ -18709,11 +18709,9 @@ nomad_expansion = {
 					limit = {
 						has_nickname = no
 					}
+					save_event_target_as = nickname_receiver
 					FROM = {
 						save_event_target_as = nickname_target
-						}
-					ROOT = {
-						save_event_target_as = nickname_receiver
 					}
 					random_list = {
 						5 = { give_nickname = nick_the_eastern_wind }
@@ -18958,6 +18956,7 @@ increase_council_power_war = {
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			vassal_of = FROM
 		}
@@ -18965,6 +18964,8 @@ increase_council_power_war = {
 
 	can_use_title = {
 		higher_tier_than = BARON
+		is_primary_holder_title = yes
+
 		OR = {
 			has_law = law_voting_power_0
 			has_law = banish_voting_power_0
@@ -18974,28 +18975,21 @@ increase_council_power_war = {
 			has_law = imprison_voting_power_0
 			has_law = war_voting_power_0
 		}
-		is_primary_holder_title = yes
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = { character = FROM }
+		}
+
+		# Defender
 		FROM = {
 			in_revolt = no
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
 					in_revolt = no
-				}
-			}
-		}
-		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
 				}
 			}
 		}
@@ -19013,7 +19007,9 @@ increase_council_power_war = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			opinion = {
 				modifier = opinion_increased_council_power
 				who = FROM
@@ -19026,11 +19022,13 @@ increase_council_power_war = {
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
 			hidden_tooltip = {
+				participation_scaled_prestige = 100
 				disband_event_forces = faction_revolters
 			}
 		}
+
+		# Defender
 		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
@@ -19040,20 +19038,13 @@ increase_council_power_war = {
 	}
 
 	on_fail = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
-
-		FROM = {
-			participation_scaled_prestige = 50
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
-		}
-
-		hidden_tooltip = {
-			any_attacker = {
+		any_attacker = {
+			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
 					name = faction_council_power_ultimatum_timer
@@ -19062,18 +19053,45 @@ increase_council_power_war = {
 				}
 			}
 		}
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
+
+		# Defenders
+		FROM = {
+			show_scope_change = no
+			participation_scaled_prestige = 50
+			hidden_tooltip = { disband_event_forces = faction_loyalists }
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 50 }
+		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			imprison = FROM
 		}
+		any_attacker = {
+			hidden_tooltip = {
+				limit = { liege = { character = FROM } }
+				imprison = FROM
+				disband_event_forces = faction_revolters
+				add_character_modifier = {
+					name = faction_council_power_ultimatum_timer
+					hidden = yes
+					duration = 3650
+				}
+			}
+		}
 
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
+				disband_event_forces = faction_loyalists
 				if = {
 					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
 					opinion = {
@@ -19087,20 +19105,6 @@ increase_council_power_war = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				imprison = FROM
-				disband_event_forces = faction_revolters
-				add_character_modifier = {
-					name = faction_council_power_ultimatum_timer
-					hidden = yes
-					duration = 3650
-				}
-			}
-		}
-		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
 	attacker_ai_victory_worth = {
