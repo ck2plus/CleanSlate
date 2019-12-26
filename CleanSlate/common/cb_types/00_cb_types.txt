@@ -18603,39 +18603,39 @@ nomad_expansion = {
 	sort_priority = 800
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
-			prestige = 300
-			population_factor = 0.5
+			prestige >= 300
+			population_factor >= 0.5
 		}
+
+		# Defender
 		FROM = {
 			OR = {
 				is_nomadic = yes # Nomads no population requirement
 				AND = {
 					is_tribal = yes
-					ROOT = { population = 5000 } # Tribals need 5k
+					ROOT = { # Tribals need 5k
+						show_scope_change = no
+						population >= 5000
+					}
 				}
-				ROOT = { population = 15000 } # Everyone else needs 15k
-			}
-		}
-	}
-
-	on_add = {
-		ROOT = { prestige = -300 }
-		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
+				ROOT = { # Everyone else needs 15k
+					show_scope_change = no
+					population >= 15000 }
 			}
 		}
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
-			is_nomadic = yes
-			NOT = { same_realm = FROM }
-			mercenary = no
+			NOR = {
+				is_nomadic = no
+				same_realm = FROM
+				mercenary = yes
+			}
+
 		}
 	}
 
@@ -18665,9 +18665,13 @@ nomad_expansion = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			NOR = {
+				is_nomadic = no
+				same_realm = FROM
 				pays_tribute_to = FROM
+
 				any_liege = {
 					OR = {
 						pays_tribute_to = FROM
@@ -18677,70 +18681,88 @@ nomad_expansion = {
 					}
 				}
 			}
-			is_nomadic = yes
-			NOT = { same_realm = FROM }
+		}
+	}
+
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -300
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
 		}
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
-			if = {
-				limit = {
-					has_nickname = no
+			hidden_effect = {
+				if = {
+					limit = {
+						has_nickname = no
+					}
+					FROM = {
+						save_event_target_as = nickname_target
+						}
+					ROOT = {
+						save_event_target_as = nickname_receiver
+					}
+					random_list = {
+						5 = { give_nickname = nick_the_eastern_wind }
+						5 = { give_nickname = nick_the_despoiler }
+						5 = {
+							give_nickname = nick_the_culture_marauder
+							modifier = {
+								factor = 0
+								event_target:nickname_target = { is_nomadic = yes }
+							}
+							modifier = {
+								factor = 0
+								event_target:nickname_target = { culture = ROOT }
+							}
+						}
+						5 = {
+							give_nickname = nick_the_bane_of_realmname
+							modifier = {
+								factor = 0
+								event_target:nickname_target = { is_nomadic = yes }
+							}
+							modifier = {
+								factor = 0
+								event_target:nickname_target = { culture = ROOT }
+							}
+						}
+						5 = {
+							give_nickname = nick_the_slayer_of_culture
+							modifier = {
+								factor = 0
+								event_target:nickname_target = { culture = ROOT }
+							}
+						}
+						5 = {
+							give_nickname = nick_the_scourge_of_god
+							modifier = {
+								factor = 0
+								event_target:nickname_target = { religion = ROOT }
+							}
+						}
+						100 = { }
+					}
 				}
-				FROM = {
-					save_event_target_as = nickname_target
+				if = {
+					limit = {
+						uses_decadence = yes
 					}
-				ROOT = {
-					save_event_target_as = nickname_receiver
+					participation_scaled_decadence = -10
 				}
-				random_list = {
-					5 = { give_nickname = nick_the_eastern_wind }
-					5 = { give_nickname = nick_the_despoiler }
-					5 = {
-						give_nickname = nick_the_culture_marauder
-						modifier = {
-							factor = 0
-							event_target:nickname_target = { is_nomadic = yes }
-						}
-						modifier = {
-							factor = 0
-							event_target:nickname_target = { culture = ROOT }
-						}
-					}
-					5 = {
-						give_nickname = nick_the_bane_of_realmname
-						modifier = {
-							factor = 0
-							event_target:nickname_target = { is_nomadic = yes }
-						}
-						modifier = {
-							factor = 0
-							event_target:nickname_target = { culture = ROOT }
-						}
-					}
-					5 = {
-						give_nickname = nick_the_slayer_of_culture
-						modifier = {
-							factor = 0
-							event_target:nickname_target = { culture = ROOT }
-						}
-					}
-					5 = {
-						give_nickname = nick_the_scourge_of_god
-						modifier = {
-							factor = 0
-							event_target:nickname_target = { religion = ROOT }
-						}
-					}
-					100 = { }
-				}
-			}
-			if = {
-				limit = {
-					uses_decadence = yes
-				}
-				participation_scaled_decadence = -10
 			}
 		}
 		any_attacker = {
@@ -18755,18 +18777,23 @@ nomad_expansion = {
 				}
 			}
 		}
-		FROM = { prestige = -200 }
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			prestige = -200
+		}
 	}
 
 	on_success_title = {
 		custom_tooltip = {
 			text = pagan_subjugation_tip
-			hidden_tooltip = {
-				ROOT = {
-					subjugate_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-					}
+
+			# Attacker
+			ROOT = {
+				subjugate_or_take_under_title = {
+					title = PREV
+					enemy = FROM
 				}
 			}
 		}
@@ -18780,20 +18807,27 @@ nomad_expansion = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 			prestige = -200
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 300
 			if = {
 				limit = {
