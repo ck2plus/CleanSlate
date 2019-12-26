@@ -19456,6 +19456,7 @@ powerful_vassal_takeover_war = { # Started from faction
 	}
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			vassal_of = FROM
 		}
@@ -19467,21 +19468,15 @@ powerful_vassal_takeover_war = { # Started from faction
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = { character = FROM }
+		}
+
+		# Defender
 		FROM = {
 			in_revolt = no
 			has_character_flag = powerful_vassal_takeover_target
-		}
-		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
 		}
 	}
 
@@ -19497,12 +19492,15 @@ powerful_vassal_takeover_war = { # Started from faction
 	}
 
 	on_success = {
+		# Attackers
 		any_attacker = {
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 			}
 		}
+
+		# Defender
 		FROM = { hidden_tooltip = { disband_event_forces = faction_loyalists } }
 	}
 
@@ -19520,14 +19518,54 @@ powerful_vassal_takeover_war = { # Started from faction
 			}
 			custom_tooltip = {
 				text = overthrow_text
-				hidden_tooltip = {
-					if = {
-						limit = {
-							OR = {
-								title = e_hre
-								has_title_flag = alternate_hre
-							}
-							NOR = { has_law = succ_feudal_elective has_law = succ_hre_elective }
+
+				if = {
+					limit = {
+						OR = {
+							title = e_hre
+							has_title_flag = alternate_hre
+						}
+						NOR = {
+							has_law = succ_feudal_elective
+							has_law = succ_hre_elective
+						}
+						has_law = law_voting_power_1
+						has_law = banish_voting_power_1
+						has_law = execution_voting_power_1
+						has_law = revoke_title_voting_power_1
+						has_law = grant_title_voting_power_1
+						has_law = imprison_voting_power_1
+						has_law = war_voting_power_1
+					}
+					add_law_w_cooldown = succ_hre_elective
+				}
+				else_if = {
+					limit = {
+						NOR = {
+							title = e_hre
+							has_title_flag = alternate_hre
+							has_law = succ_feudal_elective
+							has_law = succ_hre_elective
+						}
+						has_law = law_voting_power_1
+						has_law = banish_voting_power_1
+						has_law = execution_voting_power_1
+						has_law = revoke_title_voting_power_1
+						has_law = grant_title_voting_power_1
+						has_law = imprison_voting_power_1
+						has_law = war_voting_power_1
+					}
+					add_law_w_cooldown = succ_feudal_elective
+				}
+				else_if = {
+					limit = {
+						NOR = {
+							has_law = succ_gavelkind
+							has_law = succ_feudal_elective
+							has_law = succ_hre_elective
+						}
+						NAND = {
+							has_law = succ_feudal_elective
 							has_law = law_voting_power_1
 							has_law = banish_voting_power_1
 							has_law = execution_voting_power_1
@@ -19536,48 +19574,16 @@ powerful_vassal_takeover_war = { # Started from faction
 							has_law = imprison_voting_power_1
 							has_law = war_voting_power_1
 						}
-						add_law_w_cooldown = succ_hre_elective
 					}
-					if = {
-						limit = {
-							NOR = {
-								title = e_hre
-								has_title_flag = alternate_hre
-							}
-							NOR = { has_law = succ_feudal_elective has_law = succ_hre_elective }
-							has_law = law_voting_power_1
-							has_law = banish_voting_power_1
-							has_law = execution_voting_power_1
-							has_law = revoke_title_voting_power_1
-							has_law = grant_title_voting_power_1
-							has_law = imprison_voting_power_1
-							has_law = war_voting_power_1
-						}
-						add_law_w_cooldown = succ_feudal_elective
-					}
-					if = {
-						limit = {
-							NOT = { has_law = succ_gavelkind }
-							NOR = { has_law = succ_feudal_elective has_law = succ_hre_elective }
-							NAND = {
-								has_law = succ_feudal_elective
-								has_law = law_voting_power_1
-								has_law = banish_voting_power_1
-								has_law = execution_voting_power_1
-								has_law = revoke_title_voting_power_1
-								has_law = grant_title_voting_power_1
-								has_law = imprison_voting_power_1
-								has_law = war_voting_power_1
-							}
-						}
-						add_law_w_cooldown = succ_gavelkind
-					}
+					add_law_w_cooldown = succ_gavelkind
 				}
 			}
 		}
 		holder_scope = {
+			show_scope_change = no
 			clr_character_flag = powerful_vassal_takeover_target
 			most_popular_vassal = {
+				show_scope_change = no
 				limit = {
 					higher_tier_than = BARON
 					is_feudal = yes
@@ -19588,7 +19594,6 @@ powerful_vassal_takeover_war = { # Started from faction
 						trait = eunuch
 					}
 					age = 16
-					#can_hold_title = PREVPREV
 					OR = {
 						is_female = no
 						AND = {
@@ -19621,20 +19626,13 @@ powerful_vassal_takeover_war = { # Started from faction
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
-
-		FROM = {
-			participation_scaled_prestige = 50
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
-		}
-
-		hidden_tooltip = {
-			any_attacker = {
+		any_attacker = {
+			hidden_tooltip = {
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
 					name = faction_powerful_vassal_takeover_ultimatum_timer
@@ -19643,24 +19641,49 @@ powerful_vassal_takeover_war = { # Started from faction
 				}
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
+			participation_scaled_prestige = 50
+
 			hidden_tooltip = {
 				disband_event_forces = faction_loyalists
 				clr_character_flag = powerful_vassal_takeover_target
 			}
 		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 50 }
+		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
 			prestige = -200
 			imprison = FROM
 		}
+		any_attacker = {
+			limit = { liege = { character = FROM } }
+			hidden_tooltip = {
+				imprison = FROM
+				disband_event_forces = faction_revolters
+				add_character_modifier = {
+					name = faction_powerful_vassal_takeover_ultimatum_timer
+					hidden = yes
+					duration = 3650
+				}
+			}
+		}
 
-
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = {
+				disband_event_forces = faction_loyalists
+				clr_character_flag = powerful_vassal_takeover_target
 				if = {
 					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
 					opinion = {
@@ -19673,25 +19696,6 @@ powerful_vassal_takeover_war = { # Started from faction
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
-		}
-
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { liege = { character = FROM } }
-				imprison = FROM
-				disband_event_forces = faction_revolters
-				add_character_modifier = {
-					name = faction_powerful_vassal_takeover_ultimatum_timer
-					hidden = yes
-					duration = 3650
-				}
-			}
-		}
-		FROM = {
-			hidden_tooltip = {
-				disband_event_forces = faction_loyalists
-				clr_character_flag = powerful_vassal_takeover_target
-			}
 		}
 	}
 
