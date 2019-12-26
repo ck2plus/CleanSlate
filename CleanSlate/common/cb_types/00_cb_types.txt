@@ -19074,8 +19074,8 @@ increase_council_power_war = {
 			imprison = FROM
 		}
 		any_attacker = {
+			limit = { liege = { character = FROM } }
 			hidden_tooltip = {
-				limit = { liege = { character = FROM } }
 				imprison = FROM
 				disband_event_forces = faction_revolters
 				add_character_modifier = {
@@ -19147,10 +19147,7 @@ nomad_humiliate_cb = {
 	can_use = {
 		has_dlc = "Horse Lords"
 
-		FROM = {
-			is_nomadic = yes
-		}
-
+		# Attacker
 		ROOT = {
 			is_nomadic = yes
 			mercenary = no
@@ -19166,42 +19163,41 @@ nomad_humiliate_cb = {
 			}
 		}
 
-		# The attacker needs a border, or be at most two sea zones away from one of the target's counties
+		# Defender
 		FROM = {
+			is_nomadic = yes
+
+			# The attacker needs a border, or be at most two sea zones away from one of the target's counties
 			any_realm_province = {
 				any_neighbor_province = {
-					OR = {
-						AND = {
-							has_owner = yes
-							owner = {
-								OR = {
-									character = ROOT
-									is_liege_or_above = ROOT
-								}
+					trigger_if = {
+						limit = { has_owner = yes } # border
+						owner = {
+							OR = {
+								character = ROOT
+								is_liege_or_above = ROOT
 							}
 						}
-						AND = {
-							is_land = no
-							any_neighbor_province = {
-								OR = {
-									AND = {
-										has_owner = yes
-										owner = {
-											OR = {
-												character = ROOT
-												is_liege_or_above = ROOT
-											}
-										}
+					}
+					trigger_else = {
+						is_land = no # first sea zone
+						any_neighbor_province = {
+							trigger_if = {
+								limit = { has_owner = yes } # one sea zone away
+								owner = {
+									OR = {
+										character = ROOT
+										is_liege_or_above = ROOT
 									}
-									AND = {
-										is_land = no
-										any_neighbor_province = {
-											owner = {
-												OR = {
-													character = ROOT
-													is_liege_or_above = ROOT
-												}
-											}
+								}
+							}
+							trigger_else = {
+								is_land = no # second sea zone
+								any_neighbor_province = { # second sea zone away
+									owner = {
+										OR = {
+											character = ROOT
+											is_liege_or_above = ROOT
 										}
 									}
 								}
@@ -19225,29 +19221,41 @@ nomad_humiliate_cb = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 300
 			steal_population_scaled = {
 				target = FROM
 				percentage = 0.25
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -300
 		}
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change	 = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
@@ -19255,6 +19263,7 @@ nomad_humiliate_cb = {
 			}
 		}
 
+		# Defender
 		FROM = {
 			prestige = 200
 		}
