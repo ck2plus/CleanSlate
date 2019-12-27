@@ -2189,6 +2189,93 @@ unjust_conquest = { # New7
 		}
 	}
 
+	can_use = {
+		has_dlc = "Jade Dragon"
+		NOT = {
+			has_game_rule = {
+				name = unjustified_wars
+				value = off
+			}
+		}
+
+		# Attacker
+		ROOT = {
+			NOR = {
+				is_liege_or_above = FROM
+				mercenary = yes
+				pacifist = yes
+				is_nomadic = yes		# Use 'pagan_county_conquest' instead
+				religion_group = muslim	# Use 'muslim_county_conquest' instead
+			}
+			trigger_if = {				# Use 'pagan_county_conquest' instead
+				limit = { religion_group = pagan_group }
+				religion = FROM
+			}
+		}
+
+		trigger_if = {
+			limit = { is_shattered_world = yes }
+			OR = {
+				AND = {
+					is_shattered_world = yes
+					has_alternate_start_setting = {
+						setting = shattered_cbs
+						option = on_limited
+					}
+					total_years_played >= 25
+				}
+				AND = {
+					is_shattered_world = yes
+					has_alternate_start_setting = {
+						setting = shattered_cbs
+						option = on_long
+					}
+					total_years_played >= 100
+				}
+				AND = {
+					is_shattered_world = yes
+					has_alternate_start_setting = {
+						setting = shattered_cbs
+						option = off
+					}
+				}
+			}
+		}
+	}
+
+	can_use_title = {
+		tier = COUNT
+		holder_scope = {
+			OR = {
+				character = FROM
+				AND = {
+					is_liege_or_above = FROM
+					NOT = { same_realm = ROOT }
+				}
+			}
+		}
+
+		location = {
+			any_neighbor_province = {
+				owner = {
+					OR = {
+						character = ROOT
+						is_liege_or_above = ROOT
+					}
+				}
+			}
+		}
+	}
+
+	is_valid_title = {
+		holder_scope = {
+			OR = {
+				character = FROM
+				is_liege_or_above = FROM
+			}
+		}
+	}
+
 	on_add = {
 		# Attacker
 		ROOT = {
@@ -2408,93 +2495,6 @@ unjust_conquest = { # New7
 		}
 	}
 
-	can_use = {
-		has_dlc = "Jade Dragon"
-		NOT = {
-			has_game_rule = {
-				name = unjustified_wars
-				value = off
-			}
-		}
-
-		# Attacker
-		ROOT = {
-			NOR = {
-				is_liege_or_above = FROM
-				mercenary = yes
-				pacifist = yes
-				is_nomadic = yes		# Use 'pagan_county_conquest' instead
-				religion_group = muslim	# Use 'muslim_county_conquest' instead
-			}
-			trigger_if = {				# Use 'pagan_county_conquest' instead
-				limit = { religion_group = pagan_group }
-				religion = FROM
-			}
-		}
-
-		trigger_if = {
-			limit = { is_shattered_world = yes }
-			OR = {
-				AND = {
-					is_shattered_world = yes
-					has_alternate_start_setting = {
-						setting = shattered_cbs
-						option = on_limited
-					}
-					total_years_played >= 25
-				}
-				AND = {
-					is_shattered_world = yes
-					has_alternate_start_setting = {
-						setting = shattered_cbs
-						option = on_long
-					}
-					total_years_played >= 100
-				}
-				AND = {
-					is_shattered_world = yes
-					has_alternate_start_setting = {
-						setting = shattered_cbs
-						option = off
-					}
-				}
-			}
-		}
-	}
-
-	can_use_title = {
-		tier = COUNT
-		holder_scope = {
-			OR = {
-				character = FROM
-				AND = {
-					is_liege_or_above = FROM
-					NOT = { same_realm = ROOT }
-				}
-			}
-		}
-
-		location = {
-			any_neighbor_province = {
-				owner = {
-					OR = {
-						character = ROOT
-						is_liege_or_above = ROOT
-					}
-				}
-			}
-		}
-	}
-
-	is_valid_title = {
-		holder_scope = {
-			OR = {
-				character = FROM
-				is_liege_or_above = FROM
-			}
-		}
-	}
-
 	on_success_title = {
 		if = { # Vassalise single county counts
 			limit = {
@@ -2700,6 +2700,8 @@ tributary_permanent_cb = { # New8
 
 	can_use_gui = {
 		check_if_crusader_trigger = yes
+
+		# Attacker
 		ROOT = {
 			relative_realm_size = {
 				who = FROM
@@ -2713,8 +2715,8 @@ tributary_permanent_cb = { # New8
 						}
 					}
 				}
-				prestige = 200
-				TECH_MAJESTY = 2
+				prestige >= 200
+				TECH_MAJESTY >= 2
 			}
 			conditional_tooltip = {
 				trigger = {
@@ -2722,55 +2724,56 @@ tributary_permanent_cb = { # New8
 						region = world_europe
 					}
 				}
-				prestige = 200
-				TECH_MAJESTY = 4
+				prestige >= 200
+				TECH_MAJESTY >= 4
 			}
 		}
 	}
 
 	can_use = {
 		has_dlc = "Jade Dragon"
-
-		ROOT = {
-			NOT = {
-				has_game_rule = {
-					name = jade_dragon_cbs
-					value = off
-				}
+		NOT = {
+			has_game_rule = {
+				name = jade_dragon_cbs
+				value = off
 			}
-			is_nomadic = no
+		}
+
+		# Attacker
+		ROOT = {
 			independent = yes
-			mercenary = no
+
 			OR = {
 				is_tributary = no
 				is_tributary = {
 					type = offmap
 				}
 			}
-			NOT = { is_vassal_or_below = FROM }
-			NOT = { is_liege_or_above = FROM }
-			NOT = {
+
+			NOR = {
+				is_nomadic = yes
+				mercenary = yes
+				is_vassal_or_below = FROM
+				is_liege_or_above = FROM
 				rightful_religious_head_scope = {
 					character = FROM
 				}
 			}
+
 			NAND = {
 				holy_order = yes
 				religion = FROM
 			}
 		}
+
+		# Defender
 		FROM = {
-			is_nomadic = no
-			higher_tier_than = BARON
-			NOT = {
-				is_offmap_governor = yes
-			}
-			NAND = {
-				holy_order = yes
-				religion = ROOT
-			}
 			independent = yes
+			higher_tier_than = BARON
+
 			NOT = {
+				is_nomadic = yes
+				is_offmap_governor = yes
 				suzerain = {
 					OR = {
 						character = ROOT
@@ -2780,50 +2783,51 @@ tributary_permanent_cb = { # New8
 					}
 				}
 			}
+
+			NAND = {
+				holy_order = yes
+				religion = ROOT
+			}
 		}
 
 		# The attacker needs a border, or be at most two sea zones away from one of the target's counties
 		FROM = {
 			any_realm_province = {
 				any_neighbor_province = {
-					OR = {
-						AND = {
-							has_owner = yes
-							owner = {
-								OR = {
-									character = ROOT
-									is_liege_or_above = ROOT
-									top_liege = {
-										is_tributary = {
-											type = permanent
-											suzerain = ROOT
-										}
+					trigger_if = {
+						limit = { has_owner = yes }
+						owner = {
+							OR = {
+								character = ROOT
+								is_liege_or_above = ROOT
+								top_liege = {
+									is_tributary = {
+										type = permanent
+										suzerain = ROOT
 									}
 								}
 							}
 						}
-						AND = {
-							is_land = no
-							any_neighbor_province = {
-								OR = {
-									AND = {
-										has_owner = yes
-										owner = {
-											OR = {
-												character = ROOT
-												is_liege_or_above = ROOT
-											}
-										}
+					}
+					trigger_else = {
+						is_land = no # first sea sonze
+						any_neighbor_province = {
+							trigger_if = {
+								limit = { has_owner = yes }
+								owner = {
+									OR = {
+										character = ROOT
+										is_liege_or_above = ROOT
 									}
-									AND = {
-										is_land = no
-										any_neighbor_province = {
-											owner = {
-												OR = {
-													character = ROOT
-													is_liege_or_above = ROOT
-												}
-											}
+								}
+							}
+							trigger_else = {
+								is_land = no # second sea zone
+								any_neighbor_province = {
+									owner = {
+										OR = {
+											character = ROOT
+											is_liege_or_above = ROOT
 										}
 									}
 								}
@@ -2836,15 +2840,13 @@ tributary_permanent_cb = { # New8
 
 		# The defender is not in any tributary war
 		FROM = {
-			NOR = {
+			NOT = {
 				any_war = {
-					using_cb = tributary_cb
-				}
-				any_war = {
-					using_cb = tributary_permanent_cb
-				}
-				any_war = {
-					using_cb = tributary_nomad_cb
+					OR = {
+						using_cb = tributary_cb
+						using_cb = tributary_permanent_cb
+						using_cb = tributary_nomad_cb
+					}
 				}
 			}
 		}
@@ -2861,15 +2863,20 @@ tributary_permanent_cb = { # New8
 	}
 
 	on_add = {
-		# Chance to surrender early
+		## Chance to surrender early
+
+		# Attacker
 		ROOT = { save_event_target_as = tribute_war_suzerain }
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			save_event_target_as = tribute_war_target
 			set_character_flag = surrender_tributary_permanent_cb
 			character_event = { id = JD.2500 days = 5 tooltip = surrender_tributary_tt }
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -2880,50 +2887,21 @@ tributary_permanent_cb = { # New8
 	}
 
 	on_success = {
-		FROM = {
-			show_scope_change = no
-			save_event_target_as = target_loser
-			prestige = -100
-			custom_tooltip = {
-				text = "REMOVE_PREVIOUS_SUZERAIN"
-				hidden_tooltip = {
-					any_suzerain = {
-						event_target:target_loser = {
-							remove_tributary = PREV
-						}
-					}
-				}
-			}
-			opinion = {
-				modifier = opinion_forced_tributary
-				who = ROOT
-				years = 15
-			}
-		}
-
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = 200
 			make_tributary = { who = FROM tributary_type = permanent }
-		}
-
-		if = {
-			limit = {
-				ROOT = {
+			if = {
+				limit = {
 					uses_decadence = yes
 				}
-			}
-			ROOT = {
 				decadence = -10
 			}
-		}
-		if = {
-			limit = {
-				ROOT = {
+			if = {
+				limit = {
 					is_nomadic = yes
 				}
-			}
-			ROOT = {
 				clan_title = {
 					ROOT = {
 						any_vassal = {
@@ -2939,15 +2917,11 @@ tributary_permanent_cb = { # New8
 					}
 				}
 			}
-		}
 
-		if = {
-			limit = {
-				ROOT = {
+			if = {
+				limit = {
 					is_tribal = yes
 				}
-			}
-			ROOT = {
 				any_vassal = {
 					limit = { is_tribal = yes }
 					opinion = {
@@ -2958,13 +2932,39 @@ tributary_permanent_cb = { # New8
 				}
 			}
 		}
+
+		# Defender
+		FROM = {
+			show_scope_change = no
+			save_event_target_as = target_loser
+			prestige = -100
+			custom_tooltip = {
+				text = "REMOVE_PREVIOUS_SUZERAIN"
+				any_suzerain = {
+					event_target:target_loser = {
+						remove_tributary = PREV
+					}
+				}
+			}
+			opinion = {
+				modifier = opinion_forced_tributary
+				who = ROOT
+				years = 15
+			}
+		}
+
+
+
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = 100
@@ -2972,6 +2972,7 @@ tributary_permanent_cb = { # New8
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -2981,6 +2982,7 @@ tributary_permanent_cb = { # New8
 			}
 		}
 
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = 200
