@@ -5341,25 +5341,20 @@ pepin_religious = {
 
 	sort_priority = 790
 
-	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
-
 	can_use_gui = {
 		check_if_crusader_trigger = yes
 	}
 
 	can_use = {
-		ROOT = { #The cb is either available due to Coronation dealings, or as any King or Emperor ruler who has a Pope for Religious Head.
-			has_dlc = "Holy Fury"
+		has_dlc = "Holy Fury"
+
+		# Attacker
+		ROOT = { # The cb is either available due to Coronation dealings, or as any King or Emperor ruler who has a Pope for Religious Head
+
 			higher_tier_than = DUKE
+			is_feudal = yes
+			independent = yes
+
 			OR = {
 				has_character_flag = flag_pepin_for_coronation
 				AND = {
@@ -5371,24 +5366,26 @@ pepin_religious = {
 					rightful_religious_head_scope = { has_landed_title = d_fraticelli }
 				}
 			}
-			#war = no
-			is_feudal = yes
-			independent = yes
+
 			OR = {
 				religion = catholic
 				religion = fraticelli
 			}
+
 			NOT = { same_realm = FROM }
-		#	OR = {
-		#		NOT = { religion_group = FROM }
-		#		is_parent_religion = FROM
-		#	}
 		}
+
+		# Defender
 		FROM = {
 			is_within_diplo_range = ROOT
-			NOT = { has_landed_title = k_papal_state }
-			NOT = { has_landed_title = d_fraticelli }
-			OR = { 		#Target must either be a pagan or heretic of any government form, or it must be a disliked Catholic/Fraticelli who is not a bishop.
+
+			NOR = {
+				has_landed_title = k_papal_state
+				has_landed_title = d_fraticelli
+			}
+
+			# Target must either be a pagan or heretic of any government form, or it must be a disliked Catholic/Fraticelli who is not a bishop
+			OR = {
 				AND = {
 					is_theocracy = no
 					religion = ROOT
@@ -5435,6 +5432,7 @@ pepin_religious = {
 				any_de_jure_vassal_title = { title = PREVPREV }
 			}
 		}
+
 		any_de_jure_vassal_title = {
 			location = {
 				region = world_europe_south_italy
@@ -5443,6 +5441,7 @@ pepin_religious = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
 			OR = {
 				#has_character_flag = flag_pepin_for_coronation
@@ -5455,9 +5454,13 @@ pepin_religious = {
 					rightful_religious_head_scope = { has_landed_title = d_fraticelli }
 				}
 			}
-			NOT = { religion_group = pagan_group }
-			NOT = { pacifist = yes }
-			NOT = { same_realm = FROM }
+
+			NOR = {
+				religion_group = pagan_group
+				pacifist = yes
+				same_realm = FROM
+			}
+
 			OR = {
 				religion = catholic
 				religion = fraticelli
@@ -5465,14 +5468,45 @@ pepin_religious = {
 		}
 	}
 
-	on_invalidation = {
-		ROOT = {
-			clr_character_flag = flag_pepin_for_coronation
+	on_add = {
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
 		}
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
+			participation_scaled_piety = 150
+			participation_scaled_prestige = 75
+
+			rightful_religious_head_scope = {
+				opinion = {
+					who = ROOT
+					modifier = opinion_papal_land_donation
+				}
+			}
+
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
+			}
+
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
+					}
+					change_variable = { which = strengthen_religion value = 1 }
+				}
+			}
+
 			if = {
 				limit = {
 					religion_head = {
@@ -5480,7 +5514,7 @@ pepin_religious = {
 							has_artifact_flag = christian
 							NOR = {
 								has_artifact_flag = very_rare
-								has_artifact_flag = unique #Won't give the holiest ones away.
+								has_artifact_flag = unique # Won't give the holiest ones away
 							}
 						}
 					}
@@ -5525,13 +5559,13 @@ pepin_religious = {
 								}
 							}
 						}
-						set_character_flag = flag_pope_gifts_artifact #Effect happens in event.
+						set_character_flag = flag_pope_gifts_artifact # Effect happens in event.
 					}
-					80 = { #Nothing happens
+					80 = { # Nothing happens
 					}
 				}
 			}
-			character_event = { id = HF.20224 } #Congratulations\ Papal Coronation may proceed if flagged.
+			character_event = { id = HF.20224 } # Congratulations\ Papal Coronation may proceed if flagged
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
@@ -5555,30 +5589,12 @@ pepin_religious = {
 			}
 		}
 
-		ROOT = {
-			participation_scaled_piety = 150
-			participation_scaled_prestige = 75
-
-			rightful_religious_head_scope = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_papal_land_donation
-				}
-			}
-			religion_authority = {
-				modifier = won_holy_war
-				years = 20
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						has_ambition = obj_strengthen_religion
-					}
-					change_variable = { which = strengthen_religion value = 1 }
-				}
-			}
-		}
+		# Defender
 		FROM = {
+			show_scope_change = no
+			piety = -100
+			prestige = -50
+
 			if = {
 				limit = {
 					NOT = {
@@ -5591,23 +5607,21 @@ pepin_religious = {
 				}
 			}
 		}
-		FROM = { piety = -100 }
-		FROM = { prestige = -50 }
 	}
 
 	on_success_title = {
 		custom_tooltip = {
 			text = pepin_religious_cb_succ_tip
-			hidden_tooltip = {
-				ROOT = {
-					religion_head = {
-						vassalize_or_take_under_title = {
-							title = PREVPREV
-							enemy = FROM
-							same_religion = yes # Only vassalize rulers of my religion
-							is_religious = yes
-							type = holy_war
-						}
+
+			# Attacker
+			ROOT = {
+				religion_head = {
+					vassalize_or_take_under_title = {
+						title = PREVPREV
+						enemy = FROM
+						same_religion = yes # Only vassalize rulers of my religion
+						is_religious = yes
+						type = holy_war
 					}
 				}
 			}
@@ -5615,64 +5629,39 @@ pepin_religious = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
-			clr_character_flag = flag_pepin_for_coronation
-		}
-		ROOT = {
+			show_scope_change = no
 			piety = -50
 			prestige = -100
+			clr_character_flag = flag_pepin_for_coronation
 		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
-			clr_character_flag = flag_pepin_for_coronation
-		}
-		ROOT = {
+			show_scope_change = no
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 			piety = -75
 			prestige = -150
-		}
-		FROM = {
-			participation_scaled_piety = 100
-			participation_scaled_prestige = 75
+
+			religion_authority = {
+				modifier = lost_holy_war
+				years = 20
+			}
+
 			if = {
 				limit = {
 					uses_decadence = yes
 				}
-				participation_scaled_decadence = -10
+				participation_scaled_decadence = 20
 			}
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = {
-				participation_scaled_piety = 75
-				participation_scaled_prestige = 50
-				if = {
-					limit = {
-						uses_decadence = yes
-					}
-					participation_scaled_decadence = -10
-				}
-				hidden_tooltip = {
-					if = {
-						limit = {
-							has_ambition = obj_strengthen_religion
-						}
-						change_variable = { which = strengthen_religion value = 1 }
-					}
-				}
-			}
-		}
-		any_attacker = {
-			limit = {
-				character = ROOT
-				uses_decadence = yes
-			}
-			participation_scaled_decadence = 20
+
+			clr_character_flag = flag_pepin_for_coronation
 		}
 		any_attacker = {
 			limit = {
@@ -5683,17 +5672,25 @@ pepin_religious = {
 				participation_scaled_decadence = 20
 			}
 		}
-		ROOT = {
-			religion_authority = {
-				modifier = lost_holy_war
-				years = 20
-			}
-		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
+			participation_scaled_piety = 100
+			participation_scaled_prestige = 75
+
+			if = {
+				limit = {
+					uses_decadence = yes
+				}
+				participation_scaled_decadence = -10
+			}
+
 			religion_authority = {
 				modifier = won_holy_war
 				years = 20
 			}
+
 			hidden_tooltip = {
 				if = {
 					limit = {
@@ -5702,6 +5699,35 @@ pepin_religious = {
 					change_variable = { which = strengthen_religion value = 1 }
 				}
 			}
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+
+			hidden_tooltip = {
+				participation_scaled_piety = 75
+				participation_scaled_prestige = 50
+
+				if = {
+					limit = {
+						uses_decadence = yes
+					}
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
+					}
+					change_variable = { which = strengthen_religion value = 1 }
+				}
+			}
+		}
+	}
+
+	on_invalidation = {
+		# Attacker
+		ROOT = {
+			clr_character_flag = flag_pepin_for_coronation
 		}
 	}
 
