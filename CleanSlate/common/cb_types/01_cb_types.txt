@@ -4219,13 +4219,17 @@ dismantle_pretender_china_cb = {
 	defender_unoccupied_warscore = yes
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			independent = yes
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
 		}
 
+		# Defender
 		FROM = {
 			primary_title = { has_title_flag = rebel_general_title }
 		}
@@ -4238,35 +4242,39 @@ dismantle_pretender_china_cb = {
 		log = "The war ended in a victory for China"
 		log = "[From.GetTitledName] is now dismantled of China"
 		log = "---------------------"
+
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = 200
+		}
+
+		# Defender
 		FROM = {
 			custom_tooltip = {
 				text = dismantle_pretender_china_success_tt
-				hidden_effect = {
-					offmap_china = { set_offmap_flag = no_war_news }
-					any_player = {
-						limit = {
-							NOT = { character = ROOT_FROM }
-							OR = {
-								AND = {
-									has_offmap_news_enabled = offmap_china
-									is_within_diplo_range = ROOT
-								}
-								liege = { character = ROOT_FROM }
+
+				offmap_china = { set_offmap_flag = no_war_news }
+				any_player = {
+					limit = {
+						NOT = { character = ROOT_FROM }
+						OR = {
+							AND = {
+								has_offmap_news_enabled = offmap_china
+								is_within_diplo_range = ROOT
 							}
+							liege = { character = ROOT_FROM }
 						}
-						narrative_event = { id = JD.60209 }
 					}
-					any_courtier = { death = { death_reason = death_executed_by_chinese_emperor } }
-					primary_title = {
-						activate_title = { title = THIS status = no }
-						destroy_landed_title = THIS
-					}
-					death = { death_reason = death_executed_by_chinese_emperor }
+					narrative_event = { id = JD.60209 } # News Event: Title invaded by China destroyed
 				}
+				any_courtier = { death = { death_reason = death_executed_by_chinese_emperor } }
+				primary_title = {
+					activate_title = { title = THIS status = no }
+					destroy_landed_title = THIS
+				}
+				death = { death_reason = death_executed_by_chinese_emperor }
 			}
-		}
-		ROOT = {
-			prestige = 200
 		}
 	}
 
@@ -4276,16 +4284,22 @@ dismantle_pretender_china_cb = {
 		log = "The [offmap_china.GetShortName] dismantle pretender on [From.GetTitledName] has ended"
 		log = "The war ended in a white peace for China"
 		log = "---------------------"
+
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -100
+		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 100
 			participation_scaled_prestige = 250
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 250 }
-		}
-		ROOT = {
-			piety = -100
 		}
 	}
 
@@ -4295,7 +4309,10 @@ dismantle_pretender_china_cb = {
 		log = "The [offmap_china.GetShortName] dismantle pretender on [From.GetTitledName] has ended"
 		log = "The war ended in a defeat for China"
 		log = "---------------------"
+
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -200
 			transfer_scaled_wealth = {
 				to = FROM
@@ -4304,7 +4321,10 @@ dismantle_pretender_china_cb = {
 			}
 			offmap_power = { set_offmap_tmp_flag = pretender_chinese_empire_war_cooldown }
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 200
 			participation_scaled_prestige = 1000
 		}
