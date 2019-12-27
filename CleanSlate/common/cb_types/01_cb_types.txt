@@ -16,111 +16,88 @@ dejure_duchy_claim = { # New1
 
 	can_use_gui = {
 		check_if_crusader_trigger = yes
+
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			conditional_tooltip = {
 				trigger = {
 					tier = DUKE
 				}
-				prestige = 250
+				prestige >= 250
 			}
 			conditional_tooltip = {
 				trigger = {
 					tier = KING
 				}
-				prestige = 500
+				prestige >= 500
 			}
 			conditional_tooltip = {
 				trigger = {
 					tier = EMPEROR
 				}
-				prestige = 1000
-			}
-		}
-	}
-
-	on_add = {
-		ROOT = {
-			if = {
-				limit = {
-					tier = DUKE
-				}
-				prestige = -250
-			}
-			if = {
-				limit = {
-					tier = KING
-				}
-				prestige = -500
-			}
-			if = {
-				limit = {
-					tier = EMPEROR
-				}
-				prestige = -1000
-			}
-		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
+				prestige >= 1000
 			}
 		}
 	}
 
 	can_use_title = {
-
 		OR = {
 			holder = ROOT
-			kingdom = {
-				holder = ROOT
-			}
-			empire = {
-				holder = ROOT
-			}
+			any_de_jure_liege_title = { holder = ROOT }
 		}
 
-		FROM = { # Can only De Jure claim duchies from the same religion group
-			religion_group = ROOT
-			NOT = {
-				is_liege_of = ROOT
+		# This ensures that the AI doesn't declare this type of war against someone who only holds one county within the targeted title
+		trigger_if = {
+			limit = {
+				ROOT = { ai = yes }
 			}
-		}
 
-		OR = { # This ensures that the AI doesn't declare this type of war against someone who only holds one county within the targeted title...
-			ROOT = {
-				ai = no
-			}
 			any_de_jure_vassal_title = {
 				count = 2
-				tier = count
+				tier = COUNT
 				holder_scope = {
 					same_realm = FROM
 				}
 			}
 		}
+	}
 
-		NAND = { # Though different sects of Muslims must Holy War each other instead
-			ROOT = {
-				NOT = {
-					religion = FROM
-				}
-			}
-			ROOT = {
-				religion_group = muslim
-			}
-			FROM = {
-				religion_group = muslim
+	can_use = {
+		has_dlc = "Jade Dragon"
+		NOT = {
+			has_game_rule = {
+				name = jade_dragon_cbs
+				value = off
 			}
 		}
 
+		# Defender
 		FROM = {
-			OR = {
-				holy_order = no
-				NOT = { religion = ROOT }
-				NOT = { has_dlc = "Sons of Abraham" }
+			NOT = {
+				is_liege_of = ROOT
+			}
+
+			trigger_if = { # Though different sects of Muslims must Holy War each other instead
+				limit = {
+					ROOT = { # Attacker
+						religion_group = muslim
+					}
+					religion_group = muslim
+				}
+				religion = ROOT
+			}
+
+			# Can only De Jure claim duchies from the same religion group
+			religion_group = ROOT
+			trigger_if = {
+				limit = {
+					has_dlc = "Sons of Abraham"
+					holy_order = yes
+					religion = ROOT
+				}
+
+				# Can only attack holy orders of own religion if expelled by attacker
 				OR = {
 					AND = {
 						primary_title = { title = d_knights_templar }
@@ -253,20 +230,33 @@ dejure_duchy_claim = { # New1
 		}
 	}
 
-	can_use = {
-		has_dlc = "Jade Dragon"
+	on_add = {
+		# Attacker
 		ROOT = {
-			NOT = {
-				has_game_rule = {
-					name = jade_dragon_cbs
-					value = off
-				}
+			show_scope_change = no
+			trigger_switch = {
+				on_trigger = tier
+
+				DUKE = { prestige = -250 }
+				KING = { prestige = -500 }
+				EMPEROR = { prestige = -1000 }
+			}
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
 			}
 		}
 	}
 
 	on_success_title = {
+		# Attackers
 		ROOT = {
+			show_scope_change = no
 			vassalize_or_take_under_title = {
 				title = PREV
 				enemy = FROM
@@ -286,15 +276,16 @@ dejure_duchy_claim = { # New1
 				landless_pope_effect = yes
 			}
 		}
-
-
 	}
 
 	on_fail_title = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 50
@@ -306,6 +297,7 @@ dejure_duchy_claim = { # New1
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -200
@@ -314,6 +306,8 @@ dejure_duchy_claim = { # New1
 				value = 4.0
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -347,7 +341,7 @@ dejure_duchy_claim = { # New1
 			ROOT = {
 				has_character_flag = is_temujin
 				has_landed_title = e_mongol_empire
-				demesne_size = 1
+				demesne_size >= 1
 			}
 			FROM = {
 				has_landed_title = e_china_west_governor
