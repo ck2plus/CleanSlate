@@ -4038,13 +4038,17 @@ tributary_offmap_cb = {
 	defender_unoccupied_warscore = yes
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			independent = yes
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
 		}
 
+		# Defender
 		FROM = {
 			independent = yes
 			in_revolt = no
@@ -4068,19 +4072,29 @@ tributary_offmap_cb = {
 		log = "The war ended in a victory for China"
 		log = "[From.GetTitledName] is now tributary of China"
 		log = "---------------------"
+
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = 200
+			make_tributary = { who = FROM tributary_type = offmap }
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			save_event_target_as = target_loser
 			prestige = -100
+
 			custom_tooltip = {
 				text = "REMOVE_PREVIOUS_SUZERAIN"
-				hidden_tooltip = {
-					any_suzerain = {
-						event_target:target_loser = {
-							remove_tributary = PREV
-						}
+				any_suzerain = {
+					event_target:target_loser = {
+						remove_tributary = PREV
 					}
 				}
 			}
+
 			if = { # Remove Raid China if active
 				limit = {
 					has_character_modifier = china_raid_active
@@ -4095,11 +4109,6 @@ tributary_offmap_cb = {
 				}
 			}
 		}
-
-		ROOT = {
-			prestige = 200
-			make_tributary = { who = FROM tributary_type = offmap }
-		}
 	}
 
 	on_fail = {
@@ -4108,10 +4117,16 @@ tributary_offmap_cb = {
 		log = "The [offmap_china.GetShortName] invasion of [From.GetTitledName] has ended"
 		log = "The war ended in a white peace"
 		log = "---------------------"
+
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 200
 			set_character_flag = defeated_china
 		}
@@ -4123,13 +4138,17 @@ tributary_offmap_cb = {
 		log = "The [offmap_china.GetShortName] invasion of [From.GetTitledName] has ended"
 		log = "The war ended in a victory for [From.GetTitledName]"
 		log = "---------------------"
+
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -500
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 5.0
 				min = 1000
 			}
+
 			hidden_effect = {
 				if = { #Makes China have a chance of leaving Expansionist policy...
 					limit = {
@@ -4149,7 +4168,9 @@ tributary_offmap_cb = {
 			}
 		}
 
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 500
 			participation_scaled_prestige = 2500
 			set_character_flag = defeated_china
