@@ -1537,40 +1537,16 @@ liberate_religion = { # New6
 
 	sort_priority = 4000
 
-	on_add = {
-		hidden_tooltip = {
-			if = {
-				limit = {
-					NOT = {
-						ROOT = {
-							any_owned_bloodline = {
-								has_bloodline_flag = bloodline_religious_liberation
-								bloodline_is_active_for = PREV
-							}
-						}
-					}
-				}
-				ROOT = {
-					set_character_flag = used_liberate_opportunity
-				}
-			}
-		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
-
 	can_use = {
 		OR = {
 			has_dlc = "Holy Fury"
 			has_dlc = "Jade Dragon"
 		}
+
+		# Attacker
 		ROOT = {
+			independent = yes
+
 			OR = {
 				any_owned_bloodline = {
 					has_bloodline_flag = bloodline_religious_liberation
@@ -1582,25 +1558,16 @@ liberate_religion = { # New6
 						value = off
 					}
 				}
-			}
-			independent = yes
-			OR = {
-				any_owned_bloodline = {
-					has_bloodline_flag = bloodline_religious_liberation
-					bloodline_is_active_for = PREV
-				}
 				has_character_flag = had_liberate_opportunity
 			}
-			NOT = {
+
+			NOR = {
 				has_character_flag = used_liberate_opportunity
-			}
-			is_nomadic = no
-			mercenary = no
-			NOT = { pacifist = yes }
-			NOT = { same_realm = FROM }
-			NOT = { religion = FROM }
-			top_liege = {
-				religion = ROOT
+				is_nomadic = yes
+				mercenary = yes
+				pacifist = yes
+				same_realm = FROM
+				religion = FROM
 			}
 		}
 	}
@@ -1618,65 +1585,62 @@ liberate_religion = { # New6
 				religion = ROOT
 			}
 		}
+
 		# The attacker needs at least one county in the target kingdom, or a border, or be only two sea zones away from one of your counties
 		any_de_jure_vassal_title = {
 			OR = {
-				holder_scope = {
+				holder_scope = { # own a county
 					OR = {
 						character = ROOT
 						is_liege_or_above = ROOT
 					}
 				}
 				location = {
-					any_neighbor_province = {
-						OR = {
-							AND = {
-								has_owner = yes
-								owner = {
-									OR = {
-										character = ROOT
-										is_liege_or_above = ROOT
-									}
+					any_neighbor_province = { # have a border
+						trigger_if = {
+							limit = { has_owner = yes }
+							owner = {
+								OR = {
+									character = ROOT
+									is_liege_or_above = ROOT
 								}
 							}
-							AND = {
-								is_land = no
-								OR = {
+						}
+						trigger_else = {
+							is_land = no # first sea zone
+							OR = {
+								ROOT = { religion_group = muslim }
+								FROM = { religion_group = muslim }
+								AND = {
+									ROOT = { religion_group = pagan_group }
+									has_global_flag = pagan_ghws_unlocked
+								}
+								AND = {
+									ROOT = { religion_group = christian }
+									has_global_flag = christian_crusades_unlocked
+								}
+								AND = {
 									ROOT = { religion_group = muslim }
-									FROM = { religion_group = muslim }
-									AND = {
-										ROOT = { religion_group = pagan_group }
-										has_global_flag = pagan_ghws_unlocked
-									}
-									AND = {
-										ROOT = { religion_group = christian }
-										has_global_flag = christian_crusades_unlocked
-									}
-									AND = {
-										ROOT = { religion_group = muslim }
-										has_global_flag = muslim_jihads_unlocked
+									has_global_flag = muslim_jihads_unlocked
+								}
+							}
+							any_neighbor_province = {
+								trigger_if = {
+									limit = { has_owner = yes }
+									owner = {
+										OR = {
+											character = ROOT
+											is_liege_or_above = ROOT
+										}
 									}
 								}
-								any_neighbor_province = {
-									OR = {
-										AND = {
-											has_owner = yes
-											owner = {
-												OR = {
-													character = ROOT
-													is_liege_or_above = ROOT
-												}
-											}
-										}
-										AND = {
-											is_land = no
-											any_neighbor_province = {
-												owner = {
-													OR = {
-														character = ROOT
-														is_liege_or_above = ROOT
-													}
-												}
+								trigger_else = {
+									is_land = no # second sea zone
+									any_neighbor_province = {
+										owner = {
+											OR = {
+												character = ROOT
+												is_liege_or_above = ROOT
 											}
 										}
 									}
@@ -1690,10 +1654,13 @@ liberate_religion = { # New6
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			NOT = { pacifist = yes }
-			NOT = { same_realm = FROM }
-			NOT = { religion = FROM }
+			NOR = {
+				pacifist = yes
+				same_realm = FROM
+				religion = FROM
+			}
 			top_liege = {
 				NOT = { religion = FROM }
 			}
@@ -1701,18 +1668,66 @@ liberate_religion = { # New6
 	}
 
 	is_valid_title = {
-		FROM = {
-			any_realm_province = {
-				de_jure_liege_or_above = PREVPREV
+		any_direct_de_jure_vassal_title = { # duchies
+			any_direct_de_jure_vassal_title = { # counties
+				holder_scope = {
+					OR = {
+						character = FROM
+						is_liege_or_above = FROM
+					}
+				}
+			}
+		}
+	}
+
+	on_add = {
+		# Attacker
+		ROOT = {
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = {
+							any_owned_bloodline = {
+								has_bloodline_flag = bloodline_religious_liberation
+								bloodline_is_active_for = PREV
+							}
+						}
+					}
+					set_character_flag = used_liberate_opportunity
+				}
+			}
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
 			}
 		}
 	}
 
 	on_success = {
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { NOT = { character = ROOT } }
-
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			participation_scaled_piety = 500
+			participation_scaled_prestige = 250
+			if = {
+				limit = {
+					uses_decadence = yes
+				}
+				participation_scaled_decadence = -10
+			}
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
+			}
+		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = {
 				participation_scaled_piety = 100
 				participation_scaled_prestige = 50
 				if = {
@@ -1730,32 +1745,71 @@ liberate_religion = { # New6
 			}
 		}
 
-		ROOT = {
+		# Defender
+		FROM = {
 			show_scope_change = no
-			participation_scaled_piety = 500
-			participation_scaled_prestige = 250
-			if = {
-				limit = {
-					uses_decadence = yes
-				}
-				participation_scaled_decadence = -10
-			}
-			religion_authority = {
-				modifier = won_holy_war
-				years = 20
-			}
+			piety = -100
+			prestige = -50
 		}
-		FROM = { show_scope_change = no piety = -100 }
-		FROM = { show_scope_change = no prestige = -50 }
 	}
 
 	on_success_title = {
 		custom_tooltip = {
 			text = religious_liberation_cb_succ_tip
-			hidden_tooltip = {
-				FROM = {
-					if = {
+
+			# Defender
+			FROM = {
+				if = {
+					limit = {
+						any_realm_title = {
+							tier = COUNT
+							kingdom = { title = PREVPREVPREV }
+							location = {
+								religion = ROOT
+							}
+						}
+					}
+					random_realm_title = {
 						limit = {
+							tier = COUNT
+							kingdom = { title = PREVPREVPREV }
+							location = {
+								religion = ROOT
+							}
+						}
+						location = {
+							create_character = {
+								religion = ROOT
+								culture = THIS
+								dynasty = random
+								random_traits = yes
+								female = no
+								age = 20
+								health = 7
+								fertility = 0.7
+								attributes = {
+									martial = 10
+									diplomacy = 10
+									stewardship = 10
+								}
+								flag = is_religious_liberation_ruler
+							}
+							new_character = {
+								remove_trait = cynical
+								add_trait = zealous
+								wealth = 500
+								prestige = 500
+								piety = 500
+								save_event_target_as = new_ruler
+								usurp_title = { target = PREVPREV type = invasion }
+							}
+						}
+					}
+				}
+				if = {
+					limit = {
+						NOR = {
+							event_target:new_ruler = { is_alive = yes }
 							any_realm_title = {
 								tier = COUNT
 								kingdom = { title = PREVPREVPREV }
@@ -1764,159 +1818,108 @@ liberate_religion = { # New6
 								}
 							}
 						}
-						random_realm_title = {
-							limit = {
-								tier = COUNT
-								kingdom = { title = PREVPREVPREV }
-								location = {
-									religion = ROOT
-								}
-							}
-							location = {
-								create_character = {
-									religion = ROOT
-									culture = THIS
-									dynasty = random
-									random_traits = yes
-									female = no
-									age = 20
-									health = 7
-									fertility = 0.7
-									attributes = {
-										martial = 10
-										diplomacy = 10
-										stewardship = 10
-									}
-									flag = is_religious_liberation_ruler
-								}
-								new_character = {
-									remove_trait = cynical
-									add_trait = zealous
-									wealth = 500
-									prestige = 500
-									piety = 500
-									save_event_target_as = new_ruler
-									usurp_title = { target = PREVPREV type = invasion }
-								}
-							}
-						}
 					}
-					if = {
+					random_realm_title = {
 						limit = {
-							NOR = {
-								event_target:new_ruler = { is_alive = yes }
-								any_realm_title = {
-									tier = COUNT
-									kingdom = { title = PREVPREVPREV }
-									location = {
-										religion = ROOT
-									}
-								}
-							}
+							tier = COUNT
+							kingdom = { title = PREVPREVPREV }
 						}
-						random_realm_title = {
-							limit = {
-								tier = COUNT
-								kingdom = { title = PREVPREVPREV }
+						location = {
+							create_character = {
+								religion = ROOT
+								culture = THIS
+								dynasty = random
+								random_traits = yes
+								female = no
+								age = 20
+								health = 7
+								fertility = 0.7
+								attributes = {
+									martial = 10
+									diplomacy = 10
+									stewardship = 10
+								}
+								flag = is_religious_liberation_ruler
 							}
-							location = {
-								create_character = {
-									religion = ROOT
-									culture = THIS
-									dynasty = random
-									random_traits = yes
-									female = no
-									age = 20
-									health = 7
-									fertility = 0.7
-									attributes = {
-										martial = 10
-										diplomacy = 10
-										stewardship = 10
-									}
-									flag = is_religious_liberation_ruler
-								}
-								new_character = {
-									remove_trait = cynical
-									add_trait = zealous
-									wealth = 500
-									prestige = 500
-									piety = 500
-									save_event_target_as = new_ruler
-									usurp_title = { target = PREVPREV type = invasion }
-								}
+							new_character = {
+								remove_trait = cynical
+								add_trait = zealous
+								wealth = 500
+								prestige = 500
+								piety = 500
+								save_event_target_as = new_ruler
+								usurp_title = { target = PREVPREV type = invasion }
 							}
 						}
 					}
 				}
-				if = {
-					limit = {
-						has_holder = no
-					}
-					usurp_title = { target = event_target:new_ruler type = invasion }
+			}
+			if = {
+				limit = {
+					has_holder = no
 				}
-				else = {
-					event_target:new_ruler = {
-						create_title = {
-							tier = KING
-							landless = no
-							temporary = no
-							custom_created = yes
-							culture = event_target:new_ruler
-							holder = event_target:new_ruler
-							name = "LIBERATED_KINGDOM"
-							base_title = PREV
-						}
-					}
-				}
-
+				usurp_title = { target = event_target:new_ruler type = invasion }
+			}
+			else = {
 				event_target:new_ruler = {
-					vassalize_or_take_under_title = {
-						title = PREV
-						enemy = FROM
-						same_religion = yes # Only vassalize rulers of my religion
-						is_religious = yes
-						type = holy_war
-						as_if_allied_to = ROOT
+					create_title = {
+						tier = KING
+						landless = no
+						temporary = no
+						custom_created = yes
+						culture = event_target:new_ruler
+						holder = event_target:new_ruler
+						name = "LIBERATED_KINGDOM"
+						base_title = PREV
 					}
-					set_defacto_liege = THIS
 				}
+			}
 
+			event_target:new_ruler = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = FROM
+					same_religion = yes # Only vassalize rulers of my religion
+					is_religious = yes
+					type = holy_war
+					as_if_allied_to = ROOT
+				}
+				set_defacto_liege = THIS
+			}
+
+			if = {
+				limit = {
+					has_holder = yes
+					holder_scope = {
+						OR = {
+							character = FROM
+							is_liege_or_above = FROM
+						}
+					}
+				}
+				destroy_landed_title = THIS
+				usurp_title_only = { target = event_target:new_ruler type = invasion }
+				make_primary_title = yes
+				event_target:new_ruler = {
+					any_demesne_title = {
+						limit = {
+							tier = KING
+							is_primary_holder_title = no
+						}
+						destroy_landed_title = THIS
+					}
+				}
+			}
+
+			# Attacker
+			ROOT = {
 				if = {
 					limit = {
-						has_holder = yes
-						holder_scope = {
-							OR = {
-								character = FROM
-								is_liege_or_above = FROM
-							}
-						}
+						has_ambition = obj_strengthen_religion
 					}
-					destroy_landed_title = THIS
-					usurp_title_only = { target = event_target:new_ruler type = invasion }
-					make_primary_title = yes
-					event_target:new_ruler = {
-						any_demesne_title = {
-							limit = {
-								tier = KING
-								is_primary_holder_title = no
-							}
-							destroy_landed_title = THIS
-						}
-					}
+					change_variable = { which = strengthen_religion value = 1 }
 				}
-
-				ROOT = {
-					hidden_tooltip = {
-						if = {
-							limit = {
-								has_ambition = obj_strengthen_religion
-							}
-							change_variable = { which = strengthen_religion value = 1 }
-						}
-					}
-					make_tributary = { who = event_target:new_ruler tributary_type = permanent }
-				}
+				make_tributary = { who = event_target:new_ruler tributary_type = permanent }
 			}
 		}
 
@@ -1929,6 +1932,7 @@ liberate_religion = { # New6
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			piety = -125
@@ -1937,12 +1941,14 @@ liberate_religion = { # New6
 	}
 
 	on_invalidation = {
+		# Attacker
 		ROOT = {
 			clr_character_flag = used_liberate_opportunity
 		}
 	}
 
 	on_reverse_demand = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			transfer_scaled_wealth = {
@@ -1951,7 +1957,29 @@ liberate_religion = { # New6
 			}
 			piety = -250
 			prestige = -500
+			if = {
+				limit = {
+					character = ROOT
+					uses_decadence = yes
+				}
+				participation_scaled_decadence = 20
+			}
+			religion_authority = {
+				modifier = lost_holy_war
+				years = 20
+			}
 		}
+		any_attacker = {
+			limit = {
+				NOT = { character = ROOT }
+				uses_decadence = yes
+			}
+			hidden_tooltip = {
+				participation_scaled_decadence = 20
+			}
+		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_piety = 200
@@ -1961,6 +1989,18 @@ liberate_religion = { # New6
 					uses_decadence = yes
 				}
 				participation_scaled_decadence = -10
+			}
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
+					}
+					change_variable = { which = strengthen_religion value = 1 }
+				}
 			}
 		}
 		any_defender = {
@@ -1981,42 +2021,6 @@ liberate_religion = { # New6
 						}
 						change_variable = { which = strengthen_religion value = 1 }
 					}
-				}
-			}
-		}
-		any_attacker = {
-			limit = {
-				character = ROOT
-				uses_decadence = yes
-			}
-			participation_scaled_decadence = 20
-		}
-		any_attacker = {
-			limit = {
-				NOT = { character = ROOT }
-				uses_decadence = yes
-			}
-			hidden_tooltip = {
-				participation_scaled_decadence = 20
-			}
-		}
-		ROOT = {
-			religion_authority = {
-				modifier = lost_holy_war
-				years = 20
-			}
-		}
-		FROM = {
-			religion_authority = {
-				modifier = won_holy_war
-				years = 20
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						has_ambition = obj_strengthen_religion
-					}
-					change_variable = { which = strengthen_religion value = 1 }
 				}
 			}
 		}
