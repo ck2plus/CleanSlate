@@ -7590,7 +7590,7 @@ patriarchal_deposition_war = {
 	sort_priority = 4000
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -7602,13 +7602,14 @@ patriarchal_deposition_war = {
 
 	can_use = {
 		has_dlc = "Holy Fury"
+
+		# Attacker
 		ROOT = {
+			is_female = no
+			is_landed = yes
 			higher_real_tier_than = DUKE
 			has_religion_feature = religion_warlike
-			is_female = no
 			has_religion_feature = religion_patriarchal
-			FROM = { is_female = yes independent = yes }
-			is_landed = yes
 			is_nomadic = no
 			mercenary = no
 			NOT = { same_realm = FROM }
@@ -7619,7 +7620,11 @@ patriarchal_deposition_war = {
 				character = FROM
 			}
 		}
+
+		# Defender
 		FROM = {
+			independent = yes
+			is_female = yes
 			is_nomadic = no
 			is_merchant_republic = no
 			is_theocracy = no
@@ -7627,27 +7632,46 @@ patriarchal_deposition_war = {
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
+			is_female = no
 			higher_real_tier_than = DUKE
 			has_religion_feature = religion_warlike
-			is_female = no
 			has_religion_feature = religion_patriarchal
 			NOT = { same_realm = FROM }
 		}
+
+		# Defender
 		FROM = {
+			independent = yes
+			is_female = yes
 			is_nomadic = no
 			is_merchant_republic = no
 			is_theocracy = no
-			is_female = yes
-			independent = yes
 		}
 	}
 
 	on_success = {
-		hidden_tooltip = {
-			any_attacker = {
-				limit = { NOT = { character = ROOT } }
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+			participation_scaled_piety = 100
+			participation_scaled_prestige = 150
+			if = {
+				limit = {
+					uses_decadence = yes
+				}
+				participation_scaled_decadence = -10
+			}
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
+			}
+		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
 
+			hidden_tooltip = {
 				participation_scaled_piety = 50
 				participation_scaled_prestige = 25
 				if = {
@@ -7665,70 +7689,148 @@ patriarchal_deposition_war = {
 			}
 		}
 
-		ROOT = {
-			participation_scaled_piety = 100
-			participation_scaled_prestige = 150
-			if = {
-				limit = {
-					uses_decadence = yes
+		# Defender
+		FROM = {
+			show_scope_change = no
+			piety = -100
+			prestige = -50
+
+			custom_tooltip = {
+				text = sex_deposition_cb_succ_tip
+
+				# If dynasty member of proper sex exists, abdicate to it
+				# Else lose main title to vassal
+				# Else lose main title to spawned character
+
+				# Then, if religious dogma allows it, switch status of Women
+				# Then, if title passed on a spawned character, change succession laws
+				# Finally, if owning Jade Dragon set up permanent Tributary, if Horse Lords set up temporary tributary, else set up non-aggression pact
+
+				primary_title = { save_event_target_as = title_usurped }
+				save_event_target_as = scoped_loser
+				if = {
+					limit = {
+						any_dynasty_member = {
+							is_female = no
+							NOT = { trait = incapable }
+							NOT = { has_religion_feature = religion_matriarchal }
+						}
+					}
+					random_dynasty_member = {
+						limit = {
+							is_female = no
+							NOT = { trait = incapable }
+							NOT = { has_religion_feature = religion_matriarchal }
+						}
+						preferred_limit = {
+							is_child_of = PREV
+							is_adult = yes
+							religion = ROOT
+						}
+						preferred_limit = {
+							is_close_relative = PREV
+							is_adult = yes
+							religion = ROOT
+						}
+						preferred_limit = {
+							is_adult = yes
+							religion = ROOT
+						}
+						preferred_limit = {
+							is_close_relative = PREV
+							is_adult = yes
+						}
+						preferred_limit = {
+							is_adult = yes
+						}
+						save_event_target_as = new_swapped_ruler
+						usurp_title = { target = event_target:title_usurped type = invasion }
+						event_target:scoped_loser = {
+							any_demesne_title = {
+								limit = {
+									tier = PREVPREV
+								}
+								event_target:new_swapped_ruler = { usurp_title = { target = PREV type = invasion } }
+								add_pressed_claim = PREV
+							}
+						}
+						event_target:scoped_loser = { set_defacto_liege = event_target:new_swapped_ruler }
+					}
 				}
-				participation_scaled_decadence = -10
-			}
-			religion_authority = {
-				modifier = won_holy_war
-				years = 20
-			}
-		}
-		FROM = { piety = -100 }
-		FROM = { prestige = -50 }
-		custom_tooltip = {
-			text = sex_deposition_cb_succ_tip
-			hidden_tooltip = {
-				FROM = {
-					#If dynasty member of proper sex exists, abdicate to it.
-					#Else lose main title to vassal.
-					#Else lose main title to spawned character.
 
-					#Then, if religious dogma allows it, switch status of Women.
-					#Then, if title passed on a spawned character, change succession laws.
-					#Finally, if owning Jade Dragon set up permanent Tributary, if Horse Lords set up temporary tributary, else set up non-aggression pact.
-					primary_title = { save_event_target_as = title_usurped }
-					save_event_target_as = scoped_loser
-					if = {
+				else_if = {
+					limit = {
+						any_vassal = {
+							is_female = no
+							NOT = { trait = incapable }
+							NOT = { has_religion_feature = religion_matriarchal }
+						}
+					}
+					random_vassal = {
 						limit = {
-							any_dynasty_member = {
-								is_female = no
-								NOT = { trait = incapable }
-								NOT = { has_religion_feature = religion_matriarchal }
+							is_female = no
+							NOT = { trait = incapable }
+							NOT = { has_religion_feature = religion_matriarchal }
+						}
+						preferred_limit = {
+							religion = ROOT
+							is_adult = yes
+							NOT = { age = 30 }
+							trait = zealous
+						}
+						preferred_limit = {
+							religion = ROOT
+							is_adult = yes
+							trait = zealous
+						}
+						preferred_limit = {
+							religion = ROOT
+							is_adult = yes
+						}
+						preferred_limit = {
+							is_adult = yes
+							has_religion_feature = religion_patriarchal
+						}
+						preferred_limit = {
+							is_adult = yes
+						}
+						save_event_target_as = new_swapped_ruler
+						usurp_title = { target = event_target:title_usurped type = invasion }
+						event_target:scoped_loser = {
+							any_demesne_title = {
+								limit = {
+									tier = PREVPREV
+								}
+								event_target:new_swapped_ruler = { usurp_title = { target = PREV type = invasion } }
+								add_pressed_claim = PREV
 							}
 						}
-						random_dynasty_member = {
-							limit = {
-								is_female = no
-								NOT = { trait = incapable }
-								NOT = { has_religion_feature = religion_matriarchal }
+						event_target:scoped_loser = { set_defacto_liege = event_target:new_swapped_ruler }
+					}
+				}
+
+				else = {
+					location = {
+						create_character = {
+							religion = ROOT
+							culture = event_target:scoped_loser
+							dynasty = random
+							random_traits = yes
+							female = no
+							age = 23
+							health = 7
+							fertility = 0.7
+							attributes = {
+								martial = 8
+								diplomacy = 8
+								stewardship = 8
 							}
-							preferred_limit = {
-								is_child_of = PREV
-								is_adult = yes
-								religion = ROOT
-							}
-							preferred_limit = {
-								is_close_relative = PREV
-								is_adult = yes
-								religion = ROOT
-							}
-							preferred_limit = {
-								is_adult = yes
-								religion = ROOT
-							}
-							preferred_limit = {
-								is_close_relative = PREV
-								is_adult = yes
-							}
-							preferred_limit = {
-								is_adult = yes
-							}
+						}
+						new_character = {
+							remove_trait = cynical
+							wealth = 250
+							prestige = 300
+							piety = 100
 							save_event_target_as = new_swapped_ruler
 							usurp_title = { target = event_target:title_usurped type = invasion }
 							event_target:scoped_loser = {
@@ -7743,156 +7845,70 @@ patriarchal_deposition_war = {
 							event_target:scoped_loser = { set_defacto_liege = event_target:new_swapped_ruler }
 						}
 					}
-					else_if = {
-						limit = {
-							any_vassal = {
-								is_female = no
-								NOT = { trait = incapable }
-								NOT = { has_religion_feature = religion_matriarchal }
-							}
-						}
-						random_vassal = {
-							limit = {
-								is_female = no
-								NOT = { trait = incapable }
-								NOT = { has_religion_feature = religion_matriarchal }
-							}
-							preferred_limit = {
-								religion = ROOT
-								is_adult = yes
-								NOT = { age = 30 }
-								trait = zealous
-							}
-							preferred_limit = {
-								religion = ROOT
-								is_adult = yes
-								trait = zealous
-							}
-							preferred_limit = {
-								religion = ROOT
-								is_adult = yes
-							}
-							preferred_limit = {
-								is_adult = yes
-								has_religion_feature = religion_patriarchal
-							}
-							preferred_limit = {
-								is_adult = yes
-							}
-							save_event_target_as = new_swapped_ruler
-							usurp_title = { target = event_target:title_usurped type = invasion }
-							event_target:scoped_loser = {
-								any_demesne_title = {
-									limit = {
-										tier = PREVPREV
-									}
-									event_target:new_swapped_ruler = { usurp_title = { target = PREV type = invasion } }
-									add_pressed_claim = PREV
-								}
-							}
-							event_target:scoped_loser = { set_defacto_liege = event_target:new_swapped_ruler }
-						}
-					}
-					else = {
-						location = {
-							create_character = {
-								religion = ROOT
-								culture = event_target:scoped_loser
-								dynasty = random
-								random_traits = yes
-								female = no
-								age = 23
-								health = 7
-								fertility = 0.7
-								attributes = {
-									martial = 8
-									diplomacy = 8
-									stewardship = 8
-								}
-							}
-							new_character = {
-								remove_trait = cynical
-								wealth = 250
-								prestige = 300
-								piety = 100
-								save_event_target_as = new_swapped_ruler
-								usurp_title = { target = event_target:title_usurped type = invasion }
-								event_target:scoped_loser = {
-									any_demesne_title = {
-										limit = {
-											tier = PREVPREV
-										}
-										event_target:new_swapped_ruler = { usurp_title = { target = PREV type = invasion } }
-										add_pressed_claim = PREV
-									}
-								}
-								event_target:scoped_loser = { set_defacto_liege = event_target:new_swapped_ruler }
-							}
-						}
-					}
+				}
 
-					#Titles assigned, now onto laws.
-					if = {
-						limit = {
-							ROOT = {
-								has_religion_feature = religion_patriarchal
-							}
-							event_target:new_swapped_ruler = {
-								NOR = {
-									has_religion_feature = religion_matriarchal
-									has_religion_feature = religion_equal
-									has_religion_feature = religion_feature_bon
-								}
-							}
+				# Titles assigned, now onto laws
+				if = {
+					limit = {
+						ROOT = {
+							has_religion_feature = religion_patriarchal
 						}
 						event_target:new_swapped_ruler = {
-							any_demesne_title = {
-								add_law = {
-									law = agnatic_succession
-									cooldown = no
-									opinion_effect = no
-								}
-								add_law = {
-									law = status_of_women_0
-									cooldown = no
-									opinion_effect = no
-								}
+							NOR = {
+								has_religion_feature = religion_matriarchal
+								has_religion_feature = religion_equal
+								has_religion_feature = religion_feature_bon
 							}
-							recalc_succession = yes
 						}
 					}
+					event_target:new_swapped_ruler = {
+						any_demesne_title = {
+							add_law = {
+								law = agnatic_succession
+								cooldown = no
+								opinion_effect = no
+							}
+							add_law = {
+								law = status_of_women_0
+								cooldown = no
+								opinion_effect = no
+							}
+						}
+						recalc_succession = yes
+					}
+				}
 
-					#Laws set, now onto pacts.
-					if = {
-						limit = {
-							has_dlc = "Jade Dragon"
-							is_tributary = no
-						}
-						ROOT = {
-							make_tributary = { who = event_target:new_swapped_ruler tributary_type = permanent }
-						}
+				# Laws set, now onto pacts
+				if = {
+					limit = {
+						has_dlc = "Jade Dragon"
+						is_tributary = no
 					}
-					else_if = {
-						limit = {
-							has_dlc = "Horse Lords"
-							is_tributary = no
-						}
-						ROOT = {
-							make_tributary = { who = event_target:new_swapped_ruler percentage = 0.3 }
-						}
+					ROOT = {
+						make_tributary = { who = event_target:new_swapped_ruler tributary_type = permanent }
 					}
-					else = {
-						ROOT = {
-							opinion = {
-								modifier = in_non_aggression_pact
-								years = 50
-								who = event_target:new_swapped_ruler
-							}
+				}
+				else_if = {
+					limit = {
+						has_dlc = "Horse Lords"
+						is_tributary = no
+					}
+					ROOT = {
+						make_tributary = { who = event_target:new_swapped_ruler percentage = 0.3 }
+					}
+				}
+				else = {
+					ROOT = {
+						opinion = {
+							modifier = in_non_aggression_pact
+							years = 50
+							who = event_target:new_swapped_ruler
 						}
 					}
 				}
 			}
 		}
+
 		if = {
 			limit = {
 				OR = {
@@ -7908,22 +7924,50 @@ patriarchal_deposition_war = {
 	}
 
 	on_fail = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -125
 			prestige = -250
 		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 			piety = -250
 			prestige = -500
+
+			if = {
+				limit = {
+					uses_decadence = yes
+				}
+				participation_scaled_decadence = 20
+			}
+
+			religion_authority = {
+				modifier = lost_holy_war
+				years = 20
+			}
 		}
+		any_attacker = {
+			limit = {
+				NOT = { character = ROOT }
+				uses_decadence = yes
+			}
+			hidden_tooltip = {
+				participation_scaled_decadence = 20
+			}
+		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
 			if = {
@@ -7935,61 +7979,31 @@ patriarchal_deposition_war = {
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
+
 			hidden_tooltip = {
 				participation_scaled_piety = 200
 				participation_scaled_prestige = 100
+
 				if = {
 					limit = {
 						uses_decadence = yes
 					}
 					participation_scaled_decadence = -10
 				}
-				hidden_tooltip = {
-					if = {
-						limit = {
-							has_ambition = obj_strengthen_religion
-						}
-						change_variable = { which = strengthen_religion value = 1 }
-					}
-				}
-			}
-		}
-		any_attacker = {
-			limit = {
-				character = ROOT
-				uses_decadence = yes
-			}
-			participation_scaled_decadence = 20
-		}
-		any_attacker = {
-			limit = {
-				NOT = { character = ROOT }
-				uses_decadence = yes
-			}
-			hidden_tooltip = {
-				participation_scaled_decadence = 20
-			}
-		}
-		ROOT = {
-			religion_authority = {
-				modifier = lost_holy_war
-				years = 20
-			}
-		}
-		FROM = {
-			if = {
-				limit = { NOT = { has_religion_feature = religion_patriarchal } }
-				religion_authority = {
-					modifier = won_holy_war
-					years = 20
-				}
-			}
-			hidden_tooltip = {
+
 				if = {
 					limit = {
 						has_ambition = obj_strengthen_religion
 					}
 					change_variable = { which = strengthen_religion value = 1 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { has_religion_feature = religion_patriarchal } }
+				religion_authority = {
+					modifier = won_holy_war
+					years = 20
 				}
 			}
 		}
