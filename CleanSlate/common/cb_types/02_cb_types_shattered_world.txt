@@ -22,9 +22,7 @@ shattered_world_county_conquest = {
 					option = on_limited
 				}
 			}
-			NOT = {
-				total_years_played = 25
-			}
+			total_years_played < 25
 		}
 		conditional_tooltip = {
 			trigger = {
@@ -33,14 +31,106 @@ shattered_world_county_conquest = {
 					option = on_long
 				}
 			}
+			total_years_played < 100
+		}
+	}
+
+	can_use = {
+		is_shattered_world = yes
+
+		trigger_if = {
+			limit = {
+				has_alternate_start_setting = {
+					setting = shattered_cbs
+					option = on_limited
+				}
+			}
+			total_years_played < 25
+		}
+		trigger_else_if = {
+			limit = {
+				has_alternate_start_setting = {
+					setting = shattered_cbs
+					option = on_long
+				}
+			}
+			total_years_played < 100
+		}
+		trigger_else = {
 			NOT = {
-				total_years_played = 100
+				has_alternate_start_setting = {
+					setting = shattered_cbs
+					option = off
+				}
+			}
+		}
+
+		# Attacker
+		ROOT = {
+			NOR = {
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
+
+		}
+	}
+
+	can_use_title = {
+		tier = COUNT
+
+		holder_scope = {
+			OR = {
+				character = FROM
+				AND = {
+					is_liege_or_above = FROM
+					NOT = { same_realm = ROOT }
+				}
+			}
+			NOR = {
+				character = ROOT
+				is_liege_or_above = ROOT
+			}
+		}
+
+		# Attacker must share a border or be at most one sea zone away
+		location = {
+			any_neighbor_province = {
+				trigger_if = {
+					limit = { has_owner = yes }
+					owner = {
+						OR = {
+							character = ROOT
+							is_liege_or_above = ROOT
+						}
+					}
+				}
+				trigger_else = {
+					is_land = no
+					any_neighbor_province = {
+						has_owner = yes
+						owner = {
+							OR = {
+								character = ROOT
+								is_liege_or_above = ROOT
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	is_valid_title = {
+		holder_scope = {
+			OR = {
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		ROOT = {
 			show_scope_change = no
 			if = {
@@ -53,117 +143,12 @@ shattered_world_county_conquest = {
 		}
 	}
 
-	can_use = {
-		is_shattered_world = yes
-		NOT = {
-			has_alternate_start_setting = {
-				setting = shattered_cbs
-				option = off
-			}
-		}
-		conditional_tooltip = {
-			trigger = {
-				has_alternate_start_setting = {
-					setting = shattered_cbs
-					option = on_limited
-				}
-			}
-			NOT = {
-				total_years_played = 25
-			}
-		}
-		conditional_tooltip = {
-			trigger = {
-				has_alternate_start_setting = {
-					setting = shattered_cbs
-					option = on_long
-				}
-			}
-			NOT = {
-				total_years_played = 100
-			}
-		}
-		ROOT = {
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
-		}
-	}
-
-	can_use_title = {
-		tier = count
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
-				NOT = { same_realm = ROOT }
-			}
-		}
-
-		NOR = {
-			ROOT = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = ROOT
-			}
-		}
-
-		location = {
-			#any_neighbor_province = {
-			#	owner = {
-			#		OR = {
-			#			character = ROOT
-			#			is_liege_or_above = ROOT
-			#		}
-			#	}
-			# }
-			any_neighbor_province = {
-				OR = {
-					AND = {
-						has_owner = yes
-						owner = {
-							OR = {
-								character = ROOT
-								is_liege_or_above = ROOT
-							}
-						}
-					}
-					AND = {
-						is_land = no
-						any_neighbor_province = {
-							has_owner = yes
-							owner = {
-								OR = {
-									character = ROOT
-									is_liege_or_above = ROOT
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
-			}
-		}
-	}
-
 	on_success_title = {
 		if = {
 			limit = {
 				holder_scope = {
-					tier = count
-					NOT = { num_of_count_titles = 2 }
+					tier = COUNT
+					num_of_count_titles <= 1
 					lower_tier_than = ROOT
 				}
 			}
@@ -172,13 +157,12 @@ shattered_world_county_conquest = {
 				set_defacto_liege = ROOT
 			}
 		}
-
-		if = {
+		else_if = {
 			limit = {
 				holder_scope = {
 					OR = {
-						higher_tier_than = count
-						num_of_count_titles = 2
+						higher_tier_than = COUNT
+						num_of_count_titles >= 2
 						NOT = { lower_tier_than = ROOT }
 					}
 				}
@@ -209,10 +193,15 @@ shattered_world_county_conquest = {
 	}
 
 	on_fail_title = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
@@ -222,14 +211,19 @@ shattered_world_county_conquest = {
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 2.0
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
