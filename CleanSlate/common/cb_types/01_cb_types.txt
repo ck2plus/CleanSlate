@@ -5063,32 +5063,29 @@ truebelievers_bid_for_independence = {
 	is_independence = yes
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			vassal_of = FROM
 		}
 	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-				NOT = { religion = FROM }
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
+			NOT = { religion = FROM }
+			liege_before_war = { character = FROM }
 		}
+
+		# Defender
 		FROM = {
+			independent = yes
+			in_revolt = no
+
 			any_demesne_title = {
 				NOT = { lower_tier_than = ROOT }
 				temporary = no
 			}
-			independent = yes
-			in_revolt = no
+
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
@@ -5099,72 +5096,57 @@ truebelievers_bid_for_independence = {
 	}
 
 	on_success = {
-		#FROM = {
-		#	any_vassal = {
-		#			limit = { has_character_flag = independent_joining_flag }
-		#			set_defacto_liege = THIS
-		#			clr_character_flag = independent_joining_flag
-		#		}
-		#	}
-		if = {
-			limit = {
-				FROM = {
+		# Defender
+		FROM = {
+			if = {
+				limit = {
 					independent = no
 					liege = { religion = ROOT }
 				}
-			}
-			FROM = {
 				if = {
 					limit = {
 						in_revolt = yes
 					}
 					liege_before_war = {
-						#ROOT = {
-						#	set_defacto_liege = PREV
-						# }
 						any_attacker = {
 							set_defacto_liege = PREV
 						}
 					}
 				}
-				if = {
-					limit = {
-						in_revolt = no
-					}
+				else = {
 					liege = {
-						#ROOT = {
-						#	set_defacto_liege = PREV
-						# }
 						any_attacker = {
 							set_defacto_liege = PREV
 						}
 					}
 				}
 			}
-		}
 
-		if = {
-			limit = {
-				FROM = {
-					OR = { independent = yes
+			else_if = {
+				limit = {
+					OR = {
+						independent = yes
 						liege = { religion = ROOT }
 					}
 				}
-			}
-			#ROOT = {
-			#	set_defacto_liege = ROOT
-			# }
-			any_attacker = {
-				set_defacto_liege = ROOT
-				clr_character_flag = flag_truebelievers_revolter
+				any_attacker = {
+					set_defacto_liege = ROOT
+					clr_character_flag = flag_truebelievers_revolter
+				}
 			}
 		}
 
-		hidden_tooltip = {
-			ROOT = {
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+			prestige = 100
+			piety = 100
+			participation_scaled_prestige = 100
+			participation_scaled_piety = 100
+
+			hidden_effect = {
 				clr_character_flag = flag_truebelievers_revolter
-				prestige = 100
-				piety = 100
+
 				religion_authority = {
 					modifier = won_holy_war
 					years = 20
@@ -5173,54 +5155,36 @@ truebelievers_bid_for_independence = {
 					add_pressed_claim = FROM
 				}
 			}
-			FROM = {
-				religion_authority = {
-					modifier = lost_holy_war
-					years = 20
-				}
-			}
-		}
-
-		any_attacker = {
-			limit = { character = ROOT }
-			participation_scaled_prestige = 100
-			participation_scaled_piety = 100
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
+
 			hidden_tooltip = {
 				participation_scaled_prestige = 100
 				participation_scaled_piety = 100
-
 			}
 		}
 
+		# Defender
 		FROM = {
-			any_demesne_title = { #All titles
+			any_demesne_title = { # All titles
 				limit = {
-					OR = {
-						tier = duke
-						tier = king
-						tier = emperor
-					}
-					#is_titular = no
+					higher_tier_than = COUNT
 					NOT = {	has_law = tribal_organization_0	}
 				}
-				if = {
-					limit = { has_law = tribal_organization_1 }
-					add_law = tribal_organization_0
+				trigger_switch = { # Lower tribal organization
+					on_trigger = has_law
+					tribal_organization_1 = { add_law = tribal_organization_0 }
+					tribal_organization_2 = { add_law = tribal_organization_1 }
+					tribal_organization_3 = { add_law = tribal_organization_2 }
+					tribal_organization_4 = { add_law = tribal_organization_3 }
 				}
-				if = {
-					limit = { has_law = tribal_organization_2 }
-					add_law = tribal_organization_0
-				}
-				if = {
-					limit = { has_law = tribal_organization_3 }
-					add_law = tribal_organization_1
-				}
-				if = {
-					limit = { has_law = tribal_organization_4 }
-					add_law = tribal_organization_2
+			}
+
+			hidden_effect = {
+				religion_authority = {
+					modifier = lost_holy_war
+					years = 20
 				}
 			}
 		}
@@ -5231,13 +5195,27 @@ truebelievers_bid_for_independence = {
 	}
 
 	on_fail = {
-		if = {
-			limit = {
-				FROM = {
-					independent = no
+		# Attacker
+		ROOT = {
+			hidden_tooltip = {
+				prestige = 100
+				any_demesne_title = {
+					add_pressed_claim = FROM
 				}
 			}
-			FROM = {
+		}
+		any_attacker = {
+			hidden_tooltip = {
+				clr_character_flag = flag_truebelievers_revolter
+			}
+		}
+
+		# Defender
+		FROM = {
+			if = {
+				limit = {
+					independent = no
+				}
 				if = {
 					limit = {
 						in_revolt = yes
@@ -5248,10 +5226,7 @@ truebelievers_bid_for_independence = {
 						}
 					}
 				}
-				if = {
-					limit = {
-						in_revolt = no
-					}
+				else = {
 					liege = {
 						ROOT = {
 							set_defacto_liege = PREV
@@ -5263,69 +5238,62 @@ truebelievers_bid_for_independence = {
 					}
 				}
 			}
-		}
 
-		if = {
-			limit = {
-				FROM = {
-					independent = yes
+			else = {
+				ROOT = {
+					set_defacto_liege = FROM
 				}
-			}
-			ROOT = {
-				set_defacto_liege = FROM
-			}
-						any_vassal = { limit = { has_character_flag = independent_joining_flag }
-							set_defacto_liege = PREV
-							clr_character_flag = independent_joining_flag
-						}
-		}
-
-		hidden_tooltip = {
-			ROOT = {
-				prestige = 100
-				any_demesne_title = {
-					add_pressed_claim = FROM
+				any_vassal = { limit = { has_character_flag = independent_joining_flag }
+					set_defacto_liege = PREV
+					clr_character_flag = independent_joining_flag
 				}
-			}
-			any_attacker = {
-				clr_character_flag = flag_truebelievers_revolter
 			}
 		}
 	}
 
 	on_reverse_demand = {
-		hidden_tooltip = {
-			any_attacker = {
-				clr_character_flag = flag_truebelievers_revolter
-			}
-			ROOT = {
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+			prisoner = FROM
+
+			hidden_effect = {
 				religion_authority = {
 					modifier = lost_holy_war
 					years = 20
 				}
 			}
-			FROM = {
-				religion_authority = {
-					modifier = won_holy_war
-					years = 20
-				}
-			}
-		}
-		ROOT = {
-			prisoner = FROM
 		}
 		any_attacker = {
 			hidden_tooltip = {
 				participation_scaled_prestige = -100
 				participation_scaled_piety = -100
+
+				clr_character_flag = flag_truebelievers_revolter
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			piety = 100
+
 			hidden_tooltip = {
-				if = {
-					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
+				religion_authority = {
+					modifier = won_holy_war
+					years = 20
+				}
+
+				if = { # Allow free revocation of a title
+					limit = {
+						NOT = {
+							has_opinion_modifier = {
+								modifier = opinion_traitor
+								who = ROOT
+							}
+						}
+					}
 					opinion = {
 						who = ROOT
 						modifier = opinion_traitor
@@ -5334,6 +5302,7 @@ truebelievers_bid_for_independence = {
 			}
 		}
 	}
+
 	on_invalidation = {
 		any_attacker = {
 			clr_character_flag = flag_truebelievers_revolter
