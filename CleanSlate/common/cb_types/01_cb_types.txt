@@ -655,85 +655,64 @@ great_realm_conflict = { # New3
 
 	can_use_gui = {
 		check_if_crusader_trigger = yes
+
+		# Attacker
 		ROOT = {
-			prestige = 3000
-			piety = 1500
+			prestige >= 3000
+			piety >= 1500
 		}
+
+		# Defender
 		FROM = {
 			relative_power = {
 				who = ROOT
-				power = 0.95
-			}
-		}
-	}
-
-	on_add = {
-		ROOT = {
-			prestige = -3000
-			piety = -1500
-		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
+				power >= 0.95
 			}
 		}
 	}
 
 	can_use = {
 		has_dlc = "Jade Dragon"
-		ROOT = {
-			NOT = {
-				has_game_rule = {
-					name = jade_dragon_cbs
-					value = off
-				}
+		NOT = {
+			has_game_rule = {
+				name = jade_dragon_cbs
+				value = off
 			}
 		}
+
+		# Attacker
+		ROOT = {
+			is_nomadic = no
+			independent = yes
+			realm_size >= 200
+			higher_tier_than = DUKE
+		}
+
+		# Defender
 		FROM = {
-			relative_power = {
-				who = ROOT
-				power = 0.95
-			}
+			is_nomadic = no
+			in_revolt = no
+			realm_size >= 200
+			higher_tier_than = DUKE
 		}
 	}
 
 	can_use_title = {
-		ROOT = {
-			is_nomadic = no
-			independent = yes
-			realm_size = 200
-			OR = {
-				tier = KING
-				tier = EMPEROR
-			}
-		}
-		FROM = {
-			realm_size = 200
-			in_revolt = no
-			is_nomadic = no
-			OR = {
-				tier = KING
-				tier = EMPEROR
-			}
-		}
+		trigger_if = { # This ensures that the AI doesn't declare this type of war against someone who only holds a few counties within the targeted title
+			limit = { ROOT = { ai = yes } }
 
-		OR = { # This ensures that the AI doesn't declare this type of war against someone who only holds a few counties within the targeted title...
-			ROOT = {
-				ai = no
-			}
+			# Defender
 			FROM = {
 				num_of_realm_counties = {
-					value = 5
+					value >= 5
 					title = PREV
 				}
 			}
 		}
 
-		any_direct_de_jure_vassal_title = {
-			any_direct_de_jure_vassal_title = {
+		# The attacker needs at least one county in the target kingdom, a border or be at the most two sea zones away
+		any_direct_de_jure_vassal_title = { # duchies
+			any_direct_de_jure_vassal_title = { # counties
 				OR = {
 					holder_scope = {
 						OR = {
@@ -743,38 +722,36 @@ great_realm_conflict = { # New3
 					}
 					location = {
 						any_neighbor_province = {
-							OR = {
-								AND = {
-									has_owner = yes
-									owner = {
-										OR = {
-											character = ROOT
-											is_liege_or_above = ROOT
-										}
+							trigger_if = {
+								limit = { has_owner = yes } # border county
+
+								owner = {
+									OR = {
+										character = ROOT
+										is_liege_or_above = ROOT
 									}
 								}
-								AND = {
-									is_land = no
-									any_neighbor_province = {
-										OR = {
-											AND = {
-												has_owner = yes
-												owner = {
-													OR = {
-														character = ROOT
-														is_liege_or_above = ROOT
-													}
-												}
+							}
+							trigger_else = {
+								is_land = no # first sea zone
+								any_neighbor_province = {
+									trigger_if = {
+										limit = { has_owner = yes }
+
+										owner = {
+											OR = {
+												character = ROOT
+												is_liege_or_above = ROOT
 											}
-											AND = {
-												is_land = no
-												any_neighbor_province = {
-													owner = {
-														OR = {
-															character = ROOT
-															is_liege_or_above = ROOT
-														}
-													}
+										}
+									}
+									trigger_else = {
+										is_land = no # second sea zone
+										any_neighbor_province = {
+											owner = {
+												OR = {
+													character = ROOT
+													is_liege_or_above = ROOT
 												}
 											}
 										}
@@ -789,14 +766,37 @@ great_realm_conflict = { # New3
 	}
 
 	is_valid_title = {
-		FROM = {
-			any_realm_province = {
-				de_jure_liege_or_above = PREVPREV
+		any_direct_de_jure_vassal_title = { # duchies
+			any_direct_de_jure_vassal_title = { # counties
+				owner = {
+					OR = {
+						character = FROM
+						is_liege_or_above = FROM
+					}
+				}
+			}
+		}
+	}
+
+	on_add = {
+		# Attacjer
+		ROOT = {
+			prestige = -3000
+			piety = -1500
+		}
+
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
 			}
 		}
 	}
 
 	on_invalidation = {
+		# Attacker
 		ROOT = {
 			prestige = 3000
 			piety = 1500
@@ -816,18 +816,14 @@ great_realm_conflict = { # New3
 			}
 			usurp_title = { target = ROOT type = invasion }
 		}
+
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			vassalize_or_take_under_title = {
 				title = PREV
 				enemy = FROM
 				type = invasion
-			}
-			hidden_tooltip = {
-				vassalize_or_take_under_title = {
-					title = PREV
-					enemy = FROM
-					type = invasion
-				}
 			}
 		}
 
@@ -844,12 +840,15 @@ great_realm_conflict = { # New3
 		}
 	}
 
-	on_fail_title = {
+	on_fail = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -1500
 			piety = -750
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 50
@@ -861,6 +860,7 @@ great_realm_conflict = { # New3
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			prestige = -3000
@@ -870,6 +870,8 @@ great_realm_conflict = { # New3
 				value = 10.0
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 3000
