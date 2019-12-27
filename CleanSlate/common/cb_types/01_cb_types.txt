@@ -6099,41 +6099,28 @@ abrahamic_antihellenic_revolt = {
 	is_independence = yes
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			vassal_of = FROM
 		}
 	}
-	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
 
 	is_valid = {
+		# Attacker
 		ROOT = {
-			OR = {
-				liege = {
-					character = PREV # either independent
-				}
-				liege = {
-					FROM = {
-						is_liege_or_above = PREV # or have shared liege
-					}
-				}
-			}
+			liege_before_war = { character = FROM }
 		}
+
+		# Defender
 		FROM = {
+			independent = yes
+			in_revolt = no
+
 			any_demesne_title = {
 				NOT = { lower_tier_than = ROOT }
 				temporary = no
 			}
-			independent = yes
-			in_revolt = no
+
 			liege_before_war = {
 				in_revolt = no
 				liege_before_war = {
@@ -6143,50 +6130,27 @@ abrahamic_antihellenic_revolt = {
 		}
 	}
 
+	on_add = {
+		fire_haruspicy_event_effect = yes
+		if = {
+			limit = { defender = { is_offmap_governor = offmap_china } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
+		}
+	}
+
 	on_success = {
-		#FROM = {
-		#	any_vassal = {
-		#			limit = { has_character_flag = independent_joining_flag }
-		#			set_defacto_liege = THIS
-		#			clr_character_flag = independent_joining_flag
-		#		}
-		#	}
-
-		if = {
-			limit = {
-				FROM = {
-					current_heir = {
-						NOT = { religion_group = pagan_group }
-					}
-				}
-			}
-			FROM = {
-				abdicate = yes
-				death = { death_reason = death_execution_burning }
-			}
-		}
-		if = {
-			limit = {
-				FROM = {
-					current_heir = {
-						religion_group = pagan_group
-					}
-				}
-			}
-			FROM = {
-				abdicate_to = ROOT
-				death = { death_reason = death_execution_burning }
-			}
-		}
-		any_attacker = {
-			clr_character_flag = flag_abrahamic_revolter
-		}
-
-		hidden_tooltip = {
-			ROOT = {
+		# Attacker
+		ROOT = {
+			hidden_tooltip = {
 				clr_character_flag = flag_abrahamic_revolter
 				prestige = 100
 				piety = 100
+				participation_scaled_prestige = 100
+				participation_scaled_piety = 100
+
 				religion_authority = {
 					modifier = won_holy_war
 					years = 20
@@ -6195,122 +6159,111 @@ abrahamic_antihellenic_revolt = {
 					add_pressed_claim = FROM
 				}
 			}
-			FROM = {
-				religion_authority = {
-					modifier = lost_holy_war
-					years = 20
-				}
-			}
-		}
-
-		any_attacker = {
-			limit = { character = ROOT }
-			participation_scaled_prestige = 100
-			participation_scaled_piety = 100
 		}
 		any_attacker = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = {
 				participation_scaled_prestige = 100
 				participation_scaled_piety = 100
-
-			}
-		}
-	}
-
-	#on_fail = {
-		#if = {
-			#limit = {
-				#FROM = {
-					#independent = yes
-				# }
-			# }
-			#ROOT = {
-				#set_defacto_liege = FROM
-			# }
-			#any_vassal = {
-				#limit = { has_character_flag = independent_joining_flag }
-				#set_defacto_liege = PREV
-				#clr_character_flag = independent_joining_flag
-			# }
-		# }
-		#hidden_tooltip = {
-			#ROOT = {
-				#prestige = 100
-				#any_demesne_title = {
-					#add_pressed_claim = FROM
-				# }
-			# }
-			#any_attacker = {
-				#clr_character_flag = flag_abrahamic_revolter
-			# }
-		# }
-	# }
-
-	on_reverse_demand = {
-		hidden_tooltip = {
-			any_attacker = {
 				clr_character_flag = flag_abrahamic_revolter
 			}
-			ROOT = {
+		}
+
+		# Defender
+		FROM = {
+			if = {
+				limit = {
+					current_heir = {
+						NOT = { religion_group = pagan_group }
+					}
+				}
+				abdicate = yes
+				death = { death_reason = death_execution_burning }
+			}
+			if = {
+				limit = {
+					current_heir = {
+						religion_group = pagan_group
+					}
+				}
+				abdicate_to = ROOT
+				death = { death_reason = death_execution_burning }
+			}
+			hidden_tooltip = {
 				religion_authority = {
 					modifier = lost_holy_war
 					years = 20
 				}
 			}
-			FROM = {
+		}
+	}
+
+	on_reverse_demand = {
+		hidden_tooltip = {
+			any_player = { narrative_event = { id = HF.23117 } } # The Hellenic Emperor won, ensuring the rebirth of the faith
+		}
+
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+			prisoner = FROM
+			hidden_effect = {
 				religion_authority = {
-					modifier = won_holy_war
+					modifier = lost_holy_war
 					years = 20
 				}
 			}
-			any_player = { narrative_event = { id = HF.23117 } }
-			if = {
-				limit = {
-					FROM = { ai = yes }
-				}
-				FROM = { narrative_event = { id = HF.23117 } }
-			}
-		}
-		ROOT = {
-			prisoner = FROM
 		}
 		any_attacker = {
 			hidden_tooltip = {
 				participation_scaled_prestige = -100
 				participation_scaled_piety = -100
+				clr_character_flag = flag_abrahamic_revolter
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			piety = 100
+
 			hidden_tooltip = {
-				if = {
-					limit = { NOT = { has_opinion_modifier = { modifier = opinion_traitor who = ROOT } } } #Allow free revocation of a title.
+				if = { # Allow free revocation of a title
+					limit = {
+						NOT = {
+							has_opinion_modifier = {
+								modifier = opinion_traitor
+								who = ROOT
+							}
+						}
+					}
 					opinion = {
 						who = ROOT
 						modifier = opinion_traitor
 					}
 				}
+
+				religion_authority = {
+					modifier = won_holy_war
+					years = 20
+				}
+
+				if = {
+					limit = {
+						ai = yes
+					}
+					narrative_event = { id = HF.23117 } # The Hellenic Emperor won, ensuring the rebirth of the faith
+				}
 			}
 		}
 	}
+
 	on_invalidation = {
 		any_attacker = {
 			clr_character_flag = flag_abrahamic_revolter
 		}
 	}
-
-	#on_attacker_leader_death = {
-		#hidden_tooltip = {
-			#any_defender = {
-				#letter_event = {
-					#id = 251
-				# }
-			# }
-		# }
-		#end_war = invalid
-	# }
 
 	attacker_ai_victory_worth = {
 		factor = -1 #always accept
