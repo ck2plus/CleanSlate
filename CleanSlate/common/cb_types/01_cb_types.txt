@@ -4555,54 +4555,67 @@ destabilization_china_cb = {
 	defender_unoccupied_warscore = yes
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			independent = yes
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
 		}
 	}
 
 	on_success = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = 200
+		}
+
+		# Defender
 		FROM = {
 			custom_tooltip = {
 				text = destabilization_china_success_tt
-				hidden_effect = {
-					offmap_china = { set_offmap_flag = no_war_news }
-					any_player = {
-						limit = {
-							NOT = { character = ROOT_FROM }
-							OR = {
-								AND = {
-									has_offmap_news_enabled = offmap_china
-									is_within_diplo_range = ROOT
-								}
-								liege = { character = ROOT_FROM }
+
+				offmap_china = { set_offmap_flag = no_war_news }
+				any_player = {
+					limit = {
+						NOT = { character = ROOT_FROM }
+						OR = {
+							AND = {
+								has_offmap_news_enabled = offmap_china
+								is_within_diplo_range = ROOT
 							}
+							liege = { character = ROOT_FROM }
 						}
-						narrative_event = { id = JD.60209 }
 					}
-					any_demesne_title = {
-						limit = {
-							higher_tier_than = DUKE
-							NOR = {
-								controls_religion = yes
-								clan = yes
-							}
+					narrative_event = { id = JD.60209 } # News Event: Title invaded by China destroyed
+				}
+				any_demesne_title = {
+					limit = {
+						higher_tier_than = DUKE
+						NOR = {
+							controls_religion = yes
+							clan = yes
 						}
-						unsafe_destroy_landed_title = THIS
 					}
-					#death = { death_reason = death_executed_by_chinese_emperor }
+					unsafe_destroy_landed_title = THIS
 				}
 			}
-		}
-		ROOT = {
-			prestige = 200
 		}
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -100
+		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 100
 			participation_scaled_prestige = 250
 		}
@@ -4610,13 +4623,12 @@ destabilization_china_cb = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 250 }
 		}
-		ROOT = {
-			piety = -100
-		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -200
 			transfer_scaled_wealth = {
 				to = FROM
@@ -4624,7 +4636,10 @@ destabilization_china_cb = {
 				min = 1000
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 500
 			participation_scaled_prestige = 2500
 			set_character_flag = defeated_china
@@ -4633,10 +4648,6 @@ destabilization_china_cb = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 1000 }
 		}
-	}
-
-	on_attacker_leader_death = {
-		#end_war = invalid
 	}
 
 	attacker_ai_victory_worth = {
