@@ -4377,13 +4377,17 @@ force_open_china_cb = {
 	capturing_defender_is_complete_victory = no
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			independent = yes
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
 		}
 
+		# Defender
 		FROM = {
 			is_offmap_governor = yes
 			offmap_power = { is_offmap_tag = offmap_china }
@@ -4395,19 +4399,47 @@ force_open_china_cb = {
 	}
 
 	on_success = {
+		# Attackers
+		ROOT = {
+			show_scope_change = no
+			participation_scaled_prestige = 1000
+			add_grace_massive_effect = yes
+			add_character_modifier = {
+				modifier = chinese_favored_in_trade
+				inherit = yes
+				years = 25
+			}
+		}
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = { participation_scaled_prestige = 300 }
+		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
+			transfer_scaled_wealth = {
+				to = ROOT
+				value = 5.0
+				min = 2000
+			}
+
 			save_event_target_as = target_governor
 			offmap_power = {
 				set_offmap_flag = no_policy_news
 				set_policy = china_open
+
 				log = "--------------------------------"
 				log = "China Policy Logging:"
 				log = "Chinas new Policy is now OPEN"
 				log = "-------------------------------------"
+
 				set_offmap_tmp_flag = china_forced_open
 				set_offmap_flag = no_war_news
-				custom_tooltip = { text = china_forced_open_tt }
-				hidden_effect = {
+
+				custom_tooltip = {
+					text = china_forced_open_tt
+
 					any_player = {
 						limit = {
 							has_offmap_news_enabled = PREV
@@ -4420,30 +4452,18 @@ force_open_china_cb = {
 				clr_offmap_tmp_flag = china_force_open_in_progress
 			}
 		}
-		ROOT = {
-			participation_scaled_prestige = 1000
-			add_grace_massive_effect = yes
-			add_character_modifier = {
-				modifier = chinese_favored_in_trade
-				inherit = yes
-				years = 25
-			}
-		}
-		FROM = {
-			transfer_scaled_wealth = {
-				to = ROOT
-				value = 5.0
-				min = 2000
-			}
-		}
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 300 }
-		}
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			prestige = -150
+		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 100
 			participation_scaled_prestige = 50
 			hidden_effect = { offmap_power = { clr_offmap_tmp_flag = china_force_open_in_progress } }
@@ -4452,12 +4472,10 @@ force_open_china_cb = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
 		}
-		ROOT = {
-			prestige = -150
-		}
 	}
 
 	on_reverse_demand = {
+		# Attackee
 		ROOT = {
 			show_scope_change = no
 			prestige = -300
@@ -4468,6 +4486,7 @@ force_open_china_cb = {
 			}
 			custom_tooltip = {
 				text = angered_china_tt #Scripter! Update this is you change the value below.
+
 				add_character_modifier = {
 					modifier = angered_china_modifier
 					inherit = yes
@@ -4475,9 +4494,13 @@ force_open_china_cb = {
 				}
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			piety = 200
 			participation_scaled_prestige = 100
+
 			hidden_effect = {
 				offmap_power = {
 					set_offmap_flag = no_war_news
@@ -4486,7 +4509,7 @@ force_open_china_cb = {
 							has_offmap_news_enabled = PREV
 							is_within_diplo_range = PREV
 						}
-						narrative_event = { id = JD.60303 }
+						narrative_event = { id = JD.60303 } # News Event: Fail to force open China by war
 					}
 					clr_offmap_tmp_flag = china_force_open_in_progress
 				}
@@ -4496,10 +4519,6 @@ force_open_china_cb = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
-	}
-
-	on_attacker_leader_death = {
-		#end_war = invalid
 	}
 
 	attacker_ai_victory_worth = {
