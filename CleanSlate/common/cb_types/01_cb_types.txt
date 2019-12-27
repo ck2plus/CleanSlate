@@ -6294,26 +6294,31 @@ flower_war_cb = {
 	sort_priority = 1000
 
 	can_use = {
+		has_dlc = "Holy Fury"
+
+		# Attacker
 		ROOT = {
-			has_dlc = "Holy Fury"
 			OR = {
 				has_religion_feature = religion_ritual_sacrifice
 				religion = aztec
 				religion = aztec_reformed
 			}
-			NOT = { has_religion_feature = religion_peaceful } #Aztecs could reform as Peaceful.
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				has_religion_feature = religion_peaceful # Aztecs could reform as Peaceful
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
+
 			trait = bloodthirsty_gods_3
 		}
 
-
+		# Defender
 		FROM = {
-			in_revolt = no
-			is_nomadic = no
-			NOT = { is_offmap_governor = yes }
-			NOT = {
+			NOR = {
+				in_revolt = yes
+				is_nomadic = yes
+				is_offmap_governor = yes
 				any_war = {
 					defender = { character = PREVPREV }
 					using_cb = flower_war_cb
@@ -6321,7 +6326,9 @@ flower_war_cb = {
 			}
 		}
 	}
+
 	is_valid = {
+		# Attacker
 		ROOT = {
 			OR = {
 				has_religion_feature = religion_ritual_sacrifice
@@ -6333,7 +6340,7 @@ flower_war_cb = {
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -6344,11 +6351,19 @@ flower_war_cb = {
 	}
 
 	on_success = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_piety = 100
 			participation_scaled_prestige = 100
-			hidden_tooltip = { change_variable = { which = burned_hearts_points value = 5 } }
+
+			hidden_tooltip = {
+				change_variable = {
+					which = burned_hearts_points
+					value = 5
+				}
+			}
+
 			religion_authority = {
 				modifier = won_flower_war
 				years = 30
@@ -6358,7 +6373,10 @@ flower_war_cb = {
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_piety = 50 }
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = -100
 			prestige = -100
 
@@ -6372,10 +6390,8 @@ flower_war_cb = {
 
 			custom_tooltip = {
 				text = flower_war_cb_tooltip
-			}
 
-			hidden_tooltip = {
-				any_courtier = { #Sacrifice part of the court.
+				any_courtier = { # Sacrifice part of the court
 					limit = {
 						is_ruler = no
 					}
@@ -6389,11 +6405,11 @@ flower_war_cb = {
 							factor = 3
 							has_minor_title = title_commander
 						}
-						modifier = { #Less likely to be in battle.
+						modifier = { # Less likely to be in battle
 							factor = 0.5
 							is_adult = no
 						}
-						modifier = { #Less likely to be in battle.
+						modifier = { # Less likely to be in battle
 							factor = 0.5
 							is_adult = no
 							is_child_of = FROM
@@ -6440,6 +6456,13 @@ flower_war_cb = {
 	}
 
 	on_fail = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety = -100
+		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			piety = 50
@@ -6449,13 +6472,10 @@ flower_war_cb = {
 			limit = { NOT = { character = FROM } }
 			hidden_tooltip = { participation_scaled_prestige = 50 }
 		}
-		ROOT = {
-			show_scope_change = no
-			piety = -100
-		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			piety = -200
@@ -6468,9 +6488,13 @@ flower_war_cb = {
 				years = 30
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			piety = 100
+			participation_scaled_prestige = 100
+
 			if = {
 				limit = {
 					has_dlc = "Legacy of Rome"
@@ -6484,9 +6508,8 @@ flower_war_cb = {
 							religion = hellenic_pagan_reformed
 						}
 				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
+				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
 			}
-			participation_scaled_prestige = 100
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
