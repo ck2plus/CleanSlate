@@ -5937,11 +5937,12 @@ roman_christian_revolt = {
 	allow_whitepeace = no
 
 	can_use = {
+		# Attacker
 		ROOT = { has_character_flag = roman_christian_revolter }
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -5952,7 +5953,9 @@ roman_christian_revolt = {
 	}
 
 	on_success = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = 200
 			piety = 100
 			occupy_minors_of_occupied_settlements = FROM
@@ -5960,7 +5963,9 @@ roman_christian_revolt = {
 			clr_character_flag = religious_revolter
 		}
 
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = -500
 			piety = -500
 			abdicate = yes
@@ -5971,6 +5976,7 @@ roman_christian_revolt = {
 	}
 
 	on_success_title = {
+		# Attacker
 		ROOT = {
 			vassalize_or_take_under_title = {
 				title = PREV
@@ -5980,56 +5986,30 @@ roman_christian_revolt = {
 				type = holy_war
 			}
 		}
+
 		if = {
 			limit = {
-				controls_religion = no
-				holder_scope = {
-					OR = {
-						character = FROM
-						is_liege_or_above = FROM
+				OR = {
+					has_holder = no
+					AND = {
+						controls_religion = no
+						holder_scope = {
+							OR = {
+								character = FROM
+								is_liege_or_above = FROM
+							}
+						}
 					}
 				}
 			}
 			usurp_title = { target = ROOT type = holy_war }
 		}
-		if = {
-			limit = {
-				has_holder = no
-			}
-			usurp_title = { target = ROOT type = holy_war }
-		}
 	}
 
-	#on_fail = {
-		#ROOT = {
-			#clear_wealth = yes
-			#imprison = FROM
-			#clr_character_flag = religious_revolter
-			#hidden_tooltip = {
-				#add_character_modifier = {
-					#name = broken_spirit
-					#days = -1
-				# }
-			# }
-		# }
-		#FROM = {
-			#prestige = 50
-			#piety = 100
-			#hidden_tooltip = {
-				#opinion = {
-					#modifier = opinion_rebel_traitor
-					#who = ROOT
-					#months = 1200
-				# }
-			# }
-			#religion_authority = {
-				#modifier = won_religious_revolt
-			# }
-		# }
-	# }
-
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			clear_wealth = yes
 			imprison = FROM
 			clr_character_flag = religious_revolter
@@ -6040,9 +6020,13 @@ roman_christian_revolt = {
 				}
 			}
 		}
+
+		# Defender
 		FROM = {
+			show_scope_change = no
 			prestige = 100
 			piety = 200
+
 			hidden_tooltip = {
 				opinion = {
 					modifier = opinion_rebel_traitor
@@ -6054,32 +6038,32 @@ roman_christian_revolt = {
 					days = 3650
 				}
 			}
+
 			religion_authority = {
 				modifier = won_religious_revolt
 			}
-		}
-		hidden_tooltip = {
+
 			if = {
 				limit = {
-					FROM = {
-						NOR = {
-							religion = hellenic_pagan
-							religion = hellenic_pagan_reformed
-			 			}
+					NOR = {
+						religion = hellenic_pagan
+						religion = hellenic_pagan_reformed
 			 		}
 			 	}
-				333 = { set_province_flag = flag_rome_primed_for_conversion } #If the Emperor burning Rome is about to switch to hellenism and wins the war, Rome turns hellenic automatically.
+				333 = { # If the Emperor burning Rome is about to switch to hellenism and wins the war, Rome turns hellenic automatically
+					set_province_flag = flag_rome_primed_for_conversion
+				}
 			}
-			if = {
+			else_if = {
 				limit = {
-					FROM = {
-						OR = {
-							religion = hellenic_pagan
-							religion = hellenic_pagan_reformed
-			 			}
+					OR = {
+						religion = hellenic_pagan
+						religion = hellenic_pagan_reformed
 			 		}
 			 	}
-				333 = { religion = FROM } #If he has already revealed his conversion, convert the province immediately.
+				333 = { # If he has already revealed his conversion, convert the province immediately
+					religion = FROM
+				}
 			}
 		}
 	}
