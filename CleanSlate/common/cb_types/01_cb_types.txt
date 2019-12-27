@@ -937,27 +937,80 @@ ducal_county_conquest = { # New4
 
 	can_use_gui = {
 		check_if_crusader_trigger = yes
+
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			conditional_tooltip = {
 				trigger = {
 					tier = COUNT
 				}
-				piety = 100
-				scaled_wealth = 1.0
+				piety >= 100
+				scaled_wealth >= 1.0
 			}
 			conditional_tooltip = {
 				trigger = {
 					tier = DUKE
 				}
-				piety = 250
-				scaled_wealth = 1.0
+				piety >= 250
+				scaled_wealth >= 1.0
+			}
+		}
+	}
+
+	can_use = {
+		has_dlc = "Jade Dragon"
+		NOT = {
+			has_game_rule = {
+				name = jade_dragon_cbs
+				value = off
+			}
+		}
+
+		# Attacker
+		ROOT = {
+			NOR = { # These all have other ways to expand in the early game
+				religion_group = muslim
+				religion_group = pagan_group
+				is_nomadic = yes
+			}
+
+			# Only Counts and Dukes can use this
+			lower_tier_than = KING
+		}
+	}
+
+	can_use_title = {
+		tier = COUNT
+
+		dejure_liege_title = {
+			has_holder = no
+			any_de_jure_vassal_title = {
+				holder = ROOT
+			}
+		}
+
+		owner = {
+			OR = {
+				character = FROM
+				is_liege_or_above = FROM
+			}
+		}
+	}
+
+	is_valid_title = {
+		owner = {
+			OR = {
+				character = FROM
+				is_liege_or_above = FROM
 			}
 		}
 	}
 
 	on_add = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			if = {
 				limit = {
 					tier = COUNT
@@ -973,84 +1026,13 @@ ducal_county_conquest = { # New4
 				scaled_wealth = -1.0
 			}
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
 				sound_effect = china_angered_emperor
 				detract_grace_super_huge_effect = yes
-			}
-		}
-	}
-
-	can_use = {
-		has_dlc = "Jade Dragon"
-		ROOT = {
-			NOT = {
-				has_game_rule = {
-					name = jade_dragon_cbs
-					value = off
-				}
-			}
-		}
-	}
-
-	can_use_title = {
-		ROOT = {
-			NOR = { # These all have other ways to expand in the early game
-				religion_group = muslim
-				religion_group = pagan_group
-				is_nomadic = yes
-			}
-			OR = { # Only Counts and Dukes can use this
-				tier = COUNT
-				tier = DUKE
-			}
-		}
-
-		tier = COUNT
-
-		dejure_liege_title = {
-			has_holder = no
-			any_de_jure_vassal_title = {
-				holder = ROOT
-			}
-		}
-
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
-			}
-		}
-
-
-		NOR = {
-			ROOT = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = ROOT
-			}
-			holder_scope = {
-				ROOT = {
-					any_liege = {
-						character = PREVPREV
-					}
-				}
-			}
-		}
-	}
-
-	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
 			}
 		}
 	}
