@@ -3489,13 +3489,17 @@ offmap_submission = {
 	defender_unoccupied_warscore = yes
 
 	can_use = {
+		# Attacker
 		ROOT = {
 			independent = yes
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
+			NOR = {
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
+			}
 		}
 
+		# Defender
 		FROM = {
 			in_revolt = no
 			is_nomadic = no # Nomads cannot be subjugated
@@ -3503,7 +3507,9 @@ offmap_submission = {
 	}
 
 	on_success = {
+		# Defender
 		FROM = {
+			show_scope_change = no
 			piety = -100
 			prestige = -100
 
@@ -3523,13 +3529,12 @@ offmap_submission = {
 
 			custom_tooltip = {
 				text = offmap_submission_tip
-			}
 
-			hidden_tooltip = {
+				# Attacker
 				ROOT = {
 					if = {
 						limit = {
-							num_of_count_titles_in_realm = 0
+							num_of_count_titles_in_realm >= 0
 							ROOT_FROM = {
 								num_of_count_titles_in_realm < 2
 							}
@@ -3614,7 +3619,7 @@ offmap_submission = {
 							is_offmap_governor = yes
 							offmap_power = { is_offmap_tag = offmap_china }
 							offmap_china = { has_offmap_tmp_flag = WP_is_not_on_map }
-							NOT = { wealth = 2500 } #unless already rich from tributes
+							wealth < 2500 #unless already rich from tributes
 						}
 						set_variable = { which = "WP_nomad_provinces" value = 0 }
 						any_realm_province = {
@@ -3776,10 +3781,12 @@ offmap_submission = {
 						}
 						set_character_flag = given_temple_name_by_script
 						remove_special_character_title = TITLE_GENERAL
+
 						#Some starting stuff
 						wealth = 1000
 						prestige = 500
 						piety = 200
+
 						offmap_china = { set_offmap_flag = no_war_news }
 						any_player = {
 							limit = {
@@ -3857,16 +3864,9 @@ offmap_submission = {
 	}
 
 	on_fail = {
-		FROM = {
-			piety = 100
-			participation_scaled_prestige = 250
-			set_character_flag = defeated_china
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 250 }
-		}
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			piety = -100
 			if = {
 				limit = { has_character_flag = is_rebel_general }
@@ -3884,19 +3884,34 @@ offmap_submission = {
 				}
 			}
 		}
+
+		# Defenders
+		FROM = {
+			show_scope_change = no
+			piety = 100
+			participation_scaled_prestige = 250
+			set_character_flag = defeated_china
+		}
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 250 }
+		}
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
+			show_scope_change = no
 			prestige = -500
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 5.0
 				min = 1000
 			}
-			if = {
-				limit = { has_character_flag = is_rebel_general }
-				hidden_effect = {
+
+			hidden_effect = {
+				if = {
+					limit = { has_character_flag = is_rebel_general }
 					any_courtier = {
 						move_character = FROM
 						imprison = FROM
@@ -3908,8 +3923,6 @@ offmap_submission = {
 					move_character = FROM
 					ROOT = { imprison = FROM }
 				}
-			}
-			hidden_effect = {
 				if = { #Makes China have a chance of leaving Expanionist policy...
 					limit = {
 						NOT = {
@@ -3945,9 +3958,14 @@ offmap_submission = {
 				log = "China War Logging: China lost a submission war against [FROM.GetBestName]"
 			}
 		}
+
+		# Defenders
 		FROM = {
+			show_scope_change = no
 			set_character_flag = defeated_china
 			piety = 500
+			participation_scaled_prestige = 2500
+
 			if = {
 				limit = {
 					has_dlc = "Legacy of Rome"
@@ -3963,7 +3981,6 @@ offmap_submission = {
 				}
 				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } }
 			}
-			participation_scaled_prestige = 2500
 		}
 		any_defender = {
 			limit = { NOT = { character = FROM } }
@@ -3972,10 +3989,11 @@ offmap_submission = {
 	}
 
 	on_attacker_leader_death = {
-		if = {
-			limit = { ROOT = { has_character_flag = is_rebel_general } }
-			end_war = invalid
-			ROOT = {
+		ROOT = {
+			if = {
+				limit = { has_character_flag = is_rebel_general }
+
+				end_war = invalid
 				any_courtier = { death = { death_reason = death_went_back_to_china } }
 				primary_title = {
 					activate_title = { title = THIS status = no }
