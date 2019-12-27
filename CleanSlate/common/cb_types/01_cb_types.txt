@@ -382,49 +382,51 @@ force_vassalization = { # New2
 
 	can_use_gui = {
 		check_if_crusader_trigger = yes
-		FROM = {
+
+		# Attacker
+		ROOT = {
 			show_scope_change = no
 			conditional_tooltip = {
 				trigger = {
-					tier = COUNT
+					FROM = { tier = COUNT }
 				}
-				ROOT = {
-					show_scope_change = no
-					OR = {
-						prestige = 250
-						custom_tooltip = {
-							text = tooltip_antagonize_vassalize_claim
-							hidden_tooltip = { has_opinion_modifier = { who = FROM modifier = opinion_antagonize_vassalize_claim } }
+				OR = {
+					prestige >= 250
+					custom_tooltip = {
+						text = tooltip_antagonize_vassalize_claim
+						has_opinion_modifier = {
+							who = FROM
+							modifier = opinion_antagonize_vassalize_claim
 						}
 					}
 				}
 			}
 			conditional_tooltip = {
 				trigger = {
-					tier = DUKE
+					FROM = { tier = DUKE }
 				}
-				ROOT = {
-					show_scope_change = no
-					OR = {
-						prestige = 1000
-						custom_tooltip = {
-							text = tooltip_antagonize_vassalize_claim
-							hidden_tooltip = { has_opinion_modifier = { who = FROM modifier = opinion_antagonize_vassalize_claim } }
+				OR = {
+					prestige >= 1000
+					custom_tooltip = {
+						text = tooltip_antagonize_vassalize_claim
+						has_opinion_modifier = {
+							who = FROM
+							modifier = opinion_antagonize_vassalize_claim
 						}
 					}
 				}
 			}
 			conditional_tooltip = {
 				trigger = {
-					tier = KING
+					FROM = { tier = KING }
 				}
-				ROOT = {
-					show_scope_change = no
-					OR = {
-						prestige = 2500
-						custom_tooltip = {
-							text = tooltip_antagonize_vassalize_claim
-							hidden_tooltip = { has_opinion_modifier = { who = FROM modifier = opinion_antagonize_vassalize_claim } }
+				OR = {
+					prestige >= 2500
+					custom_tooltip = {
+						text = tooltip_antagonize_vassalize_claim
+						has_opinion_modifier = {
+							who = FROM
+							modifier = opinion_antagonize_vassalize_claim
 						}
 					}
 				}
@@ -432,45 +434,105 @@ force_vassalization = { # New2
 		}
 	}
 
-	on_add = {
+	can_use = {
+		has_dlc = "Jade Dragon"
+		NOT = {
+			has_game_rule = {
+				name = jade_dragon_cbs
+				value = off
+			}
+		}
+
+		# Attacker
+		ROOT = {
+			higher_tier_than = COUNT
+			NOR = {
+				same_realm = FROM
+				is_liege_or_above = FROM
+				mercenary = yes
+				is_nomadic = yes
+			}
+		}
+
+		# Defender
 		FROM = {
+			lower_tier_than = ROOT
+			realm_size <= 31
+			in_revolt = no
+			is_nomadic = no
+			controls_religion = no
+			holy_order = no
+			shares_realm_border_with = ROOT
+			OR = {
+				religion = ROOT
+				culture_group = ROOT
+			}
+		}
+	}
+
+	is_valid = {
+		# Defender
+		FROM = {
+			is_landed = yes
+			lower_tier_than = ROOT
+		}
+	}
+
+	on_add = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
 			if = {
 				limit = {
-					tier = COUNT
-					NOT = { reverse_has_opinion_modifier = { who = ROOT modifier = opinion_antagonize_vassalize_claim } }
+					FROM = { tier = COUNT }
+					NOT = {
+						has_opinion_modifier = {
+							who = FROM
+							modifier = opinion_antagonize_vassalize_claim
+						}
+					}
 				}
-				ROOT = {
-					prestige = -250
-				}
+				prestige = -250
 			}
 			if = {
 				limit = {
-					tier = DUKE
-					NOT = { reverse_has_opinion_modifier = { who = ROOT modifier = opinion_antagonize_vassalize_claim } }
+					FROM = { tier = DUKE }
+					NOT = {
+						has_opinion_modifier = {
+							who = FROM
+							modifier = opinion_antagonize_vassalize_claim
+						}
+					}
 				}
-				ROOT = {
-					prestige = -1000
-				}
+				prestige = -1000
 			}
 			if = {
 				limit = {
-					tier = KING
-					NOT = { reverse_has_opinion_modifier = { who = ROOT modifier = opinion_antagonize_vassalize_claim } }
+					FROM = { tier = KING }
+					NOT = {
+						has_opinion_modifier = {
+							who = FROM
+							modifier = opinion_antagonize_vassalize_claim
+						}
+					}
 				}
-				ROOT = {
-					prestige = -2500
-				}
+				prestige = -2500
 			}
 			if = {
 				limit = {
-					reverse_has_opinion_modifier = { who = ROOT modifier = opinion_antagonize_vassalize_claim }
+					has_opinion_modifier = {
+						who = FROM
+						modifier = opinion_antagonize_vassalize_claim
+					}
 				}
-				ROOT = {
-					remove_opinion = { who = ROOT modifier = opinion_antagonize_vassalize_claim }
+				remove_opinion = {
+					who = ROOT
+					modifier = opinion_antagonize_vassalize_claim
 				}
 			}
 		}
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -480,47 +542,8 @@ force_vassalization = { # New2
 		}
 	}
 
-	can_use = {
-		has_dlc = "Jade Dragon"
-		ROOT = {
-			NOT = {
-				has_game_rule = {
-					name = jade_dragon_cbs
-					value = off
-				}
-			}
-			higher_tier_than = count
-			NOT = { same_realm = FROM }
-			NOT = { is_liege_or_above = FROM }
-			mercenary = no
-			is_nomadic = no
-		}
-
-		FROM = {
-			lower_tier_than = ROOT
-			NOT = {
-				realm_size = 31
-			}
-			in_revolt = no
-			is_nomadic = no
-			controls_religion = no
-			holy_order = no
-			OR = {
-				religion = ROOT
-				culture_group = ROOT
-			}
-			shares_realm_border_with = ROOT
-		}
-	}
-
-	is_valid = {
-		FROM = {
-			is_landed = yes
-			lower_tier_than = ROOT
-		}
-	}
-
 	on_success = {
+		# Attackers
 		ROOT = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -529,6 +552,8 @@ force_vassalization = { # New2
 			limit = { NOT = { character = ROOT } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
+
+		# Defender
 		FROM = {
 			show_scope_change = no
 			prestige = -100
@@ -544,6 +569,7 @@ force_vassalization = { # New2
 	}
 
 	on_fail = {
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 50
@@ -555,6 +581,7 @@ force_vassalization = { # New2
 	}
 
 	on_reverse_demand = {
+		# Attacker
 		ROOT = {
 			show_scope_change = no
 			transfer_scaled_wealth = {
@@ -562,6 +589,8 @@ force_vassalization = { # New2
 				value = 2.0
 			}
 		}
+
+		# Defenders
 		FROM = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
