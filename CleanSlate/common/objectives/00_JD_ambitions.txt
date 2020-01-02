@@ -9,8 +9,28 @@
 obj_strengthen_religion = {
 	type = character
 
+	potential = {
+		has_dlc = "Jade Dragon"
+		religion_authority < 0.30
+		is_playable = yes
+		is_landed = yes
+		higher_tier_than = BARON
+		is_nomadic = no
+		liege = { is_nomadic = no }
+		independent = yes
+		is_adult = yes
+		NOR = {
+			has_character_flag = strengthened_religion
+			trait = incapable
+			has_secret_religion = yes
+			is_devil_worshiper_trigger = yes
+			is_inaccessible_trigger = yes
+		}
+	}
+
 	creation_effect = {
 		change_variable = { which = strengthen_religion value = 0 }
+
 		random_list = {
 			150 = { # No Opportunity
 				set_character_flag = had_ambition_opportunity_chance
@@ -20,30 +40,32 @@ obj_strengthen_religion = {
 				set_character_flag = had_ambition_opportunity_chance
 				modifier = {
 					factor = 0
-					NOT = {
+					NOR = {
 						is_nomadic = no
 						mercenary = no
-						NOT = { pacifist = yes }
+						pacifist = no
 						top_liege = {
 							religion = ROOT
 						}
 						any_realm_province = { 											# You need a province...
-							any_neighbor_province = { 									# ...that has a neighbor province...
-								holder_scope = { 										# ...whos holder is...
-									NOT = { same_realm = ROOT } 						# ...not in your realm...
-									top_liege = { 										# ...and has a Top Liege...
-										NOT = { religion = ROOT } 						# ...that is NOT of your religion...
-										any_realm_province = { 							# ...that has any province in their realm...
-											religion = ROOT 							# ...that is of your religion...
-											kingdom = { 								# ...and a De Jure part of a Kingdom, created or not...
-												any_de_jure_vassal_title = { 			# ...who contains any title...
-													tier = COUNT 						# ...of Count tier...
-													holder_scope = { same_realm = PREVPREVPREVPREV } # ...that is in the same realm as the Top Liege of the neighbor Province's holder...
-													location = { 						# ...and where the associated province...
-														any_neighbor_province = { 		# ...has a neighboring province...
-															holder_scope = { 			# ...whos holder...
-																top_liege = { 			# ...has a Top Liege...
-																	character = ROOT 	# ...that is you!
+							any_neighbor_province = {									# ... that has a neighbor province...
+								holder_scope = {										# ... whos holder is...
+									NOT = { same_realm = ROOT } 						# ... not in your realm...
+									top_liege = {										# ... and has a Top Liege...
+										NOT = { religion = ROOT }						# ... who is NOT of your religion...
+										any_realm_province = {							# ... and has any province in their realm...
+											religion = ROOT								# ... that is of your religion...
+											kingdom = {									# ... and a De Jure part of a Kingdom, created or not...
+												any_de_jure_vassal_title = { 			# ... who contains any title...
+													tier = COUNT						# ... of Count tier...
+													holder_scope = {					# ... that is in the same realm as the Top Liege of the neighbor
+														same_realm = PREVPREVPREVPREV	# Province's holder...
+													}
+													location = {						# ... and where the associated province...
+														any_neighbor_province = {		# ... has a neighboring province...
+															holder_scope = {			# ... whos holder...
+																top_liege = {			# ... has a Top Liege...
+																	character = ROOT	# ... who is you!
 																}
 															}
 														}
@@ -85,30 +107,29 @@ obj_strengthen_religion = {
 		}
 	}
 
-	potential = {
-		has_dlc = "Jade Dragon"
-		NOT = {
-			religion_authority = 0.3
-		}
-		is_playable = yes
-		is_landed = yes
-		higher_tier_than = BARON
-		is_nomadic = no
-		liege = { is_nomadic = no }
-		NOT = {
-			has_character_flag = strengthened_religion
+	success = {
+		custom_tooltip = {
+			text = tooltip_obj_strengthen_religion
+
+			check_variable = { which = strengthen_religion value = 3 }
 		}
 	}
 
-	allow = {
-		independent = yes
-		is_adult = yes
-		NOR = {
-			trait = incapable
-			has_secret_religion = yes
-			is_devil_worshiper_trigger = yes
-			is_inaccessible_trigger = yes
+	effect = {
+		religion_authority = {
+			modifier = strengthened_religion
+			years = 50
 		}
+		piety = 100
+		add_character_modifier = {
+			modifier = strengthen_religion_ambition
+			years = 30
+		}
+		set_character_flag = strengthened_religion
+	}
+
+	abort = {
+		religion_authority >= 0.50
 	}
 
 	chance = {
@@ -116,8 +137,7 @@ obj_strengthen_religion = {
 
 		modifier = {
 			factor = 0.1
-			NOT = { tier = king }
-			NOT = { tier = emperor }
+			lower_tier_than = KING
 		}
 		modifier = {
 			factor = 10.0
@@ -136,35 +156,5 @@ obj_strengthen_religion = {
 			factor = 0.01
 			trait = cynical
 		}
-	}
-
-	success = {
-		custom_tooltip = {
-			text = tooltip_obj_strengthen_religion
-			hidden_tooltip = {
-				check_variable = { which = strengthen_religion value = 3 }
-			}
-		}
-	}
-
-	abort = {
-		religion_authority = 0.50
-	}
-
-	abort_effect = {
-
-	}
-
-	effect = {
-		religion_authority = {
-			modifier = strengthened_religion
-			years = 50
-		}
-		piety = 100
-		add_character_modifier = {
-			modifier = strengthen_religion_ambition
-			years = 30
-		}
-		set_character_flag = strengthened_religion
 	}
 }
