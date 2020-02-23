@@ -1,0 +1,45 @@
+On actions let you define events and effects to happen when specific things in the game happen, for example when characters change religion, during combat, on winning battles, and so on.
+Also provided are a number of periodic pulses that are useful for ensuring the rate of events is reasonable, and which are far more performance effective than using MTTH events.
+
+It is not possible to define your own on-actions; you're limited to the ones the game provides you.
+These are all listed in the on action files, and provide documentation on what scopes are available. Whoever is ROOT will receive the associated events.
+
+== Format ==
+on_action_name = { # The identifier
+	effect = { # Effects to happen in the scope the on-action provides. Happens before any events
+		wealth = 1000
+	}
+	events = { # Events to always happen if their trigger is fulfilled
+		namespace.id
+	}
+	random_events = { # Events where one valid event is selected at random
+		1000 = namespace.id # The first number is the chance. It will be modified by MTTH modifiers in the event; the higher the MTTH, the higher the chance
+		1000 = 0 # If the right-hand-side is "0", this provides the chance of no event at all happening
+		
+		name = { # Name of an independent random list. One valid event will be selected at random from it
+			delay = 5 # How many days to delay the event. Useful to ensure the player doesn't get spammed with a bunch of events at the same time
+			1000 = namespace.id # Format is the same as within random_events itself
+		}
+		name_2 = { # Another independent random list. They can all fire at the same time. You can have as many of these as you want, with whatever names you want
+			1000 = namespace.id
+		}
+	}
+}
+
+== Folder structure ==
+The same on-action can be referenced in multiple files in the on_actions folder.
+Note that this does *not* override the on-action; it instead adds to it.
+So to eliminate the vanilla on-actions you need to overwrite the vanilla file in your mod.
+Note that random_events extends random_events. Similarly, if you name sections within random_events the same, they'll extend one another.
+E.G.,
+	random_events = {
+		fancy_name = {
+			100 = 1
+		}
+	}
+	random_events = {
+		fancy_name = {
+			100 = 2
+		}
+	}
+Will result in one of events 1 and 2 (assuming their triggers are fulfilled) will fire
