@@ -42,10 +42,11 @@ republic_governments = {
 			}
 
 			# Patrician and Doge requirements
-			is_patrician = yes
+		#	is_patrician = yes
 
 			OR = {
 				# Doge requirements
+				# Does not require being a patrician, to allow creation of new Merchant Republics
 				AND = {
 					# Must always be coastal
 					capital_scope = { port = yes }
@@ -65,14 +66,18 @@ republic_governments = {
 				}
 
 				# Patrician requirements
-				liege_before_war = { # Liege must be MR
-					NOT = { character = PREV }
-					is_merchant_republic = yes
+				AND = {
+					is_patrician = yes
 
-					NOT = {
-						liege_before_war = { # MR can't be under MR
-							NOT = { character = PREV }
-							is_merchant_republic = yes
+					liege_before_war = { # Liege must be MR
+						NOT = { character = PREV }
+						is_merchant_republic = yes
+
+						NOT = {
+							liege_before_war = { # MR can't be under MR
+								NOT = { character = PREV }
+								is_merchant_republic = yes
+							}
 						}
 					}
 				}
@@ -123,6 +128,8 @@ republic_governments = {
 		color = { 209 125 130 }
 
 		potential = {
+			# Necessary to keep Merchant Republics form reverting on some successions
+			NOT = { is_government_potential = merchant_republic_government }
 		}
 
 		can_build_tribal = no
