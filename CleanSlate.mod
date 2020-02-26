@@ -56,7 +56,7 @@ replace_path = "common\trade_routes"
 replace_path = "common\tributary_types"
 replace_path = "common\triggered_modifiers"
 #replace_path = "common\wonder_upgrades"
-#replace_path = "common\wonders"
+replace_path = "common\wonders"
 
 #replace_path = "decisions"
 #replace_path = "dlc_metadata"
