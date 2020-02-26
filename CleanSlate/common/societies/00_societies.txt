@@ -1,12 +1,15 @@
 ###MONASTIC ORDER###
 monastic_order_benedictine = {
 	primary_attribute = stewardship
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
@@ -14,23 +17,49 @@ monastic_order_benedictine = {
 	active = {
 		has_dlc = "Mystics"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			society_member_of = monastic_order_benedictine
+			religion = catholic
+
+			AND = {
+				is_heretic = no
+
+				OR = {
+					religion = fraticelli
+					religion = waldensian
+					religion = lollard
+					religion = cathar
+				}
+			}
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = monastic_order_benedictine
 					rank = 1
 				}
 			}
 		}
-		age = 16
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+
 		OR = {
 			religion = catholic
+
 			AND = {
 				is_heretic = no
+
 				OR = {
 					religion = fraticelli
 					religion = waldensian
@@ -39,42 +68,34 @@ monastic_order_benedictine = {
 				}
 			}
 		}
+
 		NOT = { trait = excommunicated }
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_benedictine }
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_benedictine }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_benedictine }
+			}
 		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
+
+		scaled_wealth >= 0.25
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
 	}
 
-	show_society = {
-		OR = {
-			religion = catholic
-			AND = {
-				is_heretic = no
-				OR = {
-					religion = fraticelli
-					religion = waldensian
-					religion = lollard
-					religion = cathar
-				}
-			}
-			society_member_of = monastic_order_benedictine
-		}
-	}
-
 	potential = {
 		OR = {
 			religion = catholic
+
 			AND = {
 				is_heretic = no
+
 				OR = {
 					religion = fraticelli
 					religion = waldensian
@@ -89,10 +110,12 @@ monastic_order_benedictine = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = monastic_order_education_power_tt
 	}
 
@@ -100,13 +123,15 @@ monastic_order_benedictine = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			stewardship = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -116,12 +141,14 @@ monastic_order_benedictine = {
 		level = 3
 		limit = 25
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			stewardship = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -132,15 +159,18 @@ monastic_order_benedictine = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			stewardship = 3
 			build_cost_temple_modifier = -0.5
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
+
 		custom_tooltip = benedictine_power_diligent_tt
 	}
 
@@ -219,17 +249,20 @@ monastic_order_benedictine = {
 			rank = 4
 			value = 10
 		}
+
 		triggered_gain = {
 			desc = "saintly_monastic_gain"
+			value = 3
+
 			trigger = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+
 					founder = {
 						religion_group = ROOT
 					}
 				}
 			}
-			value = 3
 		}
 	}
 
@@ -312,18 +345,20 @@ monastic_order_benedictine = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 		   	religion = catholic
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
-			NOR = {
+			age >= 16
+
+			NOT = {
+				is_in_society = yes
+				controls_religion = yes
+				higher_tier_than = DUKE
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				trait = excommunicated
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			NOT = { trait = excommunicated }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
@@ -331,7 +366,7 @@ monastic_order_benedictine = {
 				trait = gardener
 				trait = monk
 				trait = nun
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -340,46 +375,21 @@ monastic_order_benedictine = {
 
 monastic_order_dominican = {
 	primary_attribute = learning
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
 
 	active = {
 		has_dlc = "Mystics"
-	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = monastic_order_dominican
-					rank = 1
-				}
-			}
-		}
-		age = 16
-		religion = catholic
-		NOT = { trait = excommunicated }
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_dominican }
-		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
 	}
 
 	show_society = {
@@ -389,16 +399,58 @@ monastic_order_dominican = {
 		}
 	}
 
-	potential = { religion = catholic }
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = monastic_order_dominican
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+		religion = catholic
+		NOT = { trait = excommunicated }
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_dominican }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_dominican }
+			}
+		}
+
+		scaled_wealth >= 0.25
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+		religion = catholic
+	}
 
 	society_rank = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = monastic_order_education_power_tt
 	}
 
@@ -406,13 +458,15 @@ monastic_order_dominican = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			learning = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -422,12 +476,14 @@ monastic_order_dominican = {
 		level = 3
 		limit = 25
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			learning = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -438,12 +494,14 @@ monastic_order_dominican = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			learning = 3
 			build_cost_temple_modifier = -0.5
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
@@ -524,17 +582,20 @@ monastic_order_dominican = {
 			rank = 4
 			value = 10
 		}
+
 		triggered_gain = {
 			desc = "saintly_monastic_gain"
+			value = 3
+
 			trigger = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+
 					founder = {
 						religion_group = ROOT
 					}
 				}
 			}
-			value = 3
 		}
 	}
 
@@ -617,25 +678,28 @@ monastic_order_dominican = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
+
 		   	religion = catholic
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+			age >= 16
+
 			NOR = {
+				is_in_society = yes
+				controls_religion = yes
+				higher_tier_than = DUKE
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				trait = excommunicated
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			NOT = { trait = excommunicated }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = monk
 				trait = nun
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -645,12 +709,15 @@ monastic_order_dominican = {
 
 monastic_order_orthodox = {
 	primary_attribute = learning
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
@@ -658,23 +725,49 @@ monastic_order_orthodox = {
 	active = {
 		has_dlc = "Mystics"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			society_member_of = monastic_order_orthodox
+			religion = orthodox
+
+			AND = {
+				is_heretic = no
+
+				OR = {
+					religion = bogomilist
+					religion = monothelite
+					religion = iconoclast
+					religion = paulician
+				}
+			}
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = monastic_order_orthodox
 					rank = 1
 				}
 			}
 		}
-		age = 16
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+
 		OR = {
 			religion = orthodox
+
 			AND = {
 				is_heretic = no
+
 				OR = {
 					religion = bogomilist
 					religion = monothelite
@@ -684,41 +777,32 @@ monastic_order_orthodox = {
 			}
 		}
 		NOT = { trait = excommunicated }
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_orthodox }
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_orthodox }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_orthodox }
+			}
 		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
+
+		scaled_wealth >= 0.25
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
 	}
 
-	show_society = {
+	potential = { # To remain in society
 		OR = {
 			religion = orthodox
-			AND = {
-				is_heretic = no
-				OR = {
-					religion = bogomilist
-					religion = monothelite
-					religion = iconoclast
-					religion = paulician
-				}
-			}
-			society_member_of = monastic_order_orthodox
-		}
-	}
 
-	potential = {
-		OR = {
-			religion = orthodox
 			AND = {
 				is_heretic = no
+
 				OR = {
 					religion = bogomilist
 					religion = monothelite
@@ -733,10 +817,12 @@ monastic_order_orthodox = {
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = monastic_order_education_power_tt
 	}
 
@@ -744,13 +830,15 @@ monastic_order_orthodox = {
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			learning = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -760,12 +848,14 @@ monastic_order_orthodox = {
 		level = 3
 		limit = 10
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			learning = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -776,6 +866,7 @@ monastic_order_orthodox = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			temple_vassal_tax_modifier = 0.1
@@ -783,6 +874,7 @@ monastic_order_orthodox = {
 			build_cost_temple_modifier = -0.5
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
@@ -863,17 +955,20 @@ monastic_order_orthodox = {
 			rank = 4
 			value = 10
 		}
+
 		triggered_gain = {
 			desc = "saintly_monastic_gain"
+			value = 3
+
 			trigger = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+
 					founder = {
 						religion_group = ROOT
 					}
 				}
 			}
-			value = 3
 		}
 	}
 
@@ -956,25 +1051,27 @@ monastic_order_orthodox = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 		   	religion = orthodox
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+			age >= 16
+
 			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				trait = excommunicated
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			NOT = { trait = excommunicated }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = monk
 				trait = nun
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -983,12 +1080,15 @@ monastic_order_orthodox = {
 
 monastic_order_nestorian = {
 	primary_attribute = learning
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
@@ -996,55 +1096,71 @@ monastic_order_nestorian = {
 	active = {
 		has_dlc = "Mystics"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			society_member_of = monastic_order_nestorian
+			religion = nestorian
+
+			AND = {
+				is_heretic = no
+				religion = messalian
+			}
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = monastic_order_nestorian
 					rank = 1
 				}
 			}
 		}
-		age = 16
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+
 		OR = {
+
 			religion = nestorian
+
 			AND = {
 				is_heretic = no
 				religion = messalian
 			}
 		}
+
 		NOT = { trait = excommunicated }
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_nestorian }
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_nestorian }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_nestorian }
+			}
 		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
+
+		scaled_wealth >= 0.25
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
 	}
 
-	show_society = {
+	potential = { # To remain in society
 		OR = {
 			religion = nestorian
-			AND = {
-				is_heretic = no
-				religion = messalian
-			}
-			society_member_of = monastic_order_nestorian
-		}
-	}
 
-	potential = {
-		OR = {
-			religion = nestorian
 			AND = {
 				is_heretic = no
 				religion = messalian
@@ -1056,10 +1172,12 @@ monastic_order_nestorian = {
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = monastic_order_education_power_tt
 	}
 
@@ -1067,13 +1185,15 @@ monastic_order_nestorian = {
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			learning = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -1083,12 +1203,14 @@ monastic_order_nestorian = {
 		level = 3
 		limit = 10
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			learning = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -1099,6 +1221,7 @@ monastic_order_nestorian = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			temple_vassal_tax_modifier = 0.1
@@ -1106,6 +1229,7 @@ monastic_order_nestorian = {
 			learning = 3
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
@@ -1186,17 +1310,20 @@ monastic_order_nestorian = {
 			rank = 4
 			value = 10
 		}
+
 		triggered_gain = {
 			desc = "saintly_monastic_gain"
+			value = 3
+
 			trigger = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+
 					founder = {
 						religion_group = ROOT
 					}
 				}
 			}
-			value = 3
 		}
 	}
 
@@ -1279,25 +1406,27 @@ monastic_order_nestorian = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 		   	religion = nestorian
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+			age >= 16
+
 			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				trait = excommunicated
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			NOT = { trait = excommunicated }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = monk
 				trait = nun
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -1306,12 +1435,15 @@ monastic_order_nestorian = {
 
 monastic_order_monophysite = {
 	primary_attribute = learning
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
@@ -1319,19 +1451,37 @@ monastic_order_monophysite = {
 	active = {
 		has_dlc = "Mystics"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			society_member_of = monastic_order_monophysite
+			religion = miaphysite
+
+			AND = {
+				is_heretic = no
+				religion = monophysite
+			}
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = monastic_order_monophysite
 					rank = 1
 				}
 			}
 		}
-		age = 16
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+
 		OR = {
 			religion = miaphysite
 			AND = {
@@ -1340,34 +1490,29 @@ monastic_order_monophysite = {
 			}
 		}
 		NOT = { trait = excommunicated }
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_monophysite }
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_monophysite }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_monophysite }
+			}
 		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
+
+		scaled_wealth >= 0.25
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
 	}
 
-	show_society = {
+	potential = { # To remain in society
 		OR = {
 			religion = miaphysite
-			AND = {
-				is_heretic = no
-				religion = monophysite
-			}
-			society_member_of = monastic_order_monophysite
-		}
-	}
 
-	potential = {
-		OR = {
-			religion = miaphysite
 			AND = {
 				is_heretic = no
 				religion = monophysite
@@ -1379,10 +1524,12 @@ monastic_order_monophysite = {
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = monastic_order_education_power_tt
 	}
 
@@ -1390,13 +1537,15 @@ monastic_order_monophysite = {
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			learning = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -1406,12 +1555,14 @@ monastic_order_monophysite = {
 		level = 3
 		limit = 10
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			learning = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -1422,6 +1573,7 @@ monastic_order_monophysite = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			temple_vassal_tax_modifier = 0.1
@@ -1429,13 +1581,16 @@ monastic_order_monophysite = {
 			learning = 3
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
@@ -1513,42 +1668,47 @@ monastic_order_monophysite = {
 			rank = 4
 			value = 10
 		}
+
 		triggered_gain = {
 			desc = "saintly_monastic_gain"
+			value = 3
+
 			trigger = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+
 					founder = {
 						religion_group = ROOT
 					}
 				}
 			}
-			value = 3
 		}
 	}
 
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 		   	religion = miaphysite
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+			age >= 16
+
 			NOR = {
+				is_in_society = yes
+				controls_religion = yes
+				higher_tier_than = DUKE
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				trait = excommunicated
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			NOT = { trait = excommunicated }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = monk
 				trait = nun
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -1557,45 +1717,21 @@ monastic_order_monophysite = {
 
 monastic_order_hindu = {
 	primary_attribute = learning
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_indian_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
 
 	active = {
 		has_dlc = "Mystics"
-	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = monastic_order_hindu
-					rank = 1
-				}
-			}
-		}
-		age = 16
-		religion = hindu
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_hindu }
-		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
 	}
 
 	show_society = {
@@ -1605,16 +1741,57 @@ monastic_order_hindu = {
 		}
 	}
 
-	potential = { religion = hindu }
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = monastic_order_hindu
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+		religion = hindu
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_hindu }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_hindu }
+			}
+		}
+
+		scaled_wealth >= 0.25
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+		religion = hindu
+	}
 
 	society_rank = {
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = monastic_order_education_power_tt
 	}
 
@@ -1622,13 +1799,15 @@ monastic_order_hindu = {
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			learning = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -1638,12 +1817,14 @@ monastic_order_hindu = {
 		level = 3
 		limit = 10
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			learning = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -1654,6 +1835,7 @@ monastic_order_hindu = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			learning = 3
@@ -1661,6 +1843,7 @@ monastic_order_hindu = {
 			health = 1
 			fertility = 0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
@@ -1790,23 +1973,25 @@ monastic_order_hindu = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 		   	religion = hindu
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+			age >= 16
+
 			NOR = {
+				is_in_society = yes
+				controls_religion = yes
+				higher_tier_than = DUKE
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = brahmin
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -1815,45 +2000,21 @@ monastic_order_hindu = {
 
 monastic_order_buddhist = {
 	primary_attribute = diplomacy
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_indian_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
 
 	active = {
 		has_dlc = "Mystics"
-	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = monastic_order_buddhist
-					rank = 1
-				}
-			}
-		}
-		age = 16
-		religion = buddhist
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_buddhist }
-		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
 	}
 
 	show_society = {
@@ -1863,16 +2024,57 @@ monastic_order_buddhist = {
 		}
 	}
 
-	potential = { religion = buddhist }
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = monastic_order_buddhist
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+		religion = buddhist
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_buddhist }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_buddhist }
+			}
+		}
+
+		scaled_wealth >= 0.25
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+		religion = buddhist
+	}
 
 	society_rank = {
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = dharmic_good_trait_power_tt
 	}
 
@@ -1880,13 +2082,15 @@ monastic_order_buddhist = {
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			diplomacy = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -1896,12 +2100,14 @@ monastic_order_buddhist = {
 		level = 3
 		limit = 10
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			diplomacy = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -1912,6 +2118,7 @@ monastic_order_buddhist = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			diplomacy = 3
@@ -1919,6 +2126,7 @@ monastic_order_buddhist = {
 			global_revolt_risk = -0.08
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
@@ -2048,23 +2256,25 @@ monastic_order_buddhist = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 		   	religion = buddhist
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+			age >= 16
+
 			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = brahmin
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -2073,45 +2283,21 @@ monastic_order_buddhist = {
 
 monastic_order_jain = {
 	primary_attribute = learning
-	is_religious = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = monastic_orders_indian_interface
 	society_ranks_gfx = monk_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
 
 	active = {
 		has_dlc = "Mystics"
-	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = monastic_order_jain
-					rank = 1
-				}
-			}
-		}
-		age = 16
-		religion = jain
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_jain }
-		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
 	}
 
 	show_society = {
@@ -2121,16 +2307,57 @@ monastic_order_jain = {
 		}
 	}
 
-	potential = { religion = jain }
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = monastic_order_jain
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+		religion = jain
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_jain }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_jain }
+			}
+		}
+
+		scaled_wealth >= 0.25
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+		religion = jain
+	}
 
 	society_rank = {
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = dharmic_good_trait_power_tt
 	}
 
@@ -2138,13 +2365,15 @@ monastic_order_jain = {
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			learning = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -2154,12 +2383,14 @@ monastic_order_jain = {
 		level = 3
 		limit = 10
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_piety = 0.2
 			learning = 2
 			build_cost_temple_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -2170,6 +2401,7 @@ monastic_order_jain = {
 		level = 4
 		limit = 5
 		startup_limit = 1
+
 		modifier = {
 			monthly_character_piety = 0.5
 			learning = 3
@@ -2179,13 +2411,16 @@ monastic_order_jain = {
 			buddhist_opinion = 15
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_order_convert_county
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
@@ -2316,23 +2551,25 @@ monastic_order_jain = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 		   	religion = jain
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+			age >= 16
+
 			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = no
 				mercenary = yes
 				holy_order = yes
+				trait = cynical
+				has_secret_religion_trait_trigger = yes
 			}
-			NOT = { trait = cynical }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = brahmin
-				learning = 16
+				learning >= 16
 				is_priest = yes
 			}
 		}
@@ -2345,7 +2582,11 @@ monastic_order_stoics = {
 	opinion_per_rank_above = +5
 	sound = monastic_orders_interface
 	society_ranks_gfx = generic_ranks
+
+	indestructible = yes
+	is_religious = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
@@ -2354,29 +2595,38 @@ monastic_order_stoics = {
 		has_dlc = "Mystics"
 		has_global_flag = flag_restored_stoic_intelligentia
 	}
-	indestructible = yes
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = monastic_order_stoics
 					rank = 1
 				}
 			}
 		}
-		age = 16
-		NOR = { #Not for savages.
+
+		hidden_trigger = {
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+
+		NOR = { # Not for savages.
 			is_tribal = yes
 			is_nomadic = yes
 		}
+
 		OR = {
 			religion = hellenic_pagan
 			religion = hellenic_pagan_reformed
+
 			AND = {
 				culture = roman
-				OR = { #Somewhat compatible when mixed with Roman culture.
+
+				OR = { # Somewhat compatible when mixed with Roman culture
 					religion_group = christian
 					religion_group = jewish_group
 					religion = bon
@@ -2385,14 +2635,21 @@ monastic_order_stoics = {
 				}
 			}
 		}
+
 		NOT = { trait = excommunicated }
-		custom_tooltip = {
-			text = did_not_betray_society
-			NOT = { has_character_flag = betrayed_monastic_order_stoics }
+
+		trigger_if = {
+			limit = { has_character_flag = betrayed_monastic_order_stoics }
+
+			custom_tooltip = {
+				text = did_not_betray_society
+
+				NOT = { has_character_flag = betrayed_monastic_order_stoics }
+			}
 		}
-		scaled_wealth = 0.25
-		hidden_trigger = {
-		NOT = { has_character_flag = society_join_block } }
+
+		scaled_wealth >= 0.25
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
@@ -2400,7 +2657,7 @@ monastic_order_stoics = {
 	}
 
 	show_society = {
-		NOR = { #Not for savages.
+		NOR = { # Not for savages
 			is_tribal = yes
 			is_nomadic = yes
 		}
@@ -2408,8 +2665,10 @@ monastic_order_stoics = {
 			religion = hellenic_pagan
 			religion = hellenic_pagan_reformed
 			AND = {
+
 				culture = roman
-				OR = { #Somewhat compatible when mixed with Roman culture.
+
+				OR = { # Somewhat compatible when mixed with Roman culture
 					religion_group = christian
 					religion_group = jewish_group
 					religion = bon
@@ -2421,17 +2680,19 @@ monastic_order_stoics = {
 		}
 	}
 
-	potential = {
+	potential = { # To remain in society
 	}
 
 	society_rank = {
 		level = 1
 		limit = 60
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_piety = 0.05
 			fertility = -0.15
 		}
+
 		custom_tooltip = monastic_order_education_power_tt
 	}
 
@@ -2439,13 +2700,15 @@ monastic_order_stoics = {
 		level = 2
 		limit = 30
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_piety = 0.1
 			learning = 1
 			fertility = -0.15
 		}
+
 		decisions = {
-			monastic_orders_go_celibate #Power: toggle celibacy
+			monastic_orders_go_celibate # Power: toggle celibacy
 			monastic_orders_stop_celibate
 			monastic_orders_spiritual_guidance
 		}
@@ -2455,6 +2718,7 @@ monastic_order_stoics = {
 		level = 3
 		limit = 25
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_piety = 0.2
 			diplomacy = 1
@@ -2462,6 +2726,7 @@ monastic_order_stoics = {
 			build_cost_city_modifier = -0.25
 			fertility = -0.15
 		}
+
 		decisions = {
 			monastic_orders_invite_ascetic
 			monastic_orders_teach_virtue
@@ -2472,6 +2737,7 @@ monastic_order_stoics = {
 		level = 4
 		limit = 8
 		startup_limit = 2
+
 		modifier = {
 			monthly_character_piety = 0.5
 			diplomacy = 1
@@ -2479,6 +2745,7 @@ monastic_order_stoics = {
 			build_cost_city_modifier = -0.5
 			fertility = -0.15
 		}
+
 		decisions = {
 			stoic_order_culture_convert_county
 		}
@@ -2636,17 +2903,30 @@ monastic_order_stoics = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-	  	  	controls_religion = no
-			NOR = { #Not for savages.
+			age >= 16
+
+			NOR = {
+				# Not for savages
 				is_tribal = yes
 				is_nomadic = yes
+
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = yes
+				mercenary = yes
+				holy_order = yes
+				trait = excommunicated
+				has_secret_religion_trait_trigger = yes
 			}
+
 			OR = {
 				religion = hellenic_pagan
 				religion = hellenic_pagan_reformed
+
 				AND = {
 					culture = roman
-					OR = { #Somewhat compatible when mixed with Roman culture.
+
+					OR = { # Somewhat compatible when mixed with Roman culture
 						religion_group = christian
 						religion_group = jewish_group
 						religion = bon
@@ -2655,22 +2935,14 @@ monastic_order_stoics = {
 					}
 				}
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
-			NOR = {
-				mercenary = yes
-				holy_order = yes
-			}
-			NOT = { trait = excommunicated }
-			has_secret_religion_trait_trigger = no
+
 			OR = {
 				trait = zealous
 				trait = scholar
 				trait = theologian
 				trait = erudite
 				trait = diligent
-				learning = 16
+				learning >= 16
 			}
 		}
 	}
@@ -2682,69 +2954,16 @@ hermetics = {
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	sound = hermetic_society_interface
+
+	indestructible = yes
 	society_influence = no
+
 	non_interference = {
 		always = yes
 	}
 
 	active = {
 		has_dlc = "Mystics"
-	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = hermetics
-					rank = 1
-				}
-			}
-			OR = {
-				is_landed = yes
-				is_patrician = yes
-			}
-		}
-		learning = 10
-		OR = {
-			has_religion_feature = religion_astrology
-			religion_group = christian
-			religion_group = muslim
-			religion_group = jewish_group
-			religion_group = zoroastrian_group
-			custom_tooltip = {
-				text = zunist_hermetic_join_tooltip
-				hidden_trigger = {
-					OR = {
-						religion = zun_pagan
-						religion = zun_pagan_reformed
-					}
-				}
-			}
-			custom_tooltip = {
-				text = hellenic_hermetic_join_tooltip
-
-				OR = {
-					religion = hellenic_pagan
-					religion = hellenic_pagan_reformed
-				}
-			}
-			religion = taoist
-		}
-		NOR = {
-			is_nomadic = yes
-			is_tribal = yes
-		}
-		hidden_trigger = { mercenary = no }
-		age = 16
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
 	}
 
 	show_society = {
@@ -2763,20 +2982,84 @@ hermetics = {
 		}
 	}
 
-	potential = {
-		#If something is added here, it could break apprenticeship. Create an event if they can get kicked out. title_hermetics_apprentice
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = hermetics
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			OR = {
+				is_landed = yes
+				is_patrician = yes
+			}
+			mercenary = no
+			NOT = { has_character_flag = society_join_block }
+		}
+
+		age >= 16
+		learning >= 10
+
+		OR = {
+			has_religion_feature = religion_astrology
+			religion_group = christian
+			religion_group = muslim
+			religion_group = jewish_group
+			religion_group = zoroastrian_group
+
+			custom_tooltip = {
+				text = zunist_hermetic_join_tooltip
+
+				OR = {
+					religion = zun_pagan
+					religion = zun_pagan_reformed
+				}
+			}
+
+			custom_tooltip = {
+				text = hellenic_hermetic_join_tooltip
+
+				OR = {
+					religion = hellenic_pagan
+					religion = hellenic_pagan_reformed
+				}
+			}
+
+			religion = taoist
+		}
+
+		NOR = {
+			is_nomadic = yes
+			is_tribal = yes
+		}
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+		# If something is added here, it could break apprenticeship. Create an event if they can get kicked out. title_hermetics_apprentice
 	}
 
 	society_rank = {
 		level = 1
 		limit = 200
 		startup_limit = 10
+
 		modifier = {
 			church_opinion = -10
-			#economy_techpoints = 0.05
 		}
+
 		decisions = {
-			hermetics_write_theory_paper # Enables you to write a theorem paper that, if approved, gives you society power
+			hermetics_write_theory_paper # Enables you to write a theorem paper that, if approved, gives you society currency
 		}
 	}
 
@@ -2784,10 +3067,12 @@ hermetics = {
 		level = 2
 		limit = 100
 		startup_limit = 6
+
 		modifier = {
 			learning = 1
 			church_opinion = -10
 		}
+
 		decisions = {
 			hermetics_perform_scrying # Enables you to perform a scrying and gain an omen
 			brew_happiness_potion # Enables you to brew a potion
@@ -2798,10 +3083,12 @@ hermetics = {
 		level = 3
 		limit = 50
 		startup_limit = 4
+
 		modifier = {
 			learning = 2
 			church_opinion = -10
 		}
+
 		decisions = {
 			hermetics_make_horoscope # Enables you to "predict" your children's future
 		}
@@ -2811,10 +3098,12 @@ hermetics = {
 		level = 4
 		limit = 20
 		startup_limit = 2
+
 		modifier = {
 			learning = 3
 			church_opinion = -10
 		}
+
 		decisions = {
 			choose_hermetic_art # Enables you to pick/change your lifestyle trait
 			hermetics_write_magnum_opus # Write an enciphered book of lore (artifact)
@@ -2822,6 +3111,9 @@ hermetics = {
 	}
 
 	plots = {
+	}
+
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
@@ -2924,42 +3216,46 @@ hermetics = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-			age = 16
+			age >= 16
 			is_in_society = no
 			is_dumb_trigger = no
-			OR = {
-				NOT = { is_priest = yes }
+			controls_religion = no
+
+			trigger_if = {
+				limit = { is_priest = yes }
+
 				OR = {
 					trait = mystic
 					trait = scholar
 					trait = cynical
 				}
 			}
-			OR = {
-				AND = {
-					is_landed = yes
-					OR = {
-						learning = 14
-						trait = scholar
-						trait = faqih
-						trait = erudite
-						trait = genius
-						trait = mystic
-					}
-				}
-				AND = {
-					learning = 18
-					OR = {
-						trait = scholar
-						trait = faqih
-						trait = erudite
-						trait = genius
-						trait = mystic
-						learning = 20
-					}
+
+			trigger_if = {
+				limit = { is_landed = yes }
+
+				OR = {
+					learning >= 14
+					trait = scholar
+					trait = faqih
+					trait = erudite
+					trait = genius
+					trait = mystic
 				}
 			}
+			trigger_else_if = {
+				limit = { learning >= 18 }
+
+				OR = {
+					trait = scholar
+					trait = faqih
+					trait = erudite
+					trait = genius
+					trait = mystic
+					learning >= 20
+				}
+			}
+
 			OR = {
 				religion_group = christian
 				religion_group = muslim
@@ -2978,118 +3274,138 @@ hermetics = {
 ###THE ASSASSINS###
 the_assassins = {
 	primary_attribute = intrigue
-	is_secret = yes
-	devil_worshipper = no
 	opinion_to_other_members = +10
-	opinion_to_pretenders = -20			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -20 	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -20			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -20 	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	society_rank_up_decision = request_to_rank_up_within_society
 	sound = assassins_interface
 	society_ranks_gfx = generic_ranks
+
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
 		has_dlc = "Mystics"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			society_member_of = the_assassins # You can always see the society you are a part of
+
+			AND = {
+				OR = {
+					religion_group = muslim
+					secret_religion = shiite
+
+					trigger_if = {
+						limit = { ai = no }
+
+						NOT = { trait = zealous }
+
+						any_playable_ruler = {
+							religion = shiite
+
+							distance_from_realm = {
+								who = ROOT
+								value < 300
+							}
+						}
+					}
+				}
+
+				age >= 16
+
+				trigger_if = {
+					limit = { is_female = yes }
+					OR = {
+						has_game_rule = {
+							name = gender
+							value = all
+						}
+						has_religion_feature = religion_matriarchal
+					}
+				}
+				trigger_else = {
+					NOT = { has_religion_feature = religion_matriarchal }
+				}
+			}
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = the_assassins
 					rank = 1
 				}
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			true_religion = shiite
 			religion_group = muslim
+
 			AND = {
 				trait = sympathy_islam
 				trait = deceitful
 				NOT = { trait = zealous }
+
 				OR = {
 					trait = schemer
 					trait = elusive_shadow
-					intrigue = 18
+					intrigue >= 18
 				}
 			}
-			AND = {
-				ai = no
+
+			trigger_if = {
+				limit = { ai = no }
+
 				NOT = { trait = zealous }
+
 				any_playable_ruler = {
 					religion = shiite
-					NOT = {
-						distance_from_realm = { value = 300 who = ROOT }
+
+					distance_from_realm = {
+						who = ROOT
+						value < 300
 					}
 				}
 			}
 		}
-		OR = {
-			is_female = no
-			has_game_rule = {
-				name = gender
-				value = all
-			}
-			has_religion_feature = religion_matriarchal
-		}
-		OR = {
-			is_female = yes
-			NOT = {
+
+		trigger_if = {
+			limit = { is_female = yes }
+
+			OR = {
+				has_game_rule = {
+					name = gender
+					value = all
+				}
 				has_religion_feature = religion_matriarchal
 			}
 		}
+		trigger_else = {
+			NOT = { has_religion_feature = religion_matriarchal }
+		}
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
 	}
 
-	show_society = {
-		OR = {
-			society_member_of = the_assassins #You can always see the society you are a part of
-			AND = {
-				OR = {
-					religion_group = muslim
-					secret_religion = shiite
-					AND = {
-						ai = no
-						NOT = { trait = zealous }
-						any_playable_ruler = {
-							religion = shiite
-							NOT = {
-								distance_from_realm = { value = 300 who = ROOT }
-							}
-						}
-					}
-				}
-				age = 16
-				OR = {
-					is_female = no
-					has_game_rule = {
-						name = gender
-						value = all
-					}
-					has_religion_feature = religion_matriarchal
-				}
-				OR = {
-					is_female = yes
-					NOT = {
-						has_religion_feature = religion_matriarchal
-					}
-				}
-			}
-		}
-	}
-
-	potential = {
+	potential = { # To remain in society
 		OR = {
 			religion = shiite
 			secret_religion = shiite
@@ -3100,6 +3416,7 @@ the_assassins = {
 		level = 1
 		limit = 20
 		startup_limit = 10
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3107,8 +3424,10 @@ the_assassins = {
 					FROM = { is_society_discovered = yes }
 				}
 			}
-			murder_plot_power_modifier = 0.1 # increased plotpower
+
+			murder_plot_power_modifier = 0.1
 		}
+
 		decisions = {
 			decision_abduct
 			assassins_borrow_money
@@ -3121,6 +3440,7 @@ the_assassins = {
 		level = 2
 		limit = 15
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3128,13 +3448,15 @@ the_assassins = {
 					FROM = { is_society_discovered = yes }
 				}
 			}
-			murder_plot_power_modifier = 0.2 # further increased plotpower
+
+			murder_plot_power_modifier = 0.2
 			defensive_plot_power_modifier = 0.1
 			intrigue = 1
-			combat_rating = 10 # bonus to dueling
+			combat_rating = 10
 		}
+
 		decisions = {
-			assassins_scare_ruler #Available (targeted) Power: Can scare rulers to get a Favor (leave a dagger on their pillow, etc.
+			assassins_scare_ruler # Available (targeted) Power: Can scare rulers to get a Favor (leave a dagger on their pillow, etc.)
 		}
 	}
 
@@ -3142,6 +3464,7 @@ the_assassins = {
 		level = 3
 		limit = 5
 		startup_limit = 3
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3149,14 +3472,16 @@ the_assassins = {
 					FROM = { is_society_discovered = yes }
 				}
 			}
-			murder_plot_power_modifier = 0.30 # further increased plotpower
+
+			murder_plot_power_modifier = 0.30
 			defensive_plot_power_modifier = 0.15
-			intrigue = 2 # further increase
-			combat_rating = 10 # bonus to dueling (left over)
-			plot_discovery_chance = 0.1 # bonus to plot discovery chance
+			intrigue = 2
+			combat_rating = 10
+			plot_discovery_chance = 0.10
 		}
+
 		decisions = {
-			assassins_raise_ships #Available Power: Can raise special fleet of Ships
+			assassins_raise_ships # Available Power: Can raise special fleet of Ships
 		}
 	}
 
@@ -3164,6 +3489,7 @@ the_assassins = {
 		level = 4
 		limit = 1
 		startup_limit = 1
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3171,16 +3497,19 @@ the_assassins = {
 					FROM = { is_society_discovered = yes }
 				}
 			}
-			murder_plot_power_modifier = 0.50 # further increased plotpower
+
+			murder_plot_power_modifier = 0.50
 			defensive_plot_power_modifier = 0.25
-			intrigue = 3 # further increase
-			combat_rating = 10 # bonus to dueling (left over)
-			plot_discovery_chance = 0.2 # further bonus to plot discovery chance
+			intrigue = 3
+			combat_rating = 10
+			plot_discovery_chance = 0.20
 		}
+
 		decisions = {
-			assassins_raise_troops #Available Power: Can raise a special regiment
-			assassins_mark_for_death #Available (targeted) Power: Mark for death (+ assassins_clear_marked_for_death_target i.e. the clearing of the mark)
+			assassins_raise_troops	 # Available Power: Can raise a special regiment
+			assassins_mark_for_death # Available (targeted) Power: Mark for death (+ assassins_clear_marked_for_death_target i.e. the clearing of the mark)
 		}
+
 		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
 		obedient = {
 			ROOT = {
@@ -3329,37 +3658,44 @@ the_assassins = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
 			religion = shiite
-			age = 16
-			OR = {
-				is_female = no
-				has_game_rule = {
-					name = gender
-					value = all
-				}
-				has_religion_feature = religion_matriarchal
-			}
-			OR = {
-				is_female = yes
-				NOT = {
+			age >= 16
+
+			trigger_if = {
+				limit = { is_female = yes }
+
+				OR = {
+					has_game_rule = {
+						name = gender
+						value = all
+					}
 					has_religion_feature = religion_matriarchal
 				}
 			}
-			NOT = { trait = decadent }
+			trigger_else = {
+				NOT = { has_religion_feature = religion_matriarchal	}
+			}
+
+			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				trait = decadent
+				mercenary = yes
+				controls_religion = yes
+			}
+
 			OR = {
 				trait = zealous
 				trait = schemer
 				trait = elusive_shadow
 				trait = deceitful
 				trait = ambitious
-				intrigue = 18
+				intrigue >= 18
 			}
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
-			NOT = { mercenary = yes }
-			OR = {
-				NOT = { holy_order = yes }
+
+			trigger_if = {
+				limit = { holy_order = yes }
+
 				primary_title = { title = d_hashshashin }
 			}
 		}
@@ -3369,15 +3705,17 @@ the_assassins = {
 ###DEVIL WORSHIPERS###
 the_satanists = {
 	primary_attribute = intrigue
-	is_secret = yes
-	criminal = yes
-	devil_worshipper = yes
 	opinion_to_other_members = +5
-	opinion_to_pretenders = -40			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -40	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -40			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -40	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	sound = devil_worshippers_interface
 	society_ranks_gfx = devil_ranks
+
+	criminal = yes
+	devil_worshipper = yes
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
@@ -3389,33 +3727,6 @@ the_satanists = {
 			}
 		}
 	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NOT = {
-				has_game_rule = {
-					name = devil_worshipers
-					value = none
-				}
-			}
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = the_satanists
-					rank = 1
-				}
-			}
-		}
-		has_satanists_prerequisites = yes
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
-	}
 
 	show_society = {
 		NOT = {
@@ -3424,7 +3735,9 @@ the_satanists = {
 				value = none
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			religion_group = christian
 			religion_group = muslim
@@ -3436,25 +3749,56 @@ the_satanists = {
 		}
 	}
 
-	potential = { } #no rules
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = the_satanists
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOR = {
+				has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+				has_character_flag = society_join_block
+			}
+		}
+
+		has_satanists_prerequisites = yes
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+	}
 
 	society_rank = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		decisions = {
 			decision_abduct
-			prisoner_dark_sacrifice #Available Decision: Sacrifice Prisoner
-			#Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
+			prisoner_dark_sacrifice # Available Decision: Sacrifice Prisoner
+			# Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_2;
 	}
 
 	society_rank = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3464,15 +3808,14 @@ the_satanists = {
 			}
 			intrigue = 1
 		}
-		decisions = {
-			devil_worshipers_summon_familiar #Available Power: Summon Familiar
-			the_devil_worshipers_tainted_touch #Available Power: Curse people with disease
-			devil_worshipers_demonic_possession #Available Power: Possess someone to make fanatically loyal
-			#Available Power: Abduction plot
-			#unlock new options in Seduction and Spy On?
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_3;
+		decisions = {
+			devil_worshipers_summon_familiar	# Available Power: Summon Familiar
+			the_devil_worshipers_tainted_touch	# Available Power: Curse people with disease
+			devil_worshipers_demonic_possession	# Available Power: Possess someone to make fanatically loyal
+			# Available Power: Abduction plot
+			# Unlock new options in Seduction and Spy On?
+		}
 	}
 
 	society_rank = {
@@ -3489,19 +3832,18 @@ the_satanists = {
 			intrigue = 2
 		}
 		decisions = {
-			devil_worshipers_dark_divorce #Available Power: Dark Divorce
-			devil_worshipers_dark_healing #Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
-			devil_worshipers_invite_disciple_of_devil #Available Decision: Invite a witch to court
-			#Available Power: Love Potion
+			devil_worshipers_dark_divorce				# Available Power: Dark Divorce
+			devil_worshipers_dark_healing				# Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
+			devil_worshipers_invite_disciple_of_devil	# Available Decision: Invite a witch to court
+			# Available Power: Love Potion
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_4;
 	}
 
 	society_rank = {
 		level = 4
 		limit = 1
 		startup_limit = 1
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3511,12 +3853,12 @@ the_satanists = {
 			}
 			intrigue = 3
 		}
-		decisions = {
 
-			DW_prolong_life #Available Power: Prolong Life
-			DW_demonic_impregnation #Available power: Unholy Impregnation
+		decisions = {
+			DW_prolong_life			# Available Power: Prolong Life
+			DW_demonic_impregnation	# Available power: Unholy Impregnation
 		}
-		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
+		obedience_tooltip = obedience_tooltip
 		obedient = {
 			ROOT = {
 				always = yes
@@ -3540,11 +3882,6 @@ the_satanists = {
 		per_attribute = {
 			name = intrigue
 			value = 0.5
-		}
-	triggered_gain = {
-			desc = loc_is_revealed_antichrist
-			trigger = { has_character_modifier = demon_horns }
-			value = 10
 		}
 		has_trait = {
 			trait = ambitious
@@ -3613,6 +3950,13 @@ the_satanists = {
 		society_rank = {
 			rank = 4
 			value = 10
+		}
+
+		triggered_gain = {
+			desc = loc_is_revealed_antichrist
+			value = 10
+
+			trigger = { has_character_modifier = demon_horns }
 		}
 	}
 
@@ -3700,8 +4044,18 @@ the_satanists = {
 					value = none
 				}
 			}
+
 			ai = yes
-			controls_religion = no
+			age >= 16
+
+			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = yes
+				mercenary = yes
+				holy_order = yes
+			}
+
 			OR = {
 				true_religion_group_muslim_trigger = yes
 				true_religion_group_christian_trigger = yes
@@ -3709,6 +4063,7 @@ the_satanists = {
 				true_religion_group_zoroastrian_group_trigger = yes
 				true_religion_zun_pagan_trigger = yes
 			}
+
 			OR = {
 				has_impious_trait_trigger = yes
 				has_vice_trigger = yes
@@ -3716,28 +4071,23 @@ the_satanists = {
 				trait = possessed
 				trait = lunatic
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
-			NOR = {
-				mercenary = yes
-				holy_order = yes
-			}
 		}
 	}
 }
 
 the_trollcrafters = {
 	primary_attribute = intrigue
-	is_secret = yes
-	criminal = yes
-	devil_worshipper = yes
 	opinion_to_other_members = +5
-	opinion_to_pretenders = -40			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -40	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -40			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -40	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	sound = devil_worshippers_interface
 	society_ranks_gfx = devil_ranks
+
+	criminal = yes
+	devil_worshipper = yes
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
@@ -3749,33 +4099,6 @@ the_trollcrafters = {
 			}
 		}
 	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NOT = {
-				has_game_rule = {
-					name = devil_worshipers
-					value = none
-				}
-			}
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = the_trollcrafters
-					rank = 1
-				}
-			}
-		}
-		has_trollcrafters_prerequisites = yes
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
-	}
 
 	show_society = {
 		NOT = {
@@ -3784,7 +4107,9 @@ the_trollcrafters = {
 				value = none
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			religion = norse_pagan
 			religion = norse_pagan_reformed
@@ -3794,25 +4119,56 @@ the_trollcrafters = {
 		}
 	}
 
-	potential = { } #no rules
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = the_trollcrafters
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOR = {
+				has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+				has_character_flag = society_join_block
+			}
+		}
+
+		has_trollcrafters_prerequisites = yes
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+	}
 
 	society_rank = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		decisions = {
 			decision_abduct
-			prisoner_dark_sacrifice #Available Decision: Sacrifice Prisoner
-			#Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
+			prisoner_dark_sacrifice # Available Decision: Sacrifice Prisoner
+			# Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_2;
 	}
 
 	society_rank = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3822,21 +4178,21 @@ the_trollcrafters = {
 			}
 			intrigue = 1
 		}
-		decisions = {
-			devil_worshipers_summon_familiar #Available Power: Summon Familiar
-			the_devil_worshipers_tainted_touch #Available Power: Curse people with disease
-			devil_worshipers_demonic_possession #Available Power: Possess someone to make fanatically loyal
-			#Available Power: Abduction plot
-			#unlock new options in Seduction and Spy On?
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_3;
+		decisions = {
+			devil_worshipers_summon_familiar	# Available Power: Summon Familiar
+			the_devil_worshipers_tainted_touch	# Available Power: Curse people with disease
+			devil_worshipers_demonic_possession	# Available Power: Possess someone to make fanatically loyal
+			# Available Power: Abduction plot
+			# Unlock new options in Seduction and Spy On?
+		}
 	}
 
 	society_rank = {
 		level = 3
 		limit = 25
 		startup_limit = 3
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3846,20 +4202,20 @@ the_trollcrafters = {
 			}
 			intrigue = 2
 		}
-		decisions = {
-			devil_worshipers_dark_divorce #Available Power: Dark Divorce
-			devil_worshipers_dark_healing #Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
-			devil_worshipers_invite_disciple_of_devil #Available Decision: Invite a witch to court
-			#Available Power: Love Potion
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_4;
+		decisions = {
+			devil_worshipers_dark_divorce				# Available Power: Dark Divorce
+			devil_worshipers_dark_healing				# Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
+			devil_worshipers_invite_disciple_of_devil	# Available Decision: Invite a witch to court
+			# Available Power: Love Potion
+		}
 	}
 
 	society_rank = {
 		level = 4
 		limit = 1
 		startup_limit = 1
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -3869,11 +4225,13 @@ the_trollcrafters = {
 			}
 			intrigue = 3
 		}
+
 		decisions = {
-			DW_prolong_life #Available Power: Prolong Life
-			DW_demonic_impregnation #Available power: Unholy Impregnation
+			DW_prolong_life			# Available Power: Prolong Life
+			DW_demonic_impregnation # Available power: Unholy Impregnation
 		}
-		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
+
+		obedience_tooltip = obedience_tooltip
 		obedient = {
 			ROOT = {
 				always = yes
@@ -4048,12 +4406,15 @@ the_trollcrafters = {
 					value = none
 				}
 			}
+
 			ai = yes
-			controls_religion = no
+			age >= 16
+
 			OR = {
 				true_religion_norse_pagan_reformed_trigger = yes
 				true_religion_norse_pagan_trigger = yes
 			}
+
 			OR = {
 				has_impious_trait_trigger = yes
 				has_vice_trigger = yes
@@ -4061,10 +4422,11 @@ the_trollcrafters = {
 				trait = possessed
 				trait = lunatic
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+
 			NOR = {
+				higher_tier_than = DUKE
+				is_in_society = yes
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
 			}
@@ -4075,15 +4437,17 @@ the_trollcrafters = {
 
 the_cult_of_kali = {
 	primary_attribute = intrigue
-	is_secret = yes
-	criminal = yes
-	devil_worshipper = yes
 	opinion_to_other_members = +5
-	opinion_to_pretenders = -40			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -40	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -40			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -40	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	sound = devil_worshippers_interface
 	society_ranks_gfx = devil_ranks
+
+	criminal = yes
+	devil_worshipper = yes
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
@@ -4095,33 +4459,6 @@ the_cult_of_kali = {
 			}
 		}
 	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NOT = {
-				has_game_rule = {
-					name = devil_worshipers
-					value = none
-				}
-			}
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = the_cult_of_kali
-					rank = 1
-				}
-			}
-		}
-		has_cult_of_kali_prerequisites = yes
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
-	}
 
 	show_society = {
 		NOT = {
@@ -4130,7 +4467,9 @@ the_cult_of_kali = {
 				value = none
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			religion = hindu
 			secret_religion = hindu
@@ -4138,25 +4477,56 @@ the_cult_of_kali = {
 		}
 	}
 
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOR = {
+				is_society_rank_full = {
+					society = the_cult_of_kali
+					rank = 1
+				}
+				has_character_flag = society_join_block
+			}
+		}
+
+		hidden_trigger = {
+			NOT = {
+				has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+			}
+		}
+
+		has_cult_of_kali_prerequisites = yes
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+	}
+
 	society_rank = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		decisions = {
 			decision_abduct
-			prisoner_dark_sacrifice #Available Decision: Sacrifice Prisoner
-			#Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
+			prisoner_dark_sacrifice # Available Decision: Sacrifice Prisoner
+			# Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_2;
 	}
-
-	potential = { } #no rules
 
 	society_rank = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -4166,15 +4536,14 @@ the_cult_of_kali = {
 			}
 			intrigue = 1
 		}
-		decisions = {
-			devil_worshipers_summon_familiar #Available Power: Summon Familiar
-			the_devil_worshipers_tainted_touch #Available Power: Curse people with disease
-			devil_worshipers_demonic_possession #Available Power: Possess someone to make fanatically loyal
-			#Available Power: Abduction plot
-			#unlock new options in Seduction and Spy On?
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_3;
+		decisions = {
+			devil_worshipers_summon_familiar	# Available Power: Summon Familiar
+			the_devil_worshipers_tainted_touch	# Available Power: Curse people with disease
+			devil_worshipers_demonic_possession	# Available Power: Possess someone to make fanatically loyal
+			# Available Power: Abduction plot
+			# Unlock new options in Seduction and Spy On?
+		}
 	}
 
 	society_rank = {
@@ -4191,13 +4560,11 @@ the_cult_of_kali = {
 			intrigue = 2
 		}
 		decisions = {
-			devil_worshipers_dark_divorce #Available Power: Dark Divorce
-			devil_worshipers_dark_healing #Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
-			devil_worshipers_invite_disciple_of_devil #Available Decision: Invite a witch to court
-			#Available Power: Love Potion
+			devil_worshipers_dark_divorce				# Available Power: Dark Divorce
+			devil_worshipers_dark_healing				# Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
+			devil_worshipers_invite_disciple_of_devil	# Available Decision: Invite a witch to court
+			# Available Power: Love Potion
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_4;
 	}
 
 	society_rank = {
@@ -4214,10 +4581,10 @@ the_cult_of_kali = {
 			intrigue = 3
 		}
 		decisions = {
-			DW_prolong_life #Available Power: Prolong Life
-			DW_demonic_impregnation #Available power: Unholy Impregnation
+			DW_prolong_life			# Available Power: Prolong Life
+			DW_demonic_impregnation	# Available power: Unholy Impregnation
 		}
-		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
+		obedience_tooltip = obedience_tooltip
 		obedient = {
 			ROOT = {
 				always = yes
@@ -4384,9 +4751,12 @@ the_cult_of_kali = {
 					value = none
 				}
 			}
+
 			ai = yes
-			controls_religion = no
+			age >= 16
+
 			true_religion_hindu_trigger = yes
+
 			OR = {
 				has_impious_trait_trigger = yes
 				has_vice_trigger = yes
@@ -4394,10 +4764,11 @@ the_cult_of_kali = {
 				trait = possessed
 				trait = lunatic
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+
 			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
 			}
@@ -4407,15 +4778,17 @@ the_cult_of_kali = {
 
 the_cold_ones = {
 	primary_attribute = intrigue
-	is_secret = yes
-	criminal = yes
-	devil_worshipper = yes
 	opinion_to_other_members = +5
-	opinion_to_pretenders = -40			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -40	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -40			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -40	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	sound = devil_worshippers_interface
 	society_ranks_gfx = devil_ranks
+
+	criminal = yes
+	devil_worshipper = yes
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
@@ -4427,33 +4800,6 @@ the_cold_ones = {
 			}
 		}
 	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NOT = {
-				has_game_rule = {
-					name = devil_worshipers
-					value = none
-				}
-			}
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = the_cold_ones
-					rank = 1
-				}
-			}
-		}
-		has_cold_ones_prerequisites = yes
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
-	}
 
 	show_society = {
 		NOT = {
@@ -4462,7 +4808,9 @@ the_cold_ones = {
 				value = none
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			religion = baltic_pagan
 			religion = baltic_pagan_reformed
@@ -4480,23 +4828,56 @@ the_cold_ones = {
 		}
 	}
 
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = the_cold_ones
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOR = {
+				has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+				has_character_flag = society_join_block
+			}
+		}
+
+		has_cold_ones_prerequisites = yes
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+	}
+
 	society_rank = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		decisions = {
 			decision_abduct
-			prisoner_dark_sacrifice #Available Decision: Sacrifice Prisoner
-			#Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
+			prisoner_dark_sacrifice # Available Decision: Sacrifice Prisoner
+			# Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_2;
 	}
 
 	society_rank = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -4506,21 +4887,21 @@ the_cold_ones = {
 			}
 			intrigue = 1
 		}
-		decisions = {
-			devil_worshipers_summon_familiar #Available Power: Summon Familiar
-			the_devil_worshipers_tainted_touch #Available Power: Curse people with disease
-			devil_worshipers_demonic_possession #Available Power: Possess someone to make fanatically loyal
-			#Available Power: Abduction plot
-			#unlock new options in Seduction and Spy On?
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_3;
+		decisions = {
+			devil_worshipers_summon_familiar	# Available Power: Summon Familiar
+			the_devil_worshipers_tainted_touch	# Available Power: Curse people with disease
+			devil_worshipers_demonic_possession	# Available Power: Possess someone to make fanatically loyal
+			# Available Power: Abduction plot
+			# Unlock new options in Seduction and Spy On?
+		}
 	}
 
 	society_rank = {
 		level = 3
 		limit = 25
 		startup_limit = 3
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -4530,20 +4911,20 @@ the_cold_ones = {
 			}
 			intrigue = 2
 		}
-		decisions = {
-			devil_worshipers_dark_divorce #Available Power: Dark Divorce
-			devil_worshipers_dark_healing #Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
-			devil_worshipers_invite_disciple_of_devil #Available Decision: Invite a witch to court
-			#Available Power: Love Potion
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_4;
+		decisions = {
+			devil_worshipers_dark_divorce				# Available Power: Dark Divorce
+			devil_worshipers_dark_healing				# Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
+			devil_worshipers_invite_disciple_of_devil	# Available Decision: Invite a witch to court
+			# Available Power: Love Potion
+		}
 	}
 
 	society_rank = {
 		level = 4
 		limit = 1
 		startup_limit = 1
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -4554,10 +4935,11 @@ the_cold_ones = {
 			intrigue = 3
 		}
 		decisions = {
-			DW_prolong_life #Available Power: Prolong Life
-			DW_demonic_impregnation #Available power: Unholy Impregnation
+			DW_prolong_life			# Available Power: Prolong Life
+			DW_demonic_impregnation	# Available power: Unholy Impregnation
 		}
-		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
+
+		obedience_tooltip = obedience_tooltip
 		obedient = {
 			ROOT = {
 				always = yes
@@ -4714,8 +5096,10 @@ the_cold_ones = {
 					value = none
 				}
 			}
+
 			ai = yes
-			controls_religion = no
+			age >= 16
+
 			OR = {
 				religion = baltic_pagan
 				religion = baltic_pagan_reformed
@@ -4726,6 +5110,7 @@ the_cold_ones = {
 				secret_religion = slavic_pagan
 				secret_religion = slavic_pagan_reformed
 			}
+
 			OR = {
 				has_impious_trait_trigger = yes
 				has_vice_trigger = yes
@@ -4733,10 +5118,11 @@ the_cold_ones = {
 				trait = possessed
 				trait = lunatic
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+
 			NOR = {
+				is_in_society = yes
+				higher_tier_than = DUKE
+				controls_religion = no
 				mercenary = yes
 				holy_order = yes
 			}
@@ -4746,15 +5132,17 @@ the_cold_ones = {
 
 the_plaguebringers = {
 	primary_attribute = intrigue
-	is_secret = yes
-	criminal = yes
-	devil_worshipper = yes
 	opinion_to_other_members = +5
-	opinion_to_pretenders = -40			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -40	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -40			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -40	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	sound = devil_worshippers_interface
 	society_ranks_gfx = devil_ranks
+
+	criminal = yes
+	devil_worshipper = yes
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
@@ -4766,33 +5154,6 @@ the_plaguebringers = {
 			}
 		}
 	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NOT = {
-				has_game_rule = {
-					name = devil_worshipers
-					value = none
-				}
-			}
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = the_plaguebringers
-					rank = 1
-				}
-			}
-		}
-		has_plaguebringers_prerequisites = yes
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
-	}
 
 	show_society = {
 		NOT = {
@@ -4801,7 +5162,9 @@ the_plaguebringers = {
 				value = none
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			religion = tengri_pagan
 			religion = tengri_pagan_reformed
@@ -4811,23 +5174,53 @@ the_plaguebringers = {
 		}
 	}
 
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = the_plaguebringers
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOR = {
+				has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+				has_character_flag = society_join_block
+			}
+		}
+
+		has_plaguebringers_prerequisites = yes
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
 	society_rank = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		decisions = {
 			decision_abduct
-			prisoner_dark_sacrifice #Available Decision: Sacrifice Prisoner
-			#Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
+			prisoner_dark_sacrifice # Available Decision: Sacrifice Prisoner
+			# Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_2;
 	}
 
 	society_rank = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -4837,21 +5230,21 @@ the_plaguebringers = {
 			}
 			intrigue = 1
 		}
-		decisions = {
-			devil_worshipers_summon_familiar #Available Power: Summon Familiar
-			the_devil_worshipers_tainted_touch #Available Power: Curse people with disease
-			devil_worshipers_demonic_possession #Available Power: Possess someone to make fanatically loyal
-			#Available Power: Abduction plot
-			#unlock new options in Seduction and Spy On?
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_3;
+		decisions = {
+			devil_worshipers_summon_familiar	# Available Power: Summon Familiar
+			the_devil_worshipers_tainted_touch	# Available Power: Curse people with disease
+			devil_worshipers_demonic_possession	# Available Power: Possess someone to make fanatically loyal
+			# Available Power: Abduction plot
+			# Unlock new options in Seduction and Spy On?
+		}
 	}
 
 	society_rank = {
 		level = 3
 		limit = 25
 		startup_limit = 3
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -4861,20 +5254,20 @@ the_plaguebringers = {
 			}
 			intrigue = 2
 		}
-		decisions = {
-			devil_worshipers_dark_divorce #Available Power: Dark Divorce
-			devil_worshipers_dark_healing #Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
-			devil_worshipers_invite_disciple_of_devil #Available Decision: Invite a witch to court
-			#Available Power: Love Potion
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_4;
+		decisions = {
+			devil_worshipers_dark_divorce				# Available Power: Dark Divorce
+			devil_worshipers_dark_healing				# Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
+			devil_worshipers_invite_disciple_of_devil	# Available Decision: Invite a witch to court
+			# Available Power: Love Potion
+		}
 	}
 
 	society_rank = {
 		level = 4
 		limit = 1
 		startup_limit = 1
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -4884,11 +5277,13 @@ the_plaguebringers = {
 			}
 			intrigue = 3
 		}
+
 		decisions = {
-			DW_prolong_life #Available Power: Prolong Life
-			DW_demonic_impregnation #Available power: Unholy Impregnation
+			DW_prolong_life			# Available Power: Prolong Life
+			DW_demonic_impregnation	# Available power: Unholy Impregnation
 		}
-		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
+
+		obedience_tooltip = obedience_tooltip
 		obedient = {
 			ROOT = {
 				always = yes
@@ -5055,12 +5450,15 @@ the_plaguebringers = {
 					value = none
 				}
 			}
+
 			ai = yes
-			controls_religion = no
+			age >= 16
+
 			OR = {
 				true_religion_tengri_pagan_trigger = yes
 				true_religion_tengri_pagan_reformed_trigger = yes
 			}
+
 			OR = {
 				has_impious_trait_trigger = yes
 				has_vice_trigger = yes
@@ -5068,10 +5466,11 @@ the_plaguebringers = {
 				trait = possessed
 				trait = lunatic
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+
 			NOR = {
+				higher_tier_than = DUKE
+				is_in_society = yes
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
 			}
@@ -5081,15 +5480,17 @@ the_plaguebringers = {
 
 the_vodouns = {
 	primary_attribute = intrigue
-	is_secret = yes
-	criminal = yes
-	devil_worshipper = yes
 	opinion_to_other_members = +5
-	opinion_to_pretenders = -40			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -40	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -40			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -40	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	sound = devil_worshippers_interface
 	society_ranks_gfx = devil_ranks
+
+	criminal = yes
+	devil_worshipper = yes
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
@@ -5101,33 +5502,6 @@ the_vodouns = {
 			}
 		}
 	}
-	indestructible = yes
-
-	can_join_society = {
-		hidden_trigger = {
-			NOT = {
-				has_game_rule = {
-					name = devil_worshipers
-					value = none
-				}
-			}
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = the_vodouns
-					rank = 1
-				}
-			}
-		}
-		has_vodouns_prerequisites = yes
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
-	}
 
 	show_society = {
 		NOT = {
@@ -5136,7 +5510,9 @@ the_vodouns = {
 				value = none
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			religion = west_african_pagan
 			religion = west_african_pagan_reformed
@@ -5146,23 +5522,53 @@ the_vodouns = {
 		}
 	}
 
+	can_join_society = {
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = the_vodouns
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOR = {
+				has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+				has_character_flag = society_join_block
+			}
+		}
+
+		has_vodouns_prerequisites = yes
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
 	society_rank = {
 		level = 1
 		limit = 100
 		startup_limit = 10
+
 		decisions = {
 			decision_abduct
-			prisoner_dark_sacrifice #Available Decision: Sacrifice Prisoner
-			#Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
+			prisoner_dark_sacrifice	# Available Decision: Sacrifice Prisoner
+			# Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_2;
 	}
 
 	society_rank = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5172,21 +5578,21 @@ the_vodouns = {
 			}
 			intrigue = 1
 		}
-		decisions = {
-			devil_worshipers_summon_familiar #Available Power: Summon Familiar
-			the_devil_worshipers_tainted_touch #Available Power: Curse people with disease
-			devil_worshipers_demonic_possession #Available Power: Possess someone to make fanatically loyal
-			#Available Power: Abduction plot
-			#unlock new options in Seduction and Spy On?
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_3;
+		decisions = {
+			devil_worshipers_summon_familiar	# Available Power: Summon Familiar
+			the_devil_worshipers_tainted_touch	# Available Power: Curse people with disease
+			devil_worshipers_demonic_possession	# Available Power: Possess someone to make fanatically loyal
+			# Available Power: Abduction plot
+			# Unlock new options in Seduction and Spy On?
+		}
 	}
 
 	society_rank = {
 		level = 3
 		limit = 25
 		startup_limit = 3
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5196,20 +5602,20 @@ the_vodouns = {
 			}
 			intrigue = 2
 		}
-		decisions = {
-			devil_worshipers_dark_divorce #Available Power: Dark Divorce
-			devil_worshipers_dark_healing #Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
-			devil_worshipers_invite_disciple_of_devil #Available Decision: Invite a witch to court
-			#Available Power: Love Potion
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_4;
+		decisions = {
+			devil_worshipers_dark_divorce				# Available Power: Dark Divorce
+			devil_worshipers_dark_healing				# Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
+			devil_worshipers_invite_disciple_of_devil	# Available Decision: Invite a witch to court
+			# Available Power: Love Potion
+		}
 	}
 
 	society_rank = {
 		level = 4
 		limit = 1
 		startup_limit = 1
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5219,11 +5625,13 @@ the_vodouns = {
 			}
 			intrigue = 3
 		}
+
 		decisions = {
-			DW_prolong_life #Available Power: Prolong Life
-			DW_demonic_impregnation #Available power: Unholy Impregnation
+			DW_prolong_life			# Available Power: Prolong Life
+			DW_demonic_impregnation	# Available power: Unholy Impregnation
 		}
-		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
+
+		obedience_tooltip = obedience_tooltip
 		obedient = {
 			ROOT = {
 				always = yes
@@ -5390,12 +5798,15 @@ the_vodouns = {
 					value = none
 				}
 			}
+
 			ai = yes
-			controls_religion = no
+			age >= 16
+
 			OR = {
 				true_religion_west_african_pagan_trigger = yes
 				true_religion_west_african_pagan_reformed_trigger = yes
 			}
+
 			OR = {
 				has_impious_trait_trigger = yes
 				has_vice_trigger = yes
@@ -5403,10 +5814,11 @@ the_vodouns = {
 				trait = possessed
 				trait = lunatic
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+
 			NOR = {
+				higher_tier_than = DUKE
+				is_in_society = yes
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
 			}
@@ -5416,15 +5828,17 @@ the_vodouns = {
 
 the_bacchants = {
 	primary_attribute = intrigue
-	is_secret = yes
-	criminal = yes
-	devil_worshipper = yes
 	opinion_to_other_members = +5
-	opinion_to_pretenders = -40			#Pretenders is the opinion you have of people perceived/discovered to be in your society.
-	opinion_to_perceived_members = -40	#Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
+	opinion_to_pretenders = -40			# Pretenders is the opinion you have of people perceived/discovered to be in your society
+	opinion_to_perceived_members = -40	# Perceived is the opinion you have of people perceived/discovered to be of a society you're not part of
 	opinion_per_rank_above = +10
 	sound = devil_worshippers_interface
 	society_ranks_gfx = devil_ranks
+
+	criminal = yes
+	devil_worshipper = yes
+	indestructible = yes
+	is_secret = yes
 	society_influence = no
 
 	active = {
@@ -5437,34 +5851,6 @@ the_bacchants = {
 		}
 		has_global_flag = flag_restored_bacchants
 	}
-	indestructible = yes
-
-	can_join_society = {
-		has_global_flag = flag_restored_bacchants
-		hidden_trigger = {
-			NOT = {
-				has_game_rule = {
-					name = devil_worshipers
-					value = none
-				}
-			}
-			NAND = {
-				ai = yes
-				is_society_rank_full = {
-					society = the_bacchants
-					rank = 1
-				}
-			}
-		}
-		has_bacchants_prerequisites = yes
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
-		}
-	}
 
 	show_society = {
 		NOT = {
@@ -5473,24 +5859,66 @@ the_bacchants = {
 				value = none
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		OR = {
 			religion = hellenic_pagan
 			religion = hellenic_pagan_reformed
 			secret_religion = hellenic_pagan
 			secret_religion = hellenic_pagan_reformed
 			society_member_of = the_bacchants
-			top_liege = { true_religion_hellenic_pagan_reformed_trigger = yes }
-			top_liege = { true_religion_hellenic_pagan_trigger = yes }
-			culture = roman #Historically fashionable thrill for bored patricians.
+
+			top_liege = {
+				OR = {
+					true_religion_hellenic_pagan_reformed_trigger = yes
+					true_religion_hellenic_pagan_trigger = yes
+				}
+			}
+
+			culture = roman # Historically fashionable thrill for bored patricians
+
 			AND = {
 				has_global_flag = flag_started_roman_renaissance
-				top_liege = { has_landed_title = e_roman_empire } #Historically a plague for the Empire.
+				top_liege = { has_landed_title = e_roman_empire } # Historically a plague for the Empire
 			}
 		}
 	}
 
-	potential = { } #no rules
+	can_join_society = {
+		has_global_flag = flag_restored_bacchants
+
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
+				is_society_rank_full = {
+					society = the_bacchants
+					rank = 1
+				}
+			}
+		}
+
+		hidden_trigger = {
+			NOR = {
+				has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+				has_character_flag = society_join_block
+			}
+		}
+
+		has_bacchants_prerequisites = yes
+
+		trigger_if = {
+			limit = { prisoner = yes }
+			prisoner = no
+		}
+	}
+
+	potential = { # To remain in society
+	}
 
 	society_rank = {
 		level = 1
@@ -5498,17 +5926,16 @@ the_bacchants = {
 		startup_limit = 10
 		decisions = {
 			decision_abduct
-			prisoner_dark_sacrifice #Available Decision: Sacrifice Prisoner
-			#Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
+			prisoner_dark_sacrifice # Available Decision: Sacrifice Prisoner
+			# Over time, lose virtues, gain vices. A Soul Corruption-effect is on a yearly pulse (with a chance to do nothing)
 		}
-
-		#custom_tooltip = unlockable_DW_powers_at_rank_2;
 	}
 
 	society_rank = {
 		level = 2
 		limit = 50
 		startup_limit = 6
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5518,21 +5945,21 @@ the_bacchants = {
 			}
 			intrigue = 1
 		}
-		decisions = {
-			devil_worshipers_summon_familiar #Available Power: Summon Familiar
-			the_devil_worshipers_tainted_touch #Available Power: Curse people with disease
-			devil_worshipers_demonic_possession #Available Power: Possess someone to make fanatically loyal
-			#Available Power: Abduction plot
-			#unlock new options in Seduction and Spy On?
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_3;
+		decisions = {
+			devil_worshipers_summon_familiar	# Available Power: Summon Familiar
+			the_devil_worshipers_tainted_touch	# Available Power: Curse people with disease
+			devil_worshipers_demonic_possession	# Available Power: Possess someone to make fanatically loyal
+			# Available Power: Abduction plot
+			# Unlock new options in Seduction and Spy On?
+		}
 	}
 
 	society_rank = {
 		level = 3
 		limit = 25
 		startup_limit = 3
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5542,20 +5969,20 @@ the_bacchants = {
 			}
 			intrigue = 2
 		}
-		decisions = {
-			devil_worshipers_dark_divorce #Available Power: Dark Divorce
-			devil_worshipers_dark_healing #Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
-			devil_worshipers_invite_disciple_of_devil #Available Decision: Invite a witch to court
-			#Available Power: Love Potion
-		}
 
-		#custom_tooltip = unlockable_DW_powers_at_rank_4;
+		decisions = {
+			devil_worshipers_dark_divorce				# Available Power: Dark Divorce
+			devil_worshipers_dark_healing				# Available Power: Demonic Healing. Sacrifice a prisoner to heal a random illness or maiming.
+			devil_worshipers_invite_disciple_of_devil	# Available Decision: Invite a witch to court
+			# Available Power: Love Potion
+		}
 	}
 
 	society_rank = {
 		level = 4
 		limit = 1
 		startup_limit = 1
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5565,11 +5992,13 @@ the_bacchants = {
 			}
 			intrigue = 3
 		}
+
 		decisions = {
-			DW_prolong_life #Available Power: Prolong Life
-			DW_demonic_impregnation #Available power: Unholy Impregnation
+			DW_prolong_life			# Available Power: Prolong Life
+			DW_demonic_impregnation	# Available power: Unholy Impregnation
 		}
-		obedience_tooltip = obedience_tooltip #this can be unique per rank/society
+
+		obedience_tooltip = obedience_tooltip
 		obedient = {
 			ROOT = {
 				always = yes
@@ -5744,17 +6173,21 @@ the_bacchants = {
 					value = none
 				}
 			}
+
 			ai = yes
-			controls_religion = no
+			age >= 16
+
 			OR = {
 				true_religion_hellenic_pagan_reformed_trigger = yes
 				true_religion_hellenic_pagan_trigger = yes
 				culture = roman
+
 				AND = {
 					has_global_flag = flag_started_roman_renaissance
-					top_liege = { has_landed_title = e_roman_empire } #Historically a plague for the Empire.
+					top_liege = { has_landed_title = e_roman_empire } # Historically a plague for the Empire
 				}
 			}
+
 			OR = {
 				has_impious_trait_trigger = yes
 				has_vice_trigger = yes
@@ -5762,29 +6195,34 @@ the_bacchants = {
 				trait = possessed
 				trait = lunatic
 			}
-			age = 16
-			is_in_society = no
-			NOT = { higher_tier_than = DUKE }
+
 			NOR = {
+				higher_tier_than = DUKE
+				is_in_society = yes
+				controls_religion = yes
 				mercenary = yes
 				holy_order = yes
 			}
 		}
 	}
 }
-# Hardcoded society tag. If this exists, religions will get versions of this society generated for them unless specifically opted out, or another is specificed. See dynamic_societies.info for more documentation
+
+# Hardcoded society tag. If this exists, religions will get versions of this society generated for them unless specifically opted out,
+# or another is specificed. See dynamic_societies.info for more documentation
 secret_religious_society_template = {
 	template = yes
 	primary_attribute = diplomacy
-	is_religious = yes
-	is_secret = yes
 	opinion_to_other_members = +10
 	opinion_per_rank_above = +5
 	opinion_to_perceived_members = +10
-	criminal = yes
 	sound = secret_cults_interface
 	society_ranks_gfx = secret_ranks
+
+	criminal = yes
+	is_religious = yes
+	is_secret = yes
 	society_influence = no
+
 	non_interference = {
 		FROM = {
 			same_realm = ROOT
@@ -5792,23 +6230,29 @@ secret_religious_society_template = {
 	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = FROM
 					rank = 1
 				}
 			}
 		}
-		age = 16
+
+		age >= 16
+
 		FROM = {
 			num_of_society_members > 0
 		}
+
 		secret_religion = FROM
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
@@ -5822,8 +6266,8 @@ secret_religious_society_template = {
 		secret_religion = FROM
 	}
 
-	potential = {
-		age = 16
+	potential = { # To remain in society
+		age >= 16
 		secret_religion = FROM
 	}
 
@@ -5831,6 +6275,7 @@ secret_religious_society_template = {
 		level = 1
 		limit = 50
 		startup_limit = 0
+
 		decisions = {
 			secret_religions_induct_child
 			secret_religions_evoke_sympathy
@@ -5841,6 +6286,7 @@ secret_religious_society_template = {
 		level = 2
 		limit = 30
 		startup_limit = 0
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5850,6 +6296,7 @@ secret_religious_society_template = {
 			}
 			diplomacy = 1
 		}
+
 		decisions = {
 			secret_religions_induct_character
 		}
@@ -5859,6 +6306,7 @@ secret_religious_society_template = {
 		level = 3
 		limit = 10
 		startup_limit = 0
+
 		modifier = {
 			is_visible = {
 				OR = {
@@ -5868,6 +6316,7 @@ secret_religious_society_template = {
 			}
 			diplomacy = 2
 		}
+
 		decisions = {
 			secret_religions_prepare_grounds
 		}
@@ -5877,22 +6326,26 @@ secret_religious_society_template = {
 		level = 4
 		limit = 1
 		startup_limit = 0
+
 		modifier = {
-			diplomacy = 3
 			is_visible = {
 				OR = {
 					same_society_as = FROM
 					FROM = { is_society_discovered = yes }
 				}
 			}
+			diplomacy = 3
 		}
+
 		decisions = {
 			secret_religions_openly_adopt_faith
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
@@ -6036,16 +6489,16 @@ secret_religious_society_template = {
 }
 
 
-#WARRIOR LODGES:
-#warrior_lodge_norse - The Wolf Warriors
-#warrior_lodge_tengri - The Eagle Warriors
-#warrior_lodge_baltic - The Band of Medeina
-#warrior_lodge_finnish - The Followers of Otso
-#warrior_lodge_slavic - The Champions of Perun
-#warrior_lodge_west_african - The Children of the Storm
-#warrior_lodge_zun - The Keepers of the Flame
-#warrior_lodge_bon - The Sentinels of Light
-#warrior_lodge_hellenic - The Olympian Champions
+# WARRIOR LODGES:
+# warrior_lodge_norse			- The Wolf Warriors
+# warrior_lodge_tengri			- The Eagle Warriors
+# warrior_lodge_baltic			- The Band of Medeina
+# warrior_lodge_finnish			- The Followers of Otso
+# warrior_lodge_slavic			- The Champions of Perun
+# warrior_lodge_west_african	- The Children of the Storm
+# warrior_lodge_zun				- The Keepers of the Flame
+# warrior_lodge_bon				- The Sentinels of Light
+# warrior_lodge_hellenic		- The Olympian Champions
 
 warrior_lodge_norse = {
 	primary_attribute = martial
@@ -6053,6 +6506,8 @@ warrior_lodge_norse = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_01
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -6062,130 +6517,146 @@ warrior_lodge_norse = {
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_norse_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_norse_or_reformed_trigger = yes }
+					any_liege = { religion_openly_norse_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_norse_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_norse_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_norse
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_norse
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+
+			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_norse_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_norse_or_reformed_trigger = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_norse_or_reformed_trigger = no }
 
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_norse_or_reformed_trigger = yes }
-					any_liege = { religion_openly_norse_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_norse_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_norse_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_norse
+			NOT = { trait = zealous }
 		}
 	}
 
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_norse_or_reformed_trigger = yes
-			AND = {
-				religion_openly_norse_or_reformed_trigger = no
-				NOT = { trait = zealous }
-			}
-		}
-	}
-
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
-			warrior_lodge_norse_go_berserk #Power: Go Berserk
+			warrior_lodge_duel						# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden				# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor					# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war			# Passive Power: A Lifetime of War
+			warrior_lodge_norse_go_berserk			# Power: Go Berserk
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
+			warrior_lodge_reaver					# Passive Power: Reaver
+			warrior_lodge_warrior_training			# Power: Warrior Training
+			warrior_lodge_summon_commander			# Power: Summon Commander
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
+			warrior_lodge_inspire_warriors			# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice				# Power: War Sacrifice
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
@@ -6195,19 +6666,22 @@ warrior_lodge_norse = {
 			martial = 3
 		}
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable				# Passive Power: Indomitable
+			warrior_lodge_call_to_glory				# Power: Call to Glory
+			warrior_lodge_choose_military_aspect	# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -6376,7 +6850,8 @@ warrior_lodge_norse = {
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -6417,7 +6892,7 @@ warrior_lodge_norse = {
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -6562,7 +7037,8 @@ warrior_lodge_norse = {
 			trait = valhalla_bound
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -6604,15 +7080,14 @@ warrior_lodge_norse = {
 		   	religion_openly_norse_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
@@ -6624,6 +7099,8 @@ warrior_lodge_tengri = { # Also generally for Nomads
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_02
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -6633,155 +7110,177 @@ warrior_lodge_tengri = { # Also generally for Nomads
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_tengri_or_reformed_trigger = yes
+			is_nomadic = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_tengri_or_reformed_trigger = yes }
+					any_liege = { religion_openly_tengri_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_tengri_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_tengri_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_tengri
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_tengri
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_tengri_or_reformed_trigger = yes
 			is_nomadic = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_tengri_or_reformed_trigger = yes
-			is_nomadic = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_tengri_or_reformed_trigger = no }
 
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_tengri_or_reformed_trigger = yes }
-					any_liege = { religion_openly_tengri_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_tengri_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_tengri_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_tengri
-		}
-	}
-
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_tengri_or_reformed_trigger = yes
-			is_nomadic = yes
-			AND = {
-				religion_openly_tengri_or_reformed_trigger = no
+			OR = {
+				is_nomadic = yes
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
+			warrior_lodge_duel						# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden				# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor					# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war 			# Passive Power: A Lifetime of War
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
-			warrior_lodge_tengri_call_of_the_steppe #Power: Call of the Steppe
+			warrior_lodge_reaver					# Passive Power: Reaver
+			warrior_lodge_warrior_training			# Power: Warrior Training
+			warrior_lodge_summon_commander			# Power: Summon Commander
+			warrior_lodge_tengri_call_of_the_steppe	# Power: Call of the Steppe
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
+			warrior_lodge_inspire_warriors			# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice				# Power: War Sacrifice
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable				# Passive Power: Indomitable
+			warrior_lodge_call_to_glory				# Power: Call to Glory
+			warrior_lodge_choose_military_aspect	# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -6950,7 +7449,8 @@ warrior_lodge_tengri = { # Also generally for Nomads
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -6991,7 +7491,7 @@ warrior_lodge_tengri = { # Also generally for Nomads
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -7136,7 +7636,8 @@ warrior_lodge_tengri = { # Also generally for Nomads
 			trait = tengri_warrior
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -7175,21 +7676,22 @@ warrior_lodge_tengri = { # Also generally for Nomads
 		trigger = {
 			ai = yes
 			controls_religion = no
+
 			OR = {
 				religion_openly_tengri_or_reformed_trigger = yes
 				is_nomadic = yes
 			}
+
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
@@ -7201,6 +7703,8 @@ warrior_lodge_baltic = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_01
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -7210,153 +7714,173 @@ warrior_lodge_baltic = {
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_baltic_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_baltic_or_reformed_trigger = yes }
+					any_liege = { religion_openly_baltic_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_baltic_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_baltic_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_baltic
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_baltic
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+
+			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_baltic_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
-
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_baltic_or_reformed_trigger = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_baltic_or_reformed_trigger = yes }
-					any_liege = { religion_openly_baltic_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_baltic_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_baltic_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_baltic
-		}
-	}
-
 
 	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_baltic_or_reformed_trigger = yes
-			AND = {
-				religion_openly_baltic_or_reformed_trigger = no
-				NOT = { trait = zealous }
-			}
+		trigger_if = {
+			limit = { religion_openly_baltic_or_reformed_trigger = no }
+
+			NOT = { trait = zealous }
 		}
 	}
 
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
+			warrior_lodge_duel						# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden				# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor					# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war			# Passive Power: A Lifetime of War
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
+			warrior_lodge_reaver					# Passive Power: Reaver
+			warrior_lodge_warrior_training			# Power: Warrior Training
+			warrior_lodge_summon_commander			# Power: Summon Commander
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
-			warrior_lodge_romuva_baltic_holds #Power: Baltic Holds
+			warrior_lodge_inspire_warriors			# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice				# Power: War Sacrifice
+			warrior_lodge_romuva_baltic_holds		# Power: Baltic Holds
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable				# Passive Power: Indomitable
+			warrior_lodge_call_to_glory				# Power: Call to Glory
+			warrior_lodge_choose_military_aspect	# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -7525,7 +8049,8 @@ warrior_lodge_baltic = {
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -7566,7 +8091,7 @@ warrior_lodge_baltic = {
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -7711,7 +8236,8 @@ warrior_lodge_baltic = {
 			trait = romuvas_own
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -7753,15 +8279,14 @@ warrior_lodge_baltic = {
 		   	religion_openly_baltic_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
@@ -7773,6 +8298,8 @@ warrior_lodge_finnish = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_02
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -7782,153 +8309,172 @@ warrior_lodge_finnish = {
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_finnish_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_finnish_or_reformed_trigger = yes }
+					any_liege = { religion_openly_finnish_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_finnish_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_finnish_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_finnish
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_finnish
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_finnish_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_finnish_or_reformed_trigger = yes
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_finnish_or_reformed_trigger = no }
 
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_finnish_or_reformed_trigger = yes }
-					any_liege = { religion_openly_finnish_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_finnish_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_finnish_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_finnish
+			NOT = { trait = zealous }
 		}
 	}
 
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_finnish_or_reformed_trigger = yes
-			AND = {
-				religion_openly_finnish_or_reformed_trigger = no
-				NOT = { trait = zealous }
-			}
-		}
-	}
-
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
+			warrior_lodge_duel							# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden					# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor						# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war				# Passive Power: A Lifetime of War
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
+			warrior_lodge_reaver						# Passive Power: Reaver
+			warrior_lodge_warrior_training				# Power: Warrior Training
+			warrior_lodge_summon_commander				# Power: Summon Commander
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
-			warrior_lodge_suomenusko_summon_warriors #Power: Summon Warriors of Ukko
+			warrior_lodge_inspire_warriors				# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice					# Power: War Sacrifice
+			warrior_lodge_suomenusko_summon_warriors	# Power: Summon Warriors of Ukko
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable					# Passive Power: Indomitable
+			warrior_lodge_call_to_glory					# Power: Call to Glory
+			warrior_lodge_choose_military_aspect		# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -8097,7 +8643,8 @@ warrior_lodge_finnish = {
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -8138,7 +8685,7 @@ warrior_lodge_finnish = {
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -8283,7 +8830,8 @@ warrior_lodge_finnish = {
 			trait = ukkos_shield
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -8325,15 +8873,14 @@ warrior_lodge_finnish = {
 		   	religion_openly_finnish_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
@@ -8345,6 +8892,8 @@ warrior_lodge_slavic = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_01
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -8354,39 +8903,73 @@ warrior_lodge_slavic = {
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_slavic_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_slavic_or_reformed_trigger = yes }
+					any_liege = { religion_openly_slavic_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_slavic_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_slavic_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_slavic
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_slavic
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
 			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_slavic_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
@@ -8397,110 +8980,95 @@ warrior_lodge_slavic = {
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_slavic_or_reformed_trigger = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_slavic_or_reformed_trigger = no }
 
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_slavic_or_reformed_trigger = yes }
-					any_liege = { religion_openly_slavic_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_slavic_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_slavic_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_slavic
+			NOT = { trait = zealous }
 		}
 	}
 
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_slavic_or_reformed_trigger = yes
-			AND = {
-				religion_openly_slavic_or_reformed_trigger = no
-				NOT = { trait = zealous }
-			}
-		}
-	}
-
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
+			warrior_lodge_duel						# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden				# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor					# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war			# Passive Power: A Lifetime of War
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
-			warrior_lodge_slavic_stand_together #Power: Stand Together
+			warrior_lodge_reaver					# Passive Power: Reaver
+			warrior_lodge_warrior_training			# Power: Warrior Training
+			warrior_lodge_summon_commander			# Power: Summon Commander
+			warrior_lodge_slavic_stand_together		# Power: Stand Together
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
+			warrior_lodge_inspire_warriors			# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice				# Power: War Sacrifice
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable				# Passive Power: Indomitable
+			warrior_lodge_call_to_glory				# Power: Call to Glory
+			warrior_lodge_choose_military_aspect	# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -8669,7 +9237,8 @@ warrior_lodge_slavic = {
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -8710,7 +9279,7 @@ warrior_lodge_slavic = {
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -8855,7 +9424,8 @@ warrior_lodge_slavic = {
 			trait = peruns_chosen
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -8897,15 +9467,14 @@ warrior_lodge_slavic = {
 		   	religion_openly_slavic_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
@@ -8917,6 +9486,8 @@ warrior_lodge_west_african = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_02
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -8926,153 +9497,172 @@ warrior_lodge_west_african = {
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_west_african_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_west_african_or_reformed_trigger = yes }
+					any_liege = { religion_openly_west_african_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_west_african_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_west_african_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_west_african
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_west_african
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
 			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_west_african_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_west_african_or_reformed_trigger = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_west_african_or_reformed_trigger = no }
 
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_west_african_or_reformed_trigger = yes }
-					any_liege = { religion_openly_west_african_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_west_african_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_west_african_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_west_african
+			NOT = { trait = zealous }
 		}
 	}
 
-
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_west_african_or_reformed_trigger = yes
-			AND = {
-				religion_openly_west_african_or_reformed_trigger = no
-				NOT = { trait = zealous }
-			}
-		}
-	}
-
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
+			warrior_lodge_duel							# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden					# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor						# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war				# Passive Power: A Lifetime of War
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
+			warrior_lodge_reaver						# Passive Power: Reaver
+			warrior_lodge_warrior_training				# Power: Warrior Training
+			warrior_lodge_summon_commander				# Power: Summon Commander
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
+			warrior_lodge_inspire_warriors				# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice					# Power: War Sacrifice
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
-			warrior_lodge_west_african_create_fetish #Power: Create Fetish
+			warrior_lodge_indomitable					# Passive Power: Indomitable
+			warrior_lodge_call_to_glory					# Power: Call to Glory
+			warrior_lodge_choose_military_aspect		# Power: Choose Military Aspect
+			warrior_lodge_west_african_create_fetish	# Power: Create Fetish
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -9245,7 +9835,8 @@ warrior_lodge_west_african = {
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -9286,7 +9877,7 @@ warrior_lodge_west_african = {
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -9431,7 +10022,8 @@ warrior_lodge_west_african = {
 			trait = nyames_shield
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -9473,20 +10065,18 @@ warrior_lodge_west_african = {
 		   	religion_openly_west_african_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
 }
-
 
 warrior_lodge_zun = {
 	primary_attribute = martial
@@ -9494,6 +10084,8 @@ warrior_lodge_zun = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_01
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -9503,98 +10095,109 @@ warrior_lodge_zun = {
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_zun_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_zun_or_reformed_trigger = yes }
+					any_liege = { religion_openly_zun_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_zun_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_zun_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_zun
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_zun
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
 			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_zun_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_zun_or_reformed_trigger = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_zun_or_reformed_trigger = no }
 
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_zun_or_reformed_trigger = yes }
-					any_liege = { religion_openly_zun_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_zun_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_zun_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_zun
+			NOT = { trait = zealous }
 		}
 	}
 
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_zun_or_reformed_trigger = yes
-			AND = {
-				religion_openly_zun_or_reformed_trigger = no
-				NOT = { trait = zealous }
-			}
-		}
-	}
-
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
+			warrior_lodge_duel						# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden				# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor					# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war			# Passive Power: A Lifetime of War
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
@@ -9604,51 +10207,58 @@ warrior_lodge_zun = {
 			martial = 1
 		}
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
-			warrior_lodge_zun_battle_trance #Power: Battle Trance
+			warrior_lodge_reaver					# Passive Power: Reaver
+			warrior_lodge_warrior_training			# Power: Warrior Training
+			warrior_lodge_summon_commander			# Power: Summon Commander
+			warrior_lodge_zun_battle_trance			# Power: Battle Trance
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
+			warrior_lodge_inspire_warriors			# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice				# Power: War Sacrifice
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable				# Passive Power: Indomitable
+			warrior_lodge_call_to_glory				# Power: Call to Glory
+			warrior_lodge_choose_military_aspect	# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -9817,7 +10427,8 @@ warrior_lodge_zun = {
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -9858,7 +10469,7 @@ warrior_lodge_zun = {
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -10003,7 +10614,8 @@ warrior_lodge_zun = {
 			trait = sun_warrior
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -10045,20 +10657,18 @@ warrior_lodge_zun = {
 		   	religion_openly_zun_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
 }
-
 
 warrior_lodge_bon = {
 	primary_attribute = martial
@@ -10066,6 +10676,8 @@ warrior_lodge_bon = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_02
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -10075,152 +10687,172 @@ warrior_lodge_bon = {
 	active = {
 		has_dlc = "Holy Fury"
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_bon_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_bon_or_reformed_trigger = yes }
+					any_liege = { religion_openly_bon_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_bon_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_bon_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_bon
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_bon
 					rank = 1
 				}
 			}
 		}
+
 		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
 			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_bon_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_bon_or_reformed_trigger = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_bon_or_reformed_trigger = no }
 
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_bon_or_reformed_trigger = yes }
-					any_liege = { religion_openly_bon_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_bon_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_bon_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_bon
+			NOT = { trait = zealous }
 		}
 	}
 
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_bon_or_reformed_trigger = yes
-			AND = {
-				NOT = { religion_openly_bon_or_reformed_trigger = yes }
-				NOT = { religion_openly_bon_or_reformed_trigger = yes }
-			}
-		}
-	}
-
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
-			warrior_lodge_bon_toughness #Power: Toughness
+			warrior_lodge_duel						# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden				# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor					# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war			# Passive Power: A Lifetime of War
+			warrior_lodge_bon_toughness				# Power: Toughness
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
+			warrior_lodge_reaver					# Passive Power: Reaver
+			warrior_lodge_warrior_training			# Power: Warrior Training
+			warrior_lodge_summon_commander			# Power: Summon Commander
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
+			warrior_lodge_inspire_warriors			# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice				# Power: War Sacrifice
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable				# Passive Power: Indomitable
+			warrior_lodge_call_to_glory				# Power: Call to Glory
+			warrior_lodge_choose_military_aspect	# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -10389,7 +11021,8 @@ warrior_lodge_bon = {
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -10430,7 +11063,7 @@ warrior_lodge_bon = {
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -10571,7 +11204,8 @@ warrior_lodge_bon = {
 			trait = varangian
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -10613,20 +11247,18 @@ warrior_lodge_bon = {
 		   	religion_openly_bon_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
 }
-
 
 warrior_lodge_hellenic = {
 	primary_attribute = martial
@@ -10634,6 +11266,8 @@ warrior_lodge_hellenic = {
 	opinion_per_rank_above = +5
 	sound = warrior_lodge_ambient_01
 	society_ranks_gfx = warriors_ranks
+
+	indestructible = yes
 	society_influence = no
 
 	non_interference = {
@@ -10642,153 +11276,173 @@ warrior_lodge_hellenic = {
 
 	active = {
 		has_dlc = "Holy Fury"
-		has_global_flag = flag_restored_warrior_lodge_hellenic #Must be formed by decision.
+		has_global_flag = flag_restored_warrior_lodge_hellenic # Must be formed by decision
 	}
-	indestructible = yes
+
+	show_society = {
+		OR = {
+			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
+			religion_openly_hellenic_or_reformed_trigger = yes
+
+			AND = {
+				# You are of a religion that doesn't match *any* warrior lodge
+				has_religion_matching_available_warrior_lodge_trigger = no
+
+				OR = {
+					# You have neighbors, etc, of the correct religion...
+					any_vassal = { religion_openly_hellenic_or_reformed_trigger = yes }
+					any_liege = { religion_openly_hellenic_or_reformed_trigger = yes }
+					any_neighbor_independent_ruler = { religion_openly_hellenic_or_reformed_trigger = yes }
+				}
+			}
+
+			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
+				religion_openly_hellenic_or_reformed_trigger = no
+				has_religion_matching_available_warrior_lodge_trigger = yes
+			}
+
+			# Always show if: You are already a member. Duh.
+			society_member_of = warrior_lodge_hellenic
+		}
+	}
 
 	can_join_society = {
-		hidden_trigger = {
-			NAND = {
-				ai = yes
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOT = {
 				is_society_rank_full = {
 					society = warrior_lodge_hellenic
 					rank = 1
 				}
 			}
 		}
-is_adult = yes
+
+		is_adult = yes
+
 		custom_tooltip = {
 			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
 		}
-		NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
 		hidden_trigger = {
 			NOT = { has_character_flag = society_join_block }
 		}
+
 		trigger_if = {
 			limit = { prisoner = yes }
 			prisoner = no
 		}
+
 		OR = {
 			religion_openly_hellenic_or_reformed_trigger = yes
+
 			AND = {
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
+
 				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
+
 				NOT = { trait = zealous }
 			}
 		}
 	}
 
-	show_society = {
-		OR = {
-			#You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_hellenic_or_reformed_trigger = yes
-			AND = {
-				#You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
+	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
+		trigger_if = {
+			limit = { religion_openly_hellenic_or_reformed_trigger = no }
 
-				OR = {
-					#You have neighbors, etc, of the correct religion...
-					any_vassal = { religion_openly_hellenic_or_reformed_trigger = yes }
-					any_liege = { religion_openly_hellenic_or_reformed_trigger = yes }
-					any_neighbor_independent_ruler = { religion_openly_hellenic_or_reformed_trigger = yes }
-				}
-			}
-			NOT = { #Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_hellenic_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-			#Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_hellenic
+			NOT = { trait = zealous }
 		}
 	}
 
-	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
-		OR = {
-			religion_openly_hellenic_or_reformed_trigger = yes
-			AND = {
-				NOT = { religion_openly_hellenic_or_reformed_trigger = yes }
-				NOT = { trait = zealous }
-			}
-		}
-	}
-
-	society_rank = { #"Fledling"
+	society_rank = { # "Fledling"
 		level = 1
 		limit = 50
 		startup_limit = 10
+
 		modifier = {
 			monthly_character_prestige = 0.25
 		}
+
 		powers = {
-			warrior_lodge_duel #Passive Power: Unlocks Duel
-			warrior_lodge_shieldmaiden #Passive Power: Unlocks Shieldmaidens
-			warrior_lodge_survivor #Passive Power: Survivor
-			warrior_lodge_lifetime_of_war #Passive Power: A Lifetime of War
+			warrior_lodge_duel						# Passive Power: Unlocks Duel
+			warrior_lodge_shieldmaiden				# Passive Power: Unlocks Shieldmaidens
+			warrior_lodge_survivor					# Passive Power: Survivor
+			warrior_lodge_lifetime_of_war			# Passive Power: A Lifetime of War
 		}
 	}
 
-	society_rank = { #"Warrior"
+	society_rank = { # "Warrior"
 		level = 2
 		limit = 20
 		startup_limit = 6
+
 		modifier = {
 			monthly_character_prestige = 0.5
 			combat_rating = 5
 			martial = 1
 		}
+
 		powers = {
-			warrior_lodge_reaver #Passive Power: Reaver
-			warrior_lodge_warrior_training #Power: Warrior Training
-			warrior_lodge_summon_commander #Power: Summon Commander
+			warrior_lodge_reaver					# Passive Power: Reaver
+			warrior_lodge_warrior_training			# Power: Warrior Training
+			warrior_lodge_summon_commander			# Power: Summon Commander
 		}
 	}
 
-	society_rank = { #"Veteran"
+	society_rank = { # "Veteran"
 		level = 3
 		limit = 10
 		startup_limit = 4
+
 		modifier = {
 			monthly_character_prestige = 0.75
 			combat_rating = 10
 			martial = 2
 		}
+
 		powers = {
-			warrior_lodge_inspire_warriors #Power: Inspire Warriors
-			warrior_lodge_war_sacrifice #Power: War Sacrifice
+			warrior_lodge_inspire_warriors			# Power: Inspire Warriors
+			warrior_lodge_war_sacrifice				# Power: War Sacrifice
 		}
 	}
 
-	society_rank = { #"Hero"
+	society_rank = { # "Hero"
 		level = 4
 		limit = 4
 		startup_limit = 3
+
 		modifier = {
 			monthly_character_prestige = 1
 			combat_rating = 15
 			martial = 3
 		}
+
 		powers = {
-			warrior_lodge_indomitable #Passive Power: Indomitable
-			warrior_lodge_call_to_glory #Power: Call to Glory
-			warrior_lodge_choose_military_aspect #Power: Choose Military Aspect
+			warrior_lodge_indomitable				# Passive Power: Indomitable
+			warrior_lodge_call_to_glory				# Power: Call to Glory
+			warrior_lodge_choose_military_aspect	# Power: Choose Military Aspect
 		}
 	}
 
 	plots = {
+	}
 
+	ambitions = {
 	}
 
 	monthly_currency_gain = {
 		name = currency_name_warrior_lodge_norse
 
+		# Positive modifiers
 		per_attribute = {
 			name = martial
 			value = 0.25
@@ -10957,7 +11611,8 @@ is_adult = yes
 			trait = tengri_warrior
 			value = 1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		has_trait = {
 			trait = craven
 			value = -3
@@ -10998,7 +11653,7 @@ is_adult = yes
 	member_score = {
 		value = 10
 
-		#POSITIVE modifiers
+		# Positive modifiers
 		modifier = {
 			trait = hunter
 			factor = 1.3
@@ -11143,7 +11798,8 @@ is_adult = yes
 			trait = ares_own
 			factor = 1.1
 		}
-		#NEGATIVE modifiers
+
+		# Negative modifiers
 		modifier = {
 			trait = craven
 			factor = 0.8
@@ -11185,15 +11841,14 @@ is_adult = yes
 		   	religion_openly_hellenic_or_reformed_trigger = yes
 			is_adult = yes
 			is_in_society = no
+
 			OR = {
 				trait = zealous
-				martial = 12
+				martial >= 12
 				has_lifestyle_martial_trigger = yes
 				has_education_martial_trigger = yes
-				OR = {
-					duelist_skill_is_medium_group_trigger = yes
-					duelist_skill_is_high_group_trigger = yes
-				}
+				duelist_skill_is_medium_group_trigger = yes
+				duelist_skill_is_high_group_trigger = yes
 			}
 		}
 	}
