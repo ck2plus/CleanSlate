@@ -54,7 +54,7 @@ replace_path = "common\stories"
 replace_path = "common\trade_routes"
 #replace_path = "common\traits"
 replace_path = "common\tributary_types"
-#replace_path = "common\triggered_modifiers"
+replace_path = "common\triggered_modifiers"
 #replace_path = "common\wonder_upgrades"
 #replace_path = "common\wonders"
 
