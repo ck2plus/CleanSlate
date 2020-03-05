@@ -136,6 +136,8 @@
 # add_random_commander_trait_effect
 # add_same_commander_trait_as_FROM
 
+# add_kinslayer_trait_effect
+
 add_trait_ambitious_effect = {
 	if = {
 		limit = {
@@ -2350,4 +2352,130 @@ add_same_commander_trait_as_FROM = {
 		}
 		add_trait = levy_coordinator
 	}
+}
+
+# THIS is getting the trait added, the kinslayer_target target is the person dying
+# Save the event target before running this effect any time you publicly kill someone, the effect automatically checks they are a relative so you don't need to
+# The event target is cleared after the trait is added so re-save the target and re-run the effect to check for another character in the same event
+# The traits will overwrite each other kinslayer > familial_kinslayer > dynastic_kinslayer
+add_kinslayer_trait_effect = {
+	if = { #Parents, children, direct ancestors or descendants
+		limit = {
+			NOR = {
+				trait = kinslayer
+				religion_group = muslim
+			}
+
+			OR = {
+				is_ancestor_of = event_target:kinslayer_target
+				is_descendant_of = event_target:kinslayer_target
+				sibling = event_target:kinslayer_target
+			}
+
+			trigger_if = {
+				limit = { has_dlc = "Holy Fury" }
+
+				is_tribal = no
+			}
+		}
+
+		add_trait = kinslayer
+
+		hidden_effect = {
+			character_event = {
+				id = 38287 # Notification: I am a kinslayer
+			}
+		}
+	}
+	else_if = { #Cousins, aunts/uncles (blood ones only), nieces/nephews
+		limit = {
+			NOR = {
+				trait = kinslayer
+				trait = familial_kinslayer
+				religion_group = muslim
+			}
+
+			OR = {
+				is_cousin_of = event_target:kinslayer_target
+				is_aunt_uncle_of = event_target:kinslayer_target
+				is_nibling_of = event_target:kinslayer_target
+			}
+
+			trigger_if = {
+				limit = { has_dlc = "Holy Fury" }
+
+				is_tribal = no
+			}
+		}
+
+		add_trait = familial_kinslayer
+
+		hidden_effect = {
+			character_event = {
+				id = 38287 # Notification: I am a kinslayer
+			}
+		}
+	}
+	else_if = { #Dynasty members
+		limit = {
+			NOR = {
+				trait = kinslayer
+				trait = familial_kinslayer
+				trait = dynastic_kinslayer
+				religion_group = muslim
+				is_lowborn = yes
+			}
+
+			dynasty = event_target:kinslayer_target
+
+			trigger_if = {
+				limit = { has_dlc = "Holy Fury" }
+
+				is_tribal = no
+			}
+		}
+
+		add_trait = dynastic_kinslayer
+
+		hidden_effect = {
+			character_event = {
+				id = 38287 # Notification: I am a kinslayer
+			}
+		}
+	}
+	else_if = { #Holy Fury Tribal only: any relative
+		limit = {
+			has_dlc = "Holy Fury"
+			is_tribal = yes
+
+			NOR = {
+				trait = kinslayer
+				trait = familial_kinslayer
+				trait = dynastic_kinslayer
+				trait = tribal_kinslayer
+				religion_group = muslim
+				is_lowborn = yes
+			}
+
+			OR = {
+				is_cousin_of = event_target:kinslayer_target
+				is_aunt_uncle_of = event_target:kinslayer_target
+				is_nibling_of = event_target:kinslayer_target
+				dynasty = event_target:kinslayer_target
+				is_ancestor_of = event_target:kinslayer_target
+				is_descendant_of = event_target:kinslayer_target
+				sibling = event_target:kinslayer_target
+			}
+		}
+
+		add_trait = tribal_kinslayer
+
+		hidden_effect = {
+			character_event = {
+				id = 38287 # Notification: I am a kinslayer
+			}
+		}
+	}
+
+	clear_event_target = kinslayer_target
 }
