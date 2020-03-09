@@ -1,0 +1,125 @@
+## Condensed syntax layout:
+
+<elective_law_type> = {
+	candidate_vote_score = {
+		<MTTH>
+	}
+
+	elector_selection = {
+		max_amount = <int>
+		<MTTH>											# If max_amount is set it will pick the X amount of top scorers.
+	}													# Negative scores are considered invalid electors - Ruler is always an elector
+
+	elector_vote_strength = {
+		<MTTH>
+	}
+
+	elector_stances = {									# Intended for the elder council positions
+		<stance_name> = {
+			icon = <int>
+			<MTTH>
+		}
+	}
+
+	candidate_trigger = {
+		<trigger>
+	}
+ }
+
+## Example elective succession setup
+my_test_law = {
+	elector_stances = {									# Electoral stances visible on the Electors' tab.
+														# Do not directly affect voting pattern unless used as triggers in the modifiers of candidate_voter_score
+		my_stance = {
+			icon = 5
+			days = 1
+			additive_modifier = {
+				trait = humble
+				value = 6
+			}
+		}
+
+		other_stance = {
+			icon = 3
+			days = 1
+		}
+
+		third_stance = {
+			icon = 1
+			days = 5
+			additive_modifier = {
+				trait = wroth
+				value = 10
+			}
+		}
+	}
+
+	elector_selection = {
+		days = -5										# If below 0, ROOT is not valid to be an Elector. Any character above 0 will be an elector.
+		max_amount = 7									# Optional: Determines max amount of electors, with the lower scoring ones being excluded
+
+		additive_modifier = {
+			value = 10
+			OR = {
+				AND = {
+					higher_real_tier_than = BARON
+					FROMFROM = { real_tier = DUKE }
+				}
+				higher_real_tier_than = COUNT
+			}
+			OR = {
+				vassal_of = FROMFROM
+				independent = yes
+			}
+			OR = {
+				AND = {
+					FROMFROM = { is_titular = yes }
+					vassal_of = FROMFROM
+				}
+				any_dejure_liege = { title = FROMFROM }
+			}
+		}
+		additive_modifier = {
+			value = 10
+			character = FROMFROM
+		}
+	}
+
+	elector_vote_strength = {							# Affects the voting strength of each elector
+		days = 1										# 1 elector = 1 vote
+		additive_modifier = {
+			trait = humble
+			value = 3									# Ex: An Elector with the humble trait is worth an addtional 3 votes
+		}
+	}
+
+	candidate_vote_score = {							# Chance of an Elector voting for a candidate over the other.
+		days = 1										# The candidate with the highest value will be picked
+
+		additive_modifier = {
+			value = 15
+			localisation_key = tooltip_feudal_elector_vote_myself
+			character = FROM
+			NOR = {
+				trait = humble
+				trait = content
+				trait = craven
+				trait = slothful
+				trait = stressed
+				trait = depressed
+				trait = ambitious
+			}
+			NOT = {
+				FROMFROM = {
+					holder_scope = {
+						is_parent_of = ROOT
+					}
+				}
+			}
+		}
+	}
+
+	candidate_trigger = {								# Trigger to determine which characters are valid candidates to be voted for by electors
+		always = yes
+	}
+}
