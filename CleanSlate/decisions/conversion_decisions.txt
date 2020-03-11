@@ -379,96 +379,44 @@ targeted_decisions = {
 				prestige = -1000
 			}
 			piety = 250
-			religion_authority = {
-				modifier = ruler_converted_from
-			}
 			if = {
 				limit = {
-					religion_group = christian
-					NOT = { trait = sympathy_christendom }
-					capital_scope = {
-						NOT = { religion_group = ROOT }
+					NOR = {
+						capital_scope = { religion_group = ROOT }
+						has_trait = sympathy_christendom
+						has_trait = sympathy_islam
+						has_trait = sympathy_indian
+						has_trait = sympathy_judaism
+						has_trait = sympathy_pagans
+						has_trait = sympathy_zoroastrianism
 					}
 				}
 				random = {
 					chance = 60
-					add_trait = sympathy_christendom
-				}
-			}
-			else_if = {
-				limit = {
-					religion_group = muslim
-					NOT = { trait = sympathy_islam }
-					capital_scope = {
-						NOT = { religion_group = ROOT }
+					trigger_switch = {
+						on_trigger = religion_group
+
+						christian = { add_trait = sympathy_christendom }
+						muslim = { add_trait = sympathy_islam }
+						indian_group = { add_trait = sympathy_indian }
+						jewish_group = { add_trait = sympathy_judaism }
+						pagan_group = { add_trait = sympathy_pagans }
+						zoroastrian_group = { add_trait = sympathy_zoroastrianism }
 					}
-				}
-				random = {
-					chance = 60
-					add_trait = sympathy_islam
-				}
-			}
-			else_if = {
-				limit = {
-					religion_group = pagan_group
-					NOT = { trait = sympathy_pagans }
-					capital_scope = {
-						NOT = { religion_group = ROOT }
-					}
-				}
-				random = {
-					chance = 60
-					add_trait = sympathy_pagans
-				}
-			}
-			else_if = {
-				limit = {
-					religion_group = zoroastrian_group
-					NOT = { trait = sympathy_zoroastrianism }
-					capital_scope = {
-						NOT = { religion_group = ROOT }
-					}
-				}
-				random = {
-					chance = 60
-					add_trait = sympathy_zoroastrianism
-				}
-			}
-			else_if = {
-				limit = {
-					religion_group = jewish_group
-					NOT = { trait = sympathy_judaism }
-					capital_scope = {
-						NOT = { religion_group = ROOT }
-					}
-				}
-				random = {
-					chance = 60
-					add_trait = sympathy_judaism
-				}
-			}
-			else_if = {
-				limit = {
-					religion_group = indian_group
-					NOT = { trait = sympathy_indian }
-					capital_scope = {
-						NOT = { religion_group = ROOT }
-					}
-				}
-				random = {
-					chance = 60
-					add_trait = sympathy_indian
 				}
 			}
 			custom_tooltip = { text = local_religion_conversion_tooltip }
-			hidden_tooltip = {
-				capital_scope = {
-					reverse_religion = ROOT
+			religion_authority = {
+				modifier = ruler_converted_from
+			}
+			capital_scope = {
+				religion_authority = {
+					modifier = ruler_converted_to
 				}
 			}
 			hidden_tooltip = {
-				religion_authority = {
-					modifier = ruler_converted_to
+				capital_scope = {
+					reverse_religion = ROOT
 				}
 			}
 		}
@@ -489,14 +437,18 @@ targeted_decisions = {
 			independent = yes
 			controls_religion = no
 			is_heretic = yes
-			NOT = {
-				AND = {
-					has_dlc = "Charlemagne"
-					has_landed_title = e_byzantium  # May instead renounce iconoclasm
-					has_landed_title = c_byzantion
-					religion = iconoclast
-					is_heresy_of = orthodox
-				}
+			# May instead renounce iconoclasm
+			NAND = {
+				has_dlc = "Charlemagne"
+				has_landed_title = e_byzantium
+				has_landed_title = c_byzantion
+				religion = iconoclast
+				is_heresy_of = orthodox
+			}
+			# Can convert to Reformed instead
+			NAND = {
+				religion_group = pagan_group
+				is_reformed_religion = no
 			}
 		}
 		allow = {
@@ -512,9 +464,7 @@ targeted_decisions = {
 					modifier = ruler_converted_from
 				}
 			}
-
 			abandon_heresy = yes
-
 			if = {
 				limit = { higher_tier_than = BARON }
 				hidden_tooltip = {
@@ -532,12 +482,11 @@ targeted_decisions = {
 	convert_to_swedish = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
 			culture = norse
 			capital_scope = {
 				region = custom_swedish
@@ -545,52 +494,36 @@ targeted_decisions = {
 			any_realm_province = {
 				culture = swedish
 			}
-			NOT = { government = chinese_imperial_government }
-			NOT = {
+			NOR = {
+				government = chinese_imperial_government
 				has_alternate_start_parameter = { key = culture_names value = random }
 			}
 		}
 		allow = {
-			culture = norse
+			always = yes
 		}
 		effect = {
 			culture = swedish
-			any_courtier = {
+			any_close_relative = {
 				limit = {
 					culture = norse
 					employer = { character = ROOT }
-					dynasty = ROOT
 				}
 				culture = swedish
 			}
 		}
 		ai_will_do = {
-			factor = 1
-
-			modifier = {
-				factor = 0.5 # Slow it down a bit
-			}
-
+			factor = 0.5
 			modifier = { # Do not flip if we're in a huge Norse empire
 				factor = 0
-				top_liege = { culture = norse }
-				290 = { # Uppland
-					owner = {
-						same_realm = ROOT
-					}
-				}
-				272 = { # Akershus
-					owner = {
-						same_realm = ROOT
-					}
-				}
-				266 = { # Sjaelland
-					owner = {
-						same_realm = ROOT
+				top_liege = {
+					culture = norse
+					OR = {
+						tier = emperor
+						realm_size >= 100
 					}
 				}
 			}
-
 			modifier = {
 				factor = 0.01
 				capital_scope = {
@@ -638,15 +571,15 @@ targeted_decisions = {
 			}
 		}
 	}
+
 	convert_to_norwegian = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
 			culture = norse
 			capital_scope = {
 				region = custom_norwegian
@@ -654,52 +587,36 @@ targeted_decisions = {
 			any_realm_province = {
 				culture = norwegian
 			}
-			NOT = { government = chinese_imperial_government }
-			NOT = {
+			NOR = {
+				government = chinese_imperial_government
 				has_alternate_start_parameter = { key = culture_names value = random }
 			}
 		}
 		allow = {
-			culture = norse
+			always = yes
 		}
 		effect = {
 			culture = norwegian
-			any_courtier = {
+			any_close_relative = {
 				limit = {
 					culture = norse
 					employer = { character = ROOT }
-					dynasty = ROOT
 				}
 				culture = norwegian
 			}
 		}
 		ai_will_do = {
-			factor = 1
-
-			modifier = {
-				factor = 0.5 # Slow it down a bit
-			}
-
+			factor = 0.5
 			modifier = { # Do not flip if we're in a huge Norse empire
 				factor = 0
-				top_liege = { culture = norse }
-				290 = { # Uppland
-					owner = {
-						same_realm = ROOT
-					}
-				}
-				272 = { # Akershus
-					owner = {
-						same_realm = ROOT
-					}
-				}
-				266 = { # Sjaelland
-					owner = {
-						same_realm = ROOT
+				top_liege = {
+					culture = norse
+					OR = {
+						realm_size = 100
+						tier = emperor
 					}
 				}
 			}
-
 			modifier = {
 				factor = 0.01
 				capital_scope = {
@@ -710,7 +627,6 @@ targeted_decisions = {
 				factor = 2.0
 				liege = { culture = norwegian }
 			}
-
 			modifier = {
 				factor = 1.1
 				num_culture_realm_provs = {
@@ -748,15 +664,15 @@ targeted_decisions = {
 			}
 		}
 	}
+
 	convert_to_danish = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
 			culture = norse
 			capital_scope = {
 				region = custom_danish
@@ -764,52 +680,36 @@ targeted_decisions = {
 			any_realm_province = {
 				culture = danish
 			}
-			NOT = { government = chinese_imperial_government }
-			NOT = {
+			NOR = {
+				government = chinese_imperial_government
 				has_alternate_start_parameter = { key = culture_names value = random }
 			}
 		}
 		allow = {
-			culture = norse
+			always = yes
 		}
 		effect = {
 			culture = danish
-			any_courtier = {
+			any_close_relative = {
 				limit = {
 					culture = norse
 					employer = { character = ROOT }
-					dynasty = ROOT
 				}
 				culture = danish
 			}
 		}
 		ai_will_do = {
-			factor = 1
-
-			modifier = {
-				factor = 0.5 # Slow it down a bit
-			}
-
+			factor = 0.5
 			modifier = { # Do not flip if we're in a huge Norse empire
 				factor = 0
-				top_liege = { culture = norse }
-				290 = { # Uppland
-					owner = {
-						same_realm = ROOT
-					}
-				}
-				272 = { # Akershus
-					owner = {
-						same_realm = ROOT
-					}
-				}
-				266 = { # Sjaelland
-					owner = {
-						same_realm = ROOT
+				top_liege = {
+					culture = norse
+					OR = {
+						tier = emperor
+						realm_size >= 100
 					}
 				}
 			}
-
 			modifier = {
 				factor = 0.01
 				capital_scope = {
@@ -857,72 +757,49 @@ targeted_decisions = {
 			}
 		}
 	}
+
 	convert_to_norman = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
 			culture = norse
 			capital_scope = {
 				culture = norman
 			}
-			NOT = { government = chinese_imperial_government }
-			NOT = {
+			NOR = {
+				government = chinese_imperial_government
 				has_alternate_start_parameter = { key = culture_names value = random }
 			}
 		}
 		allow = {
-			culture = norse
+			always = yes
 		}
 		effect = {
 			culture = norman
-			any_courtier = {
+			any_close_relative = {
 				limit = {
 					culture = norse
 					employer = { character = ROOT }
-					dynasty = ROOT
 				}
 				culture = norman
 			}
 		}
 		ai_will_do = {
-			factor = 1
-
-			modifier = {
-				factor = 0.5 # Slow it down a bit
-			}
-
+			factor = 0.5
 			modifier = { # Do not flip if we're in a huge Norse empire
 				factor = 0
-				top_liege = { culture = norse }
-				OR = {
-					top_liege = {
+				top_liege = {
+					culture = norse
+					OR = {
 						tier = emperor
-					}
-					AND = {
-						290 = { # Uppland
-							owner = {
-								same_realm = ROOT
-							}
-						}
-						272 = { # Akershus
-							owner = {
-								same_realm = ROOT
-							}
-						}
-						266 = { # Sjaelland
-							owner = {
-								same_realm = ROOT
-							}
-						}
+						realm_size >= 100
 					}
 				}
 			}
-
 			modifier = {
 				factor = 1.2
 				liege = { culture = norman }
@@ -968,24 +845,14 @@ targeted_decisions = {
 	convert_to_reformed = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
+			religion_group = pagan_group
 			is_heretic = yes
-			OR = {
-				religion = norse_pagan
-				religion = finnish_pagan
-				religion = baltic_pagan
-				religion = tengri_pagan
-				religion = slavic_pagan
-				religion = aztec
-				religion = west_african_pagan
-				religion = bon
-				religion = hellenic_pagan
-			}
+			is_reformed_religion = no
 		}
 		allow = {
 			NOT = { trait = zealous }
@@ -994,42 +861,7 @@ targeted_decisions = {
 		}
 		effect = {
 			piety = -50
-			if = {
-				limit = { religion = norse_pagan }
-				religion = norse_pagan_reformed
-			}
-			if = {
-				limit = { religion = finnish_pagan }
-				religion = finnish_pagan_reformed
-			}
-			if = {
-				limit = { religion = baltic_pagan }
-				religion = baltic_pagan_reformed
-			}
-			if = {
-				limit = { religion = tengri_pagan }
-				religion = tengri_pagan_reformed
-			}
-			if = {
-				limit = { religion = slavic_pagan }
-				religion = slavic_pagan_reformed
-			}
-			if = {
-				limit = { religion = aztec }
-				religion = aztec_reformed
-			}
-			if = {
-				limit = { religion = west_african_pagan }
-				religion = west_african_pagan_reformed
-			}
-			if = {
-				limit = { religion = bon }
-				religion = bon_reformed
-			}
-			if = {
-				limit = { religion = hellenic_pagan }
-				religion = hellenic_pagan_reformed
-			}
+			abandon_heresy = yes
 
 			hidden_tooltip = {
 				any_courtier = {
@@ -1055,10 +887,8 @@ targeted_decisions = {
 			}
 		}
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Generally quite a slow process - ca 40 years
-			}
+			factor = 0.1
+
 			modifier = {
 				factor = 0.5
 				OR = {
@@ -1102,77 +932,40 @@ targeted_decisions = {
 			}
 			modifier = { #Easier for Proselytizers
 				factor = 2.0
-				OR = {
-					AND = {
-						religion = norse_pagan
-						norse_pagan_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = tengri_pagan
-						tengri_pagan_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = slavic_pagan
-						slavic_pagan_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = baltic_pagan
-						baltic_pagan_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = finnish_pagan
-						finnish_pagan_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = aztec
-						aztec_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = west_african_pagan
-						west_african_pagan_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = bon
-						bon_reformed = { has_religion_feature = religion_proselytizing }
-					}
-					AND = {
-						religion = hellenic_pagan
-						hellenic_pagan_reformed = { has_religion_feature = religion_proselytizing }
-					}
+				parent_religion_head = {
+					religion_scope = { has_religion_feature = religion_proselytizing }
 				}
 			}
 		}
 	}
 
 	convert_to_hinduism = {
-		only_playable = yes
-		icon_religion = hindu
-
-		filter = self
-		ai_target_filter = self
 		ai = no
+		only_playable = yes
+
+		icon_religion = hindu
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
+			any_realm_province = { religion = hindu }
 			has_dharmic_religion_trigger = yes
-			NOT = { religion = hindu }
-			is_theocracy = no
-			NOT = {
+			holy_order = no
+			is_adult = yes
+			is_theocracy = no # CleanSlate: Not sure if this is relevant with the only_playable trigger.
+			NOR = {
 				has_alternate_start_parameter = { key = religion_names value = random }
+				has_character_flag = india_converted # CleanSlate: This is also in allow. Put here to prevent UI clutter
+				religion = hindu
 			}
 		}
 		allow = {
-			is_adult = yes
 			prestige = 500
 			NOT = { trait = zealous }
-			any_realm_province = {
-				religion = hindu
-			}
 			custom_tooltip = {
 				text = indian_has_not_converted
 				NOT = { has_character_flag = india_converted }
 			}
-			holy_order = no
 		}
 		effect = {
 			if = {
@@ -1201,29 +994,28 @@ targeted_decisions = {
 	}
 
 	convert_to_buddhism = {
+		ai = no
 		only_playable = yes
-		icon_religion = buddhist
 
+		icon_religion = buddhist
 		filter = self
 		ai_target_filter = self
-		ai = no
 
 		potential = {
-			is_playable = yes
+			any_realm_province = { religion = buddhist }
 			has_dharmic_religion_trigger = yes
-			NOT = { religion = buddhist }
+			holy_order = no
+			is_adult = yes
 			is_theocracy = no
-			NOT = {
+			NOR = {
 				has_alternate_start_parameter = { key = religion_names value = random }
+				has_character_flag = india_converted # CleanSlate: This is also in allow. Put here to prevent UI clutter
+				religion = buddhist
 			}
 		}
 		allow = {
-			is_adult = yes
 			prestige = 500
 			NOT = { trait = zealous }
-			any_realm_province = {
-				religion = buddhist
-			}
 			custom_tooltip = {
 				text = indian_has_not_converted
 				NOT = { has_character_flag = india_converted }
@@ -1256,30 +1048,28 @@ targeted_decisions = {
 	}
 
 	convert_to_jainism = {
-		only_playable = yes
-		icon_religion = jain
-
-		filter = self
-		ai_target_filter = self
 		ai = no
+		only_playable = yes
+
+		icon_religion = jain
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
+			any_realm_province = { religion = jain }
 			has_dharmic_religion_trigger = yes
-			NOT = { religion = jain }
+			holy_order = no
+			is_adult = yes
 			is_theocracy = no
-			NOT = {
+			NOR = {
 				has_alternate_start_parameter = { key = religion_names value = random }
+				has_character_flag = india_converted # CleanSlate: This is also in allow. Put here to prevent UI clutter
+				religion = jain
 			}
 		}
 		allow = {
-			is_adult = yes
-			holy_order = no
 			prestige = 500
 			NOT = { trait = zealous }
-			any_realm_province = {
-				religion = jain
-			}
 			custom_tooltip = {
 				text = indian_has_not_converted
 				NOT = { has_character_flag = india_converted }
@@ -1312,11 +1102,11 @@ targeted_decisions = {
 	}
 
 	convert_indian_branch = {
+		ai = no
 		only_playable = yes
 
 		filter = self
 		ai_target_filter = self
-		ai = no
 
 		potential = {
 			is_playable = yes
@@ -1336,17 +1126,11 @@ targeted_decisions = {
 			set_character_flag = india_branch_converted
 			prestige = -50
 			piety = 25
-			if = {
-				limit = { religion = hindu }
-				character_event = { id = RoI.115 } # Choose branch
-			}
-			if = {
-				limit = { religion = buddhist }
-				character_event = { id = RoI.116 } # Choose branch
-			}
-			if = {
-				limit = { religion = jain }
-				character_event = { id = RoI.117 } # Confirm conversion
+			trigger_switch = {
+				on_switch = religion
+				hindu = { character_event = { id = RoI.115 } }
+				buddhist = { character_event = { id = RoI.116 } }
+				jain = { character_event = { id = RoI.117 } }
 			}
 		}
 		ai_will_do = {
@@ -1358,12 +1142,11 @@ targeted_decisions = {
 	convert_to_french = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
 			culture = old_frankish
 			capital_scope = {
 				region = world_europe_west_francia
@@ -1371,32 +1154,26 @@ targeted_decisions = {
 			any_realm_province = {
 				culture = frankish
 			}
-			NOT = { government = chinese_imperial_government }
-			NOT = {
+			NOR = {
 				has_alternate_start_parameter = { key = culture_names value = random }
+				government = chinese_imperial_government
 			}
 		}
 		allow = {
-			culture = old_frankish
+			always = yes
 		}
 		effect = {
 			culture = frankish
-			any_courtier = {
+			any_close_relative = {
 				limit = {
 					culture = old_frankish
 					employer = { character = ROOT }
-					dynasty = ROOT
 				}
 				culture = frankish
 			}
 		}
 		ai_will_do = {
-			factor = 1
-
-			modifier = {
-				factor = 0.5 # Slow it down a bit
-			}
-
+			factor = 0.5
 			modifier = {
 				factor = 0.01
 				capital_scope = {
@@ -1449,12 +1226,11 @@ targeted_decisions = {
 	convert_to_scottish = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
 			culture = pictish
 			capital_scope = {
 				region = custom_scotland
@@ -1462,32 +1238,26 @@ targeted_decisions = {
 			any_realm_province = {
 				culture = scottish
 			}
-			NOT = { government = chinese_imperial_government }
-			NOT = {
+			NOR = {
 				has_alternate_start_parameter = { key = culture_names value = random }
+				government = chinese_imperial_government
 			}
 		}
 		allow = {
-			culture = pictish
+			always = yes
 		}
 		effect = {
 			culture = scottish
-			any_courtier = {
+			any_close_relative = {
 				limit = {
 					culture = pictish
 					employer = { character = ROOT }
-					dynasty = ROOT
 				}
 				culture = scottish
 			}
 		}
 		ai_will_do = {
-			factor = 1
-
-			modifier = {
-				factor = 0.5 # Slow it down a bit
-			}
-
+			factor = 0.5
 			modifier = {
 				factor = 0.01
 				capital_scope = {
@@ -1540,12 +1310,11 @@ targeted_decisions = {
 	convert_to_andalusian = {
 		only_playable = yes
 
-		filter = self
-		ai_target_filter = self
 		ai_check_interval = 60
+		ai_target_filter = self
+		filter = self
 
 		potential = {
-			is_playable = yes
 			OR = {
 				culture = visigothic
 				culture_group = arabic
@@ -1560,32 +1329,24 @@ targeted_decisions = {
 			any_realm_province = {
 				culture = andalusian_arabic
 			}
-			NOT = {
+			NOR = {
 				culture = andalusian_arabic
-			}
-			NOT = { government = chinese_imperial_government }
-			NOT = {
+				government = chinese_imperial_government
 				has_alternate_start_parameter = { key = culture_names value = random }
 			}
 		}
 		effect = {
-			any_courtier = {
+			any_close_relative = {
 				limit = {
 					culture = ROOT
 					employer = { character = ROOT }
-					dynasty = ROOT
 				}
 				culture = andalusian_arabic
 			}
 			culture = andalusian_arabic
 		}
 		ai_will_do = {
-			factor = 1
-
-			modifier = {
-				factor = 0.5 # Slow it down a bit
-			}
-
+			factor = 0.5
 			modifier = {
 				factor = 0.01
 				capital_scope = {
