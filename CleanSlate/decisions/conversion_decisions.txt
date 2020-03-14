@@ -371,6 +371,7 @@ targeted_decisions = {
 			# May instead renounce iconoclasm
 			NAND = {
 				has_dlc = "Charlemagne"
+				year <= 899
 				has_landed_title = e_byzantium
 				has_landed_title = c_byzantion
 				religion = iconoclast
@@ -465,10 +466,10 @@ targeted_decisions = {
 			# May instead renounce iconoclasm
 			NAND = {
 				has_dlc = "Charlemagne"
+				year <= 899
 				has_landed_title = e_byzantium
 				has_landed_title = c_byzantion
 				religion = iconoclast
-				is_heresy_of = orthodox
 			}
 
 			# Can convert to Reformed instead
@@ -2404,40 +2405,34 @@ targeted_decisions = {
 	}
 
 	convert_to_spouse_religion = {
+		ai = no
 		only_playable = yes
+
 		filter = home_court
 		ai_target_filter = home_court
 		ai_check_interval = 60
 
 		from_potential = {
-			ai = no
-			is_playable = yes
-			religion_group = pagan_group
 			controls_religion = no
+			religion_group = pagan_group
+			is_reformed_religion = no
 		}
 
 		potential = {
+			ROOTs_religion_is_playable_trigger = yes
 			OR = {
-				spouse = {
-					character = FROM
-				}
-				consort = {
-					character = FROM
-				}
+				spouse = { character = FROM }
+				consort = { character = FROM }
 			}
-			OR = {
-				religion_group = christian
-				religion_group = muslim
-				religion_group = zoroastrian_group
-				religion_group = jewish_group
-				religion_group = indian_group
+			NAND = {
+				religion_group = pagan_group
+				is_reformed_religion = no
 			}
 			is_alive = yes
 		}
 
 		allow = {
 			FROM = { NOT = { trait = zealous } }
-			ROOTs_religion_is_playable_trigger = yes
 		}
 
 		effect = {
@@ -2446,136 +2441,39 @@ targeted_decisions = {
 				religion_authority = {
 					modifier = ruler_converted_from
 				}
-
-				if = {
-					limit = {
+				random = {
+					chance = 50
+					modifier = {
+						factor = 1.2 # Cynics more likely to gain sympathy
 						trait = cynical
 					}
-					random = {
-						chance = 60
-						add_trait = sympathy_pagans
-					}
-				}
-				if = {
-					limit = {
-						NOT = { trait = cynical }
-					}
-					random = {
-						chance = 50
-						add_trait = sympathy_pagans
-					}
+					add_trait = sympathy_pagans
 				}
 
 				religion = ROOT
 				abdicate_holy_order_if_religion_changes_effect = yes
-				#When spouse is Hindu
-				if = {
-					limit = {
-						ROOT = {
-							trait = shaivist_hindu
-						}
-					}
-					add_trait = shaivist_hindu
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = vaishnavist_hindu
-						}
-					}
-					add_trait = vaishnavist_hindu
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = shaktist_hindu
-						}
-					}
-					add_trait = shaktist_hindu
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = smartist_hindu
-						}
-					}
-					add_trait = smartist_hindu
-				}
 
-				#When spouse is Buddhist
-				if = {
-					limit = {
-						ROOT = {
-							trait = mahayana_buddhist
-						}
-					}
-					add_trait = mahayana_buddhist
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = vajrayana_buddhist
-						}
-					}
-					add_trait = vajrayana_buddhist
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = theravada_buddhist
-						}
-					}
-					add_trait = theravada_buddhist
-				}
+				#When spouse has a religious branch
+				trigger_switch = {
+					on_switch = trait
 
-				#When spouse is Jain
-				if = {
-					limit = {
-						ROOT = {
-							trait = digambara_jain
-						}
-					}
-					add_trait = digambara_jain
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = svetambara_jain
-						}
-					}
-					add_trait = svetambara_jain
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = pagan_branch_1
-						}
-					}
-					add_trait = pagan_branch_1
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = pagan_branch_2
-						}
-					}
-					add_trait = pagan_branch_2
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = pagan_branch_3
-						}
-					}
-					add_trait = pagan_branch_3
-				}
-				if = {
-					limit = {
-						ROOT = {
-							trait = pagan_branch_4
-						}
-					}
-					add_trait = pagan_branch_4
+					# Hindu
+					shaivist_hindu = { add_trait = shaivist_hindu }
+					vaishnavist_hindu = { add_trait = vaishnavist_hindu }
+					shaktist_hindu = { add_trait = shaktist_hindu }
+					smartist_hindu = { add_trait = smartist_hindu }
+					# Buddhist
+					mahayana_buddhist = { add_trait = mahayana_buddhist }
+					vajrayana_buddhist = { add_trait = vajrayana_buddhist }
+					theravada_buddhist = { add_trait = theravada_buddhist }
+					# Jain
+					digambara_jain = { add_trait = digambara_jain }
+					svetambara_jain = { add_trait = svetambara_jain }
+					# Pagan
+					pagan_branch_1 = { add_trait = pagan_branch_1 }
+					pagan_branch_2 = { add_trait = pagan_branch_2 }
+					pagan_branch_3 = { add_trait = pagan_branch_3 }
+					pagan_branch_4 = { add_trait = pagan_branch_4 }
 				}
 
 				hidden_tooltip = {
@@ -2587,11 +2485,12 @@ targeted_decisions = {
 			}
 		}
 
-
 		ai_will_do = {
 			factor = 0
 		}
+
 	}
+
 }
 
 decisions = {
@@ -2599,32 +2498,31 @@ decisions = {
 	# Weak or unreformed religions are allowed to convert to the attacker's religion when under Holy War
 	convert_to_attacker_religion = {
 		only_playable = yes
-		ai_check_interval = 18
-
 		is_high_prio = yes
 
+		ai_check_interval = 18
+
 		potential = {
-			is_playable = yes
-			OR = {
-				AND = {
-					religion_group = pagan_group
-					is_reformed_religion = no
-					NOT = { religion_authority = 0.4 }
-				}
-				NOT = { religion_authority = 0.3 }
-				is_nomadic = yes
-			}
 			controls_religion = no
 			NOT = { has_character_modifier = baptism_request_cooldown }
-
+			trigger_if = {
+				limit = {
+					religion_group = pagan_group
+					is_reformed_religion = no
+				}
+				religion_authority < 0.4
+			}
+			trigger_else = {
+				religion_authority < 0.3
+			}
 			war = yes
 			any_war = {
 				defender = { character = ROOT }
 				attacker = {
 					NOT = { religion = ROOT }
-					religion_authority = 0.5
-					OR = {
-						NOT = { religion_group = pagan_group }
+					religion_authority >= 0.5
+					trigger_if = {
+						limit = { religion_group = pagan_group }
 						is_reformed_religion = yes
 					}
 				}
@@ -2635,6 +2533,15 @@ decisions = {
 					using_cb = muslim_invasion
 					using_cb = buddhist_holy_war
 					using_cb = pagan_holy_war
+				}
+				trigger_if = {
+					limit = { ai = yes }
+					war_score >= 50
+					thirdparty_title_scope = {
+						primary_title = {
+							title = PREVPREV
+						}
+					}
 				}
 			}
 		}
@@ -2654,8 +2561,8 @@ decisions = {
 						attacker = {
 							NOT = { religion = ROOT }
 							religion_authority = 0.5
-							OR = {
-								NOT = { religion_group = pagan_group }
+							trigger_if = {
+								limit = { religion_group = pagan_group }
 								is_reformed_religion = yes
 							}
 						}
@@ -2678,16 +2585,18 @@ decisions = {
 			if = {
 				limit = {
 					has_dlc = "Holy Fury"
-					is_tribal = yes
 					religion_group = pagan_group
-					higher_real_tier_than = count
-					NOT = { trait = incapable }
-					NOT = { is_reformed_religion = yes }
-					NOT = { has_character_flag = flag_converting_baptism }
-					NOT = { has_character_modifier = baptism_request_cooldown }
+					is_reformed_religion = no
 					independent = yes
-					prisoner = no
+					is_incapable = no
 					has_regent = no
+					prisoner = no
+					is_tribal = yes
+					higher_real_tier_than = count
+					NOR = {
+						has_character_flag = flag_converting_baptism
+						has_character_modifier = baptism_request_cooldown
+					}
 					primary_title = {
 						OR = {
 							has_law = tribal_organization_2
@@ -2730,42 +2639,30 @@ decisions = {
 							who = ROOT
 							origin_description = EVTTOOLTIPHFB20005
 						}
+						letter_event = { id = HF.20000 tooltip = tooltip_mass_convert_during_crusade }
 					}
 				}
-				event_target:enemy_attacker = { show_scope_change = no letter_event = { id = HF.20000 tooltip = tooltip_mass_convert_during_crusade } }
 			}
+
 			else = {
 				if = {
-					limit = { event_target:enemy_attacker = { NOT = { religion_group = ROOT } } }
-					if = {
-						limit = { religion_group = pagan_group }
-						add_trait = sympathy_pagans
+					limit = {
+						event_target:enemy_attacker = {
+							NOT = { religion_group = ROOT }
+						}
 					}
-
-					if = {
-						limit = { religion_group = zoroastrian_group }
-						add_trait = sympathy_zoroastrianism
+					trigger_switch = {
+						on_switch = religion_group
+						pagan_group = { add_trait = sympathy_pagans }
+						zoroastrian_group = { add_trait = sympathy_zoroastrianism }
+						christian = { add_trait = sympathy_christendom }
+						muslim = { add_trait = sympathy_islam }
+						jewish_group = { add_trait = sympathy_judaism }
+						indian_group = { add_trait = sympathy_indian }
 					}
-
-					if = {
-						limit = { religion_group = christian }
-						add_trait = sympathy_christendom
-					}
-
-					if = {
-						limit = { religion_group = muslim }
-						add_trait = sympathy_islam
-					}
-
-					if = {
-						limit = { religion_group = jewish_group }
-						add_trait = sympathy_judaism
-					}
-
-					if = {
-						limit = { religion_group = indian_group }
-						add_trait = sympathy_indian
-					}
+				}
+				religion_authority = {
+					modifier = ruler_converted_from
 				}
 				event_target:enemy_attacker = {
 					hidden_tooltip = {
@@ -2776,19 +2673,19 @@ decisions = {
 									religion = ROOT
 									employer = { character = ROOT }
 								}
-								religion = PREVPREV
+								religion = event_target:enemy_attacker
 							}
 							any_vassal = {
 								limit = {
 									is_playable = no
 									religion = ROOT
 								}
-								religion = PREVPREV
+								religion = event_target:enemy_attacker
 							}
 							capital_scope = {
 								if = {
 									limit = { religion = ROOT }
-									religion = PREVPREV
+									religion = event_target:enemy_attacker
 								}
 							}
 						}
@@ -2800,85 +2697,29 @@ decisions = {
 					}
 					reverse_religion = ROOT
 				}
-				religion_authority = {
-					modifier = ruler_converted_from
-				}
 			}
+
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.5
-			}
+			factor = 0.5
+
 			modifier = {
 				factor = 0.05
 				is_hard_to_convert = yes
 			}
-			modifier = {
-				factor = 0
-				NOT = {
-					any_war = {
-						defender = { character = ROOT }
-						attacker = {
-							NOT = { religion = ROOT }
-							religion_authority = 0.45
-							OR = {
-								NOT = { religion_group = pagan_group }
-								is_reformed_religion = yes
-							}
-						}
-						OR = {
-							using_cb = crusade
-							using_cb = new_crusade
-							using_cb = religious
-							using_cb = muslim_invasion
-							using_cb = buddhist_holy_war
-							using_cb = pagan_holy_war
-						}
-						war_score = 50
-						thirdparty_title_scope = {
-							ROOT = {
-								primary_title = {
-									title = PREVPREV
-								}
-							}
-						}
-					}
-				}
-			}
+
 			modifier = {
 				factor = 2
 				any_war = {
 					defender = { character = ROOT }
-					attacker = {
-						NOT = { religion = ROOT }
-						religion_authority = 0.45
-						OR = {
-							NOT = { religion_group = pagan_group }
-							is_reformed_religion = yes
-						}
-					}
-					OR = {
-						using_cb = crusade
-						using_cb = new_crusade
-						using_cb = religious
-						using_cb = muslim_invasion
-						using_cb = buddhist_holy_war
-						using_cb = pagan_holy_war
-					}
+					attacker = { character = event_target:enemy_attacker }
 					war_score = 75
-					thirdparty_title_scope = {
-						ROOT = {
-							primary_title = {
-								title = PREVPREV
-							}
-						}
-					}
 				}
 			}
+
 		}
+
 	}
 
 	# Byzantine Emperor may renounce Iconoclasm
@@ -2889,23 +2730,23 @@ decisions = {
 		ai_check_interval = 60
 
 		potential = {
-			is_playable = yes
-			religion = iconoclast
 			has_dlc = "Charlemagne"
+			war = no
+			year <= 899
+			religion = iconoclast
 			has_landed_title = e_byzantium
-			NOT = { has_character_flag = renounced_iconoclasm }
-			NOT = {
+			any_realm_province = { religion = orthodox }
+			NOR = {
+				has_character_flag = renounced_iconoclasm
 				has_alternate_start_parameter = { key = religion_names value = random }
 			}
 		}
+
 		allow = {
-			has_landed_title = e_byzantium
 			has_landed_title = c_byzantion
-			any_realm_province = { religion = orthodox }
 			NOT = { trait = zealous }
-			war = no
-			NOT = { year = 900 }
 		}
+
 		effect = {
 			set_character_flag = renounced_iconoclasm
 			religion_authority = {
@@ -2980,16 +2821,14 @@ decisions = {
 			activate_title = { title = d_iconoclast status = no }
 		}
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.5 # slow it down
-			}
+			factor = 0.5
 			modifier = {
 				factor = 3
 				trait = cynical
 			}
 		}
 	}
+
 	# Roman Emperor may restore Roman Culture
 	roman_renaissance = {
 		ai_check_interval = 120 #check only once every 120 months.
@@ -2997,308 +2836,253 @@ decisions = {
 		is_high_prio = yes
 
 		potential = {
-			is_playable = yes
-			OR = {
-				culture = italian
-				culture = greek
-			}
 			has_dlc = "Holy Fury"
 			has_landed_title = e_roman_empire
-			NOT = { government = chinese_imperial_government }
-			NOT = { has_global_flag = flag_started_roman_renaissance }
-			NOT = {
-				has_alternate_start_parameter = { key = culture_names value = random }
+			OR = {
+				# CleanSlate: Note: Vanilla restricts this to specifically Greek and Italian, I consider this an oversight considering the effect below and the decision directly following
+				culture_group = latin
+				culture_group = byzantine
 			}
-		}
-		allow = {
-			show_only_failed_conditions = yes
 			OR = {
 				religion_group = christian
 				religion = hellenic_pagan
 				religion = hellenic_pagan_reformed
 			}
+			NOR = {
+				government = chinese_imperial_government
+				has_global_flag = flag_started_roman_renaissance
+				has_alternate_start_parameter = { key = culture_names value = random }
+			}
+		}
+
+		allow = {
 			capital_scope = { province = 333 }
 			ruled_years = 10
 			war = no
 		}
+
 		effect = {
 			set_global_flag = flag_started_roman_renaissance
 			culture = roman
-			hidden_tooltip = {
-				any_courtier_or_vassal = {
-					limit = { lower_tier_than = COUNT }
-					culture = roman
-				}
-			}
 			capital_scope = { culture = roman }
 			custom_tooltip = {
 				text = tooltip_roman_culture_starts_spreading
+
+				# Spreads Roman Culture
 				hidden_tooltip = {
+					any_courtier_or_vassal = {
+						limit = { lower_tier_than = COUNT }
+						culture = roman
+					}
 					any_realm_province = {
-						if = {
-							limit = { any_neighbor_province = { province = 333 } }
+						limit = {
+							distance = { where = 333 distance <= 400 }
+							OR = {
+								# CleanSlate: Note: Vanilla restricts this to Latin but the inclusion of Greek in the potential implies it was intended for both Latin and Byzantine.
+								culture_group = latin
+								culture_group = byzantine
+							}
+						}
+						random = {
+							chance = 5
+							modifier = {
+								factor = 4 # 20%
+								distance = { where = 333 distance < 200 }
+							}
+							modifier = {
+								factor = 2 # 40%
+								distance = { where = 333 distance < 100 }
+							}
+							modifier = {
+								factor = 2.5 # 100%
+								any_neighbor_province = { province = 333 }
+							}
 							culture = roman
 						}
-						if = {
-							limit = {
-								culture = italian
-								NOT = { distance = { where = 333 distance = 100 } }
-							}
-							random = {
-								chance = 40
-								culture = roman
-							}
-						}
-						if = {
-							limit = {
-								culture_group = latin
-								NOT = { distance = { where = 333 distance = 200 } }
-							}
-							random = {
-								chance = 20
-								culture = roman
-							}
-						}
-						if = {
-							limit = {
-								culture_group = latin
-								NOT = { distance = { where = 333 distance = 400 } }
-							}
-							random = {
-								chance = 5
-								culture = roman
-							}
-						}
 					}
 				}
-			}
-			hidden_tooltip = {
-				if = { #Hellenic Emperor gets chance to spread Hellenism a bit alongside the culture.
-					limit = { OR = { religion = hellenic_pagan religion = hellenic_pagan_reformed } }
-					any_realm_province = {
-						if = {
-							limit = { any_neighbor_province = { province = 333 } }
-							religion = ROOT
-						}
-						if = {
-							limit = {
-								culture = roman
-								NOT = { distance = { where = 333 distance = 100 } }
-							}
-							random = {
-								chance = 10
-								religion = ROOT
+
+				# Spreads Roman Religion
+				hidden_tooltip = {
+					if = { #Hellenic Emperor gets chance to spread Hellenism a bit alongside the culture.
+						limit = {
+							OR = {
+								religion = hellenic_pagan
+								religion = hellenic_pagan_reformed
 							}
 						}
-						if = {
-							limit = {
-								culture = roman
-								NOT = { distance = { where = 333 distance = 200 } }
-							}
-							random = {
-								chance = 5
-								religion = ROOT
-							}
-						}
-					}
-				}
-			}
-			hidden_tooltip = { #Special event if there are still enough christian provinces around (which is very likely)
-				if = {
-					limit = {
 						any_realm_province = {
-							religion_group = christian
-							count = 10
+							limit = { distance = { where = 333 distance < 200 } }
+							random = {
+								chance = 5
+								modifier = {
+									factor = 2 # 10%
+									distance = { where = 333 distance < 100 }
+								}
+								modifier = {
+									factor = 10 # 100%
+									OR = {
+										any_neighbor_province = { province = 333 }
+										province = 333
+									}
+								}
+								religion = ROOT
+							}
+
 						}
 					}
-					character_event = { id = HF.23119 days = 150 random = 50 }
 				}
+
+				# Special event if there are still enough christian provinces around (which is very likely)
+				hidden_tooltip = {
+					if = {
+						limit = {
+							any_realm_province = {
+								religion_group = christian
+								count >= 10
+							}
+						}
+						character_event = { id = HF.23119 days = 150 random = 50 }
+					}
+				}
+
 			}
+
 		}
+
 		ai_will_do = {
 			factor = 1
+
 			modifier = {
 				factor = 3
 				religion = hellenic_pagan_reformed
 			}
+
 			modifier = {
-				factor = 0.01 #Would consider it a step down.
+				factor = 0.01 # Would consider it a step down.
 				culture = greek
 			}
+
 		}
+
 	}
+
 	embrace_roman_culture = {
 		ai_check_interval = 120 #check only once every 120 months.
 		only_playable = yes
 
 		potential = {
-			is_playable = yes
-			NOT = { culture = roman }
+			has_dlc = "Holy Fury"
+			top_liege = { has_landed_title = e_roman_empire }
+			has_global_flag = flag_started_roman_renaissance
 			OR = {
 				culture_group = latin
 				culture_group = byzantine
 			}
-			has_dlc = "Holy Fury"
-			NOT = { government = chinese_imperial_government }
-			has_global_flag = flag_started_roman_renaissance
-			NOT = {
+			NOR = {
+				culture = roman
+				government = chinese_imperial_government
 				has_alternate_start_parameter = { key = culture_names value = random }
 			}
-			top_liege = { has_landed_title = e_roman_empire }
 		}
+
 		allow = {
-			show_only_failed_conditions = yes
-			OR = {
-				culture_group = latin
-				culture_group = byzantine
-			}
+			always = yes
 		}
+
 		effect = {
 			culture = roman
-			hidden_tooltip = {
-				any_courtier_or_vassal = {
-					limit = { lower_tier_than = COUNT }
-					culture = roman
-				}
-			}
 			capital_scope = { culture = roman }
+
 			custom_tooltip = {
 				text = tooltip_roman_culture_spreads
+
+				# Spreads Roman Culture
 				hidden_tooltip = {
+					any_courtier_or_vassal = {
+						limit = { lower_tier_than = COUNT }
+						culture = roman
+					}
 					any_demesne_province = {
-						if = {
-							limit = { any_neighbor_province = { province = 333 } } # Next to Rome
+						limit = {
+							distance = { where = 333 distance <= 400 }
+							OR = {
+								culture_group = latin
+								culture_group = byzantine
+							}
+						}
+						random = {
+							chance = 5
+							modifier = {
+								factor = 4 # 20%
+								distance = { where = 333 distance < 200 }
+							}
+							modifier = {
+								factor = 2 # 40%
+								distance = { where = 333 distance < 100 }
+							}
+							modifier = {
+								factor = 2.5 # 100%
+								any_neighbor_province = { province = 333 }
+							}
 							culture = roman
 						}
-						if = {
-							limit = {
-								culture = italian
-								ROOT = {
-									capital_scope = {
-										NOT = {
-											distance = {
-												where = PREVPREV
-												distance = 100
-											}
-										}
-									}
-								}
-							}
-							random = {
-								chance = 40
-								culture = roman
-							}
-						}
-						if = {
-							limit = {
-								culture_group = latin
-								ROOT = {
-									capital_scope = {
-										NOT = {
-											distance = {
-												where = PREVPREV
-												distance = 200
-											}
-										}
-									}
-								}
-							}
-							random = {
-								chance = 20
-								culture = roman
-							}
-						}
-						if = {
-							limit = {
-								culture_group = latin
-								ROOT = {
-									capital_scope = {
-										NOT = {
-											distance = {
-												where = PREVPREV
-												distance = 400
-											}
-										}
-									}
-								}
-							}
-							random = {
-								chance = 5
-								culture = roman
-							}
-						}
 					}
 				}
-			}
-			if = { #Hellenic Emperor gets chance to spread Hellenism a bit alongside the culture.
-				limit = {
-					OR = {
-						religion = hellenic_pagan
-						religion = hellenic_pagan_reformed
-					}
-				}
+
+				# Spreads Roman Religion
 				hidden_tooltip = {
-					any_demesne_province = {
-						if = {
-							limit = { any_neighbor_province = { province = 333 } }
-							religion = ROOT
-						}
-						if = {
-							limit = {
-								culture = roman
-								ROOT = {
-									capital_scope = {
-										NOT = {
-											distance = {
-												where = PREVPREV
-												distance = 100
-											}
-										}
-									}
-								}
-							}
-							random = {
-								chance = 10
-								religion = ROOT
+					if = {
+						limit = {
+							OR = {
+								religion = hellenic_pagan
+								religion = hellenic_pagan_reformed
 							}
 						}
-						if = {
-							limit = {
-								culture = roman
-								ROOT = {
-									capital_scope = {
-										NOT = {
-											distance = {
-												where = PREVPREV
-												distance = 200
-											}
-										}
-									}
-								}
-							}
+						any_demesne_province = {
+							limit = { distance = { where = 333 distance < 200 } }
 							random = {
 								chance = 5
+								modifier = {
+									factor = 2 # 10%
+									distance = { where = 333 distance < 100 }
+								}
+								modifier = {
+									factor = 10 # 100%
+									OR = {
+										any_neighbor_province = { province = 333 }
+										province = 333
+									}
+								}
 								religion = ROOT
 							}
 						}
 					}
 				}
+
 			}
+
 		}
+
 		ai_will_do = {
 			factor = 1
+
 			modifier = {
 				factor = 3
 				religion = hellenic_pagan_reformed
 			}
+
 			modifier = {
 				factor = 3
 				capital_scope = { culture = roman }
 			}
+
 			modifier = {
 				factor = 0.01 #Would consider it a step down.
 				culture = greek
 			}
+
 		}
+
 	}
 }
