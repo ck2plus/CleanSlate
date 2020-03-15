@@ -20,33 +20,31 @@ targeted_decisions = {
 		ai = no
 
 		potential = {
-			is_adult = yes
-
-			OR = {
-				trait = depressed
-				AND = {
-					trait = incapable
+			trigger_if = {
+				limit = {
 					has_dlc = "Reapers"
 				}
+				OR = {
+					is_incapable = yes
+					trait = depressed
+				}
 			}
+			trigger_else = {
+				trait = depressed
+			}
+			is_adult = yes
 			immortal = no
+			prisoner = no
+			NOT = { has_character_flag = attempting_suicide }
 		}
+
 		allow = {
 			custom_tooltip = {
 				text = commit_suicide_allow_tooltip
-				hidden_tooltip = {
-					OR = {
-						trait = depressed
-						trait = incapable
-					}
-				}
 			}
-			prisoner = no
 			custom_tooltip = {
 				text = is_not_busy_trigger_tooltip
 				hidden_tooltip = {
-					# NOR = { has_character_flag = do_not_disturb is_inaccessible_trigger = yes }
-					# Line above outcommented to account for Seclusion (below)
 					OR = {
 						in_seclusion = yes
 						NOR = {
@@ -56,31 +54,22 @@ targeted_decisions = {
 					}
 				}
 			}
-			custom_tooltip = {
-				NOT = { has_character_flag = attempting_suicide }
-				text = attempting_suicide_tooltip
-			}
 		}
+
 		effect = {
 			if = {
 				limit = { has_dlc = "Reapers" }
-
 				set_character_flag = attempting_suicide
-
 				if = {
-					limit = { NOT = { trait = incapable } }
-					character_event = { id = RIP.30200 }
-				}
-				if = {
-					limit = { trait = incapable }
+					limit = { is_incapable = yes }
 					character_event = { id = RIP.30210 }
 				}
+				else = {
+					character_event = { id = RIP.30200 }
+				}
 			}
-			if = {
-				limit = { NOT = { has_dlc = "Reapers" } }
-
+			else = {
 				prestige = -200
-
 				add_character_modifier = {
 					modifier = suicide
 					duration = -1
@@ -88,36 +77,44 @@ targeted_decisions = {
 				death = { death_reason = death_suicide }
 			}
 		}
+
 		ai_will_do = {
 			factor = 0
 		}
+
 	}
 
 	legitimize_bastard = {
+		ai = no
 		only_playable = yes
+
 		filter = close_relatives
 		ai_target_filter = close_relatives
 		ai_check_interval = 30
 
 		from_potential = {
-			ai = no
-			is_playable = yes
 			has_children = yes
-			has_polygamy = no
+			# has_polygamy = no
+			any_child = {
+				trait = bastard
+			}
 		}
 
 		potential = {
 			trait = bastard
 			is_child_of = FROM
-			is_liege_or_above = FROM
+			# is_liege_or_above = FROM
+			# CleanSlate: Replaced the above with the below for human readability due to this condition being poorly worded and poorly documented
+			any_liege = {
+				character = FROM
+			}
 		}
+
 		allow = {
-			conditional_tooltip = {
-				trigger = {
+			trigger_if = {
+				limit = {
 					NOT = {
-						any_owned_bloodline = {
-							has_bloodline_flag = bloodline_legitimize
-						}
+						any_owned_bloodline = { has_bloodline_flag = bloodline_legitimize }
 					}
 				}
 				FROM = {
@@ -125,26 +122,23 @@ targeted_decisions = {
 				}
 			}
 		}
+
 		effect = {
 			dynasty = FROM
 			remove_trait = bastard
 			add_trait = legit_bastard
 			recalc_succession = yes
-			FROM = {
-				show_scope_change = no
-				if = {
-					limit = {
-						NOT = {
-							any_owned_bloodline = {
-								has_bloodline_flag = bloodline_legitimize
-							}
-						}
-					}
+			if = {
+				limit = {
 					FROM = {
-						piety = -20
+						NOT = { any_owned_bloodline = { has_bloodline_flag = bloodline_legitimize } }
 					}
 				}
+				FROM = {
+					piety = -20
+				}
 			}
+			# Release Bastard if imprisoned
 			if = {
 				limit = {
 					prisoner = yes
@@ -152,7 +146,7 @@ targeted_decisions = {
 				}
 				imprison = no
 			}
-
+			# Bastard's other parent is pleased
 			if = {
 				limit = { FROM = { is_female = no } }
 				mother = {
@@ -164,31 +158,38 @@ targeted_decisions = {
 					}
 				}
 			}
+			else = {
+				father = {
+					show_scope_change = no
+					opinion = {
+						who = FROM
+						modifier = legitimized_child
+						years = 10
+					}
+				}
+			}
+
+			# Spouses are angry
 			FROM = {
 				show_scope_change = no
-				spouse = {
-					show_scope_change = no
-					if = {
-						limit = {
-							NOT = {
-								any_child = {
-									character = ROOT
-								}
-							}
-						}
-						opinion = {
-							who = ROOT_FROM
-							modifier = legitimized_bastard
-							years = 20
-						}
+				any_consort = { # Should be both Spouses and Concubines
+					limit = {
+						NOT = { any_child = { character = ROOT } }
+					}
+					opinion = {
+						who = ROOT_FROM
+						modifier = legitimized_bastard
+						years = 20
 					}
 				}
 				if = {
 					limit = {
 						any_child = {
 							dynasty = ROOT_FROM
-							NOT = { character = ROOT }
-							NOT = { trait = bastard }
+							NOR = {
+								character = ROOT
+								trait = legit_bastard
+							}
 						}
 					}
 					custom_tooltip = {
@@ -196,9 +197,11 @@ targeted_decisions = {
 						any_child = {
 							show_scope_change = no
 							limit = {
-								NOT = { character = ROOT }
 								dynasty = ROOT_FROM
-								NOT = { trait = bastard }
+								NOR = {
+									character = ROOT
+									trait = legit_bastard
+								}
 							}
 							opinion = {
 								who = ROOT_FROM
@@ -214,6 +217,7 @@ targeted_decisions = {
 		ai_will_do = {
 			factor = 0
 		}
+
 	}
 
 	# Muslim ruler tries to convince a dynasty member to lose the 'Decadent' Trait
