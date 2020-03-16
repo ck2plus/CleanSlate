@@ -610,7 +610,6 @@ targeted_decisions = {
 		ai_check_interval = 12
 
 		from_potential = {
-			is_ruler = yes
 			has_regent = no
 			has_children = yes
 			OR = {
@@ -625,10 +624,10 @@ targeted_decisions = {
 		}
 
 		potential = {
-			NOT = { is_inaccessible_trigger = yes }
-			is_ruler = no
+			FROM = { is_parent_of = ROOT }
 			liege = { character = FROM }
-			NOT = { is_plot_target_of = FROM }
+			is_ruler = no
+			prisoner = no
 			OR = {
 				has_character_modifier = suspected_murder_plot
 				FROM = {
@@ -641,49 +640,40 @@ targeted_decisions = {
 					}
 				}
 			}
-			NOT = { any_spouse = { character = FROM } }
-			OR = {
-				father = { character = FROM }
-				mother = { character = FROM }
-			}
-			OR = {
-				father = { ai = no }
-				mother = { ai = no }
-				is_female = no
-				is_primary_heir = yes
-				AND = {
-					is_female = yes
-					FROM = { has_law = true_cognatic_succession }
+			trigger_if = {
+				limit = { FROM = { ai = yes } }
+				trigger_if = {
+					limit = { is_female = yes }
+					FROM = {
+						OR = {
+							has_law = true_cognatic_succession
+							has_law = enatic_cognatic_succession
+							has_law = enatic_succession
+						}
+					}
 				}
-			}
-			NOT = { has_character_modifier = went_out_of_hiding_timer }
-		}
-
-		allow = {
-			in_command = no
-			prisoner = no
-			custom_tooltip = {
-				text = is_not_busy_trigger_tooltip
-				hidden_tooltip = { NOT = { has_character_flag = do_not_disturb } }
-			}
-			has_job_title = no
-			custom_tooltip = {
-				text = is_target_of_murder_plot_tooltip
-				hidden_tooltip = {
-					OR = {
-						has_character_modifier = suspected_murder_plot
-						FROM = {
-							any_known_plotter = {
-								target = PREV
-								OR = {
-									has_plot = plot_kill_character
-									has_plot = plot_kill_spouse
-								}
-							}
+				trigger_else = {
+					FROM = {
+						OR = {
+							has_law = agnatic_succession
+							has_law = cognatic_succession # agnatic-cognatic
+							has_law = true_cognatic_succession
 						}
 					}
 				}
 			}
+			NOR = {
+				any_spouse = { character = FROM }
+				has_character_flag = do_not_disturb
+				has_character_modifier = went_out_of_hiding_timer
+				is_inaccessible_trigger = yes
+				is_plot_target_of = FROM
+			}
+		}
+
+		allow = {
+			has_job_title = no
+			in_command = no
 			custom_tooltip = {
 				text = recently_went_out_of_hiding_tooltip
 				hidden_tooltip = {
@@ -691,6 +681,7 @@ targeted_decisions = {
 				}
 			}
 		}
+
 		effect = {
 			custom_tooltip = { text = go_into_hiding_info_tooltip }
 			add_trait = in_hiding
@@ -700,94 +691,49 @@ targeted_decisions = {
 					any_plotter = {
 						target = ROOT
 						limit = {
-							NOT = { has_character_flag = murder_in_motion }
-							NOT = { character = FROM }
 							OR = {
 								has_plot = plot_kill_character
 								has_plot = plot_kill_spouse
 							}
 						}
-						character_event = { id = CM.6004 }
-						any_backed_character = {
-							character_event = { id = CM.6004 }
-						}
-					}
-					any_plotter = {
-						target = ROOT
-						limit = {
-							has_character_flag = murder_in_motion
-							OR = {
-								has_plot = plot_kill_character
-								has_plot = plot_kill_spouse
+						# CleanSlate: Don't let the AI fire useless events
+						if = {
+							limit = { ai = yes }
+							if = {
+								limit = { has_character_flag = murder_in_motion }
+								clr_character_flag = murder_in_motion
 							}
 						}
-						character_event = { id = CM.6180 }
+						# CleanSlate: Players can have notification events
+						else = {
+							if = {
+								limit = { has_character_flag = murder_in_motion }
+								character_event = { id = CM.6180 }
+							}
+							else = {
+								character_event = { id = CM.6004 }
+							}
+						}
 						any_backed_character = {
+							limit = { ai = no }
 							character_event = { id = CM.6004 }
 						}
 					}
 				}
-				father = {
-					if = {
-						limit = {
-							NOT = { character = FROM }
-							NOT = { plot_target_char = { character = ROOT } }
-							NOT = { any_backed_character = { plot_target_char = { character = ROOT } } }
-							NOT = { is_rival = ROOT }
+				any_player = {
+					limit = {
+						OR = {
+							any_spouse = { character = FROM }
+							is_child_of = ROOT
+							is_lover = ROOT
+							is_parent_of = ROOT
+							is_rival = ROOT
 						}
-						character_event = { id = CM.6004 }
-					}
-				}
-				mother = {
-					if = {
-						limit = {
-							NOT = { character = FROM }
-							NOT = { plot_target_char = { character = ROOT } }
-							NOT = { any_backed_character = { plot_target_char = { character = ROOT } } }
-							NOT = { is_rival = ROOT }
+						NOR = {
+							character = FROM
+							plot_target_char = { character = ROOT }
+							any_backed_character = { plot_target_char = { character = ROOT } }
 						}
-						character_event = { id = CM.6004 }
-					}
-				}
-				any_spouse = {
-					limit = {
-						NOT = { plot_target_char = { character = ROOT } }
-						NOT = { any_backed_character = { plot_target_char = { character = ROOT } } }
-						NOT = { is_rival = ROOT }
-					}
-					character_event = { id = CM.6004 }
-				}
-				any_child = {
-					limit = {
-						NOT = { plot_target_char = { character = ROOT } }
-						NOT = { any_backed_character = { plot_target_char = { character = ROOT } } }
-						NOT = { is_rival = ROOT }
-					}
-					character_event = { id = CM.6004 }
-				}
-				any_lover = {
-					limit = {
-						NOT = { plot_target_char = { character = ROOT } }
-						NOT = { any_backed_character = { plot_target_char = { character = ROOT } } }
-						NOT = { is_rival = ROOT }
-						NOT = { spouse = { character = ROOT } }
-					}
-					character_event = { id = CM.6004 }
-				}
-				any_sibling = {
-					limit = {
-						NOT = { plot_target_char = { character = ROOT } }
-						NOT = { any_backed_character = { plot_target_char = { character = ROOT } } }
-						NOT = { is_rival = ROOT }
-						NOT = { is_lover = ROOT }
-					}
-					character_event = { id = CM.6004 }
-				}
-				any_rival = {
-					limit = {
-						NOT = { character = FROM }
-						NOT = { plot_target_char = { character = ROOT } }
-						NOT = { any_backed_character = { plot_target_char = { character = ROOT } } }
 					}
 					character_event = { id = CM.6004 }
 				}
@@ -795,42 +741,41 @@ targeted_decisions = {
 		}
 
 		ai_will_do = {
-			factor = 1
+			factor = 0.5
+
 			modifier = {
 				factor = 0.5
-			}
-			modifier = {
-				factor = 0.5
-				NOT = {
-					FROM = {
-						trait = in_hiding
-					}
+				FROM = {
+					NOT = { trait = in_hiding }
 				}
 			}
+
 			modifier = {
 				factor = 0.5
-				NOT = {
-					reverse_opinion = {
-						who = FROM
-						value = -24
-					}
+				reverse_opinion = {
+					who = FROM
+					value < -24
 				}
 			}
+
 			modifier = {
 				factor = 1.5
 				reverse_opinion = {
 					who = FROM
-					value = 25
+					value >= 25
 				}
 			}
+
 			modifier = {
 				factor = 5
 				FROM = { trait = in_hiding }
 			}
+
 			modifier = {
 				factor = 10
 				FROM = { trait = paranoid }
 			}
+
 		}
 	}
 
@@ -843,7 +788,6 @@ targeted_decisions = {
 		ai_check_interval = 12
 
 		from_potential = {
-			is_ruler = yes
 			has_regent = no
 			has_children = yes
 		}
@@ -860,10 +804,11 @@ targeted_decisions = {
 		allow = {
 			trait = in_hiding
 		}
+
 		effect = {
 			custom_tooltip = { text = come_out_of_hiding_info_tooltip }
-			remove_trait = in_hiding
 			clr_character_flag = do_not_disturb
+			remove_trait = in_hiding
 			add_character_modifier = {
 				name = went_out_of_hiding_timer
 				duration = 180
