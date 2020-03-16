@@ -172,7 +172,7 @@ targeted_decisions = {
 			# Spouses are angry
 			FROM = {
 				show_scope_change = no
-				any_consort = { # Should be both Spouses and Concubines
+				any_spouse = {
 					limit = {
 						NOT = { any_child = { character = ROOT } }
 					}
@@ -223,6 +223,7 @@ targeted_decisions = {
 	# Muslim ruler tries to convince a dynasty member to lose the 'Decadent' Trait
 	convince_to_straighten_up = {
 		only_playable = yes
+
 		filter = dynasty
 		ai_target_filter = dynasty
 		ai_check_interval = 6
@@ -230,8 +231,9 @@ targeted_decisions = {
 		hide_in_decisions_list = yes # This decision is shown in the Religion View for each decadent character
 
 		from_potential = {
-			is_playable = yes
 			religion_group = muslim
+			NOT = { trait = decadent }
+			prisoner = no
 			father_even_if_dead = {
 				OR = {
 					is_alive = no
@@ -246,13 +248,12 @@ targeted_decisions = {
 			trait = decadent
 			has_regent = no
 			lower_tier_than = FROM
+			NOT = { has_character_flag = negotiated_to_drop_decadence }
 		}
 
 		allow = {
 			FROM = {
 				piety = 100
-				prisoner = no
-				NOT = { trait = decadent }
 			}
 			custom_tooltip = {
 				text = "NOT_ALREADY_NEGOTIATED"
@@ -261,10 +262,7 @@ targeted_decisions = {
 		}
 		effect = {
 			set_character_flag = negotiated_to_drop_decadence
-			character_event = {
-				id = 91350
-			}
-
+			character_event = { id = 91350 }
 			FROM = { piety = -100 }
 		}
 
@@ -284,48 +282,38 @@ targeted_decisions = {
 	# Unhardcoded decision.
 	order_to_take_vows = {
 		only_playable = yes
+
 		filter = court
 		ai_target_filter = court
-		ai_check_interval = 120 #Check every 120 months
+		ai_check_interval = 120 # Check every 120 months
 
 		from_potential = {
-			is_playable = yes
-			has_regent = no
-			prisoner = no
-			is_adult = yes
 			has_dlc = "Sons of Abraham"
-			OR = {
-				AND = {
-					religion_group = christian
-					is_alternate_start = no
-				}
-				AND = {
-					religion = hindu
-					is_alternate_start = no
-				}
-				AND = {
-					religion = buddhist
-					is_alternate_start = no
-				}
-				AND = {
-					religion = jain
-					is_alternate_start = no
-				}
-				AND = {
-					religion = manichean
-					is_alternate_start = no
-				}
+			is_adult = yes
+			prisoner = no
+			has_regent = no
+
+			trigger_if = {
+				limit = { is_alternate_start = yes }
+				has_religion_feature = religion_monastic
+				has_religion_feature = religion_feature_west_african
+			}
+			trigger_else = {
+				religion_group = christian
+				religion_group = indian_group
+				religion = manichean
 				has_religion_feature = religion_monastic
 				has_religion_feature = religion_feature_west_african
 			}
 		}
 
 		potential = {
+			host = { character = FROM }
+			religion = FROM
 			is_adult = yes
 			is_ruler = no
-			religion = FROM
 			NOR = {
-				trait = incapable
+				is_incapable = yes
 				trait = monk
 				trait = nun
 				trait = muni
@@ -335,26 +323,24 @@ targeted_decisions = {
 				trait = sanyasi
 				trait = sanyasini
 			}
-			host = { character = FROM }
 		}
 
 		allow = {
+			FROM = { piety = 50 }
 			OR = {
+				prisoner = yes
 				AND = {
-					is_married = no
+					# Is not heir to a title
 					custom_tooltip = {
 						text = NOT_HEIR_TITLE_TT
-						NOT = {
-							any_heir_title = {
-								always = yes
-							}
-						}
+						NOT = { any_heir_title = { count >= 1 } }
 					}
+					is_married = no
 				}
-				prisoner = yes
-				conditional_tooltip = {
-					trigger = { dynasty = FROM }
-					custom_tooltip = { #Matilde's Bloodline
+				trigger_if = {
+					limit = { dynasty = FROM }
+					# Matilde's Bloodline
+					custom_tooltip = {
 						text = BLOODLINE_EASIER_VOWS_TOOLTIP
 						FROM = {
 							dynasty = ROOT
@@ -372,7 +358,6 @@ targeted_decisions = {
 					}
 				}
 			}
-			FROM = { piety = 50 }
 		}
 
 		effect = {
@@ -380,27 +365,18 @@ targeted_decisions = {
 			add_ascetic_trait_effect = yes #Adds religion-based monk-traits.
 			if = { #For pagans and Altstart
 				limit = {
-					NOR = {
-						religion_group = christian
-						religion = hindu
-						religion = buddhist
-						religion = jain
+					OR = {
+						has_religion_feature = religion_monastic
+						has_religion_feature = religion_feature_west_african
 					}
-					is_female = no
 				}
-				add_trait = monk
-			}
-			if = {
-				limit = {
-					NOR = {
-						religion_group = christian
-						religion = hindu
-						religion = buddhist
-						religion = jain
-					}
-					is_female = yes
+				if = {
+					limit = { is_female = yes }
+					add_trait = nun
 				}
-				add_trait = nun
+				else = {
+					add_trait = monk
+				}
 			}
 			if = {
 				limit = { prisoner = yes }
@@ -410,121 +386,79 @@ targeted_decisions = {
 				limit = { is_married = yes }
 				any_spouse = { remove_spouse = ROOT }
 			}
-			if = { #Make them actually become monks/nuns if you have Societies.
-				limit = {
-					has_dlc = "Mystics"
-					is_in_society = no
-					OR = {
-						religion = catholic
-						AND = {
-							is_heretic = no
-							OR = {
-								religion = fraticelli
-								religion = waldensian
-								religion = lollard
-								religion = cathar
-							}
-						}
-					}
-				}
-				custom_tooltip = { text = tooltip_vows_monk_joins_society }
-				hidden_tooltip = {
-					random_list = {
-						50 = {
-							trigger = { religion = catholic }
-							join_society = monastic_order_benedictine
-						}
-						50 = { join_society = monastic_order_dominican }
-					}
-				}
-			}
+			# Monks and Mystics actually join societies
 			if = {
 				limit = {
 					has_dlc = "Mystics"
 					is_in_society = no
-					OR = {
-						religion = orthodox
-						AND = {
-							is_heretic = no
-							OR = {
-								religion = bogomilist
-								religion = monothelite
-								religion = iconoclast
-								religion = paulician
+					is_heretic = no
+				}
+				if = {
+					limit = {
+						OR = {
+							religion = waldensian
+							religion = lollard
+							religion = cathar
+						}
+					}
+					custom_tooltip = { text = tooltip_vows_monk_joins_society }
+					hidden_tooltip = {
+						random_list = {
+							50 = {
+								trigger = { religion = catholic }
+								join_society = monastic_order_benedictine
 							}
+							50 = { join_society = monastic_order_dominican }
 						}
 					}
 				}
-				custom_tooltip = { text = tooltip_vows_monk_joins_society }
-				hidden_tooltip = {
-					join_society = monastic_order_orthodox
+				else_if = {
+					limit = {
+						OR = {
+							religion = orthodox
+							religion = bogomilist
+							religion = monothelite
+							religion = iconoclast
+							religion = paulician
+						}
+					}
+					custom_tooltip = { text = tooltip_vows_monk_joins_society }
+					hidden_tooltip = { join_society = monastic_order_orthodox }
 				}
-			}
-			if = {
-				limit = {
-					has_dlc = "Mystics"
-					is_in_society = no
-					OR = {
-						religion = nestorian
-						AND = {
-							is_heretic = no
+				else_if = {
+					limit = {
+						OR = {
+							religion = nestorian
 							religion = messalian
 						}
 					}
+					custom_tooltip = { text = tooltip_vows_monk_joins_society }
+					hidden_tooltip = { join_society = monastic_order_nestorian }
 				}
-				custom_tooltip = { text = tooltip_vows_monk_joins_society }
-				hidden_tooltip = {
-					join_society = monastic_order_nestorian
-				}
-			}
-			if = {
-				limit = {
-					has_dlc = "Mystics"
-					is_in_society = no
-					OR = {
-						religion = miaphysite
-						AND = {
-							is_heretic = no
+				else_if = {
+					limit = {
+						OR = {
+							religion = miaphysite
 							religion = monophysite
 						}
 					}
+					custom_tooltip = { text = tooltip_vows_monk_joins_society }
+					hidden_tooltip = { join_society = monastic_order_monophysite }
 				}
-				custom_tooltip = { text = tooltip_vows_monk_joins_society }
-				hidden_tooltip = {
-					join_society = monastic_order_monophysite
+				else_if = {
+					limit = { religion = hindu }
+					custom_tooltip = { text = tooltip_vows_monk_joins_society }
+					hidden_tooltip = { join_society = monastic_order_hindu }
 				}
-			}
-			if = {
-				limit = {
-					has_dlc = "Mystics"
-					is_in_society = no
-					religion = hindu
+				else_if = {
+					limit = { religion = buddhist }
+					custom_tooltip = { text = tooltip_vows_monk_joins_society }
+					hidden_tooltip = { join_society = monastic_order_buddhist }
 				}
-				custom_tooltip = { text = tooltip_vows_monk_joins_society }
-				hidden_tooltip = {
-					join_society = monastic_order_hindu
-				}
-			}
-			if = {
-				limit = {
-					has_dlc = "Mystics"
-					is_in_society = no
-					religion = buddhist
-				}
-				custom_tooltip = { text = tooltip_vows_monk_joins_society }
-				hidden_tooltip = {
-					join_society = monastic_order_buddhist
-				}
-			}
-			if = {
-				limit = {
-					has_dlc = "Mystics"
-					is_in_society = no
-					religion = jain
-				}
-				custom_tooltip = { text = tooltip_vows_monk_joins_society }
-				hidden_tooltip = {
-					join_society = monastic_order_jain
+				else_if = {
+					limit = { religion = jain }
+					custom_tooltip = { text = tooltip_vows_monk_joins_society }
+					hidden_tooltip = { join_society = monastic_order_jain }
 				}
 			}
 			if = {
@@ -534,64 +468,76 @@ targeted_decisions = {
 				custom_tooltip = { text = tooltip_vows_monk_goes_to_theocracy }
 				hidden_tooltip = {
 					random_realm_lord = {
-						limit = { is_theocracy = yes religion = ROOT }
+						limit = {
+							is_theocracy = yes
+							religion = ROOT
+						}
 						preferred_limit = {
 							reverse_opinion = { who = FROM value = 20 }
 							vassal_of = FROM
-							same_society_as = ROOT #The one he just joined.
+							# The one they just joined.
+							same_society_as = ROOT
 						}
 						preferred_limit = {
 							vassal_of = FROM
-							same_society_as = ROOT #The one he just joined.
+							# The one they just joined.
+							same_society_as = ROOT
 						}
 						preferred_limit = {
-							same_society_as = ROOT #The one he just joined.
+							# The one they just joined.
+							same_society_as = ROOT
 						}
 						preferred_limit = {
 							vassal_of = FROM
 						}
-						ROOT = {
-							move_character = PREV
-						}
+						ROOT = { move_character = PREV }
 					}
 				}
 			}
 			if = {
-				limit = { NOR = { trait = zealous dynasty = FROM } }
-				opinion = { modifier = opinion_cloistered_me who = FROM years = 20 }
-			}
-			if = {
-				limit = { NOT = { trait = zealous } dynasty = FROM }
+				limit = {
+					dynasty = FROM
+					NOT = { trait = zealous }
+				}
 				opinion = { modifier = opinion_cloistered_me_family who = FROM years = 20 }
+			}
+			else_if = {
+				limit = {
+					NOR = {
+						dynasty = FROM
+						trait = zealous
+					}
+					opinion = { modifier = opinion_cloistered_me who = FROM years = 20 }
+				}
 			}
 			if = {
 				limit = { is_child_of = FROM }
 				hidden_tooltip = { FROM = { character_event = { id = HFP.23001 } } }
 			}
-
 		}
 
 		ai_will_do = {
 			factor = 1
+
 			modifier = { #Hate you too much to just send you off.
 				factor = 0
 				prisoner = yes
-				NOT = { is_child_of = FROM }
 				FROM = { is_benevolent_trigger = no }
-				NOT = {
-					reverse_opinion = {
-						who = FROM
-						value = -20
-					}
+				NOT = { is_child_of = FROM }
+				reverse_opinion = {
+					who = FROM
+					value < -20
 				}
 			}
-			modifier = { #Like him too much to do it.
+
+			modifier = { #Like you too much to do it.
 				factor = 0
 				reverse_opinion = {
 					who = FROM
-					value = 50
+					value >= 50
 				}
 			}
+
 			modifier = { #I'm a good ruler and he is a dynastic heir.
 				factor = 0
 				is_child_of = FROM
@@ -602,16 +548,19 @@ targeted_decisions = {
 					value = 0
 				}
 			}
+
 			modifier = { #Must protect the line.
 				factor = 5
-				is_child_of = FROM
 				NOT = { dynasty = FROM }
+				is_child_of = FROM
 			}
+
 			modifier = { #Hate you.
 				factor = 5
 				is_child_of = FROM
 				is_rival = FROM
 			}
+
 			modifier = { #There are better spares.
 				factor = 20
 				is_child_of = FROM
@@ -632,6 +581,7 @@ targeted_decisions = {
 					}
 				}
 			}
+
 			modifier = { #Must preserve the realm from falling to evil.
 				factor = 5
 				is_evil_trigger = yes
@@ -646,8 +596,11 @@ targeted_decisions = {
 					}
 				}
 			}
+
 		}
+
 	}
+
 	send_child_into_hiding = {
 		only_rulers = yes
 		is_high_prio = yes
@@ -1130,7 +1083,7 @@ targeted_decisions = {
 			OR = {
 				OR = {
 					age = 16
-					NOT = {	trait = incapable }
+					NOT = {	is_incapable = yes }
 				}
 				regent = {
 					NOT = { trait = deceitful }
