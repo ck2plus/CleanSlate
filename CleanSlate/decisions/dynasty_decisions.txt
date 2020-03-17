@@ -624,19 +624,17 @@ targeted_decisions = {
 		}
 
 		potential = {
-			FROM = { is_parent_of = ROOT }
 			liege = { character = FROM }
+			is_child_of = FROM
 			is_ruler = no
 			prisoner = no
-			OR = {
-				has_character_modifier = suspected_murder_plot
-				FROM = {
-					any_known_plotter = {
-						target = PREV
-						OR = {
-							has_plot = plot_kill_character
-							has_plot = plot_kill_spouse
-						}
+			FROM = {
+				any_known_plotter = {
+					target = ROOT
+					OR = {
+						has_plot = plot_kill_character
+						has_plot = plot_kill_spouse
+						ROOT = { has_character_modifier = suspected_murder_plot }
 					}
 				}
 			}
@@ -687,37 +685,37 @@ targeted_decisions = {
 			add_trait = in_hiding
 			set_character_flag = do_not_disturb
 			hidden_tooltip = {
-				ROOT = {
-					any_plotter = {
-						target = ROOT
-						limit = {
-							OR = {
-								has_plot = plot_kill_character
-								has_plot = plot_kill_spouse
-							}
+				any_plotter = {
+					target = ROOT
+					limit = {
+						NOT = { character = FROM }
+						OR = {
+							has_plot = plot_kill_character
+							has_plot = plot_kill_spouse
 						}
-						# CleanSlate: Don't let the AI fire useless events
+					}
+					if = {
+						# CleanSlate: Prevent the AI from firing unneeded notification events
+						limit = { ai = yes }
 						if = {
-							limit = { ai = yes }
-							if = {
-								limit = { has_character_flag = murder_in_motion }
-								clr_character_flag = murder_in_motion
-							}
+							# CleanSlate: Clear the flag directly instead of firing the event that clears it
+							limit = { has_character_flag = murder_in_motion }
+							clr_character_flag = murder_in_motion
 						}
+					}
+					else = {
 						# CleanSlate: Players can have notification events
-						else = {
-							if = {
-								limit = { has_character_flag = murder_in_motion }
-								character_event = { id = CM.6180 }
-							}
-							else = {
-								character_event = { id = CM.6004 }
-							}
+						if = {
+							limit = { has_character_flag = murder_in_motion }
+							character_event = { id = CM.6180 }
 						}
-						any_backed_character = {
-							limit = { ai = no }
+						else = {
 							character_event = { id = CM.6004 }
 						}
+					}
+					any_backed_character = {
+						limit = { ai = no }
+						character_event = { id = CM.6004 }
 					}
 				}
 				any_player = {
@@ -775,7 +773,6 @@ targeted_decisions = {
 				factor = 10
 				FROM = { trait = paranoid }
 			}
-
 		}
 	}
 
@@ -802,7 +799,7 @@ targeted_decisions = {
 		}
 
 		allow = {
-			trait = in_hiding
+			always = yes
 		}
 
 		effect = {
@@ -815,39 +812,23 @@ targeted_decisions = {
 				hidden = yes
 			}
 			hidden_tooltip = {
-				ROOT = {
-					any_plotter = {
-						target = ROOT
-						limit = {
-							NOT = { character = FROM }
-							OR = {
-								has_plot = plot_kill_character
-								has_plot = plot_kill_spouse
-							}
-						}
-						character_event = { id = CM.6005 }
-					}
-				}
-				father = {
-					if = {
-						limit = {
-							NOT = { character = FROM }
-						}
-						character_event = { id = CM.6005 }
-					}
-				}
-				mother = {
-					if = {
-						limit = {
-							NOT = { character = FROM }
-						}
-						character_event = { id = CM.6005 }
-					}
-				}
-				any_sibling = {
+				any_plotter = {
+					target = ROOT
 					limit = {
-						ROOT = {
-							NOT = { is_plot_target_of = THIS }
+						ai = no
+						NOT = { character = FROM }
+						OR = {
+							has_plot = plot_kill_character
+							has_plot = plot_kill_spouse
+						}
+					}
+				}
+				any_player = {
+					limit = {
+						NOT = { character = FROM }
+						OR = {
+							is_parent_of = ROOT
+							sibling = ROOT
 						}
 					}
 					character_event = { id = CM.6005 }
@@ -857,21 +838,21 @@ targeted_decisions = {
 
 		ai_will_do = {
 			factor = 1
+
 			modifier = {
 				factor = 0.3
 				FROM = { trait = paranoid }
 			}
+
 			modifier = {
 				factor = 0
-				OR = {
-					has_character_modifier = suspected_murder_plot
-					FROM = {
-						any_known_plotter = {
-							target = PREV
-							OR = {
-								has_plot = plot_kill_character
-								has_plot = plot_kill_spouse
-							}
+				FROM = {
+					any_known_plotter = {
+						target = ROOT
+						OR = {
+							has_plot = plot_kill_character
+							has_plot = plot_kill_spouse
+							ROOT = { has_character_modifier = suspected_murder_plot }
 						}
 					}
 				}
