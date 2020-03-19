@@ -3,46 +3,47 @@ plot_decisions = {
 	faction_succ_seniority_ultimatum = {
 		only_playable = yes
 		is_high_prio = yes
+
 		ai_check_interval = 3
 
 		potential = {
-			is_playable = yes
 			leads_faction = faction_succ_seniority
-			OR = {
-				NOT = { has_character_flag = faction_succ_seniority_ultimatum_taken }
+			liege = {
+				in_revolt = no
+				NOR = {
+					war_with = ROOT
+					reverse_has_truce = ROOT
+				}
+			}
+			trigger_if = {
+				limit = { has_character_flag = faction_succ_seniority_ultimatum_taken }
 				had_character_flag = { flag = faction_succ_seniority_ultimatum_taken days = 7 }
 			}
+			trigger_if = {
+				limit = { independent = no }
+				liege = {
+					will_liege_enforce_peace = no
+					has_liege_enforced_peace = no
+				}
+			}
 		}
+
 		allow = {
 			war = no
 			prisoner = no
-			liege = {
-				in_revolt = no
-				NOT = { war_with = ROOT }
-				NOT = { reverse_has_truce = ROOT }
-			}
 			NOT = {
 				any_realm_title = {
-					NOT = { higher_tier_than = count }
+					tier = BARON
 					is_occupied = yes
 				}
 			}
-
-			liege = {
-				OR = {
-					independent = yes
-					AND = {
-						will_liege_enforce_peace = no
-						has_liege_enforced_peace = no
-					}
-				}
-			}
 		}
+
 		effect = {
 			liege = {
 				letter_event = { id = 8005 days = 3 tooltip = "EVTTOOLTIP8005" }
 			}
-			hidden_tooltip = {
+			hidden_effect = {
 				set_character_flag = faction_succ_seniority_ultimatum_taken
 			}
 		}
@@ -52,58 +53,51 @@ plot_decisions = {
 
 			modifier = {
 				factor = 0
-				NOT = {
-					faction_power =
-					{
-						faction = faction_succ_seniority
-						power = 0.75
-					}
+				faction_power = {
+					faction = faction_succ_seniority
+					power < 0.75
 				}
 			}
+
 			modifier = {
 				factor = 0.1
-				NOT = {
-					faction_power =
-					{
-						faction = faction_succ_seniority
-						power = 1.0
-					}
+				faction_power = {
+					faction = faction_succ_seniority
+					power < 1
 				}
 			}
+
 			modifier = {
 				factor = 0.1
-				NOT = {
-					faction_power =
-					{
-						faction = faction_succ_seniority
-						power = 1.5
-					}
+				faction_power = {
+					faction = faction_succ_seniority
+					power < 1.5
 				}
 			}
 
 			modifier = {
 				factor = 0
 				liege = {
-					any_war = {
-						OR = {
-							AND = {
-								defender = { character = PREV }
-								NOT = { using_cb = depose_liege }
-								NOT = { using_cb = overthrow_ruler }
-								NOT = { using_cb = overthrow_ruler_no_calls }
+					OR = {
+						any_war = {
+							defender = { character = PREV }
+							NOR = {
+								using_cb = depose_liege
+								using_cb = overthrow_ruler
+								using_cb = overthrow_ruler_no_calls
 							}
-							AND = {
-								attacker = { character = PREV }
-								OR = {
-									using_cb = invasion
-									using_cb = religious
-									using_cb = tribal_invasion
-									using_cb = muslim_invasion
-									using_cb = viking_invasion
-									using_cb = claim_all
-									using_cb = claim
-									using_cb = other_claim
-								}
+						}
+						any_war = {
+							attacker = { character = PREV }
+							OR = {
+								using_cb = invasion
+								using_cb = religious
+								using_cb = tribal_invasion
+								using_cb = muslim_invasion
+								using_cb = viking_invasion
+								using_cb = claim_all
+								using_cb = claim
+								using_cb = other_claim
 							}
 						}
 					}
