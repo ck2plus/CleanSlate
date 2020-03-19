@@ -1,6 +1,6 @@
-
-defined_text = { #Used in HF.10040 (Power: Warrior Training)
+defined_text = { # Used in HF.10040 (Power: Warrior Training)
 	name = GetWarriorLodgeTrainingDesc
+	use_first_valid = yes
 
 	text = {
 		trigger = { society_member_of = warrior_lodge_norse }
@@ -39,12 +39,13 @@ defined_text = { #Used in HF.10040 (Power: Warrior Training)
 		localisation_key = string_hellenic_training
 	}
 	fallback_text = {
-		localisation_key = string_norse_training #fallback, in case it fails to find relevant info
+		localisation_key = string_norse_training
 	}
 }
 
-defined_text = { #Used in HFP.11028 (battle event)
+defined_text = { # Used in HFP.11028 (battle event)
 	name = GetWarriorLodgeSymbol
+	use_first_valid = yes
 
 	text = {
 		trigger = { society_member_of = warrior_lodge_norse }
@@ -83,11 +84,13 @@ defined_text = { #Used in HFP.11028 (battle event)
 		localisation_key = string_hellenic_symbol
 	}
 	fallback_text = {
-		localisation_key = string_hellenic_symbol #"the gods". Fallback, in case it fails to find relevant info
+		localisation_key = string_hellenic_symbol # "the gods"
 	}
 }
-defined_text = { #Used here and there? Made *singular*, on purpose...
+
+defined_text = { # Used here and there? Made *singular*, on purpose...
 	name = GetWarriorLodgeSymbolShort #forest, light, wolf, etc...
+	use_first_valid = yes
 
 	text = {
 		trigger = { society_member_of = warrior_lodge_norse }
@@ -126,11 +129,12 @@ defined_text = { #Used here and there? Made *singular*, on purpose...
 		localisation_key = string_hellenic_symbol_short
 	}
 	fallback_text = {
-		localisation_key = string_hellenic_symbol_short #"the gods". Fallback, in case it fails to find relevant info
+		localisation_key = string_hellenic_symbol_short #"the gods"
 	}
 }
-defined_text = { #Used here and there? Made *singular*, on purpose...
+defined_text = { # Used here and there? Made *singular*, on purpose...
 	name = GetWarriorLodgeSymbolShortCap #Forest, Light, Wolf, etc...
+	use_first_valid = yes
 
 	text = {
 		trigger = { society_member_of = warrior_lodge_norse }
@@ -169,26 +173,24 @@ defined_text = { #Used here and there? Made *singular*, on purpose...
 		localisation_key = string_hellenic_symbol_short_cap
 	}
 	fallback_text = {
-		localisation_key = string_hellenic_symbol_short_cap #"the gods". Fallback, in case it fails to find relevant info
+		localisation_key = string_hellenic_symbol_short_cap # "the gods"
 	}
 }
-defined_text = { #Used in HFP.11037 (battle event)
+defined_text = { # Used in HFP.11037 (battle event)
 	name = GetSkullTrophyComment
+	use_first_valid = yes
 
 	text = {
 		trigger = { has_character_flag = took_enemy_skull }
 		localisation_key = string_took_skull
 	}
 	text = {
-		trigger = { NOT = { has_character_flag = took_enemy_skull } }
 		localisation_key = string_didnt_take_skull
 	}
-	fallback_text = {
-		localisation_key = string_didnt_take_skull #same as no skull
-	}
 }
-defined_text = { #Used in HFP.11038 (battle event)
+defined_text = { # Used in HFP.11038 (battle event)
 	name = GetWarriorBattleNick
+	use_first_valid = yes
 
 	text = {
 		trigger = { society_member_of = warrior_lodge_norse }
@@ -227,22 +229,30 @@ defined_text = { #Used in HFP.11038 (battle event)
 		localisation_key = string_battle_nick_hellenic_symbol
 	}
 	fallback_text = {
-		localisation_key = string_battle_nick_neutral_symbol #"Battering Ram". Fallback, in case it fails to find relevant info
+		localisation_key = string_battle_nick_neutral_symbol # "Battering Ram"
 	}
 }
 
-defined_text = { #Used in HF.10513 (mission event to Wage War)
+defined_text = { # Used in HF.10513 (mission event to Wage War)
 	name = GetMarchSail
+	use_first_valid = yes
 
 	text = {
 		trigger = {
 			event_target:my_war_target = {
 				location = {
-					#Is either a coastal province accessible via water...
-			        is_coastal = yes
-					can_naval_path_to = { target = event_target:home_capital distance < 1000 }
-		            #And they are not accessible via land...
-			        NOT = { can_land_path_to = { target = event_target:home_capital distance < 1000 } }
+					# Is either a coastal province accessible via water...
+					is_coastal = yes
+					can_naval_path_to = {
+						target = event_target:home_capital
+						distance < 1000
+					}
+
+					# and they are not accessible via land...
+					can_land_path_to = {
+						target = event_target:home_capital
+						distance >= 1000 # Too far away
+					}
 				}
 			}
 		}
@@ -254,15 +264,26 @@ defined_text = { #Used in HF.10513 (mission event to Wage War)
 				location = {
 					OR = {
 						AND = {
-				            #Or they are accessible via land...
-				            event_target:home_capital = { is_coastal = no }
-					        can_land_path_to = { target = event_target:home_capital distance < 1000 }
-			            }
-			            AND = { #Or not a coastal place...
-				        	is_coastal = no
-				        	can_land_path_to = { target = event_target:home_capital distance < 1000 }
-				        	#event_target:home_capital = { distance = { where = PREV distance < 1000 } }
-			            }
+							# or they are accessible via land...
+							event_target:home_capital = { is_coastal = no }
+							can_land_path_to = {
+								target = event_target:home_capital
+								distance < 1000
+							}
+						}
+						AND = { # or not a coastal place...
+							is_coastal = no
+							can_land_path_to = {
+								target = event_target:home_capital
+								distance < 1000
+							}
+							# event_target:home_capital = {
+							#	distance = {
+							#		where = PREV
+							#		distance < 1000
+							#	}
+							#}
+						}
 					}
 				}
 			}
@@ -315,21 +336,22 @@ defined_text = { #Used in HFP.11038 (battle event)
 		localisation_key = string_WL_hellenic_religion
 	}
 	fallback_text = {
-		localisation_key = string_no_religion # Fallback, in case it fails to find relevant info
+		localisation_key = string_no_religion
 	}
 }
 
 
-## Flything Insults Custom Loc extravaganza. ##
+## Flything Insults Custom Loc extravaganza ##
 
-#Options (visible by insulter)
-#FROM = insulted person, ROOT = person insulting.
+# Options (visible by insulter)
+# FROM is insulted person
+# ROOT is person insulting
 
 
-#Inult Prowess Option.
+# Insult Prowess Option
 defined_text = {
 	name = GetProwessInsultOption
-	# 																			X <-- Don't go beyond here.
+	# 																			X <-- Don't go beyond here
 	# (male)
 	# It is said that your virility is legendary amongst dwarves.
 	# No warrior is as cowardly as the one between your legs.
@@ -347,62 +369,111 @@ defined_text = {
 	# Do you dress as a warrior because you could never pass for a lady?
 	# No place is as desolate and maggot-riddled as your womb.
 
-
 	text = {
-		trigger = { FROM = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			FROM = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_1
 	}
 	text = {
-		trigger = { FROM = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			FROM = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_2
 	}
 	text = {
-		trigger = { FROM = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			FROM = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_3
 	}
 	text = {
-		trigger = { FROM = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			FROM = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_4
 	}
 	text = {
-		trigger = { FROM = { is_female = no trait = eunuch } }
+		trigger = {
+			FROM = {
+				is_female = no
+				trait = eunuch
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_5
 	}
 	text = {
-		trigger = { FROM = { is_female = no trait = eunuch } }
+		trigger = {
+			FROM = {
+				is_female = no
+				trait = eunuch
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_6
 	}
 	text = {
-		trigger = { FROM = { is_female = no trait = eunuch } }
+		trigger = {
+			FROM = {
+				is_female = no
+				trait = eunuch
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_7
 	}
 	text = {
-		trigger = { FROM = { is_female = yes } }
+		trigger = {
+			FROM = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_8
 	}
 	text = {
-		trigger = { FROM = { is_female = yes } }
+		trigger = {
+			FROM = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_9
 	}
 	text = {
-		trigger = { FROM = { is_female = yes } }
+		trigger = {
+			FROM = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_10
 	}
 	text = {
-		trigger = { FROM = { is_female = yes } }
+		trigger = {
+			FROM = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_option_11
 	}
 	fallback_text = {
-		localisation_key = string_prowess_insult_option_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_prowess_insult_option_default
 	}
 }
 
-
+# Insult Character Option
 defined_text = {
 	name = GetCharacterInsultOption
 
-#Insult Character Option.
-	# 																			X <-- Don't go beyond here.
+	# 																			X <-- Don't go beyond here
 	# Is it any surprise you would pick a game where you are the center of attention? 			(proud/groomed)
 	# Try not to choke between turns, [From.GetFirstName], we have a long game ahead. 			(gluttonous)
 	# I am surprised you haven't started to whine about losing yet. 							(envious)
@@ -444,136 +515,261 @@ defined_text = {
 	# Saying you are the dullest [From.GetManWoman] I ever met would give you too much credit.
 
 	text = {
-		trigger = { FROM = { OR = { trait = proud trait = groomed } } }
+		trigger = {
+			FROM = {
+				OR = {
+					trait = proud
+					trait = groomed
+				}
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_1
 	}
 	text = {
-		trigger = { FROM = { trait = gluttonous } }
+		trigger = {
+			FROM = {
+				trait = gluttonous
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_2
 	}
 	text = {
-		trigger = { FROM = { trait = envious } }
+		trigger = {
+			FROM = {
+				trait = envious
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_3
 	}
 	text = {
-		trigger = { FROM = { trait = slothful } }
+		trigger = {
+			FROM = {
+				trait = slothful
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_4
 	}
 	text = {
-		trigger = { FROM = { trait = greedy } }
+		trigger = {
+			FROM = {
+				trait = greedy
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_5
 	}
 	text = {
-		trigger = { FROM = { trait = wroth } }
+		trigger = {
+			FROM = {
+				trait = wroth
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_6
 	}
 	text = {
-		trigger = { FROM = { trait = lustful } }
+		trigger = {
+			FROM = {
+				trait = lustful
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_7
 	}
 	text = {
-		trigger = { FROM = { trait = uncouth } }
+		trigger = {
+			FROM = {
+				trait = uncouth
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_8
 	}
 	text = {
-		trigger = { FROM = { is_attractive_trigger = no } }
+		trigger = {
+			FROM = {
+				is_attractive_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_9
 	}
 	text = {
-		trigger = { FROM = { is_attractive_trigger = no } }
+		trigger = {
+			FROM = {
+				is_attractive_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_10
 	}
 	text = {
-		trigger = { FROM = { has_unattractive_trait_trigger = yes } }
+		trigger = {
+			FROM = {
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_11
 	}
 	text = {
-		trigger = { FROM = { has_unattractive_trait_trigger = yes } }
+		trigger = {
+			FROM = {
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_12
 	}
 	text = {
-		trigger = { FROM = { has_unattractive_trait_trigger = yes } }
+		trigger = {
+			FROM = {
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_13
 	}
 	text = {
-		trigger = { FROM = { is_female = yes has_unattractive_trait_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_female = yes
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_14
 	}
 	text = {
-		trigger = { FROM = { is_strong_trigger = no } }
+		trigger = {
+			FROM = {
+				is_strong_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_15
 	}
 	text = {
-		trigger = { FROM = { is_strong_trigger = no } }
+		trigger = {
+			FROM = {
+				is_strong_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_16
 	}
 	text = {
-		trigger = { FROM = { is_weak_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_17
 	}
 	text = {
-		trigger = { FROM = { is_weak_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_18
 	}
 	text = {
-		trigger = { FROM = { is_weak_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_19
 	}
 	text = {
-		trigger = { FROM = { is_weak_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_20
 	}
 	text = {
-		trigger = { FROM = { is_weak_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_21
 	}
 	text = {
-		trigger = { FROM = { is_smart_trigger = no } }
+		trigger = {
+			FROM = {
+				is_smart_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_22
 	}
 	text = {
-		trigger = { FROM = { is_smart_trigger = no } }
+		trigger = {
+			FROM = {
+				is_smart_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_23
 	}
 	text = {
-		trigger = { FROM = { is_dumb_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_dumb_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_24
 	}
 	text = {
-		trigger = { FROM = { is_dumb_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_dumb_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_25
 	}
 	text = {
-		trigger = { FROM = { is_dumb_trigger = yes } }
+		trigger = {
+			FROM = {
+				is_dumb_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_26
 	}
 	text = {
-		trigger = { FROM = { trait = gregarious } }
+		trigger = {
+			FROM = {
+				trait = gregarious
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_27
 	}
 	text = {
-		trigger = { FROM = { OR = { trait = craven trait = shy } } }
+		trigger = {
+			FROM = {
+				OR = {
+					trait = craven
+					trait = shy
+				}
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_28
 	}
 	text = {
-		trigger = { FROM = { is_alive = yes } }
+		trigger = {
+			FROM = {
+				is_alive = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_29
 	}
 	text = {
-		trigger = { FROM = { is_alive = yes } }
+		trigger = {
+			FROM = {
+				is_alive = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_option_30
 	}
 	fallback_text = {
-		localisation_key = string_character_insult_option_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_character_insult_option_default
 	}
 }
 
-#Insult Accomplishments Option.
-
-
+# Insult Accomplishments Option.
 defined_text = {
 	name = GetAccomplishmentsInsultOption
-	# 																			X <-- Don't go beyond here.
+	# 																			X <-- Don't go beyond here
 	# Not every [From.Culture.GetName] can be satisfied with so little...				(not ambitious)
 	# I suppose being born with so few skills makes mediocrity desirable?				(not ambitious)
 	# Better be careful not to trip over your broken dreams on your way out.			(not ambitious)
@@ -586,47 +782,78 @@ defined_text = {
 	# The thought of you managing to accomplish something is as scary as laughable.		(ambitious)
 
 	text = {
-		trigger = { FROM = { NOT = { trait = ambitious } } }
+		trigger = {
+			FROM = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_1
 	}
 	text = {
-		trigger = { FROM = { NOT = { trait = ambitious } } }
+		trigger = {
+			FROM = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_2
 	}
 	text = {
-		trigger = { FROM = { NOT = { trait = ambitious } } }
+		trigger = {
+			FROM = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_3
 	}
 	text = {
-		trigger = { FROM = { NOT = { trait = ambitious } } }
+		trigger = {
+			FROM = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_4
 	}
 	text = {
-		trigger = { FROM = { NOT = { trait = ambitious } } }
+		trigger = {
+			FROM = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_5
 	}
 	text = {
-		trigger = { FROM = { trait = ambitious } }
+		trigger = {
+			FROM = {
+				trait = ambitious
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_6
 	}
 	text = {
-		trigger = { FROM = { trait = ambitious } }
+		trigger = {
+			FROM = {
+				trait = ambitious
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_7
 	}
 	text = {
-		trigger = { FROM = { trait = ambitious } }
+		trigger = {
+			FROM = {
+				trait = ambitious
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_option_8
 	}
 	fallback_text = {
-		localisation_key = string_accomplishments_insult_option_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_accomplishments_insult_option_default
 	}
 }
 
-#Insult Family Option.
-
+# Insult Family Option
 defined_text = {
 	name = GetFamilyInsultOption
-	# 																			X <-- Don't go beyond here.
+	# 																			X <-- Don't go beyond here
 	# I guess, after seeing how you came out, your parents simply gave up?			(only child)
 	# So, how is the wretched harpy that spawned you, [From.GetFirstName]?			(living mother)
 	# I have heard great, hilarious tales about your father's cowardice.
@@ -637,7 +864,6 @@ defined_text = {
 	# Eager to return to that spineless worm you call husband? 						(married, female)
 	# Tell me, how many times did you stomp on your kids' heads?					(with children)
 	# One can only hope your children sprung from a stronger seed than yours.		(married with children, male)
-
 
 	# How does it feel to be the disgrace of your dynasty?
 	# You are truly the greatest example of your dynasty's mediocrity.
@@ -651,9 +877,8 @@ defined_text = {
 	text = {
 		trigger = {
 			FROM = {
-				NOR = {
-					father_even_if_dead = { num_of_children = 2 }
-					mother_even_if_dead = { num_of_children = 2 }
+				NOT = {
+					any_sibling_even_if_dead = { always = yes }
 				}
 			}
 		}
@@ -678,10 +903,7 @@ defined_text = {
 	text = {
 		trigger = {
 			FROM = {
-				OR = {
-					father_even_if_dead = { num_of_children = 2 }
-					mother_even_if_dead = { num_of_children = 2 }
-				}
+				any_sibling_even_if_dead = { always = yes }
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_option_4
@@ -697,12 +919,12 @@ defined_text = {
 	}
 	text = {
 		trigger = {
-			OR = {
-				is_female = no
-				AND = { is_female = yes trait = homosexual }
-			}
 			FROM = {
 				mother_even_if_dead = { is_alive = yes }
+				trigger_if = {
+					limit = { is_female = yes }
+					trait = homosexual
+				}
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_option_6
@@ -728,7 +950,7 @@ defined_text = {
 	text = {
 		trigger = {
 			FROM = {
-				num_of_children = 2
+				num_of_children >= 2
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_option_9
@@ -737,7 +959,7 @@ defined_text = {
 		trigger = {
 			FROM = {
 				is_female = no
-				num_of_children = 2
+				num_of_children >= 2
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_option_10
@@ -775,35 +997,27 @@ defined_text = {
 		localisation_key = string_WL_flyting_family_insult_option_14
 	}
 	text = {
-		trigger = {
-			trait = cruel
-		}
+		trigger = { trait = cruel }
 		localisation_key = string_WL_flyting_family_insult_option_15
 	}
 	text = {
-		trigger = {
-			trait = cruel
-		}
+		trigger = { trait = cruel }
 		localisation_key = string_WL_flyting_family_insult_option_16
 	}
 	text = {
-		trigger = {
-			trait = cruel
-		}
+		trigger = { trait = cruel }
 		localisation_key = string_WL_flyting_family_insult_option_17
 	}
 	fallback_text = {
-		localisation_key = string_family_insult_option_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_family_insult_option_default
 	}
 }
 
-#Descs (visible by insulted)
-
-
-#Inult Prowess Desc.
+## Descs (visible by insulted)
+# Insult Prowess Desc
 defined_text = {
 	name = GetProwessInsultDesc
-	# 																			X <-- Don't go beyond here.
+	# 																			X <-- Don't go beyond here
 	# (male)
 	# It is said that your virility is legendary amongst dwarves.
 	# No warrior is as cowardly as the one between your legs.
@@ -821,89 +1035,172 @@ defined_text = {
 	# Do you dress as a warrior because you could never pass for a lady?
 	# No place is as desolate and maggot-riddled as your womb.
 
-
 	text = {
-		trigger = { ROOT = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_1
 	}
 	text = {
-		trigger = { ROOT = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_2
 	}
 	text = {
-		trigger = { ROOT = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_3
 	}
 	text = {
-		trigger = { ROOT = { is_female = no NOT = { trait = eunuch } } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_4
 	}
 	text = {
-		trigger = { ROOT = { is_female = no trait = eunuch } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				trait = eunuch
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_5
 	}
 	text = {
-		trigger = { ROOT = { is_female = no trait = eunuch } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				trait = eunuch
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_6
 	}
 	text = {
-		trigger = { ROOT = { is_female = no trait = eunuch } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				trait = eunuch
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_7
 	}
 	text = {
-		trigger = { ROOT = { is_female = yes } }
+		trigger = {
+			ROOT = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_8
 	}
 	text = {
-		trigger = { ROOT = { is_female = yes } }
+		trigger = {
+			ROOT = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_9
 	}
 	text = {
-		trigger = { ROOT = { is_female = yes } }
+		trigger = {
+			ROOT = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_10
 	}
 	text = {
-		trigger = { ROOT = { is_female = yes } }
+		trigger = {
+			ROOT = {
+				is_female = yes
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_11
 	}
-	#Additional variants
+
+	# Additional variants
 	text = {
-		trigger = { ROOT = { is_female = no NOR = { is_close_relative = FROM trait = eunuch } } }
+		trigger = {
+			ROOT = {
+				NOR = {
+					is_female = yes
+					is_close_relative = FROM
+					trait = eunuch
+				}
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_12
 	}
 	text = {
-		trigger = { ROOT = { trait = eunuch NOT = { is_close_relative = FROM } } }
+		trigger = {
+			ROOT = {
+				trait = eunuch
+				NOT = { is_close_relative = FROM }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_13
 	}
 	text = {
-		trigger = { ROOT = { is_female = yes NOT = { is_close_relative = FROM } } }
+		trigger = {
+			ROOT = {
+				is_female = yes
+				NOT = { is_close_relative = FROM }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_14
 	}
 	text = {
-		trigger = { ROOT = { is_female = no is_close_relative = FROM NOT = { trait = eunuch } } }
+		trigger = {
+			ROOT = {
+				is_female = no
+				is_close_relative = FROM
+				NOT = { trait = eunuch }
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_15
 	}
 	text = {
-		trigger = { ROOT = { trait = eunuch is_close_relative = FROM } }
+		trigger = {
+			ROOT = {
+				trait = eunuch
+				is_close_relative = FROM
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_16
 	}
 	text = {
-		trigger = { ROOT = { is_female = yes is_close_relative = FROM } }
+		trigger = {
+			ROOT = {
+				is_female = yes
+				is_close_relative = FROM
+			}
+		}
 		localisation_key = string_WL_flyting_prowess_insult_desc_17
 	}
 
-
 	fallback_text = {
-		localisation_key = string_prowess_insult_desc_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_prowess_insult_desc_default
 	}
 }
-
 
 defined_text = {
 	name = GetCharacterInsultDesc
 
-#Insult Character Desc.
-	# 																			X <-- Don't go beyond here.
+#Insult Character Desc
+	# 																			X <-- Don't go beyond here
 	# Is it any surprise you would pick a game where you are the center of attention? 			(proud/groomed)
 	# Try not to choke between turns, [From.GetFirstName], we have a long game ahead. 			(gluttonous)
 	# I am surprised you haven't started to whine about losing yet. 							(envious)
@@ -939,300 +1236,631 @@ defined_text = {
 
 	# Is it really such a surprise you jumped at the chance to yap some more?					(gregarious)
 	# Are you sure you wouldn't rather give up and go hide in a corner?							(shy)
-	#
 
 	# One can hardly find anything bad or good to say about [From.GetFirstName].
 	# Saying you are the dullest [From.GetManWoman] I ever met would give you too much credit.
 
 	text = {
-		trigger = { ROOT = { OR = { trait = proud trait = groomed } } }
+		trigger = {
+			ROOT = {
+				OR = {
+					trait = proud
+					trait = groomed
+				}
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_1
 	}
 	text = {
-		trigger = { ROOT = { trait = gluttonous } }
+		trigger = {
+			ROOT = {
+				trait = gluttonous
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_2
 	}
 	text = {
-		trigger = { ROOT = { trait = envious } }
+		trigger = {
+			ROOT = {
+				trait = envious
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_3
 	}
 	text = {
-		trigger = { ROOT = { trait = slothful } }
+		trigger = {
+			ROOT = {
+				trait = slothful
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_4
 	}
 	text = {
-		trigger = { ROOT = { trait = greedy } }
+		trigger = {
+			ROOT = {
+				trait = greedy
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_5
 	}
 	text = {
-		trigger = { ROOT = { trait = wroth } }
+		trigger = {
+			ROOT = {
+				trait = wroth
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_6
 	}
 	text = {
-		trigger = { ROOT = { trait = lustful } }
+		trigger = {
+			ROOT = {
+				trait = lustful
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_7
 	}
 	text = {
-		trigger = { ROOT = { trait = uncouth } }
+		trigger = {
+			ROOT = {
+				trait = uncouth
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_8
 	}
 	text = {
-		trigger = { ROOT = { is_attractive_trigger = no } }
+		trigger = {
+			ROOT = {
+				is_attractive_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_9
 	}
 	text = {
-		trigger = { ROOT = { is_attractive_trigger = no } }
+		trigger = {
+			ROOT = {
+				is_attractive_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_10
 	}
 	text = {
-		trigger = { ROOT = { has_unattractive_trait_trigger = yes } }
+		trigger = {
+			ROOT = {
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_11
 	}
 	text = {
-		trigger = { ROOT = { has_unattractive_trait_trigger = yes } }
+		trigger = {
+			ROOT = {
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_12
 	}
 	text = {
-		trigger = { ROOT = { has_unattractive_trait_trigger = yes } }
+		trigger = {
+			ROOT = {
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_13
 	}
 	text = {
-		trigger = { ROOT = { is_female = yes has_unattractive_trait_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_female = yes
+				has_unattractive_trait_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_14
 	}
 	text = {
-		trigger = { ROOT = { is_strong_trigger = no } }
+		trigger = {
+			ROOT = {
+				is_strong_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_15
 	}
 	text = {
-		trigger = { ROOT = { is_strong_trigger = no } }
+		trigger = {
+			ROOT = {
+				is_strong_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_16
 	}
 	text = {
-		trigger = { ROOT = { is_weak_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_17
 	}
 	text = {
-		trigger = { ROOT = { is_weak_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_18
 	}
 	text = {
-		trigger = { ROOT = { is_weak_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_19
 	}
 	text = {
-		trigger = { ROOT = { is_weak_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_20
 	}
 	text = {
-		trigger = { ROOT = { is_weak_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_weak_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_21
 	}
 	text = {
-		trigger = { ROOT = { is_smart_trigger = no } }
+		trigger = {
+			ROOT = {
+				is_smart_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_22
 	}
 	text = {
-		trigger = { ROOT = { is_smart_trigger = no } }
+		trigger = {
+			ROOT = {
+				is_smart_trigger = no
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_23
 	}
 	text = {
-		trigger = { ROOT = { is_dumb_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_dumb_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_24
 	}
 	text = {
-		trigger = { ROOT = { is_dumb_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_dumb_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_25
 	}
 	text = {
-		trigger = { ROOT = { is_dumb_trigger = yes } }
+		trigger = {
+			ROOT = {
+				is_dumb_trigger = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_26
 	}
 	text = {
-		trigger = { ROOT = { trait = gregarious } }
+		trigger = {
+			ROOT = {
+				trait = gregarious
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_27
 	}
 	text = {
-		trigger = { ROOT = { OR = { trait = craven trait = shy } } }
+		trigger = {
+			ROOT = {
+				OR = {
+					trait = craven
+					trait = shy
+				}
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_28
 	}
 	text = {
-		trigger = { ROOT = { is_alive = yes } }
+		trigger = {
+			ROOT = {
+				is_alive = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_29
 	}
 	text = {
-		trigger = { ROOT = { is_alive = yes } }
+		trigger = {
+			ROOT = {
+				is_alive = yes
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_30
 	}
-	#Additional variants
 
+	# Additional variants
 	text = {
-		trigger = { ROOT = { trait = lustful is_female = no prefers_men_trigger = no } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = lustful
+				is_female = no
+				prefers_men_trigger = no
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_31
 	}
 	text = {
-		trigger = { ROOT = { trait = lustful is_female = no prefers_men_trigger = yes } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = lustful
+				is_female = no
+				prefers_men_trigger = yes
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_32
 	}
 	text = {
-		trigger = { ROOT = { trait = lustful is_female = yes prefers_men_trigger = yes } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = lustful
+				is_female = yes
+				prefers_men_trigger = yes
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_33
 	}
 	text = {
-		trigger = { ROOT = { trait = lustful is_female = yes prefers_men_trigger = no } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = lustful
+				is_female = yes
+				prefers_men_trigger = no
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_34
 	}
 	text = {
-		trigger = { ROOT = { trait = gluttonous } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = gluttonous
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_35
 	}
 	text = {
-		trigger = { ROOT = { trait = envious } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = envious
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_36
 	}
 	text = {
-		trigger = { ROOT = { trait = greedy } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = greedy
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_37
 	}
 	text = {
-		trigger = { ROOT = { trait = slothful } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = slothful
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_38
 	}
 	text = {
-		trigger = { ROOT = { trait = wroth } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				trait = wroth
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_39
 	}
 	text = {
-		trigger = { FROM = { NOT = { trait = poet } } }
+		trigger = {
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_40
 	}
 	text = {
-		trigger = { ROOT = { OR = { trait = proud trait = groomed } } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				OR = {
+					trait = proud
+					trait = groomed
+				}
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_41
 	}
 	text = {
-		trigger = { ROOT = { trait = lustful prefers_men_trigger = no } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				trait = lustful
+				prefers_men_trigger = no
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_42
 	}
 	text = {
-		trigger = { ROOT = { trait = lustful prefers_men_trigger = yes } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				trait = lustful
+				prefers_men_trigger = yes
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_43
 	}
 	text = {
-		trigger = { ROOT = { trait = gluttonous } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				trait = gluttonous
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_44
 	}
 	text = {
-		trigger = { ROOT = { trait = envious } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				trait = envious
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_45
 	}
 	text = {
-		trigger = { ROOT = { trait = greedy } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				trait = greedy
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_46
 	}
 	text = {
-		trigger = { ROOT = { trait = slothful } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				trait = slothful
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_47
 	}
 	text = {
-		trigger = { ROOT = { trait = wroth } FROM = { trait = poet } }
+		trigger = {
+			ROOT = {
+				trait = wroth
+			}
+			FROM = {
+				trait = poet
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_48
 	}
 	text = {
-		trigger = { ROOT = { OR = { trait = proud trait = groomed } } FROM = { NOT = { trait = poet } } }
+		trigger = {
+			ROOT = {
+				OR = {
+					trait = proud
+					trait = groomed
+				}
+			}
+			FROM = {
+				NOT = { trait = poet }
+			}
+		}
 		localisation_key = string_WL_flyting_character_insult_desc_49
 	}
 
 	fallback_text = {
-		localisation_key = string_character_insult_desc_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_character_insult_desc_default
 	}
 }
 
-#Insult Accomplishments Desc.
-
-
+# Insult Accomplishments Desc
 defined_text = {
 	name = GetAccomplishmentsInsultDesc
-	# 																			X <-- Don't go beyond here.
+	# 																			X <-- Don't go beyond here
 	# Not every [From.Culture.GetName] can be satisfied with so little...				(not ambitious)
 	# I suppose being born with so few skills makes mediocrity desirable?				(not ambitious)
 	# Better be careful not to trip over your broken dreams on your way out.			(not ambitious)
 	# How does it feel to be the black sheep of your dynasty?							(not ambitious)
 	# I can scarcely believe how little a [From.GetTitle] like you could accomplish.	(not ambitious)
 
-
 	# It is very impressive to wish for so much yet accomplish so little.				(ambitious)
 	# Hard to find somebody with greater designs and pettier goals.						(ambitious)
 	# The thought of you managing to accomplish something is as scary as laughable.		(ambitious)
 
 	text = {
-		trigger = { ROOT = { NOT = { trait = ambitious } } }
+		trigger = {
+			ROOT = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_1
 	}
 	text = {
-		trigger = { ROOT = { NOT = { trait = ambitious } } }
+		trigger = {
+			ROOT = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_2
 	}
 	text = {
-		trigger = { ROOT = { NOT = { trait = ambitious } } }
+		trigger = {
+			ROOT = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_3
 	}
 	text = {
-		trigger = { ROOT = { NOT = { trait = ambitious } } }
+		trigger = {
+			ROOT = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_4
 	}
 	text = {
-		trigger = { ROOT = { NOT = { trait = ambitious } } }
+		trigger = {
+			ROOT = {
+				NOT = { trait = ambitious }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_5
 	}
 	text = {
-		trigger = { ROOT = { trait = ambitious } }
+		trigger = {
+			ROOT = { trait = ambitious }
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_6
 	}
 	text = {
-		trigger = { ROOT = { trait = ambitious } }
+		trigger = {
+			ROOT = { trait = ambitious }
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_7
 	}
 	text = {
-		trigger = { ROOT = { trait = ambitious } }
+		trigger = {
+			ROOT = { trait = ambitious }
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_8
 	}
-	#Additional variants
+
+	# Additional variants
 	text = {
-		trigger = { ROOT = { trait = content } NOT = { vassal_of = FROM } }
+		trigger = {
+			ROOT = {
+				trait = content
+				NOT = { vassal_of = FROM }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_9
 	}
 	text = {
-		trigger = { ROOT = { NOR = { trait = ambitious trait = content } } NOT = { vassal_of = FROM } }
+		trigger = {
+			ROOT = {
+				NOR = {
+					trait = ambitious
+					trait = content
+					vassal_of = FROM
+				}
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_10
 	}
 	text = {
-		trigger = { ROOT = { trait = ambitious } NOT = { vassal_of = FROM } }
+		trigger = {
+			ROOT = {
+				trait = ambitious
+				NOT = { vassal_of = FROM }
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_11
 	}
 	text = {
-		trigger = { ROOT = { trait = content vassal_of = FROM } }
+		trigger = {
+			ROOT = {
+				trait = content
+				vassal_of = FROM
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_12
 	}
 	text = {
-		trigger = { ROOT = { NOR = { trait = ambitious trait = content } vassal_of = FROM } }
+		trigger = {
+			ROOT = {
+				NOR = {
+					trait = ambitious
+					trait = content
+					vassal_of = FROM
+				}
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_13
 	}
 	text = {
-		trigger = { ROOT = { trait = ambitious vassal_of = FROM } }
+		trigger = {
+			ROOT = {
+				trait = ambitious
+				vassal_of = FROM
+			}
+		}
 		localisation_key = string_WL_flyting_accomplishments_insult_desc_14
 	}
 
 	fallback_text = {
-		localisation_key = string_accomplishments_insult_desc_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_accomplishments_insult_desc_default
 	}
 }
 
-#Insult Family Desc.
-
+# Insult Family Desc
 defined_text = {
 	name = GetFamilyInsultDesc
-	# 																			X <-- Don't go beyond here.
+	# 																			X <-- Don't go beyond here
 	# I guess, after seeing how you came out, your parents simply gave up?			(only child)
 	# So, how is the wretched harpy that spawned you, [From.GetFirstName]?			(living mother)
 	# I have heard great, hilarious tales about your father's cowardice.
@@ -1243,7 +1871,6 @@ defined_text = {
 	# Eager to return to that spineless worm you call husband? 						(married, female)
 	# Tell me, how many times did you stomp on your kids' heads?					(with children)
 	# One can only hope your children sprung from a stronger seed than yours.		(married with children, male)
-
 
 	# How does it feel to be the disgrace of your dynasty?
 	# You are truly the greatest example of your dynasty's mediocrity.
@@ -1257,9 +1884,8 @@ defined_text = {
 	text = {
 		trigger = {
 			ROOT = {
-				NOR = {
-					father_even_if_dead = { num_of_children = 2 }
-					mother_even_if_dead = { num_of_children = 2 }
+				NOT = {
+					any_sibling_even_if_dead = { always = yes }
 				}
 			}
 		}
@@ -1284,10 +1910,7 @@ defined_text = {
 	text = {
 		trigger = {
 			ROOT = {
-				OR = {
-					father_even_if_dead = { num_of_children = 2 }
-					mother_even_if_dead = { num_of_children = 2 }
-				}
+				any_sibling_even_if_dead = { always = yes }
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_desc_4
@@ -1304,13 +1927,11 @@ defined_text = {
 	text = {
 		trigger = {
 			FROM = {
-				OR = {
-					is_female = no
-					AND = { is_female = yes trait = homosexual }
-				}
-			}
-			ROOT = {
 				mother_even_if_dead = { is_alive = yes }
+				trigger_if = {
+					limit = { is_female = yes }
+					trait = homosexual
+				}
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_desc_6
@@ -1336,7 +1957,7 @@ defined_text = {
 	text = {
 		trigger = {
 			ROOT = {
-				num_of_children = 2
+				num_of_children >= 2
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_desc_9
@@ -1345,7 +1966,7 @@ defined_text = {
 		trigger = {
 			ROOT = {
 				is_female = no
-				num_of_children = 2
+				num_of_children >= 2
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_desc_10
@@ -1406,13 +2027,12 @@ defined_text = {
 		}
 		localisation_key = string_WL_flyting_family_insult_desc_17
 	}
-	#Additional variants
+
+	# Additional variants
 	text = {
 		trigger = {
 			FROM = {
-				NOT = {
-					trait = cruel
-				}
+				NOT = { trait = cruel }
 			}
 		}
 		localisation_key = string_WL_flyting_family_insult_desc_18
@@ -1434,13 +2054,14 @@ defined_text = {
 		localisation_key = string_WL_flyting_family_insult_desc_20
 	}
 	fallback_text = {
-		localisation_key = string_family_insult_desc_default # Fallback, in case it fails to find relevant info
+		localisation_key = string_family_insult_desc_default
 	}
 }
 
-
-defined_text = { #Used when founding a legendary bloodline...
+# Used when founding a legendary bloodline...
+defined_text = {
 	name = GetLegendaryReturnReception
+	use_first_valid = yes
 
 	text = {
 		trigger = { has_character_flag = bloodline_quality_1 }
@@ -1455,11 +2076,14 @@ defined_text = { #Used when founding a legendary bloodline...
 		localisation_key = string_reception_3
 	}
 	fallback_text = {
-		localisation_key = string_reception_1 # Fallback, in case it fails to find relevant info
+		localisation_key = string_reception_1
 	}
 }
-defined_text = { #Used when founding a legendary bloodline...
+
+# Used when founding a legendary bloodline...
+defined_text = {
 	name = GetLegendaryAchievementSummary
+	use_first_valid = yes
 
 	text = {
 		trigger = { has_character_flag = bloodline_quality_1 }
@@ -1474,11 +2098,12 @@ defined_text = { #Used when founding a legendary bloodline...
 		localisation_key = string_summary_3
 	}
 	fallback_text = {
-		localisation_key = string_summary_1 # Fallback, in case it fails to find relevant info
+		localisation_key = string_summary_1
 	}
 }
 
-defined_text = { #Used to refer to a type of "warrior"...
+# Used to refer to a type of "warrior"...
+defined_text = {
 	name = GetWarriorRole
 
 	text = {
@@ -1509,9 +2134,7 @@ defined_text = { #Used to refer to a type of "warrior"...
 		localisation_key = String_fighter
 	}
 	text = {
-		trigger = {
-			prestige = 2000
-		}
+		trigger = { prestige >= 2000 }
 		localisation_key = String_champion
 	}
 	text = {
@@ -1520,7 +2143,7 @@ defined_text = { #Used to refer to a type of "warrior"...
 	text = {
 		trigger = {
 			OR = {
-				leader_traits = 1
+				leader_traits >= 1
 				has_minor_title = title_commander
 			}
 		}
@@ -1529,7 +2152,7 @@ defined_text = { #Used to refer to a type of "warrior"...
 	text = {
 		trigger = {
 			OR = {
-				leader_traits = 1
+				leader_traits >= 1
 				trait = wroth
 			}
 		}
@@ -1547,12 +2170,12 @@ defined_text = { #Used to refer to a type of "warrior"...
 	}
 
 	fallback_text = {
-		localisation_key = String_warrior # Fallback, in case it fails to find relevant info
+		localisation_key = String_warrior
 	}
 }
 
-
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+# Used to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetWarriorRoleCap
 
 	text = {
@@ -1583,9 +2206,7 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 		localisation_key = String_Fighter
 	}
 	text = {
-		trigger = {
-			prestige = 2000
-		}
+		trigger = { prestige >= 2000 }
 		localisation_key = String_Champion
 	}
 	text = {
@@ -1594,7 +2215,7 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 	text = {
 		trigger = {
 			OR = {
-				leader_traits = 1
+				leader_traits >= 1
 				has_minor_title = title_commander
 			}
 		}
@@ -1603,7 +2224,7 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 	text = {
 		trigger = {
 			OR = {
-				leader_traits = 1
+				leader_traits >= 1
 				trait = wroth
 			}
 		}
@@ -1621,13 +2242,14 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 	}
 
 	fallback_text = {
-		localisation_key = String_Warrior # Fallback, in case it fails to find relevant info
+		localisation_key = String_Warrior
 	}
 }
 
-
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+# Used to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetTeachingMomentActivity
+	use_first_valid = yes
 
 	text = {
 		localisation_key = String_bravery_lesson
@@ -1666,13 +2288,14 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 		}
 	}
 	fallback_text = {
-		localisation_key = String_bravery_lesson # Fallback, in case it fails to find relevant info
+		localisation_key = String_bravery_lesson
 	}
 }
 
-
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+#U sed to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetTeachingMomentTool
+	use_first_valid = yes
 
 	text = {
 		localisation_key = String_bravery_tool
@@ -1711,12 +2334,14 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 		}
 	}
 	fallback_text = {
-		localisation_key = String_bravery_tool # Fallback, in case it fails to find relevant info
+		localisation_key = String_bravery_tool
 	}
 }
 
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+# Used to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetTeachingMomentResult
+	use_first_valid = yes
 
 	text = {
 		localisation_key = String_teaching_moment_great
@@ -1740,18 +2365,18 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 		trigger = { event_target:teacher = { has_character_flag = bad_outcome } }
 	}
 	fallback_text = {
-		localisation_key = String_teaching_moment_ok # Fallback, in case it fails to find relevant info
+		localisation_key = String_teaching_moment_ok
 	}
 }
 
-
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+# Used to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetWarriorLodgeCompetitionType
 
 	text = {
 		localisation_key = String_flyting
 		trigger = {
-			OR = { #Only for northeners
+			OR = { # Only for northeners
 				society_member_of = warrior_lodge_norse
 				society_member_of = warrior_lodge_slavic
 				society_member_of = warrior_lodge_baltic
@@ -1764,7 +2389,9 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 	}
 	text = {
 		localisation_key = String_drinking
-		trigger = { NOT = { society_member_of = warrior_lodge_bon } }
+		trigger = {
+			NOT = { society_member_of = warrior_lodge_bon }
+		}
 	}
 	text = {
 		localisation_key = String_dice
@@ -1776,12 +2403,14 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 		}
 	}
 	fallback_text = {
-		localisation_key = String_arm_wrestling # Fallback, in case it fails to find relevant info
+		localisation_key = String_arm_wrestling
 	}
 }
 
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+# Used to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetTeachingMomentRomanceReaction
+	use_first_valid = yes
 
 	text = {
 		localisation_key = String_share_kiss_long
@@ -1801,8 +2430,10 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 	}
 }
 
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+# Used to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetTeachingMomentFocus
+	use_first_valid = yes
 
 	text = {
 		localisation_key = String_bravery
@@ -1842,8 +2473,10 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 	}
 }
 
-defined_text = { #Used to refer to a type of "warrior", initial cap...
+# Used to refer to a type of "warrior", initial cap...
+defined_text = {
 	name = GetTeachingMomentFocusCap
+	use_first_valid = yes
 
 	text = {
 		localisation_key = String_Bravery
@@ -1883,36 +2516,36 @@ defined_text = { #Used to refer to a type of "warrior", initial cap...
 	}
 }
 
-
-
-defined_text = { #Used to find accurate status of Legend
+# Used to find accurate status of Legend
+defined_text = {
 	name = GetLegendStatus
+	use_first_valid = yes
 
 	text = {
 		localisation_key = String_LegendaryJourneyActiveTooltip
 		trigger = {
-            any_society_member = {
-            	count = 2
-                has_character_flag = call_to_legend_active
-                prisoner = no
-                is_alive = yes
-                is_dying = no
-                is_incapable = no
-            }
-        }
+			any_society_member = {
+				count >= 2
+				has_character_flag = call_to_legend_active
+				is_alive = yes
+				prisoner = no
+				is_dying = no
+				is_incapable = no
+			}
+		}
 	}
 	text = {
 		localisation_key = String_DefaultLegendTooltip
 		trigger = {
 			NOT = {
-                any_society_member = {
-                    has_character_flag = call_to_legend_active
-                    prisoner = no
-                    is_alive = yes
-                    is_dying = no
-                    is_incapable = no
-                }
-            }
+				any_society_member = {
+					has_character_flag = call_to_legend_active
+					is_alive = yes
+					prisoner = no
+					is_dying = no
+					is_incapable = no
+				}
+			}
 		}
 	}
 	text = {
@@ -1920,44 +2553,43 @@ defined_text = { #Used to find accurate status of Legend
 		trigger = {
 			AND = {
 				any_society_member = {
-	                has_character_flag = call_to_legend_active
-	                prisoner = no
-	                is_alive = yes
-	                is_dying = no
-	                is_incapable = no
-	            }
-	            NOT = {
-	                any_society_member = {
-	                	count = 2
-		                has_character_flag = call_to_legend_active
-		                prisoner = no
-		                is_alive = yes
-		                is_dying = no
-		                is_incapable = no
-		            }
-	            }
+					has_character_flag = call_to_legend_active
+					is_alive = yes
+					prisoner = no
+					is_dying = no
+					is_incapable = no
+				}
+				NOT = {
+					any_society_member = {
+						count >= 2
+						has_character_flag = call_to_legend_active
+						is_alive = yes
+						prisoner = no
+						is_dying = no
+						is_incapable = no
+					}
+				}
 			}
 		}
 	}
 }
 
-defined_text = { #Used to find correct desc and Berserking potential
+# Used to find correct desc and Berserking potential
+defined_text = {
 	name = GetBerserkerDecisionDesc
+	use_first_valid = yes
 
 	text = {
 		localisation_key = string_go_berserk_at_home
-		trigger = {
-           	prisoner = no
-        }
+		trigger = { prisoner = no }
 	}
 	text = {
 		localisation_key = string_go_berserk_in_prison
-		trigger = {
-			prisoner = yes
-		}
 	}
 }
-defined_text = { #Used to find correct desc (can return empty - "fallback" contains real text)
+
+# Used to find correct desc (can return empty - "fallback" contains real text)
+defined_text = {
 	name = GetBerserkerDecisionExtras
 
 	text = {
@@ -1971,19 +2603,22 @@ defined_text = { #Used to find correct desc (can return empty - "fallback" conta
 		localisation_key = String_some_change_tt
 	}
 }
-defined_text = { #Used to find correct desc and Berserking potential
+
+# Used to find correct desc and Berserking potential
+defined_text = {
 	name = GetBerserkerDecisionTraitChanges
 
 	text = {
 		localisation_key = String_gain_wroth_aggressive_leader_lose_defender
 		trigger = {
-           	NOR = {
+			trait = defensive_leader
+
+		   	NOR = {
 				trait = wroth
 				trait = patient
 				trait = aggressive_leader
 			}
-			trait = defensive_leader
-        }
+		}
 	}
 	text = {
 		localisation_key = String_lose_patient_defender_gain_aggressive_leader
@@ -1991,14 +2626,15 @@ defined_text = { #Used to find correct desc and Berserking potential
 			trait = patient
 			trait = defensive_leader
 			NOT = {	trait = aggressive_leader }
-        }
+		}
 	}
 	text = {
 		localisation_key = String_lose_patient_gain_aggressive_leader
 		trigger = {
 			trait = patient
+
 			NOR = {
-				leader_traits = 2 #Max
+				leader_traits >= 2 # Max
 				trait = aggressive_leader
 				trait = defensive_leader
 			}
@@ -2008,8 +2644,9 @@ defined_text = { #Used to find correct desc and Berserking potential
 		localisation_key = String_gain_aggressive_leader
 		trigger = {
 			trait = wroth
+
 			NOR = {
-				leader_traits = 2 #Max
+				leader_traits >= 2 # Max
 				trait = aggressive_leader
 				trait = defensive_leader
 			}
@@ -2019,10 +2656,12 @@ defined_text = { #Used to find correct desc and Berserking potential
 		localisation_key = String_lose_patient
 		trigger = {
 			trait = patient
-			OR = { #Either you already have Aggressive Leader, or you have enough leader traits (that are not Defender)...
+
+			OR = { # Either you already have Aggressive Leader, or you have enough leader traits (that are not Defender)...
 				trait = aggressive_leader
+
 				AND = {
-					leader_traits = 2 #Max
+					leader_traits >= 2 # Max
 					NOT = { trait = defensive_leader }
 				}
 			}
@@ -2035,10 +2674,12 @@ defined_text = { #Used to find correct desc and Berserking potential
 				trait = wroth
 				trait = patient
 			}
-			OR = { #Either you already have Aggressive Leader, or you have enough leader traits (that are not Defender)...
+
+			OR = { # Either you already have Aggressive Leader, or you have enough leader traits (that are not Defender)...
 				trait = aggressive_leader
+
 				AND = {
-					leader_traits = 2 #Max
+					leader_traits >= 2 # Max
 					NOT = { trait = defensive_leader }
 				}
 			}
@@ -2050,9 +2691,7 @@ defined_text = { #Used to find correct desc and Berserking potential
 			NOR = {
 				trait = wroth
 				trait = patient
-			}
-			NOR = {
-				leader_traits = 2
+				leader_traits >= 2
 				trait = aggressive_leader
 				trait = defensive_leader
 			}
@@ -2068,21 +2707,16 @@ defined_text = { #Used to find correct desc and Berserking potential
 	}
 }
 
-
 defined_text = {
 	name = GetWarLetterFlavor
 
 	text = {
-		trigger = {
-			has_focus = focus_war
-		}
+		trigger = { has_focus = focus_war }
 		localisation_key = string_war_letter_positive_war_focus
 	}
 
 	text = {
-		trigger = {
-			has_focus = focus_hunting
-		}
+		trigger = { has_focus = focus_hunting }
 		localisation_key = string_war_letter_positive_hunting_focus
 	}
 
@@ -2101,7 +2735,7 @@ defined_text = {
 		trigger = {
 			opinion = {
 				who = FROM
-				value = 50
+				value >= 50
 			}
 		}
 		localisation_key = string_war_letter_positive_quench
@@ -2118,11 +2752,7 @@ defined_text = {
 	}
 
 	text = {
-		trigger = {
-			OR = {
-				martial = 16
-			}
-		}
+		trigger = { martial >= 16 }
 		localisation_key = string_war_letter_positive_exchange
 	}
 
@@ -2137,18 +2767,14 @@ defined_text = {
 
 defined_text = {
 	name = GetWarLetterOutcome
+	use_first_valid = yes
 
 	text = {
-		trigger = {
-			has_character_flag = positive_war_letter
-		}
+		trigger = { has_character_flag = positive_war_letter }
 		localisation_key = string_positive_war_letter
 	}
 
 	text = {
-		trigger = {
-			has_character_flag = negative_war_letter
-		}
 		localisation_key = string_negative_war_letter
 	}
 }
@@ -2194,7 +2820,7 @@ defined_text = {
 					trait = scholar
 					trait = mystic
 					trait = erudite
-					learning = 18
+					learning >= 18
 					trait = physician
 				}
 				NAND = {
@@ -2223,7 +2849,7 @@ defined_text = {
 					trait = scholar
 					trait = mystic
 					trait = erudite
-					learning = 18
+					learning >= 18
 					trait = physician
 				}
 			}
@@ -2232,44 +2858,34 @@ defined_text = {
 	}
 }
 
-
 defined_text = {
 	name = GetDecidedActionInHF51002
-	text = {
-		trigger = {
-			has_character_flag = decided_to_kidnap
-		}
-		localisation_key = string_decided_to_abduct
-	}
+	use_first_valid = yes
 
 	text = {
-		trigger = {
-			has_character_flag = decided_to_dig_up
-		}
+		trigger = { has_character_flag = decided_to_kidnap }
+		localisation_key = string_decided_to_abduct
+	}
+	text = {
+		trigger = { has_character_flag = decided_to_dig_up }
 		localisation_key = string_decided_to_dig_up
 	}
 }
 
 defined_text = {
 	name = GetDecidedWeapon
+	use_first_valid = yes
+
 	text = {
-		trigger = {
-			has_character_flag = crucible_steel_axe
-		}
+		trigger = { has_character_flag = crucible_steel_axe }
 		localisation_key = string_decided_weapon_axe
 	}
-
 	text = {
-		trigger = {
-			has_character_flag = crucible_steel_sword
-		}
+		trigger = { has_character_flag = crucible_steel_sword }
 		localisation_key = string_decided_weapon_sword
 	}
-
 	text = {
-		trigger = {
-			has_character_flag = crucible_steel_mace
-		}
+		trigger = { has_character_flag = crucible_steel_mace }
 		localisation_key = string_decided_weapon_mace
 	}
 }
