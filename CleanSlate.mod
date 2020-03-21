@@ -1,7 +1,7 @@
 name = "CleanSlate"
 path = "mod/CleanSlate"
 
-#replace_path = "common"
+replace_path = "common"
 replace_path = "common\alternate_start"
 replace_path = "common\artifact_spawns"
 replace_path = "common\artifacts"
