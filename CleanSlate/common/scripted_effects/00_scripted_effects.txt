@@ -853,56 +853,48 @@ impregnate_effect = {
 	if = {
 		limit = { is_opposite_sex = FROM }
 
-		#If ROOT is a female which can get pregnant
+		# If ROOT is a female which can get pregnant
 		if = {
 			limit = {
 				is_female = yes
-				NOT = { age = 45 }
+				age < 45
 				is_pregnant = no
-				health = 3
+				health >= 3
 				FROM = { NOT = { trait = eunuch } }
 			}
 
-			#ROOT is not consort/spouse of anyone or is consort/spouse of FROM
+			# ROOT is not consort/spouse of anyone or is consort/spouse of FROM
 			if = {
 				limit = {
-					OR = {
-						AND = {
-							is_married = no
-							is_consort = no
-						}
-						AND = {
-							is_consort = yes
-							consort = { character = FROM }
-						}
-						AND = {
-							is_married = yes
-							spouse = { character = FROM }
-						}
+					trigger_if = {
+						limit = { is_consort = yes }
+						is_consort = FROM
+					}
+					trigger_else_if = {
+						limit = { is_married = yes }
+						is_married = FROM
 					}
 				}
 				FROM = { impregnate = ROOT }
 			}
 
-			#ROOT is consort/spouse of someone else than FROM
+			# ROOT is consort/spouse of someone else than FROM
 			if = {
 				limit = {
-					OR = {
-					 	AND = {
-					 		is_married = yes
-					 		NOT = { spouse = { character = FROM } }
-					 	}
-					 	AND = {
-					 		is_consort = yes
-					 		NOT = { consort = { character = FROM } }
-					 	}
+					trigger_if = {
+						limit = { is_married = yes }
+					 	NOT = { is_married = FROM }
+					}
+					trigger_else = {
+						is_consort = yes
+						NOT = { is_consort = FROM }
 					}
 				}
 				FROM = { impregnate_cuckoo = ROOT }
 			}
 		}
 
-		#If FROM is a female which can get pregnant
+		# If FROM is a female who can get pregnant
 		if = {
 			limit = {
 				FROM = {
@@ -929,9 +921,6 @@ impregnate_effect = {
 							limit = { is_consort = yes }
 							is_consort = ROOT
 						}
-						trigger_else = {
-							always = yes
-						}
 					}
 				}
 				impregnate = FROM
@@ -945,7 +934,7 @@ impregnate_effect = {
 							limit = { is_married = yes }
 							NOT = { is_married = ROOT }
 						}
-						trigger_else_if = {
+						trigger_else = {
 							is_consort = yes
 							NOT = { is_consort = ROOT }
 						}
@@ -987,9 +976,6 @@ impregnate_effect_event_target = {
 						limit = { is_consort = yes }
 						is_consort = event_target:sex_partner
 					}
-					trigger_else = {
-						always = yes
-					}
 				}
 
 				event_target:sex_partner = { impregnate = PREV }
@@ -1002,8 +988,8 @@ impregnate_effect_event_target = {
 						limit = { is_married = yes }
 						NOT = { is_married = event_target:sex_partner }
 					}
-					trigger_else_if = {
-						limit = { is_consort = yes }
+					trigger_else = {
+						is_consort = yes
 						NOT = { is_consort = event_target:sex_partner }
 					}
 				}
@@ -1012,7 +998,7 @@ impregnate_effect_event_target = {
 			}
 		}
 
-		# If event_target:sex_partner is a female which can get pregnant
+		# If event_target:sex_partner is a female who can get pregnant
 		if = {
 			limit = {
 				event_target:sex_partner = {
@@ -1035,12 +1021,9 @@ impregnate_effect_event_target = {
 							limit = { is_married = yes }
 							is_married = PREV
 						}
-						trigger_else_if = {
-							limit = { is_consort = yes }
-							is_consort = PREV
-						}
 						trigger_else = {
-							always = yes
+							is_consort = yes
+							is_consort = PREV
 						}
 					}
 				}
@@ -1052,15 +1035,13 @@ impregnate_effect_event_target = {
 			if = {
 				limit = {
 					event_target:sex_partner = {
-						OR = {
-						 	trigger_if = {
-								limit = { is_married = yes }
-								NOT = { is_married = PREV }
-							}
-							trigger_else_if = {
-								limit = { is_consort = yes }
-								NOT = { is_consort = PREV }
-							}
+						trigger_if = {
+							limit = { is_married = yes }
+							NOT = { is_married = PREV }
+						}
+						trigger_else = {
+							is_consort = yes
+							NOT = { is_consort = PREV }
 						}
 					}
 				}
