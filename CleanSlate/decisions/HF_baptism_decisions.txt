@@ -2,49 +2,48 @@
 targeted_decisions = {
 
 	request_sponsored_baptism = {
-		ai_target_filter = court
 		ai = no
+		ai_target_filter = independent_rulers
+		target = independent_rulers
 
 		from_potential = {
 			has_dlc = "Holy Fury"
-			is_tribal = yes
-			religion_group = pagan_group
-			#higher_real_tier_than = count 		#condition only for ai to avoid single counts spamming Kings
-			is_incapable = no
-			NOT = { is_reformed_religion = yes }
-			#NOT = { has_character_modifier = baptism_request_cooldown }
-			NOT = { has_character_flag = flag_converting_baptism }
 			independent = yes
-
+			religion_group = pagan_group
+			is_reformed_religion = no
+			is_tribal = yes
+			is_incapable = no
+			NOT = { has_character_flag = flag_converting_baptism }
 		}
+
 		potential = {
 			independent = yes
-			is_tribal = no
-			is_nomadic = no
-			is_theocracy = no
+			is_within_diplo_range = FROM
 			higher_real_tier_than = DUKE
 			is_incapable = no
 			has_regent = no
-			NOT = { religion = FROM }
-			NOT = { pays_tribute_to = FROM }
-			NOT = { has_character_flag = flag_sponsoring_baptism }
 			OR = {
-				NOT = { religion_group = pagan_group }
+				is_feudal = yes
+				is_republic = yes
+			}
+			NOR = {
+				religion = FROM
+				pays_tribute_to = FROM
+				has_character_flag = flag_sponsoring_baptism
+				ROOTs_religion_is_playable_trigger = no
+			}
+			trigger_if = {
+				limit = { religion_group = pagan_group }
 				is_reformed_religion = yes
 			}
 		}
+
 		allow = {
-			is_within_diplo_range = FROM
+			FROM = { pagan_baptism_trigger = yes }
 			prisoner = no
 			has_regent = no
-			custom_tooltip = {
-				text = NOT_CURRENTLY_BAPTIZING
-				hidden_tooltip = {
-					NOT = { has_character_flag = flag_sponsoring_baptism }
-				}
-			}
-			conditional_tooltip = {
-				trigger = { has_character_modifier = baptism_request_cooldown }
+			trigger_if = {
+				limit = { has_character_modifier = baptism_request_cooldown }
 				custom_tooltip = {
 					text = NOT_BEEN_ASKED_BAPTISM_RECENTLY
 					hidden_tooltip = {
@@ -52,33 +51,27 @@ targeted_decisions = {
 					}
 				}
 			}
-			custom_tooltip = {
-				text = NOT_ROOT_RELIGION_PLAYABLE
-				hidden_tooltip = { ROOTs_religion_is_playable_trigger = yes }
-			}
-			FROM = { pagan_baptism_trigger = yes }
 		}
+
 		effect = {
 			hidden_effect = {
-				FROM = {
-					add_character_modifier = {
-						name = baptism_request_cooldown
-						months = 1
-						hidden = yes
-					}
-				}
 				add_character_modifier = {
 					name = baptism_request_cooldown
 					months = 1
 					hidden = yes
 				}
-			opinion = {
+				opinion = {
 					modifier = opinion_baptism_sponsor_target
 					years = 20
 					who = FROM
 					origin_description = EVTTOOLTIPHFA20005
 				}
 				FROM = {
+					add_character_modifier = {
+						name = baptism_request_cooldown
+						months = 1
+						hidden = yes
+					}
 					opinion = {
 						modifier = opinion_baptism_sponsor_target
 						years = 20
@@ -89,35 +82,14 @@ targeted_decisions = {
 			}
 			letter_event = { id = HF.20000 tooltip = EVTTOOLTIPHF20000 }
 		}
-		ai_will_do = {
-			factor = 0
-		}
+
+		ai_will_do = { factor = 0 }
+
 		ai_acceptance = {
 			factor = 10	# The base score
 			yes_threshold = 0
 			show_maybe_for_human = yes
 
-			additive_modifier = {
-				value = 10
-				localisation_key = baptism_sponsor_patriarch
-				religion_head = { is_liege_or_above = ROOT }
-			}
-		#	additive_modifier = {
-		#		value = -15
-		#		custom_tooltip = { text = send_extracoronation_invitations
-		#		NOT = { true_religion = FROM }
-		#		society_member_of = secret_religious_cult }
-		#	}
-		#	additive_modifier = {
-		#		value = 5
-		#		true_religion = FROM
-		#	}
-		#	additive_modifier = {
-		#		value = 10
-		#		custom_tooltip = { text = send_extracoronation_invitations }
-		#		hidden_tooltip = { true_religion = FROM
-		#		society_member_of = secret_religious_cult }
-		#	}
 			additive_modifier = {
 				value = 5
 				localisation_key = baptism_sponsor_emperor
@@ -136,13 +108,18 @@ targeted_decisions = {
 			additive_modifier = {
 				value = -5
 				localisation_key = baptism_sponsor_wealth
-				NOT = { wealth = 0 }
+				wealth < 0
 			}
 			additive_modifier = {
 				value = 5
 				localisation_key = baptism_sponsor_wealth
 				wealth = 100
-				NOT = { wealth = 200 }
+				wealth < 200
+			}
+			additive_modifier = {
+				value = 10
+				localisation_key = baptism_sponsor_patriarch
+				religion_head = { is_liege_or_above = ROOT }
 			}
 			additive_modifier = {
 				value = 10
@@ -152,11 +129,11 @@ targeted_decisions = {
 			additive_modifier = {
 				value = 10
 				localisation_key = baptism_sponsor_proselytizer
-				NOT = { religion = yazidi }
 				OR = {
 					religion_group = christian
 					religion_group = muslim
 				}
+				NOT = { religion = yazidi }
 			}
 			additive_modifier = {
 				value = 10
@@ -193,11 +170,9 @@ targeted_decisions = {
 			additive_modifier = {
 				value = -15
 				localisation_key = baptism_sponsor_size
-				NOT = {
-					relative_realm_size = {
-						who = FROM
-						size < 1.5
-					}
+				relative_realm_size = {
+					who = FROM
+					size >= 1.5
 				}
 				relative_realm_size = {
 					who = FROM
@@ -215,13 +190,22 @@ targeted_decisions = {
 			additive_modifier = {
 				value = -100
 				localisation_key = baptism_sponsor_power
-				FROM = { relative_power = { who = ROOT power = 5 } }
+				relative_power = {
+					who = FROM
+					power > 0.2
+				}
 			}
 			additive_modifier = {
 				value = -50
 				localisation_key = baptism_sponsor_power
-				NOT = { FROM = { relative_power = { who = ROOT power = 5 } } }
-				FROM = { relative_power = { who = ROOT power = 4 } }
+				relative_power = {
+					who = FROM
+					power < 0.2
+				}
+				relative_power = {
+					who = FROM
+					power > 0.25
+				}
 			}
 			additive_modifier = {
 				value = -20
@@ -390,6 +374,7 @@ targeted_decisions = {
 			}
 		}
 	}
+
 	give_child_special_baptism = {
 		ai_target_filter = court
 		ai_check_interval = 12 #check only every 12 months.
