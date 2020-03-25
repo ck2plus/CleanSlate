@@ -119,9 +119,7 @@ will_add_kinslayer = {
 		}
 	}
 	trigger_else_if = {
-		limit = {
-			dynasty = event_target:kinslayer_target
-		}
+		limit = { dynasty = event_target:kinslayer_target }
 
 		NOR = {
 			trait = kinslayer
@@ -134,53 +132,52 @@ will_add_kinslayer = {
 
 # Hardcoded trigger for the Assassinate interaction. Used for triggering whether it can be used at all
 # ROOT is the person being assassinated
-# RROM is the person doing the assassination
+# FROM is the person doing the assassination
 assassination_interaction_trigger = {
 	trigger_if = {
-		limit = {
-			multiplayer = yes
-		}
+		limit = { multiplayer = yes }
 
 		custom_tooltip = {
 			text = MP_GAME_RULE_ALLOWED
 
-			OR = {
-				ai = yes
-				NOT = {
+			trigger_if = {
+				limit = {
 					has_game_rule = {
 						name = multiplayer_assassinations
 						value = no_players
 					}
 				}
+				ai = yes
 			}
-			OR = {
-				NOT = {
+			trigger_else_if = {
+				limit = {
 					has_game_rule = {
 						name = multiplayer_assassinations
 						value = no_players_or_relatives
 					}
 				}
-				AND = {
-					ai = yes
-					NOT = {
-						any_close_relative = {
-							ai = no
-							NOT = { character = FROM }
-						}
+
+				ai = yes
+
+				NOR = {
+					any_close_relative = {
+						ai = no
+						NOT = { character = FROM } # Own family is fair game
 					}
-					NOT = {
-						any_spouse = {
-							ai = no
-							NOT = { character = FROM }
-						}
+
+					any_spouse = {
+						ai = no
+						NOT = { character = FROM } # Own family is fair game
 					}
-					NOT = {
+
+					AND = {
+						is_heir = yes
+
 						liege = {
 							ai = no
 							dynasty = ROOT
-							NOT = { character = FROM }
+							NOT = { character = FROM } # Own family is fair game
 						}
-						is_heir = yes
 					}
 				}
 			}
@@ -222,8 +219,8 @@ pagan_baptism_trigger = {
 		text = TT_UNREFORMED_PAGAN
 
 		religion_group = pagan_group
-		NOT = { is_reformed_religion = yes }
-		#NOT = { religion = bon }
+		is_reformed_religion = no
+		# NOT = { religion = bon }
 	}
 
 	primary_title = {

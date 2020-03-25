@@ -484,20 +484,35 @@ this_can_duel_with_from_trigger = {
 # To make sure characters have a chance of gaining a lover from dueling them (used as a modifier weight)...
 prev_is_lonely_this_romance_makes_sense_trigger = {
 	PREV = { has_lover = no }
-	NOT = { is_lover = PREV }
+
+	NOR = {
+		is_lover = PREV
+		is_rival = PREV
+	}
 
 	# Check opinions and attraction, etc...
-	NOT = { is_rival = PREV }
-	NOT = { is_lover = PREV }
 	prev_attraction_trigger = yes
-	OR = {
-		reverse_opinion = { who = PREV value = 45 }
-		reverse_has_opinion_modifier = { who = PREV modifier = opinion_budding_romance }
-	}
 	attacted_to_prev_trigger = yes
+
 	OR = {
-		opinion = { who = ROOT value = 45 }
-		has_opinion_modifier = { who = ROOT modifier = opinion_budding_romance }
+		reverse_opinion = {
+			who = PREV
+			value >= 45
+		}
+		reverse_has_opinion_modifier = {
+			who = PREV
+			modifier = opinion_budding_romance
+		}
+	}
+	OR = {
+		opinion = {
+			who = ROOT
+			value >= 45
+		}
+		has_opinion_modifier = {
+			who = ROOT
+			modifier = opinion_budding_romance
+		}
 	}
 }
 
@@ -511,19 +526,26 @@ interesting_duel_target_for_prev_trigger = {
 				is_rival = PREV
 			}
 
-			# Check opinions and attraction, etc...
 			prev_attraction_trigger = yes
+			attacted_to_prev_trigger = yes
+
+			# Check opinions and attraction, etc...
 			OR = {
-				reverse_opinion = { who = PREV value >= 45 }
+				reverse_opinion = {
+					who = PREV
+					value >= 45
+				}
 				reverse_has_opinion_modifier = {
 					who = PREV
 					modifier = opinion_budding_romance
 				}
 			}
 
-			attacted_to_prev_trigger = yes
 			OR = {
-				opinion = { who = ROOT value >= 45 }
+				opinion = {
+					who = ROOT
+					value >= 45
+				}
 				has_opinion_modifier = {
 					who = ROOT
 					modifier = opinion_budding_romance
@@ -533,11 +555,20 @@ interesting_duel_target_for_prev_trigger = {
 
 		# Friendship potential...
 		AND = {
-			NOT = { is_friend = PREV }
-			opinion = { who = PREV value >= 5 }
-			reverse_opinion = { who = PREV value >= 5 }
-			this_has_terrible_opinion_modifier_of_root_trigger = no
-			root_has_terrible_opinion_modifier_of_this_trigger = no
+			NOR = {
+				is_friend = PREV
+				this_has_terrible_opinion_modifier_of_root_trigger = yes
+				root_has_terrible_opinion_modifier_of_this_trigger = yes
+			}
+
+			opinion = {
+				who = PREV
+				value >= 5
+			}
+			reverse_opinion = {
+				who = PREV
+				value >= 5
+			}
 		}
 
 		# Rival potential...
@@ -548,12 +579,20 @@ interesting_duel_target_for_prev_trigger = {
 				is_friend = PREV
 			}
 
-			opinion = { who = PREV value < 5 }
+			opinion = {
+				who = PREV
+				value < 5
+			}
 
 			OR = {
-				is_foe = PREV # Checks if the current scope has committed a crime against PREV
-				PREV = { is_foe = PREVPREV } # Checks if PREV has committed a crime against current scope
-				opinion = { who = PREV value < -25 }
+				# Either has committed a crime against the other
+				is_foe = PREV
+				PREV = { is_foe = PREVPREV }
+
+				opinion = {
+					who = PREV
+					value < -25
+				}
 				this_has_terrible_opinion_modifier_of_root_extended_trigger = yes
 			}
 		}
@@ -565,12 +604,19 @@ interesting_duel_target_for_prev_trigger = {
 				is_friend = PREV
 			}
 
-			reverse_opinion = { who = PREV value < 5 }
+			reverse_opinion = {
+				who = PREV
+				value < 5
+			}
 
 			OR = {
-				is_foe = PREV #checks if the current scope has committed a crime against PREV
-				PREV = { is_foe = PREVPREV } #checks if PREV has committed a crime against current scope
-				reverse_opinion = { who = PREV value < -25 }
+				# Either has committed a crime against the other
+				is_foe = PREV
+				PREV = { is_foe = PREVPREV }
+				reverse_opinion = {
+					who = PREV
+					value < -25
+				}
 				root_has_terrible_opinion_modifier_of_this_extended_trigger = yes
 			}
 		}
@@ -589,7 +635,8 @@ has_bruises_trigger = {
 	}
 }
 
-is_using_intrigue_trigger = { # Either THIS is the attacker using intrigue, or the defender using intrigue
+# Either THIS is the attacker using intrigue, or the defender using intrigue
+is_using_intrigue_trigger = {
 	OR = {
 		AND = {
 			character = event_target:combatant_1
