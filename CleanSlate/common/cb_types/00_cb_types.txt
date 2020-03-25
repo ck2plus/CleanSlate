@@ -4240,34 +4240,29 @@ new_crusade = {
 			religion_authority >= 0.05
 			mercenary = no
 
-			conditional_tooltip = {
-				trigger = {
-					is_alternate_start = yes
+			trigger_if = {
+				limit = {
 					has_alternate_start_parameter = {
 						key = religion_names
 						value = random
 					}
 				}
+
 				custom_tooltip = {
 					text = ALT_GHW_STARTED
+
 					has_global_flag = muslim_jihads_unlocked
 					has_global_flag = pagan_ghws_unlocked
 					has_global_flag = christian_crusades_unlocked
 				}
 			}
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						has_alternate_start_parameter = {
-							key = religion_names
-							value = random
-						}
-					}
-				}
+			trigger_else = {
 				religion_group = christian
+
 				custom_tooltip = {
 					text = CTT_CHRISTIAN_CRUSADES_UNLOCKED
+
 					has_global_flag = christian_crusades_unlocked
 				}
 			}
@@ -4279,70 +4274,68 @@ new_crusade = {
 		ROOT = {
 			uses_new_crusade = yes
 			can_call_crusade = yes
-			hidden_tooltip = {
-				NOT = { has_character_modifier = cancel_crusade_cooldown }
-			}
 
-			# Religion check
-			OR = {
-				NOT = { religion_group = FROM }
-
-				# One is a heretic of the other
-				is_heresy_of = FROM
-				is_parent_religion = FROM
-
-				AND = {
-					religion_group = pagan_group
-					NOT = { religion = FROM }
-				}
-			}
+			NOT = { has_character_modifier = cancel_crusade_cooldown }
 		}
 
 		# Defender
 		FROM = {
+			independent = yes # Don't declare Crusades on revolters - chances are high the war will invalidate
+
+			NOT = { religion = ROOT }
+
 			OR = {
-				AND = {
-					has_character_flag = fourth_crusade_target
-					NOT = {
-						has_character_flag = fourth_crusade_recipient
-					}
+				NOT = { religion_group = ROOT }
+				religion_group = pagan_group
+
+				# One is a heretic of the other
+				is_heresy_of = ROOT
+				is_parent_religion = ROOT
+
+				# Fourth Crusade
+				trigger_if = {
+					limit = { has_character_flag = fourth_crusade_target }
+					NOT = { has_character_flag = fourth_crusade_recipient }
 				}
-				AND = {
-					has_global_flag = 4th_crusade_official
+				trigger_else_if = {
+					limit = { has_global_flag = 4th_crusade_official }
 					has_landed_title = e_byzantium
 				}
 			}
 		}
 
-		NAND = { # Not if the Schism has been mended
-			OR = {
+		# Not if the Schism has been mended
+		trigger_if = {
+			limit = { has_global_flag = schism_mended }
+
+			NOR = {
 				religion = catholic
 				religion = fraticelli
 			}
-			has_global_flag = schism_mended
 		}
 	}
 
 	can_use_title = {
 		# Defender
 		FROM = {
-			independent = yes # Don't declare Crusades on revolters - chances are high the war will invalidate
-
-			OR = {
-				num_of_realm_counties = {
-					value >= 6
-					title = PREV
+			trigger_if = {
+				limit = {
+					NOT = {
+						num_of_realm_counties = {
+							value >= 6
+							title = PREV
+						}
+					}
 				}
-				AND = {
-					PREV = { title = k_thrace }
-					FROM = {
-						has_landed_title = e_byzantium
-						religion_group = christian
-					}
-					num_of_realm_counties = {
-						value >= 1
-						title = PREV
-					}
+
+				PREV = { title = k_thrace }
+
+				has_landed_title = e_byzantium
+				religion_group = christian
+
+				num_of_realm_counties = {
+					value >= 1
+					title = PREV
 				}
 			}
 		}
@@ -4352,18 +4345,30 @@ new_crusade = {
 		# Attacker
 		ROOT = {
 			can_call_crusade = yes
+		}
+
+		# Defender
+		FROM = {
+			NOT = { religion = ROOT }
 
 			# Religion check
 			OR = {
-				NOT = { religion_group = FROM }
+				NOT = { religion_group = ROOT }
 
 				# One is a heretic of the other
-				is_heresy_of = FROM
-				is_parent_religion = FROM
+				is_heresy_of = ROOT
+				is_parent_religion = ROOT
 
-				AND = {
-					religion_group = pagan_group
-					NOT = { religion = FROM }
+				religion_group = pagan_group
+
+				trigger_if = {
+					limit = { has_global_flag = 4th_crusade_official }
+					has_landed_title = e_byzantium
+				}
+
+				trigger_else_if = {
+					limit = { has_character_flag = fourth_crusade_target }
+					NOT = { has_character_flag = fourth_crusade_recipient }
 				}
 			}
 		}
@@ -8870,7 +8875,7 @@ muslim_invasion = {
 		# Muslims require the target to have at least 6 counties within the target kingdom
 		FROM = {
 			num_of_realm_counties = {
-				value = 6
+				value >= 6
 				title = PREV
 			}
 		}
