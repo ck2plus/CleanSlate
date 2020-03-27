@@ -2,42 +2,37 @@
 #
 # Adventurers negotiation
 #
-# ADV.1-30
-#
 #########################################
 
-#Mathilda Bjarnehed
+# Mathilda Bjarnehed
 
-namespace = ADV
+namespace = adv
 
 character_event = {
-	id = ADV.1
-
+	id = adv.001
 	is_triggered_only = yes
 	hide_window = yes
 
 	immediate = {
-		FROM = { save_event_target_as = raiding_adventurer }
+		# Use the override if there is one, otherwise use FROM
 		if = {
 			limit = {
-				event_target:adventurer_decision_target_override = {
-					is_alive = yes
-				}
+				event_target:adventurer_decision_target_override = { is_alive = yes }
 			}
-			event_target:adventurer_decision_target_override = {
-				save_event_target_as = raiding_adventurer
-			}
+			event_target:adventurer_decision_target_override = { save_event_target_as = raiding_adventurer }
 		}
-		save_event_target_as = adventurer_target
+		else = {
+			FROM = { save_event_target_as = raiding_adventurer }
+		}
+		# Use the override if there is one, otherwise use ROOT
 		if = {
 			limit = {
-				event_target:adventurer_decision_taker_override = {
-					is_alive = yes
-				}
+				event_target:adventurer_decision_taker_override = { is_alive = yes }
 			}
-			event_target:adventurer_decision_taker_override = {
-				save_event_target_as = adventurer_target
-			}
+			event_target:adventurer_decision_taker_override = { save_event_target_as = adventurer_target }
+		}
+		else = {
+			save_event_target_as = adventurer_target
 		}
 
 		#Stores how much money adventurer has
@@ -48,23 +43,23 @@ character_event = {
 			limit = {
 				is_capital = no
 				num_of_settlements = 1
-				NOT = {
-					has_province_modifier = nomad_agitation
-				}
+				NOT = { has_province_modifier = nomad_agitation }
 			}
 			preferred_limit = {
 				event_target:raiding_adventurer = {
 					OR = {
-						religion = norse_pagan
 						has_religion_feature = religion_seafaring
 						is_seafarer = yes
+						religion = norse_pagan
 					}
 				}
 				port = yes
 			}
 
+			# Base Value is 100
 			set_variable = { which = price value = 100 }
 
+			# Each settlement is worth 100
 			trigger_switch = {
 				on_trigger = num_of_settlements
 				7 = { change_variable = { which = price value = 700 } }
@@ -76,6 +71,7 @@ character_event = {
 				1 = { change_variable = { which = price value = 100 } }
 			}
 
+			# Each empty holding is worth 25
 			trigger_switch = {
 				on_trigger = num_of_empty_holdings
 				6 = { change_variable = { which = price value = 150 } }
@@ -89,22 +85,25 @@ character_event = {
 			set_variable = { which = haggle_price which = price }
 			multiply_variable = { which = haggle_price value = 0.7 }
 
-
 			#Checks that the adventurer has enough money to haggle
 			if = {
 				limit = {
 					OR = {
-						event_target:adventurer_target = {
-							has_character_flag = peaceful_negotiation
+						event_target:adventurer_target = { has_character_flag = peaceful_negotiation }
+						event_target:raiding_adventurer = {
+							check_variable = {
+								which = adventurer_treasury
+								which >= haggle_price
+								which = PREV
+							}
 						}
-						event_target:raiding_adventurer = { check_variable = { which = adventurer_treasury which = haggle_price which = PREV } }
 					}
 				}
 				save_event_target_as = selling_province
 			}
 		}
 
-   		#If they can't afford your province, pick a vassal province (also a big chance to happen even if they can afford it)
+   		# If they can't afford your province, pick a vassal province (also a big chance to happen even if they can afford it)
 		random_list = {
 			80 = {
 				random_vassal = {
@@ -112,25 +111,21 @@ character_event = {
 						any_demesne_province = {
 							is_capital = no
 							num_of_settlements = 1
-							NOT = {
-								has_province_modifier = nomad_agitation
-							}
+							NOT = { has_province_modifier = nomad_agitation }
 						}
 					}
 					preferred_limit = {
 						event_target:raiding_adventurer = {
 							OR = {
-								religion = norse_pagan
 								has_religion_feature = religion_seafaring
 								is_seafarer = yes
+								religion = norse_pagan
 							}
 						}
 						any_demesne_province = {
 							is_capital = no
 							num_of_settlements = 1
-							NOT = {
-								has_province_modifier = nomad_agitation
-							}
+							NOT = { has_province_modifier = nomad_agitation }
 							port = yes
 						}
 					}
@@ -138,23 +133,19 @@ character_event = {
 						limit = {
 							is_capital = no
 							num_of_settlements = 1
-							NOT = {
-								has_province_modifier = nomad_agitation
-							}
+							NOT = { has_province_modifier = nomad_agitation }
 						}
 						preferred_limit = {
 							event_target:raiding_adventurer = {
 								OR = {
-									religion = norse_pagan
 									has_religion_feature = religion_seafaring
 									is_seafarer = yes
+									religion = norse_pagan
 								}
 							}
 							is_capital = no
 							num_of_settlements = 1
-							NOT = {
-								has_province_modifier = nomad_agitation
-							}
+							NOT = { has_province_modifier = nomad_agitation }
 							port = yes
 						}
 
@@ -189,9 +180,7 @@ character_event = {
 				}
 			}
 			20 = {
-				trigger = {
-					event_target:selling_province = { always = yes }
-				}
+				trigger = { event_target:selling_province = { always = yes } }
 				#Empty, your demesne province is kept as selling_province
 			}
 		}
@@ -200,6 +189,8 @@ character_event = {
 			limit = { event_target:raiding_adventurer = { is_married = no } }
 			random_child = {
 				limit = {
+					is_alive = yes
+					NOT = { is_primary_heir = ROOT }
 					OR = {
 						AND = {
 							event_target:raiding_adventurer = { is_female = yes }
@@ -210,14 +201,12 @@ character_event = {
 							is_female = yes
 						}
 					}
-					is_adult = yes
-					is_alive = yes
-					is_married = no
 					can_marry = yes
-					NOT = { is_primary_heir = ROOT }
-					is_ruler = no
 					character_disease_trigger = no
 					has_disability_trigger = no
+					is_married = no
+					is_marriage_adult = yes
+					is_ruler = no
 					OR = {
 						stewardship = 5
 						martial = 5
@@ -228,11 +217,11 @@ character_event = {
 				}
 				preferred_limit = {
 					NOR = {
-						is_dumb_trigger = yes
 						has_mental_disorder_trigger = yes
-						trait = homosexual
-						trait = celibate
 						has_ugly_trait_trigger = yes
+						is_dumb_trigger = yes
+						trait = celibate
+						trait = homosexual
 					}
 					OR = {
 						is_smart_trigger = yes
@@ -262,9 +251,7 @@ character_event = {
 					}
 				}
 				preferred_limit = {
-					NOT = {
-						has_ugly_trait_trigger = yes
-					}
+					NOT = { has_ugly_trait_trigger = yes }
 				}
 				save_event_target_as = marriage_child
 			}
@@ -278,7 +265,7 @@ character_event = {
 					event_target:marriage_child = { always = yes }
 				}
 			}
-			event_target:raiding_adventurer = { character_event = { id = ADV.2 } }
+			event_target:raiding_adventurer = { character_event = { id = adv.002 } }
 			break = yes
 		}
 
@@ -295,15 +282,15 @@ character_event = {
 
 #Ping event
 character_event = {
-	id = ADV.2
+	id = adv.002
 	hide_window = yes
 	is_triggered_only = yes
-	immediate = { FROM = { letter_event = { id = ADV.3 } } }
+	immediate = { FROM = { letter_event = { id = adv.003 } } }
 }
 
 #Negotiation start
 letter_event = {
-	id = ADV.3
+	id = adv.003
 	border = GFX_event_letter_frame_war
 
 	desc = {
@@ -343,7 +330,7 @@ letter_event = {
 		custom_tooltip = { text = evt_ADV_3_opt_a_tt }
 
 		hidden_effect = {
-			event_target:raiding_adventurer = { character_event = { id = ADV.10 days = 5 } }
+			event_target:raiding_adventurer = { character_event = { id = adv.010 days = 5 } }
 		}
 
 		ai_chance = {
@@ -395,7 +382,7 @@ letter_event = {
 		}
 
 		hidden_effect = {
-			event_target:raiding_adventurer = { character_event = { id = ADV.10 days = 5 } }
+			event_target:raiding_adventurer = { character_event = { id = adv.010 days = 5 } }
 		}
 
 		ai_chance = {
@@ -524,83 +511,9 @@ letter_event = {
 	}
 }
 
-
-#Raiding adventurer evaluates
-character_event = {
-	id = ADV.10
-	hide_window = yes
-	is_triggered_only = yes
-	immediate = {
-		#If they can afford the price, see if they haggle or not
-		export_to_variable = { which = adventurer_treasury value = treasury }
-		subtract_variable = { which = adventurer_treasury which = price which = event_target:selling_province }
-
-		if = {
-			limit = {
-				NOT = { check_variable = { which = adventurer_treasury value = 0 } }
-			}
-			log = "Adventurer [This.GetBestName]([This.GetID]) is forced to haggle since [This.GetSheHe] can't afford the province."
-		}
-
-		random_list = {
-			50 = { #Deal
-				trigger = { check_variable = { which = adventurer_treasury value = 0 } }
-				modifier = { NOT = { stewardship = 8 } factor = 2 }
-				modifier = { age = 50 factor = 2 }
-				modifier = { trait = craven factor = 2 }
-				modifier = { trait = content factor = 2 }
-				modifier = { trait = charitable factor = 2 }
-				modifier = { trait = just factor = 2 }
-				event_target:adventurer_target = { letter_event = { id = ADV.4 } }
-				break = yes
-			}
-			50 = { #Haggle
-				modifier = { stewardship = 14 factor = 2 }
-				modifier = { trait = greedy factor = 2 }
-				modifier = { trait = ambitious factor = 2 }
-				modifier = { trait = arbitrary factor = 2 }
-
-				export_to_variable = { which = adventurer_treasury value = treasury }
-				subtract_variable = { which = adventurer_treasury which = haggle_price which = event_target:selling_province }
-
-				if = {
-					limit = { check_variable = { which = adventurer_treasury value = 0 } }
-					set_variable = { which = province_offer value = 0 }
-					change_variable = { which = province_offer which = haggle_price which = event_target:selling_province }
-					set_character_flag = haggle_price
-				}
-
-				if = {
-					limit = {
-						NOT = { check_variable = { which = adventurer_treasury value = 0 } }
-						NOT = {
-							wealth = 100
-						}
-					}
-					set_character_flag = no_haggling
-					log = "[This.GetBestName]([This.GetID]) can't even afford the reduced haggle price."
-				}
-
-				if = {
-					limit = {
-						NOT = { check_variable = { which = adventurer_treasury value = 0 } }
-						wealth = 100
-					}
-					set_variable = { which = province_offer value = 0 }
-					export_to_variable = { which = province_offer value = treasury }
-					set_character_flag = haggle_price
-					log = "[This.GetBestName]([This.GetID]) can't even afford the reduced haggle price - they are offering what they have instead."
-				}
-
-				event_target:adventurer_target = { letter_event = { id = ADV.5 } }
-			}
-		}
-	}
-}
-
 #They accept the offer
 letter_event = {
-	id = ADV.4
+	id = adv.004
 	desc = EVTDESC_ADV_4
 	border = GFX_event_letter_frame_diplomacy
 
@@ -735,7 +648,7 @@ letter_event = {
 						}
 					}
 				}
-				event_target:raiding_adventurer = { character_event = { id = ADV.20 } }
+				event_target:raiding_adventurer = { character_event = { id = adv.020 } }
 			}
 		}
 
@@ -773,7 +686,7 @@ letter_event = {
 
 #They have a counter-offer
 letter_event = {
-	id = ADV.5
+	id = adv.005
 	desc = {
 		trigger = { FROM = { has_character_flag = haggle_price } } #They have enough money and offer to haggle
 		text = EVTDESC_ADV_5
@@ -928,7 +841,7 @@ letter_event = {
 						}
 					}
 				}
-				event_target:raiding_adventurer = { character_event = { id = ADV.20 } }
+				event_target:raiding_adventurer = { character_event = { id = adv.020 } }
 			}
 		}
 
@@ -1029,9 +942,82 @@ letter_event = {
 	}
 }
 
+#Raiding adventurer evaluates
+character_event = {
+	id = adv.010
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		#If they can afford the price, see if they haggle or not
+		export_to_variable = { which = adventurer_treasury value = treasury }
+		subtract_variable = { which = adventurer_treasury which = price which = event_target:selling_province }
+
+		if = {
+			limit = {
+				NOT = { check_variable = { which = adventurer_treasury value = 0 } }
+			}
+			log = "Adventurer [This.GetBestName]([This.GetID]) is forced to haggle since [This.GetSheHe] can't afford the province."
+		}
+
+		random_list = {
+			50 = { #Deal
+				trigger = { check_variable = { which = adventurer_treasury value = 0 } }
+				modifier = { NOT = { stewardship = 8 } factor = 2 }
+				modifier = { age = 50 factor = 2 }
+				modifier = { trait = craven factor = 2 }
+				modifier = { trait = content factor = 2 }
+				modifier = { trait = charitable factor = 2 }
+				modifier = { trait = just factor = 2 }
+				event_target:adventurer_target = { letter_event = { id = adv.004 } }
+				break = yes
+			}
+			50 = { #Haggle
+				modifier = { stewardship = 14 factor = 2 }
+				modifier = { trait = greedy factor = 2 }
+				modifier = { trait = ambitious factor = 2 }
+				modifier = { trait = arbitrary factor = 2 }
+
+				export_to_variable = { which = adventurer_treasury value = treasury }
+				subtract_variable = { which = adventurer_treasury which = haggle_price which = event_target:selling_province }
+
+				if = {
+					limit = { check_variable = { which = adventurer_treasury value = 0 } }
+					set_variable = { which = province_offer value = 0 }
+					change_variable = { which = province_offer which = haggle_price which = event_target:selling_province }
+					set_character_flag = haggle_price
+				}
+
+				if = {
+					limit = {
+						NOT = { check_variable = { which = adventurer_treasury value = 0 } }
+						NOT = {
+							wealth = 100
+						}
+					}
+					set_character_flag = no_haggling
+					log = "[This.GetBestName]([This.GetID]) can't even afford the reduced haggle price."
+				}
+
+				if = {
+					limit = {
+						NOT = { check_variable = { which = adventurer_treasury value = 0 } }
+						wealth = 100
+					}
+					set_variable = { which = province_offer value = 0 }
+					export_to_variable = { which = province_offer value = treasury }
+					set_character_flag = haggle_price
+					log = "[This.GetBestName]([This.GetID]) can't even afford the reduced haggle price - they are offering what they have instead."
+				}
+
+				event_target:adventurer_target = { letter_event = { id = adv.005 } }
+			}
+		}
+	}
+}
+
 #Change religion etc. of settled adventurer
 character_event = {
-	id = ADV.20
+	id = adv.020
 	hide_window = yes
 	is_triggered_only = yes
 	trigger = {
@@ -1046,7 +1032,7 @@ character_event = {
 				modifier = { trait = craven factor = 5 }
 				liege = {
 					ROOT = { religion = PREV }
-					letter_event = { id = ADV.21 days = 7 }
+					letter_event = { id = adv.021 days = 7 }
 				}
 				any_courtier = {
 					limit = { is_landed = no }
@@ -1062,7 +1048,7 @@ character_event = {
 }
 
 letter_event = { # Religion flip notification event
-	id = ADV.21
+	id = adv.021
 	desc = EVTDESC_ADV_21
 
 	is_triggered_only = yes
@@ -1071,51 +1057,3 @@ letter_event = { # Religion flip notification event
 		name = EXCELLENT
 	}
 }
-
-
-#Testing event for adventurer negotiation
-#character_event = {
-#    id = ADV.30
-#    hide_window = yes
-#    is_triggered_only = yes
-
-#    immediate = {
-#    	random_list = {
-#    		10 = {
-#    			wealth = 300
-#    		}
-#    		10 = {
-#    			wealth = 400
-#    		}
-#    		10 = {
-#    			wealth = 500
-#    		}
-#    		10 = {
-#    			wealth = 60
-#    		}
-#    		10 = {
-#    			wealth = 70
-#    		}
-#    		10 = {
-#    			wealth = 250
-#    		}
-#    		10 = {
-#    			wealth = 300
-#    		}
-#    		10 = {
-#    			wealth = 150
-#    		}
-#    	}
-
-#    	random_independent_ruler = {
-#    		limit = {
-#	    		NOT = { has_character_flag = negotiating_with_adventurer }
-#	    		ai = no
-#
-#    		}
-#    		character_event = {
-#    			id = ADV.1
-#    		}
-#    	}
-# }
-# }
