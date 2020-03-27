@@ -2,9 +2,6 @@
 #
 # Ambition Events
 #
-# ID 94000 - 95000 reserved
-# Cleanslate: Changed to Namespace: ambition
-#
 ################################
 
 namespace = ambition
@@ -49,25 +46,22 @@ character_event = {
 		}
 	}
 
-	desc = {
-		trigger = { always = yes }
-		text = evt_ambition_001_desc_a
-	}
+	desc = evt_ambition_001_desc_a
 
 	option = {
 		name = evt_ambition_001_opt_a
+		change_martial = 1
 		set_character_flag = toy_army
 		set_character_flag = toy_army_prepare
 		set_character_flag = toy_army_taken
-		change_martial = 1
 	}
 }
 
 # Other Toy Army Enthusiasts
 character_event = {
 	id = ambition.002
-	is_triggered_only = yes
 	hide_from = yes
+	is_triggered_only = yes
 
 	picture = GFX_evt_large_army
 	border = GFX_event_normal_frame_war
@@ -86,15 +80,13 @@ character_event = {
 		}
 	}
 
-	desc = {
-		trigger = { always = yes }
-		text = evt_ambition_002_desc_a
-	}
+	desc = evt_ambition_002_desc_a
 
 	option = {
 		name = evt_ambition_002_opt_a
-		character_event = { id = 94002 days = 10 tooltip = EVTTOOLTIP94002 }
+		character_event = { id = ambition.003 days = 10 tooltip = evt_ambition_003_tt }
 	}
+
 	option = {
 		name = evt_ambition_002_opt_b
 		clr_character_flag = toy_army
@@ -104,14 +96,12 @@ character_event = {
 
 # Toy Army Tournament Begins
 character_event = {
-	id = 94002
-	desc = EVTDESC94002
+	id = ambition.003
+	hide_from = yes
+	is_triggered_only = yes
+
 	picture = GFX_evt_large_army
 	border = GFX_event_normal_frame_war
-
-	hide_from = yes
-
-	is_triggered_only = yes
 
 	trigger = {
 		OR = {
@@ -120,65 +110,69 @@ character_event = {
 		}
 	}
 
+	desc = evt_ambition_003_desc_a
+
 	option = {
-		name = EVTOPTA94002
-		random_list = {
-			50 = {
-				character_event = { id = 94004 tooltip = EVTTOOLTIP94004 }
-			}
-			50 = {
-				character_event = { id = 94003 tooltip = EVTTOOLTIP94003 }
-			}
-		}
+		name = evt_ambition_003_opt_a
+		character_event = { id = ambition.004 tooltip = evt_ambition_004_tt }
 	}
 }
 
-# Toy Army Tournament Defeat
+# Toy Army Tournament result
 character_event = {
-	id = 94003
-	desc = EVTDESC94003
+	id = ambition.004
+	hide_from = yes
+	is_triggered_only = yes
+
 	picture = GFX_evt_large_army
 	border = GFX_event_normal_frame_war
 
-	hide_from = yes
+	immediate = {
+		random_list = {
+			50 = { set_character_flag = toy_army_tournament_defeat }
+			50 = { set_character_flag = toy_army_tournament_victory }
+		}
+	}
 
-	is_triggered_only = yes
+	desc = {
+		trigger = { has_character_flag = toy_army_tournament_defeat }
+		text = evt_ambition_004_desc_a
+	}
+	desc = {
+		trigger = { has_character_flag = toy_army_tournament_victory }
+		text = evt_ambition_004_desc_b
+	}
 
 	option = {
-		name = EVTOPTA94003
-		tooltip_info = wroth
 		trigger = {
 			trait = wroth
+			has_character_flag = toy_army_tournament_defeat
 		}
+		name = evt_ambition_004_opt_a
+		tooltip_info = wroth
 		ambition_succeeds = yes
 		change_martial = 1
-		set_character_flag = improve_martial_success
 		piety = -10
+		set_character_flag = improve_martial_success
 	}
 	option = {
-		name = EVTOPTB94003
+		trigger = { has_character_flag = toy_army_tournament_defeat }
+		name = evt_ambition_004_opt_b
 		ambition_succeeds = yes
 		change_martial = 1
-		set_character_flag = improve_martial_success
 		prestige = -15
+		set_character_flag = improve_martial_success
 	}
-}
-
-# Toy Army Tournament Victory
-character_event = {
-	id = 94004
-	desc = EVTDESC94004
-	picture = GFX_evt_large_army
-	border = GFX_event_normal_frame_war
-
-	hide_from = yes
-
-	is_triggered_only = yes
-
 	option = {
-		name = EVTOPTA94004
+		trigger = { has_character_flag = toy_army_tournament_victory }
+		name = evt_ambition_004_opt_c
 		change_martial = 2
 		prestige = 15
+	}
+
+	after = {
+		clr_character_flag = toy_army_tournament_defeat
+		clr_character_flag = toy_army_tournament_victory
 	}
 }
 
@@ -186,96 +180,101 @@ character_event = {
 
 # Street Ruffians
 character_event = {
-	id = 94005
-	desc = EVTDESC94005
+	id = ambition.005
+	hide_from = yes
+	is_triggered_only = yes
+
 	picture = GFX_evt_peasants
 	border = GFX_event_normal_frame_war
 
-	hide_from = yes
 	capable_only = yes
 	only_rulers = yes
 	prisoner = no
 	min_age = 16
 
-	is_triggered_only = yes
-
 	trigger = {
+		is_inaccessible_trigger = no
 		OR = {
+			has_ambition = obj_improve_martial
 			AND = {
 				has_focus = focus_war
 				NOT = { martial = 8 }
 			}
-			has_ambition = obj_improve_martial
 		}
-		NOT = { has_character_flag = toy_army }
-		NOT = { has_character_flag = street_ruffians }
-		NOT = { has_character_flag = warrior_mentor }
-		NOT = { has_character_flag = street_ruffians_taken }
-		NOT = { is_inaccessible_trigger = yes }
+		NOR = {
+			has_character_flag = toy_army
+			has_character_flag = street_ruffians
+			has_character_flag = warrior_mentor
+			has_character_flag = street_ruffians_taken
+		}
 	}
 
+	desc = evt_ambition_005_desc_a
+
 	option = {
-		name = EVTOPTA94005
+		name = evt_ambition_005_opt_a
 		set_character_flag = street_ruffians
 		set_character_flag = street_ruffians_taken
-		random_list = {
-			50 = {
-				character_event = { id = 94007 tooltip = EVTTOOLTIP94007 }
-			}
-			50 = {
-				character_event = { id = 94006 tooltip = EVTTOOLTIP94006 }
-			}
-		}
 		pacifists_lose_piety_effect = yes
+		character_event = { id = ambition.006 tooltip = evt_ambition_006_tt }
 	}
 	option = {
-		name = EVTOPTB94005
+		name = evt_ambition_005_opt_b
 		custom_tooltip = { text = improve_martial_quit }
 	}
 }
 
-# Melee Lost
+# Melee finished
 character_event = {
-	id = 94006
-	desc = EVTDESC94006
+	id = ambition.006
+	hide_from = yes
+	is_triggered_only = yes
+
 	picture = GFX_evt_drunk
 	border = GFX_event_normal_frame_war
 
-	hide_from = yes
+	immediate = {
+		random_list = {
+			50 = { set_character_flag = lost_against_ruffians }
+			50 = { set_character_flag = won_against_ruffians }
+		}
+	}
 
-	is_triggered_only = yes
+	desc = {
+		trigger = { has_character_flag = lost_against_ruffians }
+		text = evt_ambition_006_desc_a
+	}
+	desc = {
+		trigger = { has_character_flag = won_against_ruffians }
+		text = evt_ambition_006_desc_b
+	}
 
 	option = {
-		name = EVTOPTA94006
-		tooltip_info = cruel
 		trigger = {
+			has_character_flag = lost_against_ruffians
 			trait = cruel
 		}
+		name = evt_ambition_006_opt_a
+		tooltip_info = cruel
 		change_martial = 1
 		piety = -10
 	}
 	option = {
-		name = EVTOPTB94006
+		trigger = { has_character_flag = lost_against_ruffians }
+		name = evt_ambition_006_opt_b
 		change_martial = 1
 		prestige = -15
 	}
-}
-
-# Melee Won
-character_event = {
-	id = 94007
-	desc = EVTDESC94007
-	picture = GFX_evt_drunk
-	border = GFX_event_normal_frame_war
-
-	hide_from = yes
-
-	is_triggered_only = yes
-
 	option = {
-		name = EVTOPTA94007
+		trigger = { has_character_flag = won_against_ruffians }
+		name = evt_ambition_006_opt_c
 		change_martial = 2
 		prestige = 15
+	}
+
+	after = {
+		clr_character_flag = lost_against_ruffians
+		clr_character_flag = won_against_ruffians
 	}
 }
 
