@@ -15,8 +15,8 @@ shattered_world_county_conquest = {
 	sort_priority = 795
 
 	can_use_gui = {
-		conditional_tooltip = {
-			trigger = {
+		trigger_if = {
+			limit = {
 				has_alternate_start_setting = {
 					setting = shattered_cbs
 					option = on_limited
@@ -24,8 +24,8 @@ shattered_world_county_conquest = {
 			}
 			total_years_played < 25
 		}
-		conditional_tooltip = {
-			trigger = {
+		trigger_if = {
+			limit = {
 				has_alternate_start_setting = {
 					setting = shattered_cbs
 					option = on_long
@@ -86,10 +86,6 @@ shattered_world_county_conquest = {
 					NOT = { same_realm = ROOT }
 				}
 			}
-			NOR = {
-				character = ROOT
-				is_liege_or_above = ROOT
-			}
 		}
 
 		# Attacker must share a border or be at most one sea zone away
@@ -97,6 +93,7 @@ shattered_world_county_conquest = {
 			any_neighbor_province = {
 				trigger_if = {
 					limit = { has_owner = yes }
+
 					owner = {
 						OR = {
 							character = ROOT
@@ -106,8 +103,10 @@ shattered_world_county_conquest = {
 				}
 				trigger_else = {
 					is_land = no
+
 					any_neighbor_province = {
 						has_owner = yes
+
 						owner = {
 							OR = {
 								character = ROOT
@@ -131,16 +130,7 @@ shattered_world_county_conquest = {
 
 	on_add = {
 		fire_haruspicy_event_effect = yes
-		ROOT = {
-			show_scope_change = no
-			if = {
-				limit = { defender = { is_offmap_governor = offmap_china } }
-				attacker = {
-					sound_effect = china_angered_emperor
-					detract_grace_super_huge_effect = yes
-				}
-			}
-		}
+		anger_china_effect = yes
 	}
 
 	on_success_title = {
@@ -149,12 +139,12 @@ shattered_world_county_conquest = {
 				holder_scope = {
 					tier = COUNT
 					num_of_count_titles <= 1
-					lower_tier_than = ROOT
+					lower_tier_than = attacker
 				}
 			}
 
 			holder_scope = {
-				set_defacto_liege = ROOT
+				set_defacto_liege = attacker
 			}
 		}
 		else_if = {
@@ -163,72 +153,74 @@ shattered_world_county_conquest = {
 					OR = {
 						higher_tier_than = COUNT
 						num_of_count_titles >= 2
-						NOT = { lower_tier_than = ROOT }
+						NOT = { lower_tier_than = attacker }
 					}
 				}
 			}
 
-			usurp_title_plus_barony_if_unlanded = { target = ROOT type = invasion }
+			usurp_title_plus_barony_if_unlanded = {
+				target = attacker
+				type = invasion
+			}
+
 			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
 				limit = {
 					has_holder = yes
-					NOT = {
-						de_facto_liege = PREV
-					}
+					NOT = { de_facto_liege = PREV }
+
 					holder_scope = {
-						is_liege_or_above = FROM
+						is_liege_or_above = defender
 					}
 				}
 
-				usurp_title_plus_barony_if_unlanded = { target = ROOT type = invasion }
+				usurp_title_plus_barony_if_unlanded = {
+					target = attacker
+					type = invasion
+				}
 			}
 		}
 
-		add_pressed_claim = FROM
+		add_pressed_claim = defender
 
 		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
+			limit = { NOT = { character = attacker } }
+			hidden_effect = { participation_scaled_prestige = 100 }
 		}
 	}
 
 	on_fail_title = {
-		# Attacker
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = -100
 		}
 
-		# Defenders
-		FROM = {
+		defender = {
 			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 50 }
 		}
 	}
 
 	on_reverse_demand = {
-		# Attacker
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = -100
 			transfer_scaled_wealth = {
-				to = FROM
+				to = defender
 				value = 2.0
 			}
 		}
 
-		# Defenders
-		FROM = {
+		defender = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 100 }
 		}
 	}
 
@@ -250,11 +242,11 @@ shattered_world_county_conquest = {
 
 	ai_will_do = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 0.1
-			ROOT = {
+			attacker = {
 				independent = no
-				same_liege = FROM
+				same_liege = defender
 			}
 		}
 	}
@@ -272,35 +264,29 @@ shattered_world_county_conquest = {
 #	infamy_modifier = 2
 #
 #	can_use_gui = {
-#		conditional_tooltip = {
-#			trigger = {
+#		trigger_if = {
+#			limit = {
 #				has_alternate_start_setting = {
 #					setting = shattered_cbs
 #					option = on_limited
 #				}
 #			}
-#			NOT = {
-#				total_years_played = 25
-#			}
+#			total_years_played < 25
 #		}
-#		conditional_tooltip = {
-#			trigger = {
+#		trigger_else_if = {
+#			limit = {
 #				has_alternate_start_setting = {
 #					setting = shattered_cbs
 #					option = on_long
 #				}
 #			}
-#			NOT = {
-#				total_years_played = 100
-#			}
+#			total_years_played < 100
 #		}
 #		ROOT = {
 #			show_scope_change = no
-#			prestige = 500
-#			NOR = {
-#				higher_tier_than = DUKE
-#				num_of_count_titles = 20
-#			}
+#			prestige >= 500
+#			num_of_count_titles < 20
+#			NOT = { higher_tier_than = DUKE }
 #		}
 #	}
 #
@@ -312,27 +298,23 @@ shattered_world_county_conquest = {
 #				option = off
 #			}
 #		}
-#		conditional_tooltip = {
-#			trigger = {
+#		trigger_if = {
+#			limit = {
 #				has_alternate_start_setting = {
 #					setting = shattered_cbs
 #					option = on_limited
 #				}
 #			}
-#			NOT = {
-#				total_years_played = 25
-#			}
+#			total_years_played < 25
 #		}
-#		conditional_tooltip = {
-#			trigger = {
+#		trigger_else_if = {
+#			limit = {
 #				has_alternate_start_setting = {
 #					setting = shattered_cbs
 #					option = on_long
 #				}
 #			}
-#			NOT = {
-#				total_years_played = 100
-#			}
+#			total_years_played < 100
 #		}
 #		ROOT = {
 #			NOT = { is_liege_or_above = FROM }
@@ -366,23 +348,16 @@ shattered_world_county_conquest = {
 #
 #		any_de_jure_vassal_title = { # Can only liberate Duchies that are either outside of the Steppe region, or contains a Castle/City/Tribe
 #			tier = COUNT
-#			OR = {
-#				holder_scope = {
+#			holder_scope = {
+#				OR = {
 #					character = FROM
-#				}
-#				holder_scope = {
-#					any_liege = {
-#						character = FROM
-#					}
+#					is_liege_or_above = FROM
 #				}
 #			}
-#			OR = {
-#				location = {
-#					NOT = {
-#						region = world_steppe
-#					}
-#				}
-#				location = {
+#			location = {
+#				trigger_if = {
+#					limit = { region = world_steppe }
+#
 #					any_province_holding = {
 #						OR = {
 #							holding_type = city
@@ -403,35 +378,32 @@ shattered_world_county_conquest = {
 #	}
 #
 #	on_add = {
-#		ROOT = {
+#		attacker = {
 #			show_scope_change = no
 #			prestige = -500
 #		}
-#		if = {
-#			limit = { defender = { is_offmap_governor = offmap_china } }
-#			attacker = {
-#				sound_effect = china_angered_emperor
-#				detract_grace_super_huge_effect = yes
-#			}
-#		}
+#		anger_china_effect = yes
 #	}
 #
 #	on_success = {
 #		any_attacker = {
-#			limit = { NOT = { character = ROOT } }
-#			hidden_tooltip = {
+#			limit = { NOT = { character = attacker } }
+#			hidden_effect = {
 #				participation_scaled_prestige = 100
 #			}
 #		}
 #
-#		FROM = { prestige = -100 }
+#		defender = {
+#			show_scope_change = no
+#			prestige = -100
+#		}
 #	}
 #
 #	on_success_title = {
-#		ROOT = {
+#		attacker = {
 #			vassalize_or_take_under_title = {
 #				title = PREV
-#				enemy = FROM
+#				enemy = defender
 #				anti_nomad = yes
 #				type = invasion
 #			}
@@ -439,25 +411,28 @@ shattered_world_county_conquest = {
 #	}
 #
 #	on_fail = {
-#		ROOT = {
+#		attacker = {
+#			show_scope_change = no
 #			prestige = -200
 #		}
 #	}
 #
 #	on_reverse_demand = {
-#		ROOT = {
+#		attacker = {
+#			show_scope_change = no
 #			transfer_scaled_wealth = {
-#				to = FROM
+#				to = defender
 #				value = 4.0
 #			}
 #			prestige = -200
 #		}
-#		FROM = {
+#		defender = {
+#			show_scope_change = no
 #			participation_scaled_prestige = 300
 #		}
 #		any_defender = {
-#			limit = { NOT = { character = FROM } }
-#			hidden_tooltip = {
+#			limit = { NOT = { character = defender } }
+#			hidden_effect = {
 #				participation_scaled_prestige = 300
 #			}
 #		}
@@ -481,16 +456,14 @@ shattered_world_county_conquest = {
 #
 #	ai_will_do = {
 #		factor = 1
-#		modifier = {
+#		mult_modifier = {
 #			factor = 0
 #			ROOT = {
-#				NOT = {
-#					is_tribal = yes
-#				}
+#				is_tribal = no
 #			}
 #			NOT = {
-#				any_direct_de_jure_vassal_title = {
-#					any_direct_de_jure_vassal_title = {
+#				any_direct_de_jure_vassal_title = { # counties
+#					any_direct_de_jure_vassal_title = { # baronies
 #						OR = {
 #							holding_type = castle
 #							holding_type = city
@@ -499,14 +472,14 @@ shattered_world_county_conquest = {
 #				}
 #			}
 #		}
-#		modifier = {
+#		mult_modifier = {
 #			factor = 0
 #			ROOT = {
 #				is_tribal = yes
 #			}
 #			NOT = {
-#				any_direct_de_jure_vassal_title = {
-#					any_direct_de_jure_vassal_title = {
+#				any_direct_de_jure_vassal_title = { # counties
+#					any_direct_de_jure_vassal_title = { # baronies
 #						OR = {
 #							holding_type = castle
 #							holding_type = city
@@ -583,30 +556,24 @@ shattered_invasion = {
 
 	on_add = {
 		fire_haruspicy_event_effect = yes
-		if = {
-			limit = { defender = { is_offmap_governor = offmap_china } }
-			attacker = {
-				sound_effect = china_angered_emperor
-				detract_grace_super_huge_effect = yes
-			}
-		}
+		anger_china_effect = yes
 	}
 
 	on_success = {
-		# Attackers
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = 200
 			participation_scaled_prestige = 200
 
-			hidden_tooltip = {
-				occupy_minors_of_occupied_settlements = FROM
-				gain_all_occupied_titles = { who = FROM type = invasion }
+			hidden_effect = {
+				occupy_minors_of_occupied_settlements = defender
+				gain_all_occupied_titles = {
+					who = defender
+					type = invasion
+				}
 
 				if = {
-					limit = {
-						has_nickname = no
-					}
+					limit = { has_nickname = no }
 					random_list = {
 						10 = { give_nickname = nick_the_great }
 						10 = { give_nickname = nick_the_magnificent }
@@ -619,27 +586,26 @@ shattered_invasion = {
 			if = {
 				limit = {
 					uses_decadence = yes
-					FROM = { NOT = { uses_decadence = yes } }
+					defender = { uses_decadence = no }
 				}
 				participation_scaled_decadence = -20
 			}
 		}
 		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = {
+			limit = { NOT = { character = attacker } }
+			hidden_effect = {
 				participation_scaled_prestige = 200
 				if = {
 					limit = {
 						uses_decadence = yes
-						FROM = { NOT = { uses_decadence = yes } }
+						defender = { uses_decadence = no }
 					}
 					participation_scaled_decadence = -20
 				}
 			}
 		}
 
-		# Defender
-		FROM = {
+		defender = {
 			show_scope_change = no
 			prestige = -200
 		}
@@ -649,11 +615,10 @@ shattered_invasion = {
 		custom_tooltip = {
 			text = tribal_invasion_succ_tip
 
-			# Attacker
-			ROOT = {
+			attacker = {
 				vassalize_or_take_under_title_destroy_duchies = {
 					title = PREV
-					enemy = FROM
+					enemy = defender
 					is_crusade = yes # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
 					type = invasion
 				}
@@ -662,69 +627,43 @@ shattered_invasion = {
 	}
 
 	on_fail = {
-		# Attacker
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = -200
 		}
 
-		# Defenders
-		FROM = {
+		defender = {
 			show_scope_change = no
 			prestige = 100
 			participation_scaled_prestige = 100
-
-			if = {
-				limit = {
-					has_dlc = "Legacy of Rome"
-					OR = {
-						has_landed_title = e_byzantium
-						has_landed_title = e_roman_empire
-					}
-					religion_group = christian
-				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
-			}
+			roman_victory_triumph_effect = yes
 		}
 		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 100 }
 		}
 	}
 
 	on_reverse_demand = {
-		# Attacker
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
-				to = FROM
+				to = defender
 				value = 4.0
 			}
 			decadence = 10
 		}
 
-		# Defenders
-		FROM = {
+		defender = {
 			show_scope_change = no
 			prestige = 200
 			participation_scaled_prestige = 200
-
-			if = {
-				limit = {
-					has_dlc = "Legacy of Rome"
-					OR = {
-						has_landed_title = e_byzantium
-						has_landed_title = e_roman_empire
-					}
-					religion_group = christian
-				}
-				hidden_tooltip = { character_event = { id = LoR.30 days = 12 } } # Victory Triumph
-			}
+			roman_victory_triumph_effect = yes
 		}
 		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 200 }
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 200 }
 		}
 	}
 
