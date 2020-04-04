@@ -346,17 +346,20 @@ character_event = {
 							any_independent_ruler = {
 								valid_offmap_china_target = yes
 								is_nomadic = no # Don't subjugate nomads
-								AND = { # must either be an eligble realm around within the target area...
-									ROOT = { has_offmap_tmp_flag = WP_is_on_map }
-									valid_offmap_china_target_location = yes
-									num_of_count_titles_in_realm = 15
-									num_of_count_titles_in_realm < 30
-								}
-								AND = { # or, if WP is unlanded, an eligble realm by the eastern border of the map...
-									ROOT = { has_offmap_tmp_flag = WP_is_not_on_map }
-									capital_scope = { region = custom_eastern_edge_of_map }
-									num_of_count_titles_in_realm = 10
-									num_of_count_titles_in_realm < 40
+
+								OR = {
+									AND = { # must either be an eligble realm around within the target area...
+										ROOT = { has_offmap_tmp_flag = WP_is_on_map }
+										valid_offmap_china_target_location = yes
+										num_of_count_titles_in_realm = 15
+										num_of_count_titles_in_realm < 30
+									}
+									AND = { # or, if WP is unlanded, an eligble realm by the eastern border of the map...
+										ROOT = { has_offmap_tmp_flag = WP_is_not_on_map }
+										capital_scope = { region = custom_eastern_edge_of_map }
+										num_of_count_titles_in_realm = 10
+										num_of_count_titles_in_realm < 40
+									}
 								}
 							}
 						}
@@ -1934,105 +1937,105 @@ character_event = { #"[Root.GetBestName] prepares to settle (declare war)"
 }
 
 
-character_event = { #returns home in a state of war [NOT USED?]
-	id = JD.10114 # clone of HL.113
-
-	has_dlc = "Jade Dragon"
-
-	is_triggered_only = yes
-	hide_window = yes
-
-	immediate = {
-		any_army = {
-			set_can_toggle_looting = yes
-			set_looting = no
-		}
-		clr_character_flag = raiding_adventurer
-		event_target:target_province = {
-			owner = {
-				character_event = { id = HL.112 }
-				ROOT = {
-					war = {
-						target = PREV
-						casus_belli = duchy_adventure
-						thirdparty_title = PREVPREV
-						tier = DUKE
-					}
-				}
-			}
-		}
-	}
-}
+# character_event = { #returns home in a state of war [NOT USED?]
+# 	id = JD.10114 # clone of HL.113
+#
+# 	has_dlc = "Jade Dragon"
+#
+# 	is_triggered_only = yes
+# 	hide_window = yes
+#
+# 	immediate = {
+# 		any_army = {
+# 			set_can_toggle_looting = yes
+# 			set_looting = no
+# 		}
+# 		clr_character_flag = raiding_adventurer
+# 		event_target:target_province = {
+# 			owner = {
+# 				character_event = { id = HL.112 }
+# 				ROOT = {
+# 					war = {
+# 						target = PREV
+# 						casus_belli = duchy_adventure
+# 						thirdparty_title = PREVPREV
+# 						tier = DUKE
+# 					}
+# 				}
+# 			}
+# 		}
+# 	}
+# }
 
 # Clean-up
-character_event = {
-	id = JD.10115#clone of HL.199
-
-	has_dlc = "Jade Dragon"
-
-	is_triggered_only = yes
-
-	hide_window = yes
-
-	immediate = {
-#		log = "Cleaning up adventurer: [Root.GetTitledFirstName]."
-		clr_character_flag = raiding_adventurer
-		disband_event_forces = yes
-		clan_title = {
-			activate_title = { title = THIS status = no }
-			destroy_landed_title = THIS
-		}
-		primary_title = {
-			if = {
-				limit = {
-					OR = {
-						AND = {
-							tier = DUKE
-							adventurer = yes
-						}
-						tier = EMPEROR
-					}
-				}
-				activate_title = { title = THIS status = no }
-				destroy_landed_title = THIS
-			}
-		}
-		if = { # Add other clean-up effects before this if-block since this block includes breaks
-			limit = {
-				prisoner = no
-			}
-			if = {
-				limit = {
-					father = {
-						is_alive = yes
-					}
-				}
-				father = {
-					if = {
-						limit = {
-							is_ruler = yes
-						}
-						ROOT = {
-							set_defacto_liege = PREV
-							break = yes
-						}
-					}
-					if = {
-						limit = {
-							is_ruler = no
-						}
-						liege = {
-							ROOT = {
-								set_defacto_liege = PREV
-								break = yes
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
+# character_event = {
+# 	id = JD.10115#clone of HL.199
+#
+# 	has_dlc = "Jade Dragon"
+#
+# 	is_triggered_only = yes
+#
+# 	hide_window = yes
+#
+# 	immediate = {
+# #		log = "Cleaning up adventurer: [Root.GetTitledFirstName]."
+# 		clr_character_flag = raiding_adventurer
+# 		disband_event_forces = yes
+# 		clan_title = {
+# 			activate_title = { title = THIS status = no }
+# 			destroy_landed_title = THIS
+# 		}
+# 		primary_title = {
+# 			if = {
+# 				limit = {
+# 					OR = {
+# 						AND = {
+# 							tier = DUKE
+# 							adventurer = yes
+# 						}
+# 						tier = EMPEROR
+# 					}
+# 				}
+# 				activate_title = { title = THIS status = no }
+# 				destroy_landed_title = THIS
+# 			}
+# 		}
+# 		if = { # Add other clean-up effects before this if-block since this block includes breaks
+# 			limit = {
+# 				prisoner = no
+# 			}
+# 			if = {
+# 				limit = {
+# 					father = {
+# 						is_alive = yes
+# 					}
+# 				}
+# 				father = {
+# 					if = {
+# 						limit = {
+# 							is_ruler = yes
+# 						}
+# 						ROOT = {
+# 							set_defacto_liege = PREV
+# 							break = yes
+# 						}
+# 					}
+# 					if = {
+# 						limit = {
+# 							is_ruler = no
+# 						}
+# 						liege = {
+# 							ROOT = {
+# 								set_defacto_liege = PREV
+# 								break = yes
+# 							}
+# 						}
+# 					}
+# 				}
+# 			}
+# 		}
+# 	}
+# }
 
 #Should adventurer continue to raid?
 character_event = {
@@ -3773,7 +3776,7 @@ character_event = {
 
 	option = { #Convert culture
 		name = evt_OPTA_JD_60212
-		culture = FROMFROM
+		culture = FROMFROMFROM
 		clr_character_flag = chinese_imperial_government_preserve
 		repeat_event = { id = JD.60204 }
 	}
