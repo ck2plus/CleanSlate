@@ -11752,27 +11752,6 @@ character_event = {
 }
 
 character_event = {
-	id = MNM.9899
-	hide_window = yes
-
-	is_triggered_only = yes
-	has_dlc = "Mystics"
-
-	trigger = {
-		FROM = {
-			always = yes
-			is_capital = yes
-			location = { is_capital = yes }
-		}
-	}
-
-	immediate = {
-		set_character_flag = looted_by_raiding_holding
-		repeat_event = { id = MNM.9900 }
-	}
-}
-
-character_event = {
 	id = MNM.9900
 	hide_window = yes
 
@@ -11915,7 +11894,14 @@ character_event = {
 			6000 = { #chance of no artifact stealing
 				modifier = {
 					factor = 0.2
-					FROM = { has_character_flag = looted_by_raiding_holding }
+					# Must be raiding, not sieging
+					FROM = {
+						is_looting_in = event_target:target_location
+					}
+					FROMFROM = { # Sieged holding
+						has_holding_modifier = looted_modifier
+						NOT = { controlled_by = FROM }
+					}
 				}
 				modifier = {
 					factor = 0.8
