@@ -67,7 +67,7 @@ replace_path = "common/wonders"
 #replace_path = "gfx"
 replace_path = "gfx/ambitions"
 
-replace_path = "interface"
+#replace_path = "interface" # Do not uncomment this line. Overriding the base interface folder breaks portraits
 
 replace_path = "localisation"
 replace_path = "localisation/customizable_localisation"
