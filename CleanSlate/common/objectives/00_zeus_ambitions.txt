@@ -15,20 +15,14 @@ obj_become_council_member = {
 
 	potential = {
 		has_dlc = "Conclave"
-		independent = no
-		prisoner = no
-		is_adult = yes
-		is_councillor = no
 		is_landed = yes
-
-		NOR = {
-			liege = {
-				spouse = {
-					character = ROOT
-				}
-			}
-			is_incapable = yes is_inaccessible_trigger = yes
-		}
+		is_adult = yes
+		independent = no
+		is_councillor = no
+		prisoner = no
+		is_incapable = no
+		is_inaccessible_trigger = no
+		NOT = { is_married = liege }
 
 		OR = {
 			can_hold_title = job_chancellor
@@ -138,18 +132,16 @@ obj_land_for_son = {
 		is_adult = yes
 		independent = no
 		is_nomadic = no
+		is_incapable = no
 
 		NOR = {
 			has_religion_feature = religion_matriarchal
-			is_incapable = yes
 			has_character_flag = land_for_son_successful
 		}
 
 		liege = {
 			is_nomadic = no
-			NOT = {
-				has_religion_feature = religion_matriarchal
-			}
+			NOT = { has_religion_feature = religion_matriarchal }
 		}
 
 		any_child = {
@@ -158,12 +150,9 @@ obj_land_for_son = {
 			is_adult = yes
 			is_heir = no
 			prisoner = no
-
-			NOR = {
-				is_incapable = yes
-				is_ascetic_trigger = yes
-				trait = eunuch
-			}
+			is_incapable = no
+			is_ascetic_trigger = no
+			NOT = { trait = eunuch }
 
 			liege = {
 				character = ROOT
@@ -241,7 +230,7 @@ obj_land_for_son = {
 		}
 		modifier = {
 			factor = 5
-			relative_income_to_liege = 0.50
+			relative_income_to_liege >= 0.50
 		}
 	}
 }
@@ -255,11 +244,8 @@ obj_land_for_daughter = {
 		is_adult = yes
 		independent = no
 		is_nomadic = no
-
-		NOR = {
-			is_incapable = yes
-			has_character_flag = land_for_daughter_successful
-		}
+		is_incapable = no
+		NOT = { has_character_flag = land_for_daughter_successful }
 
 		OR = {
 			has_religion_feature = religion_matriarchal
@@ -269,6 +255,7 @@ obj_land_for_daughter = {
 
 		liege = {
 			is_nomadic = no
+
 			OR = {
 				has_religion_feature = religion_matriarchal
 				has_religion_feature = religion_equal
@@ -282,11 +269,8 @@ obj_land_for_daughter = {
 			is_adult = yes
 			is_heir = no
 			prisoner = no
-
-			NOR = {
-				is_incapable = yes
-				is_ascetic_trigger = yes
-			}
+			is_incapable = no
+			is_ascetic_trigger = no
 
 			liege = {
 				character = ROOT
@@ -363,7 +347,7 @@ obj_land_for_daughter = {
 		}
 		modifier = {
 			factor = 5
-			relative_income_to_liege = 0.50
+			relative_income_to_liege >= 0.50
 		}
 	}
 }
@@ -373,13 +357,14 @@ obj_build_a_war_chest = {
 
 	potential = {
 		has_dlc = "Conclave"
-		NOT = { has_character_modifier = war_chest_timer }
-		is_nomadic = no
-		higher_tier_than = BARON
 		is_landed = yes
+		higher_tier_than = BARON
 		is_adult = yes
-		is_ruler = yes
+		is_nomadic = no
 		war = no
+		is_incapable = no
+		is_inaccessible_trigger = no
+		NOT = { has_character_modifier = war_chest_timer }
 
 		trigger_if = {
 			limit = { tier = COUNT }
@@ -395,11 +380,6 @@ obj_build_a_war_chest = {
 		}
 		trigger_else = {
 			wealth < 1000
-		}
-
-		NOR = {
-			is_incapable = yes
-			is_inaccessible_trigger = yes
 		}
 	}
 
@@ -428,7 +408,7 @@ obj_build_a_war_chest = {
 	effect = {
 		add_character_modifier = {
 			modifier = war_taxes
-			months = 60
+			years = 5
 		}
 		add_character_modifier = {
 		   modifier = war_chest_timer
@@ -524,31 +504,29 @@ obj_groom_an_heir = {
 
 	potential = {
 		has_dlc = "Conclave"
+		is_ruler = yes
 		higher_tier_than = BARON
+		is_adult = yes
+		is_incapable = no
+		is_inaccessible_trigger = no
 		holy_order = no
 		mercenary = no
-		is_adult = yes
-		is_ruler = yes
 
-		OR = {
-			NOT = { trait = eunuch }
-			any_child = {
-				is_alive = yes
-			}
+		trigger_if = {
+			limit = { trait = eunuch }
+			has_living_children = yes
 		}
 
 		NOR = {
-			is_incapable = yes
-			is_inaccessible_trigger = yes
-
 			any_child = {
 				is_adult = yes
+				is_incapable = no
+				is_ascetic_trigger = no
+
 				NOR = {
 					trait = bastard
 					trait = eunuch
 					trait = celibate
-					is_incapable = yes
-					is_ascetic_trigger = yes
 				}
 
 				trigger_if = {
@@ -590,43 +568,40 @@ obj_groom_an_heir = {
 	chance = {
 		factor = 100
 
-		modifier = {
-			factor = 0
-			trait = celibate
+		trigger = {
+			is_theocracy = no
+			NOT = { trait = celibate }
 		}
-		modifier = {
-			factor = 0
-			is_theocracy = yes
-		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 10
 			has_focus = focus_family
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 5
 			trait = bastard
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 5
 			age >= 30
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 5
 			age >= 45
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 5
 			government = nomadic_government
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			is_smart_trigger = yes
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = shy
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = chaste
 		}
@@ -635,7 +610,9 @@ obj_groom_an_heir = {
 	success = {
 		any_child = {
 			is_adult = yes
-			NOR = {
+			is_ascetic_trigger = no
+
+			NOT = {
 				custom_tooltip = {
 					text = bastard_eunuch_celibate_or_incapable_tt
 					OR = {
@@ -645,7 +622,6 @@ obj_groom_an_heir = {
 						is_incapable = yes
 					}
 				}
-				is_ascetic_trigger = yes
 			}
 
 			trigger_if = {
@@ -695,25 +671,23 @@ obj_groom_an_heir = {
 			any_child = {
 				limit = {
 					is_adult = yes
+					is_incapable = no
+					is_ascetic_trigger = no
 
 					NOR = {
 						trait = bastard
 						trait = eunuch
 						trait = celibate
-						is_incapable = yes
-						is_ascetic_trigger = yes
 					}
 
-					OR = {
-						is_female = no
-						AND = {
-							is_female = yes
-							ROOT = {
-								OR = {
-									has_law = true_cognatic_succession
-									has_law = enatic_succession
-									has_law = enatic_cognatic_succession
-								}
+					trigger_if = {
+						limit = { is_female = yes }
+
+						ROOT = {
+							OR = {
+								has_law = true_cognatic_succession
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
 							}
 						}
 					}

@@ -11,17 +11,17 @@ obj_create_treasury = {
 
 	potential = {
 		has_dlc = "Holy Fury"
+		is_landed = yes
+		higher_tier_than = BARON
+		is_adult = yes
 		NOR = {
 			has_character_flag = created_treasury
 			any_artifact = {
 				quality >= 2
 			}
-			is_incapable = yes
-			is_inaccessible_trigger = yes
 		}
-		is_landed = yes
-		higher_tier_than = BARON
-		is_adult = yes
+		is_incapable = no
+		is_inaccessible_trigger = no
 	}
 
 	success = {
@@ -29,7 +29,7 @@ obj_create_treasury = {
 			text = create_treasury_condition_tooltip
 
 			any_artifact = {
-				count = 3
+				count >= 3
 				quality >= 2
 			}
 		}
@@ -58,16 +58,16 @@ obj_make_friends = {
 
 	potential = {
 		has_dlc = "Holy Fury"
-		num_of_friends < 1
-		NOR = {
-			has_character_flag = made_friends
-			trait = shy
-			is_incapable = yes
-			is_inaccessible_trigger = yes
-		}
 		is_landed = yes
 		higher_tier_than = BARON
 		is_adult = yes
+		num_of_friends < 1
+		is_incapable = no
+		is_inaccessible_trigger = no
+		NOR = {
+			has_character_flag = made_friends
+			trait = shy
+		}
 	}
 
 	success = {
@@ -107,10 +107,10 @@ obj_forge_bloodline = {
 		is_playable = yes
 		higher_tier_than = COUNT
 		age >= 6
+		is_incapable = no
 
 		NOR = {
 			trait = content
-			is_incapable = yes
 			any_owned_bloodline = { # Should not already have a created bloodline
 				has_bloodline_flag = created_bloodline
 			}
@@ -119,134 +119,219 @@ obj_forge_bloodline = {
 		trigger_if = { # The AI shouldn't create bloodlines when they already have a historical one
 			limit = { ai = yes }
 
-			any_owned_bloodline = {
-				has_bloodline_flag = historical_bloodline
+			NOT = {
+				any_owned_bloodline = {
+					has_bloodline_flag = historical_bloodline
+				}
 			}
 		}
 
 		trigger_if = {
 			limit = { has_dynasty_flag = flag_dynasty_forged_bloodline }
-			OR = {
-				prestige >= 20000 # Adults
-				AND = { # Child facilitation
-					prestige >= 15000
-					is_adult = no
-					OR = {
-						trait = willful
-						trait = proud
-						trait = ambitious
-						trait = quick
-						trait = genius
-					}
+
+			trigger_if = {
+				limit = { is_adult = no }
+
+				prestige >= 15000
+
+				OR = {
+					trait = willful
+					trait = proud
+					trait = ambitious
+					trait = quick
+					trait = genius
 				}
+			}
+			trigger_else = {
+				prestige >= 20000
 			}
 		}
 		trigger_else = {
-			OR = {
-				prestige >= 5000 # Adults
-				AND = { # Child facilitation
-					prestige >= 2500
-					is_adult = no
-					OR = {
-						trait = willful
-						trait = proud
-						trait = ambitious
-						trait = quick
-						trait = genius
-					}
+			trigger_if = {
+				limit = { is_adult = no }
+
+				prestige >= 2500
+
+				OR = {
+					trait = willful
+					trait = proud
+					trait = ambitious
+					trait = quick
+					trait = genius
 				}
+			}
+			trigger_else = {
+				prestige >= 5000
 			}
 		}
 	}
 
 	creation_effect = {
 		if = {
-			limit = {
-				age < 12
-			}
-			set_character_flag = flag_forge_bloodline_was_child # Checked to unlock special flavor.
+			limit = { age < 12 }
+
+			# Checked to unlock special flavor
+			set_character_flag = flag_forge_bloodline_was_child
 		}
 
 		# Set variables immediately so that the 0s show in the tooltip
 		if = {
 			limit = {
-				NOT = { check_variable = { which = bloodline_murdered_people value = 1 } }
+				check_variable = {
+					which = bloodline_murdered_people
+					value < 1
+				}
 			}
-			set_variable = { which = bloodline_murdered_people value = 0 }
+			set_variable = {
+				which = bloodline_murdered_people
+				value = 0
+			}
 		}
 		if = {
 			limit = {
-				NOT = { check_variable = { which = bloodline_won_wars value = 1 } }
+				check_variable = {
+					which = bloodline_won_wars
+					value < 1
+				}
 			}
-			set_variable = { which = bloodline_won_wars value = 0 }
+			set_variable = {
+				which = bloodline_won_wars
+				value = 0
+			}
 		}
 		if = {
 			limit = {
-				NOT = { check_variable = { which = bloodline_built_holdings value = 1 } }
+				check_variable = {
+					which = bloodline_built_holdings
+					value < 1
+				}
 			}
-			set_variable = { which = bloodline_built_holdings value = 0 }
+			set_variable = {
+				which = bloodline_built_holdings
+				value = 0
+			}
 		}
 		if = {
 			limit = {
-				NOT = { check_variable = { which = bloodline_built_cities value = 1 } }
+				check_variable = {
+					which = bloodline_built_cities
+					value < 1
+				}
 			}
-			set_variable = { which = bloodline_built_cities value = 0 }
+			set_variable = {
+				which = bloodline_built_cities
+				value = 0
+			}
 		}
 		if = {
 			limit = {
-				NOT = { check_variable = { which = bloodline_built_castles value = 1 } }
+				check_variable = {
+					which = bloodline_built_castles
+					value < 1
+				}
 			}
-			set_variable = { which = bloodline_built_castles value = 0 }
+			set_variable = {
+				which = bloodline_built_castles
+				value = 0
+			}
 		}
 		if = {
 			limit = {
-				NOT = { check_variable = { which = bloodline_built_temples value = 1 } }
+				check_variable = {
+					which = bloodline_built_temples
+					value < 1
+				}
 			}
-			set_variable = { which = bloodline_built_temples value = 0 }
+			set_variable = {
+				which = bloodline_built_temples
+				value = 0
+			}
 		}
 
-		#If you already fulfilled one of the paths, fire event immediately
+		# If you already fulfilled one of the paths, fire event immediately
 		if = {
 			limit = {
-				check_variable = { which = bloodline_murdered_people value = 30 }
+				check_variable = {
+					which = bloodline_murdered_people
+					value >= 30
+				}
 			}
 			set_character_flag = flag_about_to_murder_bloodline
-			character_event = { id = HF.24025 days = 25 random = 25 }
+			character_event = {
+				id = HF.24025
+				days = 25
+				random = 25
+			}
 		}
 		else_if = {
 			limit = {
-				check_variable = { which = bloodline_won_wars value = 15 }
+				check_variable = {
+					which = bloodline_won_wars
+					value >= 15
+				}
 			}
 			set_character_flag = flag_about_to_war_bloodline
-			character_event = { id = HF.24031 days = 25 random = 25 }
+			character_event = {
+				id = HF.24031
+				days = 25
+				random = 25
+			}
 		}
 		else_if = {
 			limit = {
-				check_variable = { which = bloodline_built_holdings value = 24 }
+				check_variable = {
+					which = bloodline_built_holdings
+					value >= 24
+				}
 			}
 			set_character_flag = flag_about_to_builder_bloodline
-			narrative_event = { id = HF.24047 days = 25 random = 25 }
+			narrative_event = {
+				id = HF.24047
+				days = 25
+				random = 25
+			}
 		}
 		else_if = {
 			limit = {
-				check_variable = { which = bloodline_built_cities value = 10 }
+				check_variable = {
+					which = bloodline_built_cities
+					value >= 10
+				}
 			}
 			set_character_flag = flag_about_to_builder_bloodline
-			narrative_event = { id = HF.24042 days = 25 random = 25 }
+			narrative_event = {
+				id = HF.24042
+				days = 25
+				random = 25
+			}
 		}
 		else_if = {
 			limit = {
-				check_variable = { which = bloodline_built_castles value = 10 }
+				check_variable = {
+					which = bloodline_built_castles
+					value >= 10
+				}
 			}
 			set_character_flag = flag_about_to_builder_bloodline
-			narrative_event = { id = HF.24043 days = 25 random = 25 }
+			narrative_event = {
+				id = HF.24043
+				days = 25
+				random = 25
+			}
 		}
 		else_if = {
 			limit = {
-				check_variable = { which = bloodline_built_temples value = 10 }
+				check_variable = {
+					which = bloodline_built_temples
+					value >= 10
+				}
 			}
 			set_character_flag = flag_about_to_builder_bloodline
-			narrative_event = { id = HF.24044 days = 25 random = 25 }
+			narrative_event = {
+				id = HF.24044
+				days = 25
+				random = 25
+			}
 		}
 
 		# Otherwise delayed fire of event bloodlines chain
@@ -255,13 +340,23 @@ obj_forge_bloodline = {
 				higher_real_tier_than = DUKE
 				ai = no
 			}
-			character_event = { id = HF.24052 days = 800 random = 800 }
+			character_event = {
+				id = HF.24052
+				days = 800
+				random = 800
+			}
 		}
 
 		# Finally, set counter for years at peace
-		set_variable = { which = bloodline_peaceful_years value = 0 }
+		set_variable = {
+			which = bloodline_peaceful_years
+			value = 0
+		}
 		# And start increasing it. on_started_war actions will reset it
-		character_event = { id = HF.24020 days = 365 }
+		character_event = {
+			id = HF.24020
+			days = 365
+		}
 	}
 
 	success = {
@@ -317,37 +412,32 @@ obj_forge_bloodline = {
 	chance = {
 		factor = 10
 
-		modifier = {
-			factor = 0
-			NOR = {
+		trigger = {
+			OR = {
 				trait = ambitious
 				trait = proud
 				trait = willful
 			}
-		}
-		modifier = {
-			factor = 0
-			OR = {
+
+			NOR = {
 				trait = humble
 				trait = timid
-			}
-		}
-		modifier = {
-			factor = 100
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0
-			# The AI shouldn't try to create a new bloodline if they are already the founder of one (from legendary journey, crusades, etc.), but that's fine for the player
-			any_owned_bloodline = {
-				founder = {
-					character = ROOT
+
+				# Don't step on the player's dreams, AI.
+				any_dynasty_member = { ai = no }
+
+				# The AI shouldn't try to create a new bloodline if they are already the founder of one (from legendary journey, crusades, etc.), but that's fine for the player
+				any_owned_bloodline = {
+					founder = {
+						character = ROOT
+					}
 				}
 			}
 		}
-		modifier = {
-			factor = 0
-			any_dynasty_member = { ai = no } # Don't step on the player's dreams, AI.
+
+		mult_modifier = {
+			factor = 100
+			trait = ambitious
 		}
 	}
 }
