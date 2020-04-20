@@ -713,18 +713,9 @@ character_event = {
 		NOT = { trait = berserker }
 	}
 
-	desc = {
-		text = EVTDESC_HFP_11001_A
-		trigger = { has_character_flag = desc_A }
-	}
-	desc = {
-		text = EVTDESC_HFP_11001_B
-		trigger = { has_character_flag = desc_B }
-	}
-	desc = {
-		text = EVTDESC_HFP_11001_C
-		trigger = { has_character_flag = desc_C }
-	}
+	desc = EVTDESC_HFP_11001_A
+	desc = EVTDESC_HFP_11001_B
+	desc = EVTDESC_HFP_11001_C
 
 	immediate = {
 		hidden_effect = {
@@ -735,7 +726,6 @@ character_event = {
 			random_rival = {
 				save_event_target_as = random_rival_target #For loc and extra fun
 			}
-			randomize_ABC_desc_flag_effect = yes #picks a desc-text flag...
 
 			#Sets up weapons for localization...
 			set_dueling_weapon_effect = yes
@@ -1650,8 +1640,6 @@ character_event = {
 		allow_new_battle_events_effect = yes
 	}
 	after = {
-		clr_ABC_desc_flag_effect = yes
-
 		clr_character_flag = skip_wounded_trait
 		clr_character_flag = injury_both_eyes
 		clr_character_flag = injury_eye
@@ -1701,7 +1689,6 @@ character_event = {
 			disallow_new_battle_events_effect = yes #to keep the tombola from spamming your potential target...
 		}
 		hidden_effect = { save_beloved_character_effect = yes } #event_target:my_beloved (might be platonic, children, etc)
-		randomize_ABC_desc_flag_effect = yes
 		set_battle_duels_option_flag_effect = yes
 		if = {
 			limit = { has_dlc = Reapers }
@@ -1777,14 +1764,10 @@ character_event = {
 		}
 	}
 
-	desc = {
-		text = EVTDESC_HFP_11011_A
-		trigger = { has_character_flag = desc_A }
-	}
+	desc = EVTDESC_HFP_11011_A
 	desc = {
 		text = EVTDESC_HFP_11011_B_1 #Default variant B
 		trigger = {
-			has_character_flag = desc_B
 			NOT = {
 				event_target:enemy_commander = {
 					always = yes
@@ -1795,16 +1778,12 @@ character_event = {
 	desc = {
 		text = EVTDESC_HFP_11011_B_2 #Second variant: makes sure to fetch the correct culture for the enemy commander, if they exist
 		trigger = {
-			has_character_flag = desc_B
 			event_target:enemy_commander = {
 				always = yes
 			}
 		}
 	}
-	desc = {
-		text = EVTDESC_HFP_11011_C
-		trigger = { has_character_flag = desc_C }
-	}
+	desc = EVTDESC_HFP_11011_C
 
 	option = { #Special option: High Combat-rating only (no enemy commander present)
 		tooltip_info = combat_rating
@@ -2092,7 +2071,6 @@ character_event = {
 		}
 	}
 	after = {
-		clr_ABC_desc_flag_effect = yes
 		clr_character_flag = skip_wounded_trait
 		clr_character_flag = injury_both_eyes
 		clr_character_flag = injury_eye
@@ -2685,15 +2663,12 @@ character_event = {
 
 	desc = {
 		text = EVTDESC_HFP_11019_A # I can't be near my children
-		trigger = { has_character_flag = desc_A }
+		trigger = { num_of_children = 1 }
 	}
-	desc = {
-		text = EVTDESC_HFP_11019_B #I'm not really here
-		trigger = { has_character_flag = desc_B }
-	}
+	desc = EVTDESC_HFP_11019_B #I'm not really here
 	desc = {
 		text = EVTDESC_HFP_11019_C #Survivor's guilt
-		trigger = { has_character_flag = desc_C }
+		trigger = { NOT = { event_target:home_liege = { character = ROOT } } }
 	}
 
 
@@ -2701,33 +2676,36 @@ character_event = {
 		name = EVTOPTA_HFP_11019_1 #I need a drink
 		add_trait = drunkard
 		add_trait = cynical
-		trigger = { has_character_flag = desc_A }
+		trigger = { num_of_children = 1 }
 	}
 	option = { #Try to cope (#Scenario A: I can't be near my children)
 		name = EVTOPTA_HFP_11019_2 #I do NOT have nightmares, servant! How dare you?
 		add_trait = depressed
-		trigger = { has_character_flag = desc_A }
+		trigger = { num_of_children = 1 }
 	}
 	option = { #Act out (Scenario A (last option) or B (top option if so))
 		name = EVTOPTF_HFP_11019 #I can never be close to anyone.
 		add_trait = celibate
 		trigger = {
-			OR = {
-				has_character_flag = desc_A
-				has_character_flag = desc_B
-			}
+			event_target:home_liege = { character = ROOT } # Not scenario C
 		}
 	}
 	option = { #Try to cope (#Scenario B: I'm not really here)
 		name = EVTOPTB_HFP_11019_2 #Some solitude is what's needed
 		add_trait = depressed
-		trigger = { has_character_flag = desc_B }
+		trigger = { # Not scenario A and C
+			num_of_children < 1
+			event_target:home_liege = { character = ROOT }
+		}
 	}
 	option = { #Act out (#Scenario B: I'm not really here)
 		name = EVTOPTB_HFP_11019_1 #I need to feel alive again
 		add_trait = lustful
 		add_trait = drunkard
-		trigger = { has_character_flag = desc_B }
+		trigger = { # Not scenario A and C
+			num_of_children < 1
+			event_target:home_liege = { character = ROOT }
+		}
 	}
 	option = { #Act out (#Scenario C: Survivor's guilt)
 		name = EVTOPTC_HFP_11019_1 #It should've been me who died
@@ -2735,13 +2713,13 @@ character_event = {
 		death = {
 			death_reason = death_suicide
 		}
-		trigger = { has_character_flag = desc_C }
+		trigger = { NOT = { event_target:home_liege = { character = ROOT } } }
 	}
 	option = { #Try to cope (Scenario C: Survivor's guilt)
 		name = EVTOPTC_HFP_11019_2 #Some people will always want me dead
 		add_trait = cynical
 		add_trait = depressed
-		trigger = { has_character_flag = desc_C }
+		trigger = { NOT = { event_target:home_liege = { character = ROOT } } }
 	}
 
 	option = { #Act out in anger (A, B, or C)
@@ -2762,13 +2740,12 @@ character_event = {
 	option = { #For WL members only: comfort hunting
 		name = EVTOPTE_HFP_11019 #Enough of these nonsense FEELINGS
 		tooltip_info_custom = available_due_to_warrior_lodge
-		piety =-5
+		piety = -5
 		trigger = {
 			is_member_of_any_warrior_lodge_trigger = yes
 		}
 	}
 	after = {
-		clr_ABC_desc_flag_effect = yes
 		allow_new_battle_events_effect = yes
 	}
 }
@@ -5917,8 +5894,6 @@ character_event = {
 		allow_new_battle_events_effect = yes
 	}
 	after = {
-		clr_ABC_desc_flag_effect = yes
-
 		clr_character_flag = skip_wounded_trait
 
 		clr_character_flag = high_PCS_opt
