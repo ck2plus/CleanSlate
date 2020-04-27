@@ -399,16 +399,12 @@ succession_laws = {
 
 					PREV = { is_primary_holder_title = no }
 				}
-
-				trigger_if = {
+				trigger_else_if = {
 					limit = { is_patrician = no }
 
 					is_feudal = yes
 
-					NOR = {
-						religion_group = muslim
-						religion_group = indian_group
-					}
+					NOT = { religion_group = indian_group }
 				}
 
 				trigger_if = {
@@ -427,98 +423,41 @@ succession_laws = {
 						is_patrician = no
 					}
 
-					NOR = {
-						any_liege = {
-							holy_order = yes
-						}
-
-						any_demesne_title = {
-							is_vice_royalty = yes
-						}
+					NOT = {
+						any_demesne_title = { is_vice_royalty = yes }
 					}
 				}
 
-				NOT = { government = confucian_bureaucracy }
+				NOR = {
+					government = confucian_bureaucracy
+					government = muslim_government
+					government = order_government
+				}
 			}
 		}
 
 		allow = {
+			# NOTE: Do not combine these three. They are separate for the tooltip
 			trigger_if = {
-				limit = {
-					NOR = {
-						has_dlc = "Conclave"
-						has_law = succ_hre_elective
-					}
-				}
+				limit = { has_law = succ_hre_elective }
 
-				trigger_if = {
-					limit = {
-						has_crown_law_title = yes
-						is_republic = no
-					}
-
-					crownlaw_title = {
-						OR = {
-							has_law = crown_authority_2
-							has_law = crown_authority_3
-							has_law = crown_authority_4
-						}
-					}
-				}
-				trigger_else = {
-					holder_scope = {
-						show_scope_change = no
-
-						is_patrician = yes
-
-						OR = {
-							is_merchant_republic = no
-
-							PREV = {
-								show_scope_change = no
-
-								is_primary_holder_title = no
-							}
-
-							trigger_if = {
-								limit = { in_revolt = yes }
-
-								in_revolt = no
-
-								succ_law_title = {
-									NOT = { title = PREVPREV }
-								}
-							}
-						}
-					}
-				}
+				has_law = centralization_4
 			}
 			trigger_if = {
 				limit = {
-					has_law = succ_hre_elective
 					has_dlc = "Conclave"
+					has_law = succ_hre_elective
 				}
 				has_law = law_voting_power_0
 			}
 			trigger_else_if = {
-				limit = {
-					has_law = succ_hre_elective
-					NOT = { has_dlc = "Conclave" }
-				}
+				limit = { has_law = succ_hre_elective }
 				has_law = crown_authority_4
 			}
 
 			trigger_if = {
-				limit = {
-					has_law = succ_hre_elective
-				}
-				has_law = centralization_4
-			}
+				limit = { has_dlc = "Conclave" }
 
-			trigger_if = {
-				limit = {
-					has_dlc = "Conclave"
-				}
 				custom_tooltip = {
 					text = forced_elective_tt
 
@@ -532,16 +471,50 @@ succession_laws = {
 				}
 			}
 
-			custom_tooltip = {
-				text = not_forced_tt
+			trigger_if = {
+				limit = {
+					NOR = {
+						has_dlc = "Conclave"
+						has_law = succ_hre_elective
+						is_patrician = yes
+					}
+					has_crown_law_title = yes
+				}
 
-				holder_scope = {
-					NOT = { has_character_flag = liege_forced_succ_law }
+				crownlaw_title = {
+					OR = {
+						has_law = crown_authority_2
+						has_law = crown_authority_3
+						has_law = crown_authority_4
+					}
+				}
+			}
+
+			holder_scope = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
 				}
 			}
 		}
 
+		pass_effect = {
+			log = "succ_seniority pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "succ_seniority ([This.GetFullBaseName])"
 			succession = seniority
 		}
 	}
