@@ -530,6 +530,13 @@ succession_laws = {
 		dynasty_opinion = -5
 
 		potential = {
+			is_primary_type_title = no
+
+			trigger_if = {
+				limit = { is_landless_type_title = yes }
+				temporary = yes
+			}
+
 			trigger_if = {
 				limit = {
 					OR = {
@@ -545,109 +552,77 @@ succession_laws = {
 				is_patrician = no
 
 				NOR = {
-					religion_group = muslim
 					government = confucian_bureaucracy
-				}
-			}
-
-			OR = {
-				holder_scope = { # Viceroyalties can always have primogeniture if not muslim
-					any_demesne_title = {
-						is_vice_royalty = yes
-					}
+					government = muslim_government
+					government = order_government
 				}
 
-				has_title_flag = alternate_byz
+				trigger_if = {
+					limit = { religion_group = pagan_group }
 
-				AND = { # Regular requirements
-					trigger_if = {
-						limit = { is_landless_type_title = yes }
-						temporary = yes
-					}
-
-					is_primary_type_title = no
-
-					holder_scope = {
-						trigger_if = {
-							limit = { independent = no }
-
-							NOT = {
-								any_liege = {
-									holy_order = yes
-								}
-							}
-						}
-						trigger_if = {
-							limit = { religion_group = pagan_group }
-
-							OR = {
-								is_reformed_religion = yes
-								religion = bon
-								religion = hellenic_pagan
-							}
-						}
+					OR = {
+						is_reformed_religion = yes
+						religion = bon
+						religion = hellenic_pagan
 					}
 				}
 			}
 		}
 
 		allow = {
+			# NOTE: Do not combine these three. They are separate for the tooltip
 			trigger_if = {
-				trigger = { has_dlc = "Conclave" }
+				limit = { has_law = succ_hre_elective }
+
+				has_law = centralization_4
+			}
+			trigger_if = {
+				limit = {
+					has_dlc = "Conclave"
+					has_law = succ_hre_elective
+				}
+				has_law = law_voting_power_0
+			}
+			trigger_else_if = {
+				limit = { has_law = succ_hre_elective }
+				has_law = crown_authority_4
+			}
+
+			trigger_if = {
+				limit = { has_dlc = "Conclave" }
 
 				holder_scope = {
 					show_scope_change = no
 
 					OR = {
-						any_demesne_title = { # Viceroyalties can always have primogeniture if not muslim
+						# Viceroyalties can always have primogeniture if not muslim
+						any_demesne_title = {
 							is_vice_royalty = yes
 						}
 
 						primary_title = {
 							show_scope_change = no
 
-							OR = {
-								has_law = ze_administration_laws_1
-								has_law = ze_administration_laws_2
-							}
+							NOT = { has_law = ze_administration_laws_0 }
 						}
 					}
 				}
 			}
 			trigger_else_if = {
-				limit = {
-					NOT = { has_law = succ_hre_elective }
-				}
+				limit = { NOT = { has_law = succ_hre_elective } }
 
-				OR = {
-					holder_scope = { # Viceroyalties can always have primogeniture if not muslim
-						show_scope_change = no
+				holder_scope = {
+					show_scope_change = no
 
+					OR = {
+						# Viceroyalties can always have primogeniture if not muslim
 						any_demesne_title = {
 							is_vice_royalty = yes
 						}
+
+						crownlaw_title = { has_law = crown_authority_3 }
+						crownlaw_title = { has_law = crown_authority_4 }
 					}
-
-					crownlaw_title = {
-						OR = {
-							has_law = crown_authority_3
-							has_law = crown_authority_4
-						}
-					}
-				}
-			}
-
-			trigger_if = {
-				limit = { has_law = succ_hre_elective }
-
-				has_law = centralization_4
-
-				trigger_if = {
-					limit = { has_dlc = "Conclave" }
-					has_law = law_voting_power_0
-				}
-				trigger_else = {
-					has_law = crown_authority_4
 				}
 			}
 
@@ -667,16 +642,34 @@ succession_laws = {
 				}
 			}
 
-			custom_tooltip = {
-				text = not_forced_tt
+			holder_scope = {
+				show_scope_change = no
 
-				holder_scope = {
-					NOT = { has_character_flag = liege_forced_succ_law }
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+
+						holder_scope = {
+							NOT = { has_character_flag = liege_forced_succ_law }
+						}
+					}
 				}
 			}
 		}
 
+		pass_effect = {
+			log = "succ_primogeniture pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "succ_primogeniture ([This.GetFullBaseName])"
 			succession = primogeniture
 		}
 	}
