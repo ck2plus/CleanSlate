@@ -54,6 +54,7 @@ laws = {
 		group = centralization
 		default = yes
 
+		demesne_size = 0
 		vassal_limit = 10
 
 		potential = {
@@ -75,7 +76,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "centralization_0 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "centralization_0 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = centralization_1
 				revoke_law = centralization_2
@@ -140,7 +147,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "centralization_1 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "centralization_1 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = centralization_0
 				revoke_law = centralization_2
@@ -199,7 +212,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "centralization_2 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "centralization_2 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = centralization_0
 				revoke_law = centralization_1
@@ -256,7 +275,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "centralization_3 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "centralization_3 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = centralization_0
 				revoke_law = centralization_1
@@ -307,6 +332,21 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "centralization_4 pass ([This.GetFullBaseName])"
+		}
+
+		effect = {
+			log = "centralization_4 ([This.GetFullBaseName])"
+
+			hidden_tooltip = {
+				revoke_law = centralization_0
+				revoke_law = centralization_1
+				revoke_law = centralization_2
+				revoke_law = centralization_3
+			}
+		}
+
 		ai_will_do = {
 			factor = 0.8
 
@@ -317,15 +357,6 @@ laws = {
 					over_vassal_limit <= 5
 					over_max_demesne_size > 0
 				}
-			}
-		}
-
-		effect = {
-			hidden_effect = {
-				revoke_law = centralization_0
-				revoke_law = centralization_1
-				revoke_law = centralization_2
-				revoke_law = centralization_3
 			}
 		}
 	}
@@ -343,6 +374,7 @@ laws = {
 		potential = {
 			holder_scope = {
 				is_tribal = yes
+				higher_tier_than = COUNT
 			}
 		}
 
@@ -358,18 +390,19 @@ laws = {
 				}
 				has_law = tribal_organization_1
 			}
+		}
 
-			holder_scope = {
-				show_scope_change = no
+		pass_effect = {
+			log = "tribal_organization_0 pass ([This.GetFullBaseName])"
 
-				trigger_if = {
-					limit = { lower_tier_than = DUKE }
-					higher_tier_than = COUNT
-				}
+			hidden_effect = {
+				holder_scope = { decreased_tribal_organization_effect = yes }
 			}
 		}
 
 		effect = {
+			log = "tribal_organization_0 ([This.GetFullBaseName])"
+
 			if = {
 				limit = { has_dlc = "Conclave" }
 				hidden_effect = {
@@ -391,33 +424,19 @@ laws = {
 				on_trigger = has_law
 
 				tribal_organization_1 = {
-					custom_tooltip = {
-						text = disables_centralization_1
-					}
+					custom_tooltip = { text = disables_centralization_1 }
 				}
 				tribal_organization_2 = {
-					custom_tooltip = {
-						text = disables_centralization_2
-					}
+					custom_tooltip = { text = disables_centralization_2 }
 				}
 				tribal_organization_3 = {
-					custom_tooltip = {
-						text = disables_centralization_3
-					}
-					custom_tooltip = {
-						text = disables_tribal_levy_laws
-					}
-					custom_tooltip = {
-						text = disables_tribal_tax_laws
-					}
+					custom_tooltip = { text = disables_centralization_3 }
+					custom_tooltip = { text = disables_tribal_levy_laws }
+					custom_tooltip = { text = disables_tribal_tax_laws }
 				}
 				tribal_organization_4 = {
-					custom_tooltip = {
-						text = disables_centralization_4
-					}
-					custom_tooltip = {
-						text = disallows_change_government
-					}
+					custom_tooltip = { text = disables_centralization_4 }
+					custom_tooltip = { text = disallows_change_government }
 				}
 			}
 
@@ -487,6 +506,7 @@ laws = {
 		potential = {
 			holder_scope = {
 				is_tribal = yes
+				higher_tier_than = COUNT
 			}
 		}
 
@@ -495,40 +515,26 @@ laws = {
 				has_law = tribal_organization_0
 				has_law = tribal_organization_2
 			}
-
-			holder_scope = {
-				show_scope_change = no
-
-				trigger_if = {
-					limit = { lower_tier_than = DUKE }
-					higher_tier_than = COUNT
-				}
-			}
 		}
 
 		pass_effect = {
+			log = "tribal_organization_1 pass ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				if = {
 					limit = { has_law = tribal_organization_0 }
 
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								is_tribal = yes
-								dislike_tribal_organization = yes
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_tribal_organization
-								years = 5
-							}
-						}
-					}
+					holder_scope = { increased_tribal_organization_effect = yes }
+				}
+				else = {
+					holder_scope = { decreased_tribal_organization_effect = yes }
 				}
 			}
 		}
 
 		effect = {
+			log = "tribal_organization_1 ([This.GetFullBaseName])"
+
 			if = {
 				limit = { has_dlc = "Conclave" }
 				add_law = law_voting_power_1
@@ -545,33 +551,19 @@ laws = {
 				on_trigger = has_law
 
 				tribal_organization_0 = {
-					custom_tooltip = {
-						text = enables_centralization_1
-					}
+					custom_tooltip = { text = enables_centralization_1 }
 				}
 				tribal_organization_2 = {
-					custom_tooltip = {
-						text = disables_centralization_2
-					}
+					custom_tooltip = { text = disables_centralization_2 }
 				}
 				tribal_organization_3 = {
-					custom_tooltip = {
-						text = disables_centralization_3
-					}
-					custom_tooltip = {
-						text = disables_tribal_levy_laws
-					}
-					custom_tooltip = {
-						text = disables_tribal_tax_laws
-					}
+					custom_tooltip = { text = disables_centralization_3 }
+					custom_tooltip = { text = disables_tribal_levy_laws }
+					custom_tooltip = { text = disables_tribal_tax_laws }
 				}
 				tribal_organization_4 = {
-					custom_tooltip = {
-						text = disables_centralization_4
-					}
-					custom_tooltip = {
-						text = disallows_change_government
-					}
+					custom_tooltip = { text = disables_centralization_4 }
+					custom_tooltip = { text = disallows_change_government }
 				}
 			}
 
@@ -670,6 +662,7 @@ laws = {
 		potential = {
 			holder_scope = {
 				is_tribal = yes
+				higher_tier_than = COUNT
 			}
 		}
 
@@ -678,41 +671,26 @@ laws = {
 				has_law = tribal_organization_1
 				has_law = tribal_organization_3
 			}
-
-			holder_scope = {
-				show_scope_change = no
-
-				trigger_if = {
-					limit = { lower_tier_than = DUKE }
-					higher_tier_than = COUNT
-				}
-			}
 		}
 
 		pass_effect = {
+			log = "tribal_organization_2 pass ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				if = {
 					limit = { has_law = tribal_organization_1 }
 
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								is_tribal = yes
-								dislike_tribal_organization = yes
-							}
-
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_tribal_organization
-								years = 5
-							}
-						}
-					}
+					holder_scope = { increased_tribal_organization_effect = yes }
+				}
+				else = {
+					holder_scope = { decreased_tribal_organization_effect = yes }
 				}
 			}
 		}
 
 		effect = {
+			log = "tribal_organization_2 ([This.GetFullBaseName])"
+
 			if = {
 				limit = { has_dlc = "Conclave" }
 				add_law = grant_title_voting_power_1
@@ -729,33 +707,19 @@ laws = {
 				on_trigger = has_law
 
 				tribal_organization_0 = {
-					custom_tooltip = {
-						text = enables_centralization_2
-					}
+					custom_tooltip = { text = enables_centralization_2 }
 				}
 				tribal_organization_1 = {
-					custom_tooltip = {
-						text = enables_centralization_2
-					}
+					custom_tooltip = { text = enables_centralization_2 }
 				}
 				tribal_organization_3 = {
-					custom_tooltip = {
-						text = disables_centralization_3
-					}
-					custom_tooltip = {
-						text = disables_tribal_levy_laws
-					}
-					custom_tooltip = {
-						text = disables_tribal_tax_laws
-					}
+					custom_tooltip = { text = disables_centralization_3 }
+					custom_tooltip = { text = disables_tribal_levy_laws }
+					custom_tooltip = { text = disables_tribal_tax_laws }
 				}
 				tribal_organization_4 = {
-					custom_tooltip = {
-						text = disables_centralization_4
-					}
-					custom_tooltip = {
-						text = disallows_change_government
-					}
+					custom_tooltip = { text = disables_centralization_4 }
+					custom_tooltip = { text = disallows_change_government }
 				}
 			}
 
@@ -855,6 +819,7 @@ laws = {
 		potential = {
 			holder_scope = {
 				is_tribal = yes
+				higher_tier_than = COUNT
 			}
 		}
 
@@ -863,41 +828,26 @@ laws = {
 				has_law = tribal_organization_2
 				has_law = tribal_organization_4
 			}
-
-			holder_scope = {
-				show_scope_change = no
-
-				trigger_if = {
-					limit = { lower_tier_than = DUKE }
-					higher_tier_than = COUNT
-				}
-			}
 		}
 
 		pass_effect = {
+			log = "tribal_organization_3 pass ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				if = {
 					limit = { has_law = tribal_organization_2 }
 
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								is_tribal = yes
-								dislike_tribal_organization = yes
-							}
-
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_tribal_organization
-								years = 5
-							}
-						}
-					}
+					holder_scope = { increased_tribal_organization_effect = yes }
+				}
+				else = {
+					holder_scope = { decreased_tribal_organization_effect = yes }
 				}
 			}
 		}
 
 		effect = {
+			log = "tribal_oganization_3 ([This.GetFullBaseName])"
+
 			if = {
 				limit = { has_dlc = "Conclave" }
 
@@ -1025,45 +975,25 @@ laws = {
 		potential = {
 			holder_scope = {
 				is_tribal = yes
+				higher_tier_than = COUNT
 			}
 		}
 
 		allow = {
 			has_law = tribal_organization_3
-			holder_scope = {
-				show_scope_change = no
-
-				trigger_if = {
-					limit = { lower_tier_than = DUKE }
-					higher_tier_than = COUNT
-				}
-			}
 		}
 
 		pass_effect = {
+			log = "tribal_organization_4 pass ([This.GetFullBaseName])"
+
 			hidden_effect = {
-				if = {
-					limit = { has_law = tribal_organization_3 }
-
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								is_tribal = yes
-								dislike_tribal_organization = yes
-							}
-
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_tribal_organization
-								years = 5
-							}
-						}
-					}
-				}
+				holder_scope = { increased_tribal_organization_effect = yes }
 			}
 		}
 
 		effect = {
+			log = "tribal_organization_4 ([This.GetFullBaseName])"
+
 			if = {
 				limit = { NOT = { has_dlc = "Conclave" } }
 
@@ -1155,14 +1085,17 @@ laws = {
 			tier = EMPEROR
 
 			holder_scope = {
-				show_scope_change = no
-
-				independent = yes
 				is_feudal = yes
 			}
 		}
 
+		pass_effect = {
+			log = "vice_royalty_0 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "vice_royalty_0 ([This.GetFullBaseName])"
+
 			set_allow_vice_royalties = no
 
 			hidden_effect = {
@@ -1186,12 +1119,17 @@ laws = {
 			tier = EMPEROR
 
 			holder_scope = {
-				independent = yes
 				is_feudal = yes
 			}
 		}
 
+		pass_effect = {
+			log = "vice_royalty_1 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "vice_royalty_1 ([This.GetFullBaseName])"
+
 			set_allow_vice_royalties = KING
 
 			hidden_effect = {
@@ -1221,12 +1159,17 @@ laws = {
 			tier = EMPEROR
 
 			holder_scope = {
-				independent = yes
 				is_feudal = yes
 			}
 		}
 
+		pass_effect = {
+			log = "vice_royalty_2 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "vice_royalty_2 ([This.GetFullBaseName])"
+
 			set_allow_vice_royalties = DUKE
 
 			hidden_effect = {
@@ -1263,12 +1206,17 @@ laws = {
 			tier = EMPEROR
 
 			holder_scope = {
-				independent = yes
 				is_feudal = yes
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_administration pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_administration ([This.GetFullBaseName])"
+
 			if = {
 				limit = { has_dlc = "Charlemagne" }
 				set_allow_free_vice_royalty_revokation = no
@@ -1298,7 +1246,6 @@ laws = {
 			tier = EMPEROR
 
 			holder_scope = {
-				independent = yes
 				is_feudal = yes
 			}
 		}
@@ -1307,7 +1254,13 @@ laws = {
 			has_law = crown_authority_4
 		}
 
+		pass_effect = {
+			log = "imperial_administration pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "imperial_administration ([This.GetFullBaseName])"
+
 			if = {
 				limit = { has_dlc = "Charlemagne" }
 				add_law = vice_royalty_2
@@ -1349,7 +1302,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_contract_0 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_contract_0 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = feudal_contract_1
 				revoke_law = feudal_contract_2
@@ -1381,7 +1340,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_contract_1 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_contract_1 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = feudal_contract_0
 				revoke_law = feudal_contract_2
@@ -1413,7 +1378,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_contract_2 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_contract_2 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = feudal_contract_0
 				revoke_law = feudal_contract_1
@@ -1435,16 +1406,21 @@ laws = {
 			NOT = { has_dlc = "Conclave" }
 
 			holder_scope = {
-				NOT = { religion_group = muslim
+				NOT = { religion_group = muslim }
 
 				trigger_if = {
 					limit = { tier = BARON }
 					is_patrician = yes
-				}}
+				}
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_contract_3 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_contract_3 ([This.GetFullBaseName])"
 			hidden_effect = {
 				revoke_law = feudal_contract_0
 				revoke_law = feudal_contract_1
@@ -1478,7 +1454,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_tax_0 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_tax_0 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = feudal_tax_1
 				revoke_law = feudal_tax_2
@@ -1509,7 +1491,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_tax_1 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_tax_1 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = feudal_tax_0
 				revoke_law = feudal_tax_2
@@ -1541,7 +1529,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_tax_2 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_tax_2 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = feudal_tax_0
 				revoke_law = feudal_tax_1
@@ -1573,7 +1567,13 @@ laws = {
 			}
 		}
 
+		pass_effect = {
+			log = "feudal_tax_3 pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "feudal_tax_3 ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				revoke_law = feudal_tax_0
 				revoke_law = feudal_tax_1

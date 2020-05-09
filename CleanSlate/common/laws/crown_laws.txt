@@ -27,10 +27,31 @@ de_jure_laws = {
 		}
 
 		allow = {
-			has_law = crown_authority_1
+			trigger_if = {
+				limit = {
+					OR = {
+						has_law = crown_authority_0
+						has_law = crown_authority_1
+						has_law = crown_authority_2
+						has_law = crown_authority_3
+						has_law = crown_authority_4
+					}
+				}
+				has_law = crown_authority_1
+			}
+		}
+
+		pass_effect = {
+			log = "crown_authority_0 pass ([This.GetFullBaseName])"
+
+			hidden_effect = {
+				decreased_crown_authority_effect = yes
+			}
 		}
 
 		effect = {
+			log = "crown_authority_0 ([This.GetFullBaseName])"
+
 			set_the_kings_peace = no
 			set_the_kings_full_peace = no
 			set_protected_inheritance = no
@@ -81,29 +102,22 @@ de_jure_laws = {
 		}
 
 		pass_effect = {
+			log = "crown_authority_1 pass ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				if = {
 					limit = { has_law = crown_authority_0 }
-
-					any_de_jure_vassal = {
-						limit = {
-							OR = {
-								religion = ROOT
-								is_liege_or_above = ROOT
-							}
-						}
-
-						opinion = {
-							who = ROOT
-							modifier = opinion_increased_authority
-							years = 5
-						}
-					}
+					increased_crown_authority_effect = yes
+				}
+				else = {
+					decreased_crown_authority_effect = yes
 				}
 			}
 		}
 
 		effect = {
+			log = "crown_authority_1 ([This.GetFullBaseName])"
+
 			set_the_kings_peace = no
 			set_the_kings_full_peace = no
 			set_protected_inheritance = no
@@ -175,29 +189,23 @@ de_jure_laws = {
 		}
 
 		pass_effect = {
+			log = "crown_authority_2 pass ([This.GetFullBaseName])"
+
 			hidden_effect = {
 				if = {
 					limit = { has_law = crown_authority_1 }
 
-					any_de_jure_vassal = {
-						limit = {
-							OR = {
-								religion = ROOT
-								is_liege_or_above = ROOT
-							}
-						}
-
-						opinion = {
-							who = ROOT
-							modifier = opinion_increased_authority
-							years = 5
-						}
-					}
+					increased_crown_authority_effect = yes
+				}
+				else = {
+					decreased_crown_authority_effect = yes
 				}
 			}
 		}
 
 		effect = {
+			log = "crown_authority_2 ([This.GetFullBaseName])"
+
 			set_the_kings_peace = yes
 			set_the_kings_full_peace = no
 			set_protected_inheritance = no
@@ -269,29 +277,22 @@ de_jure_laws = {
 		}
 
 		pass_effect = {
-			hidden_tooltip = {
+			log = "crown_authority_3 pass ([This.GetFullBaseName])"
+
+			hidden_effect = {
 				if = {
 					limit = { has_law = crown_authority_2 }
-
-					any_de_jure_vassal = {
-						limit = {
-							OR = {
-								religion = ROOT
-								is_liege_or_above = ROOT
-							}
-						}
-
-						opinion = {
-							who = ROOT
-							modifier = opinion_increased_authority
-							years = 5
-						}
-					}
+					increased_crown_authority_effect = yes
+				}
+				else = {
+					decreased_crown_authority_effect = yes
 				}
 			}
 		}
 
 		effect = {
+			log = "crown_authority_3 ([This.GetFullBaseName])"
+
 			set_the_kings_peace = yes
 			set_the_kings_full_peace = no
 			set_protected_inheritance = yes
@@ -301,7 +302,7 @@ de_jure_laws = {
 			# set_appoint_generals = yes
 			# set_appoint_regents = yes
 
-			hidden_tooltip = {
+			hidden_effect = {
 				revoke_law = crown_authority_0
 				revoke_law = crown_authority_1
 				revoke_law = crown_authority_2
@@ -361,29 +362,16 @@ de_jure_laws = {
 		}
 
 		pass_effect = {
+			log = "crown_authority_4 pass ([This.GetFullBaseName])"
+
 			hidden_effect = {
-				if = {
-					limit = { has_law = crown_authority_3 }
-
-					any_de_jure_vassal = {
-						limit = {
-							OR = {
-								religion = ROOT
-								is_liege_or_above = ROOT
-							}
-						}
-
-						opinion = {
-							who = ROOT
-							modifier = opinion_increased_authority
-							years = 5
-						}
-					}
-				}
+				increased_crown_authority_effect = yes
 			}
 		}
 
 		effect = {
+			log = "crown_authority_4 ([This.GetFullBaseName])"
+
 			set_the_kings_peace = yes
 			set_the_kings_full_peace = yes
 			set_protected_inheritance = yes
@@ -416,7 +404,6 @@ de_jure_laws = {
 	# Papal Investiture
 	investiture_law_0 = {
 		group = investiture_law
-		default = yes
 
 		potential = {
 			holder_scope = {
@@ -437,10 +424,16 @@ de_jure_laws = {
 		}
 
 		allow = {
-			year >= 1000
+			year >= 1059 # In nomine Domini Codified by Benedict X
+		}
+
+		pass_effect = {
+			log = "investiture_law_0 ([This.GetFullBaseName])"
 		}
 
 		effect = {
+			log = "investiture_law_0 pass ([This.GetFullBaseName])"
+
 			set_investiture = head
 
 			hidden_effect = {
@@ -449,7 +442,24 @@ de_jure_laws = {
 		}
 
 		ai_will_do = {
-			factor = 0
+			factor =  0.002 # Rare to do this
+
+			trigger = {
+				holder_scope = {
+					trait = zealous
+				}
+			}
+		}
+
+		default_selection = {
+			factor = 10
+
+			trigger = {
+				OR = {
+					holy_order = yes
+					year >= 1059
+				}
+			}
 		}
 	}
 
@@ -481,7 +491,13 @@ de_jure_laws = {
 			holy_order = no
 		}
 
+		pass_effect = {
+			log = "investiture_law_1 ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			log = "investiture_law_1 pass ([This.GetFullBaseName])"
+
 			set_investiture = any
 
 			hidden_effect = {
@@ -497,6 +513,10 @@ de_jure_laws = {
 					trait = cynical
 				}
 			}
+		}
+
+		default_selection = {
+			factor = 1
 		}
 	}
 }
