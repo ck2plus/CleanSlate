@@ -8403,10 +8403,6 @@ muslim_invasion = {
 			is_nomadic = no
 
 			trigger_if = {
-				limit = { primary_title = { is_tribal_type_title = yes } }
-				has_horde_culture = no
-			}
-			trigger_if = {
 				limit = { mercenary = yes }
 				num_of_titles < 2
 			}
@@ -14970,6 +14966,24 @@ tributary_cb = {
 		attacker = {
 			show_scope_change = no
 			prestige = 200
+
+			hidden_effect = {
+				defender = {
+					if = {
+						limit = { is_tributary = yes }
+
+						# Used for custom tooltip further down
+						set_character_flag = had_suzerain
+
+						any_suzerain = {
+							event_target:target_loser = {
+								remove_tributary = PREV
+							}
+						}
+					}
+				}
+			}
+
 			make_tributary = {
 				who = defender
 				percentage = 0.4
@@ -15008,6 +15022,7 @@ tributary_cb = {
 				}
 				else_if = {
 					limit = { is_tribal = yes }
+
 					any_vassal = {
 						limit = { is_tribal = yes }
 
@@ -15026,13 +15041,14 @@ tributary_cb = {
 			save_event_target_as = target_loser
 			prestige = -100
 
-			custom_tooltip = {
-				text = REMOVE_PREVIOUS_SUZERAIN
+			if = {
+				limit = { has_character_flag = had_suzerain }
 
-				any_suzerain = {
-					event_target:target_loser = {
-						remove_tributary = PREV
-					}
+				# Set up above
+				clr_character_flag = had_suzerain
+
+				custom_tooltip = {
+					text = REMOVE_PREVIOUS_SUZERAIN # actually happens above
 				}
 			}
 		}

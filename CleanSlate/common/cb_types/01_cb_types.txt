@@ -2482,17 +2482,17 @@ tributary_permanent_cb = { # New8
 				size > 1
 			}
 
+			prestige >= 200
+
 			trigger_if = {
 				limit = {
 					capital_scope = {
 						region = world_europe
 					}
 				}
-				prestige >= 200
 				TECH_MAJESTY >= 4
 			}
 			trigger_else = {
-				prestige >= 200
 				TECH_MAJESTY >= 2
 			}
 		}
@@ -2654,10 +2654,29 @@ tributary_permanent_cb = { # New8
 		attacker = {
 			show_scope_change = no
 			prestige = 200
+
+			hidden_effect = {
+				defender = {
+					if = {
+						limit = { is_tributary = yes }
+
+						# Used for custom tooltip further down
+						set_character_flag = had_suzerain
+
+						any_suzerain = {
+							event_target:target_loser = {
+								remove_tributary = PREV
+							}
+						}
+					}
+				}
+			}
+
 			make_tributary = {
 				who = defender
 				tributary_type = permanent
 			}
+
 			if = {
 				limit = { uses_decadence = yes }
 				decadence = -10
@@ -2703,14 +2722,18 @@ tributary_permanent_cb = { # New8
 			show_scope_change = no
 			save_event_target_as = target_loser
 			prestige = -100
-			custom_tooltip = {
-				text = "REMOVE_PREVIOUS_SUZERAIN"
-				any_suzerain = {
-					event_target:target_loser = {
-						remove_tributary = PREV
-					}
+
+			if = {
+				limit = { has_character_flag = had_suzerain }
+
+				# Set up above
+				clr_character_flag = had_suzerain
+
+				custom_tooltip = {
+					text = REMOVE_PREVIOUS_SUZERAIN # actually happens above
 				}
 			}
+
 			opinion = {
 				modifier = opinion_forced_tributary
 				who = attacker
