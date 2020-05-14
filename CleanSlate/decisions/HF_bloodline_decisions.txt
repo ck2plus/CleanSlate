@@ -1,17 +1,19 @@
 targeted_decisions = {
+
 	prisoner_brazen_bull = {
-		only_playable = yes
 		filter = court
 		ai_target_filter = court
 		ai_check_interval = 12
 		diplomacy_icon = GFX_special_bloodline_decision
 
+		only_playable = yes
+
 		from_potential = {
 			has_dlc = "Holy Fury"
-			is_playable = yes
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_brazen_bull
 				bloodline_is_active_for = PREV
@@ -21,52 +23,32 @@ targeted_decisions = {
 		potential = {
 			host = { character = FROM }
 			prisoner = yes
-			age = 13
+			age >= 13
 		}
+
 		allow = {
+			show_only_failed_conditions = yes
+
 			ROOT = {
-				NOT = { diplomatic_immunity = yes }
 				prisoner = yes
+				diplomatic_immunity = no
 			}
 		}
+
 		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = {
-						FROM = {
-							has_nickname = no
-							is_adult = yes
-							is_incapable = no
-						}
-					}
-					random_list = {
-						1 = {
-							FROM = { give_nickname = nick_the_cruel }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_dragon }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_monster }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_tyrant }
-						}
-						300 = { }
-					}
-				}
-			}
 			if = {
 				limit = {
 					is_ruler = yes
-					vassal_of = FROM #Executing your own vassals this way will intimidate the others.
+					vassal_of = FROM # Executing your own vassals this way will intimidate the others
 				}
-				custom_tooltip = { text = tooltip_decision_brazen_bull }
-				hidden_tooltip = {
+
+				custom_tooltip = {
+					text = tooltip_decision_brazen_bull
+
 					FROM = {
 						any_courtier_or_vassal = {
 							limit = {
-								age = 5 #Old enough to witness and understand what's happening.
+								age >= 5 # Old enough to witness and understand what's happening
 								NOT = { trait = brave }
 							}
 							opinion = {
@@ -78,18 +60,32 @@ targeted_decisions = {
 					}
 				}
 			}
-			FROM = {
-				add_character_modifier = {
-					modifier = intimidated_plotters
-					duration = 1250
-				}
-			}
 
-			hidden_tooltip = {
-				FROM = { character_event = { id = HF.24004 } }
-				character_event = { id = HF.24005 }
-			}
-			hidden_tooltip = {
+			hidden_effect = {
+				save_event_target_as = kinslayer_target # to deal with Kinslayer
+				character_event = { id = HF.24005 } # Killed by brazen bull (generic executions)
+
+				FROM = {
+					character_event = { id = HF.24004 } # Host notified of death by brazen bull
+					add_kinslayer_trait_effect = yes
+
+					if = {
+						limit = {
+							has_nickname = no
+							is_adult = yes
+							is_incapable = no
+						}
+
+						random_list = {
+							1 = { give_nickname = nick_the_cruel }
+							5 = { give_nickname = nick_the_dragon }
+							5 = { give_nickname = nick_the_monster }
+							5 = { give_nickname = nick_the_tyrant }
+							300 = { }
+						}
+					}
+				}
+
 				mother = {
 					opinion = {
 						modifier = opinion_executed_child
@@ -102,7 +98,7 @@ targeted_decisions = {
 						who = FROM
 					}
 				}
-				spouse = {
+				any_spouse = {
 					opinion = {
 						modifier = opinion_spouse_slayer
 						who = FROM
@@ -114,13 +110,17 @@ targeted_decisions = {
 						who = FROM
 					}
 				}
+
 				if = {
 					limit = {
 						FROM = {
-							NOT = { dynasty = ROOT }
-							NOT = { sibling = ROOT }
+							NOR = {
+								dynasty = ROOT
+								sibling = ROOT
+							}
 						}
 					}
+
 					any_sibling = {
 						opinion = {
 							modifier = opinion_killed_close_kin
@@ -132,52 +132,50 @@ targeted_decisions = {
 
 			FROM = {
 				show_scope_change = no
-				if = {
-					limit = {
-						NOR = {
-							trait = cruel
-							trait = kind
-						}
-					}
-					random = {
-						chance = 25
-						add_trait = cruel
-						hidden_tooltip = { character_event = { id = 38259 } }
-					}
+
+				tiered_piety_negative_effect = yes
+
+				add_character_modifier = {
+					modifier = intimidated_plotters
+					duration = 1250
+				}
+
+				random = {
+					chance = 25
+					add_trait_cruel_effect = yes
 				}
 
 				if = {
 					limit = { trait = kind }
+
 					random = {
 						chance = 50
-						remove_trait = kind
-						hidden_tooltip = {
-							character_event = { id = 38307 }
-						}
+						remove_trait_kind_effect = yes
 					}
-					hidden_tooltip = {
+
+					hidden_effect = {
 						if = {
 							limit = {
 								OR = {
+									is_close_relative = ROOT
+
 									NOR = {
 										trait = cruel
 										trait = impaler
 										trait = lunatic
 									}
-									is_close_relative = ROOT
 								}
 							}
+
 							random_list = {
 								20 = {
-									add_trait = stressed
-									hidden_tooltip = { character_event = { id = 38282 } }
+									add_trait_stressed_effect = yes
 								}
 								8 = {
-									add_trait = depressed
-									hidden_tooltip = { character_event = { id = 38288 } }
+									add_trait_depressed_effect = yes
 								}
 								2 = {
-									add_trait = lunatic
+									add_trait = lunatic # TODO: replace with scripted effect
 								}
 								70 = {
 									#nothing
@@ -186,7 +184,6 @@ targeted_decisions = {
 						}
 					}
 				}
-				tiered_piety_negative_effect = yes
 			}
 		}
 
@@ -194,22 +191,28 @@ targeted_decisions = {
 		ai_will_do = {
 			factor = 0.1
 
-			modifier = {
-				factor = 0
-				OR = {
-					reverse_opinion = { who = FROM value = 40 }
-					FROM = { NOT = { piety = 100 } }
-					FROM = { liege = { dynasty = ROOT } }
-				}
-			}
-			modifier = {
-				factor = 0
+			trigger = {
 				FROM = {
-					NOR = {
+					piety >= 100
+
+					opinion = {
+						who = ROOT
+						value < 40
+					}
+
+					trigger_if = {
+						limit = { independent = no }
+
+						liege = {
+							NOT = { dynasty = ROOT }
+						}
+					}
+
+					OR = {
+						is_rival = ROOT
 						trait = cruel
 						trait = impaler
 						trait = wroth
-						is_rival = ROOT
 						trait = arbitrary
 						trait = paranoid
 						trait = deceitful
@@ -217,12 +220,8 @@ targeted_decisions = {
 						trait = lunatic
 						trait = possessed
 					}
-				}
-			}
-			modifier = {
-				factor = 0
-				FROM = {
-					OR = {
+
+					NOR = {
 						trait = kind
 						trait = just
 						trait = patient
@@ -231,33 +230,36 @@ targeted_decisions = {
 					}
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				FROM = {
 					OR = {
+						is_rival = ROOT
 						trait = cruel
 						trait = impaler
 						trait = wroth
-						is_rival = ROOT
 						trait = arbitrary
 					}
 				}
 			}
 		}
 	}
+
 	prisoner_macabre_banquet = {
-		only_playable = yes
 		filter = court
 		ai_target_filter = court
 		ai_check_interval = 12
 		diplomacy_icon = GFX_special_bloodline_decision
 
+		only_playable = yes
+
 		from_potential = {
 			has_dlc = "Holy Fury"
-			is_playable = yes
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_macabre_banquet
 				bloodline_is_active_for = PREV
@@ -267,54 +269,34 @@ targeted_decisions = {
 		potential = {
 			host = { character = FROM }
 			prisoner = yes
-			age = 13
+			age >= 13
 		}
+
 		allow = {
+			show_only_failed_conditions = yes
+
 			ROOT = {
-				NOT = { diplomatic_immunity = yes }
+				diplomatic_immunity = no
 				prisoner = yes
 			}
 		}
+
 		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = {
-						FROM = {
-							has_nickname = no
-							is_adult = yes
-							is_incapable = no
-						}
-					}
-					random_list = {
-						1 = {
-							FROM = { give_nickname = nick_the_cruel }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_dragon }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_monster }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_tyrant }
-						}
-						300 = { }
-					}
-				}
-			}
 			if = {
 				limit = {
 					is_ruler = yes
-					vassal_of = FROM #Executing your own vassals this way will intimidate the others.
+					vassal_of = FROM # Executing your own vassals this way will intimidate the others
 				}
-				custom_tooltip = { text = tooltip_decision_brazen_bull }
-				hidden_tooltip = {
+				custom_tooltip = {
+					text = tooltip_decision_brazen_bull
+
 					FROM = {
 						any_courtier_or_vassal = {
 							limit = {
-								age = 5 #Old enough to witness and understand what's happening.
+								age >= 5 # Old enough to witness and understand what's happening
 								NOT = { trait = brave }
 							}
+
 							opinion = {
 								who = FROM
 								modifier = opinion_scared_into_submission
@@ -324,45 +306,60 @@ targeted_decisions = {
 					}
 				}
 			}
-			FROM = {
-				show_scope_change = no
-				add_character_modifier = {
-					modifier = intimidated_plotters
-					duration = 1250
-				}
-			}
 
-			hidden_tooltip = {
-				FROM = { character_event = { id = HF.24105 } }
-				character_event = { id = HF.24106 }
+			hidden_effect = {
+				character_event = { id = HF.24106 }	# Killed by macabre banquet
 				save_event_target_as = kinslayer_target # to deal with Kinslayer
-				FROM = { add_kinslayer_trait_effect = yes }
-			}
-			hidden_tooltip = {
+
+				FROM = {
+					character_event = { id = HF.24105 } # Notify host
+					add_kinslayer_trait_effect = yes
+
+					if = {
+						limit = {
+							has_nickname = no
+							is_adult = yes
+							is_incapable = no
+						}
+
+						random_list = {
+							1 = { give_nickname = nick_the_cruel }
+							5 = { give_nickname = nick_the_dragon }
+							5 = { give_nickname = nick_the_monster }
+							5 = { give_nickname = nick_the_tyrant }
+							300 = { }
+						}
+					}
+				}
+
 				mother = {
 					opinion = {
 						modifier = opinion_executed_child
 						who = FROM
 					}
 				}
+
 				father = {
 					opinion = {
 						modifier = opinion_executed_child
 						who = FROM
 					}
 				}
-				spouse = {
+
+				any_spouse = {
 					opinion = {
 						modifier = opinion_spouse_slayer
 						who = FROM
 					}
 				}
+
 				any_child = {
 					opinion = {
 						modifier = opinion_killed_close_kin
 						who = FROM
 					}
 				}
+
 				if = {
 					limit = {
 						FROM = {
@@ -370,6 +367,7 @@ targeted_decisions = {
 							NOT = { sibling = ROOT }
 						}
 					}
+
 					any_sibling = {
 						opinion = {
 							modifier = opinion_killed_close_kin
@@ -381,52 +379,49 @@ targeted_decisions = {
 
 			FROM = {
 				show_scope_change = no
-				if = {
-					limit = {
-						NOR = {
-							trait = cruel
-							trait = kind
-						}
-					}
-					random = {
-						chance = 25
-						add_trait = cruel
-						hidden_tooltip = { character_event = { id = 38259 } }
-					}
+
+				tiered_piety_negative_effect = yes
+
+				add_character_modifier = {
+					modifier = intimidated_plotters
+					duration = 1250
+				}
+
+				random = {
+					chance = 25
+					add_trait_cruel_effect = yes
 				}
 
 				if = {
 					limit = { trait = kind }
-					hidden_tooltip = {
+
+					hidden_effect = {
 						random = {
 							chance = 50
-							remove_trait = kind
-							hidden_tooltip = {
-								character_event = { id = 38307 }
-							}
+							remove_trait_kind_effect = yes
 						}
+
 						if = {
 							limit = {
 								OR = {
+									is_close_relative = ROOT
+
 									NOR = {
 										trait = cruel
 										trait = impaler
 										trait = lunatic
 									}
-									is_close_relative = ROOT
 								}
 							}
 							random_list = {
 								20 = {
-									add_trait = stressed
-									hidden_tooltip = { character_event = { id = 38282 } }
+									add_trait_stressed_effect = yes
 								}
 								8 = {
-									add_trait = depressed
-									hidden_tooltip = { character_event = { id = 38288 } }
+									add_trait_depressed_effect = yes
 								}
 								2 = {
-									add_trait = lunatic
+									add_trait = lunatic # TODO: replace with scripted effect
 								}
 								70 = {
 									#nothing
@@ -435,7 +430,6 @@ targeted_decisions = {
 						}
 					}
 				}
-				tiered_piety_negative_effect = yes
 			}
 		}
 
@@ -443,22 +437,28 @@ targeted_decisions = {
 		ai_will_do = {
 			factor = 0.1
 
-			modifier = {
-				factor = 0
-				OR = {
-					reverse_opinion = { who = FROM value = 40 }
-					FROM = { NOT = { piety = 100 } }
-					FROM = { liege = { dynasty = ROOT } }
-				}
-			}
-			modifier = {
-				factor = 0
+			trigger = {
 				FROM = {
-					NOR = {
+					piety >= 100
+
+					opinion = {
+						who = ROOT
+						value < 40
+					}
+
+					trigger_if = {
+						limit = { independent = no }
+
+						liege = {
+							NOT = { dynasty = ROOT }
+						}
+					}
+
+					OR = {
+						is_rival = ROOT
 						trait = cruel
 						trait = impaler
 						trait = wroth
-						is_rival = ROOT
 						trait = arbitrary
 						trait = paranoid
 						trait = deceitful
@@ -466,12 +466,8 @@ targeted_decisions = {
 						trait = lunatic
 						trait = possessed
 					}
-				}
-			}
-			modifier = {
-				factor = 0
-				FROM = {
-					OR = {
+
+					NOR = {
 						trait = kind
 						trait = just
 						trait = patient
@@ -480,39 +476,43 @@ targeted_decisions = {
 					}
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				FROM = {
 					OR = {
+						is_rival = ROOT
 						trait = cruel
 						trait = impaler
 						trait = wroth
-						is_rival = ROOT
 						trait = arbitrary
 					}
 				}
 			}
 		}
 	}
+
 	prisoner_dragon_burning = {
-		only_playable = yes
 		filter = court
 		ai_target_filter = court
 		ai_check_interval = 12
 		diplomacy_icon = GFX_special_bloodline_decision
 
+		only_playable = yes
+
 		from_potential = {
 			has_dlc = "Holy Fury"
-			is_playable = yes
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
+
 			OR = {
+				culture = dragon_culture # Random World
+
 				any_owned_bloodline = {
 					has_bloodline_flag = bloodline_murder_burn
 					bloodline_is_active_for = PREV
 				}
-				culture = dragon_culture #Random World.
 			}
 		}
 
@@ -521,104 +521,79 @@ targeted_decisions = {
 			prisoner = yes
 			is_adult = yes
 		}
+
 		allow = {
+			show_only_failed_conditions = yes
+
 			ROOT = {
-				NOT = { diplomatic_immunity = yes }
 				prisoner = yes
+				diplomatic_immunity = no
 			}
 		}
+
 		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = {
-						FROM = {
+			hidden_effect = {
+				save_event_target_as = kinslayer_target # to deal with Kinslayer
+				character_event = { id = HF.24235 } # Killed by (dragon) burning
+
+				FROM = {
+					character_event = { id = HF.24234 } # Notify host
+					add_kinslayer_trait_effect = yes
+
+					if = {
+						limit = {
 							has_nickname = no
 							is_adult = yes
 							is_incapable = no
 						}
 					}
 					random_list = {
-						1 = {
-							FROM = { give_nickname = nick_the_cruel }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_dragon }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_monster }
-						}
-						5 = {
-							FROM = { give_nickname = nick_the_tyrant }
-						}
+						1 = { give_nickname = nick_the_cruel }
+						5 = { give_nickname = nick_the_dragon }
+						5 = { give_nickname = nick_the_monster }
+						5 = { give_nickname = nick_the_tyrant }
 						300 = { }
 					}
 				}
-			}
-			if = {
-				limit = {
-					is_ruler = yes
-					vassal_of = FROM #Executing your own vassals this way will intimidate the others.
-				}
-				custom_tooltip = { text = tooltip_decision_brazen_bull }
-				hidden_tooltip = {
-					FROM = {
-						any_courtier_or_vassal = {
-							limit = {
-								age = 5 #Old enough to witness and understand what's happening.
-								NOT = { trait = brave }
-							}
-							opinion = {
-								who = FROM
-								modifier = opinion_scared_into_submission
-								years = 4
-							}
-						}
-					}
-				}
-			}
-			FROM = {
-				add_character_modifier = {
-					modifier = intimidated_plotters
-					duration = 1250
-				}
-			}
 
-			hidden_tooltip = {
-				FROM = { character_event = { id = HF.24234 } }
-				character_event = { id = HF.24235 }
-			}
-			hidden_tooltip = {
 				mother = {
 					opinion = {
 						modifier = opinion_executed_child
 						who = FROM
 					}
 				}
+
 				father = {
 					opinion = {
 						modifier = opinion_executed_child
 						who = FROM
 					}
 				}
+
 				spouse = {
 					opinion = {
 						modifier = opinion_spouse_slayer
 						who = FROM
 					}
 				}
+
 				any_child = {
 					opinion = {
 						modifier = opinion_killed_close_kin
 						who = FROM
 					}
 				}
+
 				if = {
 					limit = {
 						FROM = {
-							NOT = { dynasty = ROOT }
-							NOT = { sibling = ROOT }
+							NOR = {
+								dynasty = ROOT
+								sibling = ROOT
+							}
 						}
 					}
+
 					any_sibling = {
 						opinion = {
 							modifier = opinion_killed_close_kin
@@ -628,8 +603,42 @@ targeted_decisions = {
 				}
 			}
 
+			if = {
+				limit = {
+					is_ruler = yes
+					vassal_of = FROM # Executing your own vassals this way will intimidate the others
+				}
+
+				custom_tooltip = {
+					text = tooltip_decision_brazen_bull
+
+					FROM = {
+						any_courtier_or_vassal = {
+							limit = {
+								age >= 5 # Old enough to witness and understand what's happening
+								NOT = { trait = brave }
+							}
+
+							opinion = {
+								who = FROM
+								modifier = opinion_scared_into_submission
+								years = 4
+							}
+						}
+					}
+				}
+			}
+
 			FROM = {
 				show_scope_change = no
+
+				tiered_piety_negative_effect = yes
+
+				add_character_modifier = {
+					modifier = intimidated_plotters
+					duration = 1250
+				}
+
 				if = {
 					limit = {
 						NOR = {
@@ -637,45 +646,43 @@ targeted_decisions = {
 							trait = kind
 						}
 					}
+
 					random = {
 						chance = 25
-						add_trait = cruel
-						hidden_tooltip = { character_event = { id = 38259 } }
+						add_trait_cruel_effect = yes
 					}
 				}
 
 				if = {
 					limit = { trait = kind }
+
 					random = {
 						chance = 50
-						remove_trait = kind
-						hidden_tooltip = {
-							character_event = { id = 38307 }
-						}
+						remove_trait_kind_effect = yes
 					}
+
 					hidden_tooltip = {
 						if = {
 							limit = {
 								OR = {
+									is_close_relative = ROOT
+
 									NOR = {
 										trait = cruel
 										trait = impaler
 										trait = lunatic
 									}
-									is_close_relative = ROOT
 								}
 							}
 							random_list = {
 								20 = {
-									add_trait = stressed
-									hidden_tooltip = { character_event = { id = 38282 } }
+									add_trait_stressed_effect = yes
 								}
 								8 = {
-									add_trait = depressed
-									hidden_tooltip = { character_event = { id = 38288 } }
+									add_trait_depressed_effect = yes
 								}
 								2 = {
-									add_trait = lunatic
+									add_trait = lunatic # TODO: replace with scripted effect
 								}
 								70 = {
 									#nothing
@@ -684,7 +691,6 @@ targeted_decisions = {
 						}
 					}
 				}
-				tiered_piety_negative_effect = yes
 			}
 		}
 
@@ -692,22 +698,28 @@ targeted_decisions = {
 		ai_will_do = {
 			factor = 0.1
 
-			modifier = {
-				factor = 0
-				OR = {
-					reverse_opinion = { who = FROM value = 40 }
-					FROM = { NOT = { piety = 100 } }
-					FROM = { liege = { dynasty = ROOT } }
-				}
-			}
-			modifier = {
-				factor = 0
+			trigger = {
 				FROM = {
-					NOR = {
+					piety >= 100
+
+					opinion = {
+						who = ROOT
+						value < 40
+					}
+
+					trigger_if = {
+						limit = { independent = no }
+
+						liege = {
+							NOT = { dynasty = ROOT }
+						}
+					}
+
+					OR = {
+						is_rival = ROOT
 						trait = cruel
 						trait = impaler
 						trait = wroth
-						is_rival = ROOT
 						trait = arbitrary
 						trait = paranoid
 						trait = deceitful
@@ -715,12 +727,8 @@ targeted_decisions = {
 						trait = lunatic
 						trait = possessed
 					}
-				}
-			}
-			modifier = {
-				factor = 0
-				FROM = {
-					OR = {
+
+					NOR = {
 						trait = kind
 						trait = just
 						trait = patient
@@ -729,7 +737,8 @@ targeted_decisions = {
 					}
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				FROM = {
 					OR = {
@@ -743,18 +752,21 @@ targeted_decisions = {
 			}
 		}
 	}
+
 	dynastic_meddling = {
-		only_playable = yes
 		filter = dynasty
 		ai_target_filter = dynasty
 		ai_check_interval = 40
 		diplomacy_icon = GFX_special_bloodline_decision
+
+		only_playable = yes
 
 		from_potential = {
 			has_dlc = "Holy Fury"
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_dynastic_meddling
 				bloodline_is_active_for = PREV
@@ -762,79 +774,78 @@ targeted_decisions = {
 		}
 
 		potential = {
-			prisoner = no
-			NOT = { character = FROM }
-			is_incapable = no
-			is_adult = yes
 			is_close_relative = FROM
-			FROM = { is_within_diplo_range = ROOT }
+			is_within_diplo_range = FROM
+			is_adult = yes
+			prisoner = no
+			is_incapable = no
+			NOT = { character = FROM }
 		}
+
 		allow = {
+			show_only_failed_conditions = yes
+
 			FROM = {
-				piety = 0
-				age = 40 #Meddler must be old
+				piety >= 0
+				age >= 40 # Meddler must be old
+
 				custom_tooltip = {
 					text = tooltip_dynastic_meddling_cooldown
 					NOT = { has_character_modifier = dynastic_meddling_cooldown }
 				}
 			}
+
 			ROOT = {
-				NOT = {
-					age = 35 #Target must be young.
-				}
-				NOT = { diplomatic_immunity = yes }
+				age < 35 # Target must be young
+				diplomatic_immunity = no
 			}
 		}
+
 		effect = {
 			FROM = {
-				if = {
-					limit = { real_tier = EMPEROR }
-					piety = -100
-				}
-				if = {
-					limit = { real_tier = KING }
-					piety = -75
-				}
-				if = {
-					limit = { real_tier = DUKE }
-					piety = -50
-				}
-				if = {
-					limit = { real_tier = COUNT }
-					piety = -30
-				}
-				if = {
-					limit = { real_tier = BARON }
-					piety = -15
-				}
-				if = {
-					limit = { is_ruler = no }
-					piety = -5
+				trigger_switch = {
+					on_trigger = real_tier
+
+					EMPEROR = { piety = -100 }
+					KING = { piety = -75 }
+					DUKE = { piety = -50 }
+					COUNT = { piety = -30 }
+					BARON = { piety = -15 }
+					fallback = { piety = -5 }
 				}
 			}
-			hidden_tooltip = {
+
+			custom_tooltip = {
+				text = tooltip_dynastic_meddling
+
 				FROM = {
+					character_event = { id = HF.24152 } # Family Bloodline - Dynastic meddling
+
 					add_character_modifier = {
 						name = dynastic_meddling_cooldown
-						duration = 1825
+						years = 5
 						hidden = yes
 					}
-					character_event = { id = HF.24152 }
 				}
-				if = {
-					limit = { ai = no }
-					ROOT = {
-						change_variable = { which = "family_nagging" value = 1 } #Stop the AI from spamming the player.
-						add_character_modifier = { 		#Other AI shouldn't target a recent target.
+
+				ROOT = {
+					if = {
+						limit = { ai = no }
+
+					#	CleanSlate: unused?
+					#	change_variable = {
+					#		which = family_nagging
+					#		value = 1
+					#	}
+
+						# Stop the AI from spamming the player
+						add_character_modifier = {
 							name = dynastic_meddling_target_cooldown
-							duration = 1825
+							years = 5
 							hidden = yes
 						}
 					}
 				}
-			}
-			custom_tooltip = {
-				text = tooltip_dynastic_meddling
 			}
 		}
 
@@ -842,23 +853,14 @@ targeted_decisions = {
 		ai_will_do = {
 			factor = 1
 
-			modifier = {
-				factor = 0
+			trigger = {
 				FROM = {
-					higher_real_tier_than = COUNT
-					NOT = { piety = 200 }
-				}
-			}
-			modifier = {
-				factor = 0
-				ROOT = {
-					has_character_modifier = dynastic_meddling_target_cooldown #Player should not be spammed.
-				}
-			}
-			modifier = {
-				factor = 0
-				FROM = {
-					OR = {
+					trigger_if = {
+						limit = { higher_real_tier_than = COUNT }
+						piety >= 200
+					}
+
+					NOR = {
 						trait = shy
 						trait = patient
 						trait = slothful
@@ -869,19 +871,22 @@ targeted_decisions = {
 						is_friend = ROOT
 					}
 				}
-			}
-			modifier = {
-				factor = 0
+
 				ROOT = {
-					NOR = {
-						host = { character = FROM } 	#AI only picks decision if host, guest, liege, or spouse of target.
+					# Player should not be spammed
+					NOT = { has_character_modifier = dynastic_meddling_target_cooldown }
+
+					# AI only picks decision if host, guest, liege, or spouse of target
+					OR = {
+						host = { character = FROM }
 						FROM = { host = { character = ROOT } }
 						is_married = FROM
 						is_vassal_or_below = FROM
 					}
 				}
 			}
-			modifier = { #Will interfere.
+
+			mult_modifier = { # Will interfere
 				factor = 5
 				FROM = {
 					OR = {
@@ -894,7 +899,8 @@ targeted_decisions = {
 					}
 				}
 			}
-			modifier = { #Needs a good talk.
+
+			mult_modifier = { # Needs a good talk
 				factor = 3
 				ROOT = {
 					OR = {
@@ -902,13 +908,16 @@ targeted_decisions = {
 						trait = depressed
 						trait = drunkard
 						trait = slothful
-						AND = {
-							trait = lustful
-							OR = {
-								is_married = no
-								num_of_children = 2
+
+						trigger_if = {
+							limit = { trait = lustful }
+
+							trigger_if = {
+								limit = { is_married = yes }
+								num_of_children >= 2
 							}
 						}
+
 						has_focus = focus_seduction
 						trait = uncouth
 						trait = is_fat
@@ -916,36 +925,36 @@ targeted_decisions = {
 					}
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 6
 				FROM = {
 					has_focus = focus_family
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 4
-				FROM = {
-					age = 60
-				}
-				ROOT = {
-					NOT = { age = 25 }
-				}
+				FROM = { age >= 60 }
+				ROOT = { age < 25 }
 			}
 		}
 	}
+
 	murder_deflection_decision = {
-		only_playable = yes
 		filter = self
 		ai_target_filter = self
 		ai_check_interval = 75
 		diplomacy_icon = GFX_special_bloodline_decision
 
+		only_playable = yes
+
 		potential = {
 			has_dlc = "Holy Fury"
-			is_playable = yes
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_murder_deflection
 				bloodline_is_active_for = PREV
@@ -953,7 +962,8 @@ targeted_decisions = {
 		}
 
 		allow = {
-			intrigue = 8
+			intrigue >= 8
+
 			OR = {
 				trait = kinslayer
 				trait = familial_kinslayer
@@ -963,20 +973,23 @@ targeted_decisions = {
 				has_character_modifier = vicious_rumors
 				has_character_modifier = vicious_rumors_2
 			}
+
 			custom_tooltip = {
 				text = tooltip_deflection_cooldown
-				hidden_tooltip = { NOT = { has_character_modifier = deflection_decision_cooldown } }
+				NOT = { has_character_modifier = deflection_decision_cooldown }
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_murder_deflection_decision
-				hidden_tooltip = {
-					character_event = { id = HF.24107 }
-					add_character_modifier = {
-						name = deflection_decision_cooldown
-						duration = 3650
-						hidden = yes
-					}
+			custom_tooltip = {
+				text = tooltip_murder_deflection_decision
+
+				character_event = { id = HF.24107 } # Murder deflection
+
+				add_character_modifier = {
+					name = deflection_decision_cooldown
+					years = 10
+					hidden = yes
 				}
 			}
 		}
@@ -985,22 +998,28 @@ targeted_decisions = {
 		ai_will_do = {
 			factor = 0.1
 
-			modifier = {
-				factor = 0
-				OR = {
-					reverse_opinion = { who = FROM value = 40 }
-					FROM = { NOT = { piety = 100 } }
-					FROM = { liege = { dynasty = ROOT } }
-				}
-			}
-			modifier = {
-				factor = 0
+			trigger = {
 				FROM = {
-					NOR = {
+					piety >= 100
+
+					opinion = {
+						who = ROOT
+						value < 40
+					}
+
+					trigger_if = {
+						limit = { independent = no }
+
+						liege = {
+							NOT = { dynasty = ROOT }
+						}
+					}
+
+					OR = {
+						is_rival = ROOT
 						trait = cruel
 						trait = impaler
 						trait = wroth
-						is_rival = ROOT
 						trait = arbitrary
 						trait = paranoid
 						trait = deceitful
@@ -1008,12 +1027,8 @@ targeted_decisions = {
 						trait = lunatic
 						trait = possessed
 					}
-				}
-			}
-			modifier = {
-				factor = 0
-				FROM = {
-					OR = {
+
+					NOR = {
 						trait = kind
 						trait = just
 						trait = patient
@@ -1022,33 +1037,41 @@ targeted_decisions = {
 					}
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				FROM = {
 					OR = {
+						is_rival = ROOT
 						trait = cruel
 						trait = impaler
 						trait = wroth
-						is_rival = ROOT
 						trait = arbitrary
 					}
 				}
 			}
 		}
 	}
+
 	drill_troops_decision = {
 		filter = self
 		ai_target_filter = self
 		ai_check_interval = 40
 		diplomacy_icon = GFX_special_bloodline_decision
 
+		only_playable = yes
+
 		potential = {
-			character = FROM
 			has_dlc = "Holy Fury"
-			is_playable = yes
+			character = FROM
 			is_landed = yes
 			is_adult = yes
-			higher_tier_than = BARON
+
+			trigger_if = {
+				limit = { tier = BARON }
+				is_patrician = yes
+			}
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_drill
 				bloodline_is_active_for = PREV
@@ -1056,7 +1079,8 @@ targeted_decisions = {
 		}
 
 		allow = {
-			prestige = 50
+			prestige >= 50
+
 			custom_tooltip = {
 				text = tooltip_drill_troops_cooldown
 				NOT = { has_character_modifier = drill_troops_cooldown }
@@ -1064,48 +1088,57 @@ targeted_decisions = {
 		}
 
 		effect = {
-			hidden_tooltip = {
-				add_character_modifier = {
-					name = drill_troops_cooldown
-					duration = 3650
-					hidden = yes
-				}
-				character_event = { id = HF.24134 }
-			}
 			custom_tooltip = {
 				text = tooltip_drill_troops_action
+
+				character_event = { id = HF.24134 }
+
+				add_character_modifier = {
+					name = drill_troops_cooldown
+					years = 10
+					hidden = yes
+				}
 			}
 		}
 
 		ai_will_do = {
 			factor = 1
-			modifier = {
-				factor = 0
-				war = no
+
+			trigger = {
+				war = yes
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.25
 				trait = brave
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.25
-				NOT = { martial = 5 }
+				martial < 5
 			}
 		}
 	}
+
 	endearing_noblemen_decision = {
 		filter = self
 		ai_target_filter = self
 		ai_check_interval = 40
 		diplomacy_icon = GFX_special_bloodline_decision
 
+		only_playable = yes
+
 		potential = {
-			character = FROM
 			has_dlc = "Holy Fury"
-			is_playable = yes
+			character = FROM
 			is_landed = yes
 			is_adult = yes
-			higher_tier_than = BARON
+
+			trigger_if = {
+				limit = { tier = BARON }
+				is_patrician = yes
+			}
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_endearing
 				bloodline_is_active_for = PREV
@@ -1113,8 +1146,9 @@ targeted_decisions = {
 		}
 
 		allow = {
-			prestige = 50
+			prestige >= 50
 			prisoner = no
+
 			custom_tooltip = {
 				text = tooltip_drill_troops_cooldown
 				NOT = { has_character_modifier = endearing_noblemen_cooldown }
@@ -1122,48 +1156,54 @@ targeted_decisions = {
 		}
 
 		effect = {
-			hidden_tooltip = {
-				add_character_modifier = {
-					name = endearing_noblemen_cooldown
-					duration = 3650
-					hidden = yes
-				}
-				character_event = { id = HF.24138 }
-			}
 			custom_tooltip = {
 				text = tooltip_endearing_noblemen_action
+
+				character_event = { id = HF.24138 }
+
+				add_character_modifier = {
+					name = endearing_noblemen_cooldown
+					years = 10
+					hidden = yes
+				}
 			}
 		}
 
 		ai_will_do = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.25
 				trait = shy
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = gregarious
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
-				NOT = { diplomacy = 5 }
+				diplomacy < 5
 			}
 		}
 	}
+
 	dissolve_factions_decision = {
 		filter = self
 		ai_target_filter = self
 		ai_check_interval = 40
 		diplomacy_icon = GFX_special_bloodline_decision
 
+		only_playable = yes
+
 		potential = {
-			character = FROM
 			has_dlc = "Holy Fury"
-			is_playable = yes
+			character = FROM
 			is_landed = yes
 			is_adult = yes
 			higher_tier_than = BARON
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_dismantle_factions
 				bloodline_is_active_for = PREV
@@ -1171,14 +1211,17 @@ targeted_decisions = {
 		}
 
 		allow = {
-			prestige = 500
-			piety = 250
+			prestige >= 500
+			piety >= 250
+
 			custom_tooltip = {
 				text = tooltip_dismantle_factions_cooldown
 				NOT = { has_character_modifier = dismantle_factions_cooldown }
 			}
+
 			custom_tooltip = {
 				text = tooltip_dismantle_factions_exist
+
 				any_vassal = {
 					in_faction = yes
 				}
@@ -1188,71 +1231,74 @@ targeted_decisions = {
 		effect = {
 			prestige = -500
 			piety = -250
-			hidden_tooltip = {
-				add_character_modifier = {
-					name = dismantle_factions_cooldown
-					duration = 3650
-					hidden = yes
-				}
-				character_event = { id = HF.24144 }
-			}
+
 			custom_tooltip = {
 				text = tooltip_dismantle_factions
+
+				character_event = { id = HF.24144 }
+
+				add_character_modifier = {
+					name = dismantle_factions_cooldown
+					years = 10
+					hidden = yes
+				}
 			}
 		}
 
 		ai_will_do = {
 			factor = 1
-			modifier = {
+
+			trigger = {
+				NOT = { trait = trusting }
+
+				# CleanSlate: odd requirement?
+				any_vassal = {
+					faction_power = {
+						faction = faction_succ_seniority
+						power >= 0.75
+					}
+				}
+			}
+
+			mult_modifier = {
 				factor = 5
 				trait = paranoid
 			}
-			modifier = {
-				factor = 0
-				trait = trusting
-			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = cruel
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.25
 				trait = kind
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.25
-				NOT = {
-					any_vassal = {
-						in_faction = yes
-						count = 5
-					}
+				any_vassal = {
+					in_faction = yes
+					count < 5
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 3
 				any_vassal = {
 					in_faction = yes
-					count = 10
+					count >= 10
 				}
 			}
-			modifier = {
-				factor = 0
-				NOT = {
-					any_vassal = {
-						faction_power = {
-							faction = faction_succ_seniority
-							power = 0.75
-						}
-					}
-				}
-			}
-			modifier = {
+
+			# CleanSlate: odd requirement?
+			mult_modifier = {
 				factor = 0.1
 				NOT = {
 					any_vassal = {
 						faction_power = {
 							faction = faction_succ_seniority
-							power = 1.0
+							power >= 1.0
 						}
 					}
 				}
