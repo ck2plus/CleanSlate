@@ -1,82 +1,96 @@
 decisions = {
 	hold_great_tribal_festival = {
-		only_playable = yes
 		ai_check_interval = 100
+
+		only_playable = yes
+
 		potential = {
 			has_dlc = "Holy Fury"
-			is_playable = yes
-			age = 12
-			prisoner = no
-			is_tribal = yes
-			NOT = { has_character_modifier = held_great_tribal_festival_cooldown }
-			NOT = {	has_character_flag = flag_holding_great_tribal_festival }
-			higher_real_tier_than = COUNT
 			independent = yes
+			higher_real_tier_than = COUNT
+			is_tribal = yes
+			age >= 12
+			prisoner = no
+
+			NOR = {
+				has_character_modifier = held_great_tribal_festival_cooldown
+				has_character_flag = flag_holding_great_tribal_festival
+			}
 		}
+
 		allow = {
 			war = no
-			prisoner = no
 			is_incapable = no
-			NOT = { is_inaccessible_trigger = yes }
+			is_inaccessible_trigger = no
+
 			custom_tooltip = {
 				text = is_not_busy_trigger_tooltip
-				hidden_tooltip = { NOT = { has_character_flag = do_not_disturb } }
+				NOT = { has_character_flag = do_not_disturb }
 			}
+
 			trigger_if = {
-				limit = {
-					ai = no
-				}
-				wealth = 50
+				limit = { ai = no }
+				wealth >= 50
 			}
 		}
+
 		effect = {
 			if = {
 				limit = { ai = no }
 				wealth = -50
 			}
+
 			set_character_flag = flag_holding_great_tribal_festival
-			hidden_tooltip = {
-				character_event = { id = HF.23800 days = 300 } # Full cleanup event, in case something goes wrong.
+
+			hidden_effect = {
+				character_event = {
+					id = HF.23800 # Full cleanup event, in case something goes wrong
+					days = 300
+				}
 			}
+
 			custom_tooltip = {
 				text = tooltip_preparations_great_tribal_festival
-				hidden_tooltip = {
-					character_event = { id = HF.23806 }
-					add_character_modifier = {
-						name = held_great_tribal_festival_cooldown
-						years = 15
-						hidden = yes
-					}
+
+				character_event = { id = HF.23806 } # Send invitations
+
+				add_character_modifier = {
+					name = held_great_tribal_festival_cooldown
+					years = 15
+					hidden = yes
 				}
 			}
+
 			if = {
-				limit = {
-					has_dlc = "Reapers"
-				}
+				limit = { has_dlc = "Reapers" }
+
 				custom_tooltip = {
 					text = capital_prospers_custom_tooltip
-					hidden_tooltip = {
-						capital_scope = {
-							change_variable = { which = prosperity_value value = 4 }
+
+					capital_scope = {
+						change_variable = {
+							which = prosperity_value
+							value = 4
 						}
 					}
 				}
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.01
-				NOT = {
-					wealth = 150
-				}
+				wealth < 150
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.1
 				trait = shy
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = gregarious
 			}
@@ -85,49 +99,47 @@ decisions = {
 
 	prepare_reconquista = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 36
+
+		only_playable = yes
 
 		potential = {
 			has_dlc = "Holy Fury"
-			is_landed = yes
+			is_alternate_start = no
+
 			NOT = {
 				has_game_rule = {
 					name = reconquista
 					value = off
 				}
 			}
+
 			independent = yes
+			is_landed = yes
+
 			any_demesne_title = {
 				higher_tier_than = COUNT
 				region = world_europe_west_iberia
 			}
+
 			culture_group = iberian
 			religion_group = christian
+
 			any_neighbor_independent_ruler = {
+				NOT = { religion_group = christian }
+
 				any_realm_province = {
 					region = world_europe_west_iberia
 				}
-				NOT = {
-					religion_group = christian
-				}
-			}
-			NOT = {
-				has_character_flag = ex_reconquistador
-			}
-			NOT = {
-				e_spain = {
-					owner = {
-						always = yes
-					}
-				}
-			}
-			NOT = {
-				has_global_flag = reconquista_finished
 			}
 
-			NOT = {
-				is_alternate_start = yes
+			e_spain = {
+				has_holder = no
+			}
+
+			NOR = {
+				has_character_flag = ex_reconquistador
+				has_global_flag = reconquista_finished
 			}
 		}
 
@@ -135,196 +147,148 @@ decisions = {
 			is_adult = yes
 			war = no
 			prisoner = no
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
+
+			trigger_if = {
+				limit = { ai = no }
+
+				trigger_if = {
+					limit = {
 						any_owned_bloodline = {
 							has_bloodline_flag = cheap_reconquista
 						}
 					}
-					ai = no
-					tier = DUKE
-				}
-				prestige = 300
-				piety = 150
-				wealth = 100
-			}
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						any_owned_bloodline = {
-							has_bloodline_flag = cheap_reconquista
-						}
+
+					trigger_if = {
+						limit = { tier = DUKE }
+
+						prestige >= 150
+						piety >= 100
+						wealth >= 75
 					}
-					ai = no
-					tier = KING
-				}
-				prestige = 500
-				piety = 250
-				wealth = 200
-			}
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						any_owned_bloodline = {
-							has_bloodline_flag = cheap_reconquista
-						}
+					trigger_else_if = {
+						limit = { tier = KING }
+
+						prestige >= 250
+						piety >= 200
+						wealth >= 150
 					}
-					ai = no
-					tier = EMPEROR
-				}
-				prestige = 1000
-				piety = 500
-				wealth = 300
-			}
-			conditional_tooltip = {
-				trigger = {
-					ai = no
-					any_owned_bloodline = {
-						has_bloodline_flag = cheap_reconquista
+					trigger_else_if = {
+						limit = { tier = EMPEROR }
+
+						prestige >= 500
+						piety >= 300
+						wealth >= 200
 					}
-					tier = DUKE
 				}
-				prestige = 150
-				piety = 100
-				wealth = 75
-			}
-			conditional_tooltip = {
-				trigger = {
-					ai = no
-					any_owned_bloodline = {
-						has_bloodline_flag = cheap_reconquista
+				trigger_else = {
+					trigger_if = {
+						limit = { tier = DUKE }
+
+						prestige >= 300
+						piety >= 150
+						wealth >= 100
 					}
-					tier = KING
-				}
-				prestige = 250
-				piety = 200
-				wealth = 150
-			}
-			conditional_tooltip = {
-				trigger = {
-					ai = no
-					any_owned_bloodline = {
-						has_bloodline_flag = cheap_reconquista
+					trigger_else_if = {
+						limit = { tier = KING }
+
+						prestige >= 500
+						piety >= 250
+						wealth >= 200
 					}
-					tier = EMPEROR
+					trigger_else_if = {
+						limit = { tier = EMPEROR }
+
+						prestige >= 1000
+						piety >= 500
+						wealth >= 300
+					}
 				}
-				prestige = 500
-				piety = 300
-				wealth = 200
 			}
-			conditional_tooltip = {
-				trigger = {
-					ai = yes
-				}
-				prestige = 300
-				piety = 100
-				wealth = 100
+			trigger_else = {
+				prestige >= 300
+				piety >= 100
+				wealth >= 100
 			}
 
 			custom_tooltip = {
 				text = active_reconquista_condition_TT
 
-				NOT = {
-					has_global_flag = active_reconquista
-				}
+				NOT = { has_global_flag = active_reconquista }
 			}
-			conditional_tooltip = {
-				trigger = {
-					ai = yes
-				}
 
-				NOT = {
-					has_global_flag = reconquista_ai_cooldown
-				}
+			trigger_if = {
+				limit = { ai = yes }
+
+				NOT = { has_global_flag = reconquista_ai_cooldown }
 			}
 		}
 
 		effect = {
 			if = {
-				limit = {
-					ai = yes
-				}
+				limit = { ai = yes }
 				character_event = { id = HF.49480 }
 			}
+
 			if = {
-				limit = {
-					any_owned_bloodline = {
-						has_bloodline_flag = cheap_reconquista
-					}
-				}
+				limit = { ai = yes }
+
 				if = {
 					limit = {
-						ai = no
-						tier = DUKE
+						any_owned_bloodline = {
+							has_bloodline_flag = cheap_reconquista
+						}
 					}
-					prestige = -150
-					piety = -100
-					wealth = -75
+
+					trigger_switch = {
+						on_trigger = tier
+
+						DUKE = {
+							prestige = -150
+							piety = -100
+							wealth = -75
+						}
+
+						KING = {
+							prestige = -250
+							piety = -200
+							wealth = -150
+						}
+
+						EMPEROR = {
+							prestige = -500
+							piety = -300
+							wealth = -200
+						}
+					}
 				}
-				if = {
-					limit = {
-						ai = no
-						tier = KING
+				else = {
+					trigger_switch = {
+						on_trigger = tier
+
+						DUKE = {
+							prestige = -300
+							piety = -150
+							wealth = -100
+						}
+
+						KING = {
+							prestige = -500
+							piety = -250
+							wealth = -200
+						}
+
+						EMPEROR = {
+							prestige = -1000
+							piety = -500
+							wealth = -300
+						}
 					}
-					prestige = -250
-					piety = -200
-					wealth = -150
-				}
-				if = {
-					limit = {
-						ai = no
-						tier = EMPEROR
-					}
-					prestige = -500
-					piety = -300
-					wealth = -200
-				}
-				if = {
-					limit = {
-						ai = yes
-					}
-					prestige = -300
-					piety = -100
-					wealth = -100
 				}
 			}
 			else = {
-				if = {
-					limit = {
-						ai = no
-						tier = DUKE
-					}
-					prestige = -300
-					piety = -150
-					wealth = -100
-				}
-				if = {
-					limit = {
-						ai = no
-						tier = KING
-					}
-					prestige = -500
-					piety = -250
-					wealth = -200
-				}
-				if = {
-					limit = {
-						ai = no
-						tier = EMPEROR
-					}
-					prestige = -1000
-					piety = -500
-					wealth = -300
-				}
-				if = {
-					limit = {
-						ai = yes
-					}
-					prestige = -300
-					piety = -100
-					wealth = -100
-				}
+				prestige = -300
+				piety = -100
+				wealth = -100
 			}
 
 			custom_tooltip = {
@@ -332,12 +296,11 @@ decisions = {
 
 				if = {
 					limit = {
-						NOT = {
-							has_character_flag = ex_reconquistador
-						}
+						NOT = { has_character_flag = ex_reconquistador }
 					}
 					set_character_flag = ex_reconquistador
 				}
+
 				set_character_flag = currently_reconquering_iberia
 				set_global_flag = active_reconquista
 
@@ -351,30 +314,32 @@ decisions = {
 					hidden = yes
 					years = 2
 				}
-				character_event = { id = HF.49207 days = 730 }
 
-				character_event = { id = HF.49240 days = 10 random = 10 }
-				ROOT = {
-					narrative_event = { id = HF.49450 }
+				character_event = {
+					id = HF.49207 # Clean-up, if war doesn't start
+					days = 730
 				}
-				any_playable_ruler = {
+
+				character_event = {
+					id = HF.49240 # Preparation tombola
+					days = 10
+					random = 10
+				}
+
+				any_player = {
 					limit = {
-						is_landed = yes
 						any_demesne_title = {
 							higher_tier_than = BARON
 							region = world_europe_west_iberia
 						}
 					}
-					narrative_event = { id = HF.49450 }
+					narrative_event = { id = HF.49450 } # Notify
 				}
 			}
 
 			if = {
-				limit = {
-					NOT = {
-						year = 800
-					}
-				}
+				limit = { year < 800 }
+
 				spawn_unit = {
 					province = capital_scope
 					home = capital_scope
@@ -391,11 +356,8 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = {
-					NOT = {
-						year = 900
-					}
-				}
+				limit = { year < 900 }
+
 				spawn_unit = {
 					province = capital_scope
 					home = capital_scope
@@ -412,11 +374,8 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = {
-					NOT = {
-						year = 1000
-					}
-				}
+				limit = { year < 1000 }
+
 				spawn_unit = {
 					province = capital_scope
 					home = capital_scope
@@ -433,11 +392,8 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = {
-					NOT = {
-						year = 1100
-					}
-				}
+				limit = { year < 1100 }
+
 				spawn_unit = {
 					province = capital_scope
 					home = capital_scope
@@ -454,11 +410,8 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = {
-					NOT = {
-						year = 1200
-					}
-				}
+				limit = { year < 1200 }
+
 				spawn_unit = {
 					province = capital_scope
 					home = capital_scope
@@ -475,11 +428,8 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = {
-					NOT = {
-						year = 1300
-					}
-				}
+				limit = { year < 1300 }
+
 				spawn_unit = {
 					province = capital_scope
 					home = capital_scope
@@ -496,11 +446,8 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = {
-					NOT = {
-						year = 1400
-					}
-				}
+				limit = { year < 1400 }
+
 				spawn_unit = {
 					province = capital_scope
 					home = capital_scope
@@ -548,71 +495,57 @@ targeted_decisions = {
 
 		third_party_potential = {
 			FROMFROM = {
+				religion_group = christian
 				is_alive = yes
 				is_adult = yes
-				is_landed = no
-				is_patrician = no
-				holy_order = no
 				is_feudal = yes
-				religion_group = christian
-				NOT = {
-					trait = bastard
+				is_landed = no
+
+				trigger_if = {
+					limit = {
+						is_female = yes
+						is_married = yes
+					}
+
+					is_married_matrilineally = yes
 				}
+
 				NOR = {
+					trait = bastard
 					government = theocracy_government
 					government = order_government
-				}
-				OR = {
-					is_female = no
-					AND = {
-						is_female = yes
-						is_married_matrilineally = yes
-					}
-					AND = {
-						is_female = yes
-						is_married = no
-					}
-				}
-				NOT = {
 					has_character_flag = reconquista_beneficiary_flag
-				}
-				NOT = {
 					has_global_flag = reconquista_finished
 				}
 			}
 		}
 
 		potential = {
-			has_character_flag = currently_reconquering_iberia
 			always = no # Disabled
+			has_character_flag = currently_reconquering_iberia
 		}
 
 		allow = {
 			any_dynasty_member = {
+				religion_group = christian
 				is_alive = yes
 				is_adult = yes
 				is_landed = no
-				is_patrician = no
-				holy_order = no
 				is_feudal = yes
-				religion_group = christian
-				NOT = {
-					trait = bastard
-				}
+
 				NOR = {
+					trait = bastard
 					government = theocracy_government
 					government = order_government
 				}
-				OR = {
-					is_female = no
-					AND = {
+
+				trigger_if = {
+					limit = {
 						is_female = yes
-						is_married_matrilineally = yes
+						is_married = yes
 					}
-					AND = {
-						is_female = yes
-						is_married = no
-					}
+
+					is_married_matrilineally = yes
 				}
 			}
 		}
@@ -624,6 +557,7 @@ targeted_decisions = {
 						has_character_flag = reconquista_beneficiary_flag
 					}
 				}
+
 				custom_tooltip = {
 					text = remove_previous_reconquista_beneficiary
 
@@ -632,21 +566,28 @@ targeted_decisions = {
 					}
 				}
 			}
-			hidden_tooltip = {
+
+			hidden_effect = {
 				any_dynasty_member_even_if_dead = {
 					clr_character_flag = reconquista_beneficiary_flag
 				}
 			}
+
 			FROMFROM = {
 				show_scope_change = no
-				set_character_flag = reconquista_beneficiary_flag
-				ROOT = {
-					save_persistent_event_target = {
-						name = reconquista_beneficiary_target
-						scope = PREV
+
+				custom_tooltip = {
+					text = new_reconquista_beneficiary_self
+
+					set_character_flag = reconquista_beneficiary_flag
+
+					ROOT = {
+						save_persistent_event_target = {
+							name = reconquista_beneficiary_target
+							scope = PREV
+						}
 					}
 				}
-				custom_tooltip = { text = new_reconquista_beneficiary_self }
 			}
 		}
 	}
@@ -659,10 +600,8 @@ targeted_decisions = {
 		ai_check_interval = 36
 
 		potential = {
-			NOT = {
-				has_character_flag = reconquista_beneficiary_flag
-			}
 			always = no # Disabled
+			NOT = { has_character_flag = reconquista_beneficiary_flag }
 		}
 
 		from_potential = {
@@ -670,42 +609,39 @@ targeted_decisions = {
 		}
 
 		allow = {
+			religion_group = christian
 			is_alive = yes
 			is_adult = yes
-			is_landed = no
-			is_patrician = no
-			holy_order = no
 			is_feudal = yes
-			religion_group = christian
-			NOT = {
-				trait = bastard
-			}
+			is_landed = no
+
 			NOR = {
+				trait = bastard
 				government = theocracy_government
 				government = order_government
 			}
-			OR = {
-				is_female = no
-				AND = {
+
+			trigger_if = {
+				limit = {
 					is_female = yes
-					is_married_matrilineally = yes
+					is_married = yes
 				}
-				AND = {
-					is_female = yes
-					is_married = no
-				}
+
+				is_married_matrilineally = yes
 			}
 		}
 
 		effect = {
 			FROM = {
 				show_scope_change = no
+
 				if = {
 					limit = {
 						any_dynasty_member = {
 							has_character_flag = reconquista_beneficiary_flag
 						}
 					}
+
 					custom_tooltip = {
 						text = remove_previous_reconquista_beneficiary
 
@@ -714,13 +650,16 @@ targeted_decisions = {
 						}
 					}
 				}
-				hidden_tooltip = {
+
+				hidden_effect = {
 					any_dynasty_member_even_if_dead = {
 						clr_character_flag = reconquista_beneficiary_flag
 					}
 				}
 			}
+
 			set_character_flag = reconquista_beneficiary_flag
+
 			FROM = {
 				save_persistent_event_target = {
 					name = reconquista_beneficiary_target
@@ -731,8 +670,8 @@ targeted_decisions = {
 	}
 
 	remove_reconquista_beneficiary_self = {
-		only_playable = yes
 		filter = self
+
 		ai = no
 
 		potential = {
@@ -750,6 +689,7 @@ targeted_decisions = {
 						has_character_flag = reconquista_beneficiary_flag
 					}
 				}
+
 				custom_tooltip = {
 					text = remove_previous_reconquista_beneficiary
 
@@ -758,7 +698,8 @@ targeted_decisions = {
 					}
 				}
 			}
-			hidden_tooltip = {
+
+			hidden_effect = {
 				any_dynasty_member_even_if_dead = {
 					clr_character_flag = reconquista_beneficiary_flag
 				}
@@ -767,8 +708,8 @@ targeted_decisions = {
 	}
 
 	remove_reconquista_beneficiary_other = {
-		only_playable = yes
 		filter = dynasty
+
 		ai = no
 
 		from_potential = {
@@ -781,7 +722,7 @@ targeted_decisions = {
 
 		effect = {
 			FROM = {
-				hidden_tooltip = {
+				hidden_effect = {
 					any_dynasty_member_even_if_dead = {
 						clr_character_flag = reconquista_beneficiary_flag
 					}
@@ -791,26 +732,28 @@ targeted_decisions = {
 	}
 
 	promise_to_join_reconquista = {
-		only_playable = yes
 		filter = independent_rulers
 		ai_target_filter = independent_rulers
-
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		from_potential = {
-			NOT = {
-				has_character_flag = promised_reconquista_ally
-			}
+			NOT = { has_character_flag = promised_reconquista_ally }
 			culture_group = iberian
-			religion = ROOT
 			religion_group = christian
+			religion = ROOT
 			mercenary = no
 			holy_order = no
-			OR = {
-				ai = no
-				ai_zeal = 5
-				trait = zealous
-				trait = ambitious
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				OR = {
+					ai_zeal >= 5
+					trait = zealous
+					trait = ambitious
+				}
 			}
 		}
 
@@ -823,34 +766,45 @@ targeted_decisions = {
 			FROM = {
 				independent = yes
 				is_adult = yes
-				NOT = {
-					war_with = ROOT
-				}
+				NOT = { war_with = ROOT }
 				prisoner = no
 			}
 		}
 
 		effect = {
 			FROM = {
-				sound_effect = click_pledge_troops_03
-				custom_tooltip = { text = reconquest_decision_tt }
-				set_character_flag = promised_reconquista_ally
-				character_event = { id = HF.49211 }
+				show_scope_change = no
+
+				custom_tooltip = {
+					text = reconquest_decision_tt
+
+					sound_effect = click_pledge_troops_03
+					set_character_flag = promised_reconquista_ally
+					character_event = { id = HF.49211 } # Send letter
+				}
 			}
 		}
 	}
 
 	christian_mercenary_against_reconquista_mercenary_side = {
-		only_playable = yes
 		filter = independent_rulers
 		ai_target_filter = independent_rulers
-
 		ai_check_interval = 48
 
+		only_playable = yes
+
 		from_potential = {
+			independent = yes
 			culture_group = iberian
 			religion_group = christian
-			war = no
+			higher_real_tier_than = BARON
+			mercenary = no
+			holy_order = no
+
+			any_realm_province = {
+				region = world_europe_west_iberia
+			}
+
 			NOT = {
 				any_war = {
 					OR = {
@@ -867,38 +821,33 @@ targeted_decisions = {
 					}
 				}
 			}
-			independent = yes
-			mercenary = no
-			holy_order = no
-			higher_real_tier_than = BARON
-			any_realm_province = {
-				region = world_europe_west_iberia
-			}
-			OR = {
-				ai = no
-				AND = {
-					ai = yes
-					NOR = {
-						trait = zealous
-						trait = holy_warrior
-						has_crusade_trait_trigger = yes
-						ai_zeal = 5
-					}
-					OR = {
-						trait = envious
-						trait = greedy
-						trait = cynical
-						trait = deceitful
-					}
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				ai_zeal < 5
+				has_crusade_trait_trigger = no
+
+				NOR = {
+					trait = zealous
+					trait = holy_warrior
+				}
+
+				OR = {
+					trait = envious
+					trait = greedy
+					trait = cynical
+					trait = deceitful
 				}
 			}
 		}
 
 		potential = {
-			NOT = {
-				religion_group = christian
-			}
+			NOT = { religion_group = christian }
+
 			any_war = {
+				is_primary_war_defender = yes
+
 				OR = {
 					using_cb = reconquista_leon
 					using_cb = reconquista_castille
@@ -910,132 +859,110 @@ targeted_decisions = {
 					using_cb = reconquista_valencia
 					using_cb = reconquista_navarra
 				}
-				defender = {
-					character = ROOT
-				}
 			}
 		}
 
 		allow = {
 			FROM = {
+				show_scope_change = no
+
 				prisoner = no
-			}
+				is_adult = yes
 
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = COUNT
+				trigger_if = {
+					limit = { real_tier = COUNT }
+
+					ROOT = {
+						scaled_wealth >= 0.25
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = DUKE }
+
+					ROOT = {
+						scaled_wealth >= 0.5
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = KING }
+
+					ROOT = {
+						scaled_wealth >= 0.75
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = EMPEROR }
+
+					ROOT = {
+						scaled_wealth >= 1
 					}
 				}
 
-				ROOT = {
-					scaled_wealth = 0.25
-				}
-			}
+				trigger_if = {
+					limit = { has_character_modifier = reconquista_mercenary_cooldown }
 
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = DUKE
+					custom_tooltip = {
+						text = reconquista_mercenary_cooldown_TT
+
+						always = no
 					}
-				}
-
-				ROOT = {
-					scaled_wealth = 0.5
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = KING
-					}
-				}
-
-				ROOT = {
-					scaled_wealth = 0.75
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = EMPEROR
-					}
-				}
-
-				ROOT = {
-					scaled_wealth = 1
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						has_character_modifier = reconquista_mercenary_cooldown
-					}
-				}
-
-				custom_tooltip = {
-					text = reconquista_mercenary_cooldown_TT
-
-					always = no
 				}
 			}
 		}
 
 		effect = {
-			hidden_tooltip = {
-				FROM = {
-					add_character_modifier = {
-						name = reconquista_mercenary_cooldown
-						hidden = yes
-						years = 1
-					}
-				}
-			}
-
 			FROM = {
 				show_scope_change = no
 
+				piety = -100
+
 				if = {
-					limit = {
-						trait = zealous
-					}
+					limit = { trait = zealous }
 					remove_trait = zealous
 				}
-				piety = -100
+
 				if = {
-					limit = {
-						trait = content
-					}
+					limit = { trait = content }
 					remove_trait = content
 				}
 				else_if = {
 					limit = {
-						NOT = {
-							trait = ambitious
-						}
+						NOT = { trait = ambitious }
 					}
 					add_trait = ambitious
 				}
+
+				hidden_effect = {
+					add_character_modifier = {
+						name = reconquista_mercenary_cooldown
+						years = 1
+						hidden = yes
+					}
+				}
 			}
-			letter_event = { id = HF.49230 days = 3 }
+
+			letter_event = {
+				id = HF.49230 # Receive mercenary offer
+				days = 3
+			}
 		}
 	}
 
 	christian_mercenary_against_reconquista_defender_side = {
-		only_playable = yes
 		filter = independent_rulers
 		ai_target_filter = independent_rulers
-
 		ai_check_interval = 48
 
+		only_playable = yes
+
 		from_potential = {
-			NOT = {
-				religion_group = christian
-			}
+			NOT = { religion_group = christian }
+
 			any_war = {
+				any_defender = {
+					character = PREVPREV
+				}
+
 				OR = {
 					using_cb = reconquista_leon
 					using_cb = reconquista_castille
@@ -1048,16 +975,21 @@ targeted_decisions = {
 					using_cb = reconquista_navarra
 					using_cb = reconquista_balearic
 				}
-				any_defender = {
-					character = PREVPREV
-				}
 			}
 		}
 
 		potential = {
+			independent = yes
 			culture_group = iberian
 			religion_group = christian
-			war = no
+			higher_real_tier_than = BARON
+			mercenary = no
+			holy_order = no
+
+			any_realm_province = {
+				region = world_europe_west_iberia
+			}
+
 			NOT = {
 				any_war = {
 					OR = {
@@ -1074,136 +1006,112 @@ targeted_decisions = {
 					}
 				}
 			}
-			higher_real_tier_than = BARON
-			mercenary = no
-			holy_order = no
-			independent = yes
-			any_realm_province = {
-				region = world_europe_west_iberia
-			}
-			OR = {
-				FROM = {
-					ai = no
+
+			trigger_if = {
+				limit = {
+					FROM = { ai = yes }
+					ai = yes
 				}
-				AND = {
-					FROM = {
-						ai = yes
-					}
-					OR = {
-						ai = no
-						AND = {
-							NOR = {
-								trait = zealous
-								trait = holy_warrior
-								has_crusade_trait_trigger = yes
-								ai_zeal = 5
-							}
-							OR = {
-								trait = envious
-								trait = greedy
-								trait = cynical
-								trait = deceitful
-							}
-						}
-					}
+
+				ai_zeal < 5
+				has_crusade_trait_trigger = no
+
+				NOR = {
+					trait = zealous
+					trait = holy_warrior
+				}
+
+				OR = {
+					trait = envious
+					trait = greedy
+					trait = cynical
+					trait = deceitful
 				}
 			}
 		}
 
 		allow = {
-			#is_adult = yes
+			is_adult = yes
 			prisoner = no
-			NOT = {
-				trait = zealous
-			}
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = COUNT
+			NOT = { trait = zealous }
+
+			ROOT = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { real_tier = COUNT }
+
+					FROM = {
+						scaled_wealth >= 0.25
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = DUKE }
+
+					FROM = {
+						scaled_wealth >= 0.5
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = KING }
+
+					FROM = {
+						scaled_wealth >= 0.75
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = EMPEROR }
+
+					FROM = {
+						scaled_wealth >= 1
 					}
 				}
 
-				FROM = {
-					scaled_wealth = 0.25
-				}
-			}
+				trigger_if = {
+					limit = { has_character_modifier = reconquista_mercenary_other_cooldown }
 
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = DUKE
+					custom_tooltip = {
+						text = reconquista_mercenary_cooldown_other_TT
+						always = no
 					}
-				}
-
-				FROM = {
-					scaled_wealth = 0.5
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = KING
-					}
-				}
-
-				FROM = {
-					scaled_wealth = 0.75
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = EMPEROR
-					}
-				}
-
-				FROM = {
-					scaled_wealth = 1
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						has_character_modifier = reconquista_mercenary_other_cooldown
-					}
-				}
-
-				custom_tooltip = {
-					text = reconquista_mercenary_cooldown_other_TT
-
-					always = no
 				}
 			}
 		}
 
 		effect = {
-			hidden_tooltip = {
+			hidden_effect = {
 				add_character_modifier = {
 					name = reconquista_mercenary_other_cooldown
-					hidden = yes
 					years = 1
+					hidden = yes
 				}
 			}
 
-			letter_event = { id = HF.49233 days = 3 }
+			letter_event = {
+				id = HF.49233 # Receive mercenary offer
+				days = 3
+			}
 		}
 	}
 
 	muslim_mercenary_for_reconquista_mercenary_side = {
-		only_playable = yes
 		filter = independent_rulers
 		ai_target_filter = independent_rulers
-
 		ai_check_interval = 48
 
+		only_playable = yes
+
 		from_potential = {
-			NOT = {
-				religion_group = christian
+			independent = yes
+			higher_real_tier_than = BARON
+			NOT = { religion_group = christian }
+			mercenary = no
+			holy_order = no
+
+			any_realm_province = {
+				region = world_europe_west_iberia
 			}
-			war = no
+
 			NOT = {
 				any_war = {
 					OR = {
@@ -1220,29 +1128,23 @@ targeted_decisions = {
 					}
 				}
 			}
-			independent = yes
-			higher_real_tier_than = BARON
-			mercenary = no
-			holy_order = no
-			any_realm_province = {
-				region = world_europe_west_iberia
-			}
-			OR = {
-				ai = no
-				AND = {
-					ai = yes
-					NOR = {
-						trait = zealous
-						trait = holy_warrior
-						has_crusade_trait_trigger = yes
-						ai_zeal = 5
-					}
-					OR = {
-						trait = envious
-						trait = greedy
-						trait = cynical
-						trait = deceitful
-					}
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				ai_zeal < 5
+				has_crusade_trait_trigger = no
+
+				NOR = {
+					trait = zealous
+					trait = holy_warrior
+				}
+
+				OR = {
+					trait = envious
+					trait = greedy
+					trait = cynical
+					trait = deceitful
 				}
 			}
 		}
@@ -1251,6 +1153,8 @@ targeted_decisions = {
 			religion_group = christian
 
 			any_war = {
+				is_primary_war_attacker = yes
+
 				OR = {
 					using_cb = reconquista_leon
 					using_cb = reconquista_castille
@@ -1263,118 +1167,92 @@ targeted_decisions = {
 					using_cb = reconquista_navarra
 					using_cb = reconquista_balearic
 				}
-				attacker = {
-					character = ROOT
-				}
 			}
 		}
 
 		allow = {
 			FROM = {
+				show_scope_change = no
+
 				is_adult = yes
 				prisoner = no
-			}
 
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = COUNT
+				trigger_if = {
+					limit = { real_tier = COUNT }
+
+					ROOT = {
+						scaled_wealth >= 0.25
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = DUKE }
+
+					ROOT = {
+						scaled_wealth >= 0.5
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = KING }
+
+					ROOT = {
+						scaled_wealth >= 0.75
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = EMPEROR }
+
+					ROOT = {
+						scaled_wealth >= 1
 					}
 				}
 
-				ROOT = {
-					scaled_wealth = 0.25
-				}
-			}
+				trigger_if = {
+					limit = { has_character_modifier = reconquista_mercenary_cooldown }
 
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = DUKE
+					custom_tooltip = {
+						text = reconquista_mercenary_cooldown_TT
+
+						always = no
 					}
-				}
-
-				ROOT = {
-					scaled_wealth = 0.5
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = KING
-					}
-				}
-
-				ROOT = {
-					scaled_wealth = 0.75
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						real_tier = EMPEROR
-					}
-				}
-
-				ROOT = {
-					scaled_wealth = 1
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					FROM = {
-						has_character_modifier = reconquista_mercenary_cooldown
-					}
-				}
-
-				custom_tooltip = {
-					text = reconquista_mercenary_cooldown_TT
-
-					always = no
 				}
 			}
 		}
 
 		effect = {
-			hidden_tooltip = {
-				FROM = {
-					add_character_modifier = {
-						name = reconquista_mercenary_cooldown
-						hidden = yes
-						years = 1
-					}
-				}
-			}
-
 			FROM = {
 				show_scope_change = no
 
+				piety = -100
+
 				if = {
-					limit = {
-						trait = zealous
-					}
+					limit = { trait = zealous }
 					remove_trait = zealous
 				}
-				piety = -100
+
 				if = {
-					limit = {
-						trait = content
-					}
+					limit = { trait = content }
 					remove_trait = content
 				}
 				else_if = {
 					limit = {
-						NOT = {
-							trait = ambitious
-						}
+						NOT = { trait = ambitious }
 					}
 					add_trait = ambitious
 				}
 			}
-			letter_event = { id = HF.49230 days = 3 }
+
+			letter_event = {
+				id = HF.49230 # Receive mercenary offer
+				days = 3
+			}
+
+			hidden_effect = {
+				add_character_modifier = {
+					name = reconquista_mercenary_cooldown
+					years = 1
+					hidden = yes
+				}
+			}
 		}
 	}
 
@@ -1387,6 +1265,7 @@ targeted_decisions = {
 
 		from_potential = {
 			religion_group = christian
+
 			any_war = {
 				OR = {
 					using_cb = reconquista_leon
@@ -1407,10 +1286,16 @@ targeted_decisions = {
 		}
 
 		potential = {
-			NOT = {
-				religion_group = christian
+			independent = yes
+			higher_real_tier_than = BARON
+			NOT = { religion_group = christian }
+			mercenary = no
+			holy_order = no
+
+			any_realm_province = {
+				region = world_europe_west_iberia
 			}
-			war = no
+
 			NOT = {
 				any_war = {
 					OR = {
@@ -1427,38 +1312,26 @@ targeted_decisions = {
 					}
 				}
 			}
-			higher_real_tier_than = BARON
-			mercenary = no
-			holy_order = no
-			independent = yes
-			any_realm_province = {
-				region = world_europe_west_iberia
-			}
-			OR = {
-				FROM = {
-					ai = no
+
+			trigger_if = {
+				limit = {
+					FROM = { ai = yes }
+					ai = yes
 				}
-				AND = {
-					FROM = {
-						ai = yes
-					}
-					OR = {
-						ai = no
-						AND = {
-							NOR = {
-								trait = zealous
-								trait = holy_warrior
-								has_crusade_trait_trigger = yes
-								ai_zeal = 5
-							}
-							OR = {
-								trait = envious
-								trait = greedy
-								trait = cynical
-								trait = deceitful
-							}
-						}
-					}
+
+				ai_zeal < 5
+				has_crusade_trait_trigger = no
+
+				NOR = {
+					trait = zealous
+					trait = holy_warrior
+				}
+
+				OR = {
+					trait = envious
+					trait = greedy
+					trait = cynical
+					trait = deceitful
 				}
 			}
 		}
@@ -1466,82 +1339,64 @@ targeted_decisions = {
 		allow = {
 			is_adult = yes
 			prisoner = no
-			NOT = {
-				trait = zealous
-			}
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = COUNT
+			NOT = { trait = zealous }
+
+			ROOT = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { real_tier = COUNT }
+
+					FROM = {
+						scaled_wealth >= 0.25
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = DUKE }
+
+					FROM = {
+						scaled_wealth >= 0.5
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = KING }
+
+					FROM = {
+						scaled_wealth >= 0.75
+					}
+				}
+				trigger_else_if = {
+					limit = { real_tier = EMPEROR }
+
+					FROM = {
+						scaled_wealth >= 1
 					}
 				}
 
-				FROM = {
-					scaled_wealth = 0.25
-				}
-			}
+				trigger_if = {
+					limit = { has_character_modifier = reconquista_mercenary_other_cooldown }
 
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = DUKE
+					custom_tooltip = {
+						text = reconquista_mercenary_cooldown_other_TT
+						always = no
 					}
-				}
-
-				FROM = {
-					scaled_wealth = 0.5
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = KING
-					}
-				}
-
-				FROM = {
-					scaled_wealth = 0.75
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						real_tier = EMPEROR
-					}
-				}
-
-				FROM = {
-					scaled_wealth = 1
-				}
-			}
-
-			conditional_tooltip = {
-				trigger = {
-					ROOT = {
-						has_character_modifier = reconquista_mercenary_other_cooldown
-					}
-				}
-
-				custom_tooltip = {
-					text = reconquista_mercenary_cooldown_other_TT
-
-					always = no
 				}
 			}
 		}
 
 		effect = {
-			hidden_tooltip = {
+			hidden_effect = {
 				add_character_modifier = {
 					name = reconquista_mercenary_other_cooldown
-					hidden = yes
 					years = 1
+					hidden = yes
 				}
 			}
 
-			letter_event = { id = HF.49233 days = 3 }
+			letter_event = {
+				id = HF.49233 # Receive mercenary offer
+				days = 3
+			}
 		}
 	}
 }
