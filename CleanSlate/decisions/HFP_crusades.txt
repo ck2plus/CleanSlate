@@ -1,44 +1,46 @@
 targeted_decisions = {
 	select_crusade_beneficiary = {
-		only_playable = yes
+		filter = dynasty
+
 		ai = no
 
 		from_potential = {
 			has_pledged_crusade_participation = yes
-			hidden_tooltip = {
-				holy_order = no
-			}
+			holy_order = no
 		}
 
 		potential = {
+			religion = FROM
+			age >= 12
+			is_sick_or_injured_trigger = no
+			is_landed = no
+			mercenary = no
+			holy_order = no
+
 			NOR = {
-				character = FROM
 				trait = nun
 				trait = monk
-				is_sick_or_injured_trigger = yes
+
 				FROM = {
 					crusade_beneficiary = {
 						character = ROOT
 					}
 				}
-			}
-			dynasty = FROM
-			religion = FROM
-			NOT = {
+
 				any_heir_title = {
 					always = yes
 				}
 			}
-			is_landed = no
-			mercenary = no
-			holy_order = no
-			age = 12
 		}
+
 		allow = {
 		}
+
 		effect = {
-			hidden_tooltip = {
-				FROM = {
+			FROM = {
+				show_scope_change = no
+
+				hidden_effect = {
 					crusade_beneficiary = {
 						remove_opinion = {
 							who = FROM
@@ -46,17 +48,15 @@ targeted_decisions = {
 						}
 					}
 				}
-			}
-			set_character_flag = crusade_beneficiary
-			FROM = {
-				show_scope_change = no
+
 				set_crusade_beneficiary = ROOT
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						FROM = {
-							crusade_beneficiary = {
+
+				hidden_effect = {
+					crusade_beneficiary = {
+						set_character_flag = crusade_beneficiary
+
+						if = {
+							limit = {
 								NOT = {
 									has_opinion_modifier = {
 										who = FROM
@@ -65,14 +65,11 @@ targeted_decisions = {
 								}
 							}
 						}
-					}
-					FROM = {
-						crusade_beneficiary = {
-							opinion = {
-								who = FROM
-								modifier = opinion_beneficiary
-								years = 10
-							}
+
+						opinion = {
+							who = FROM
+							modifier = opinion_beneficiary
+							years = 10
 						}
 					}
 				}
@@ -83,22 +80,27 @@ targeted_decisions = {
 
 title_decisions = {
 	dynamic_crusader_state = {
-		only_playable = yes
 		is_high_prio = yes
 		filter = all
 		ai_target_filter = all
 		ai_check_interval = 36
 
+		only_playable = yes
+
 		from_potential = {
 			is_ruler = yes
 			religion_group = christian
 			has_pledged_crusade_participation = yes
-			OR = {
-				has_game_rule = { name = dynamic_crusader_states value = default }
-				AND = {
-					ai = no
-					has_game_rule = { name = dynamic_crusader_states value = limited }
+
+			trigger_if = {
+				limit = {
+					has_game_rule = {
+						name = dynamic_crusader_states
+						value = limited
+					}
 				}
+
+				ai = no
 			}
 		}
 
@@ -110,65 +112,54 @@ title_decisions = {
 		allow = {
 			FROM = {
 				show_scope_change = no
-				conditional_tooltip = {
-					trigger = {
+
+				trigger_if = {
+					limit = {
 						any_owned_bloodline = {
 							has_bloodline_flag = crusade_lord_bloodline
 							bloodline_is_active_for = PREV
 						}
 					}
-					prestige = 300
-					wealth = 100
+					prestige >= 300
+					wealth >= 100
 				}
-				conditional_tooltip = {
-					trigger = {
-						NOT = {
-							any_owned_bloodline = {
-								has_bloodline_flag = crusade_lord_bloodline
-								bloodline_is_active_for = PREV
-							}
-						}
-					}
-					prestige = 500
-					wealth = 300
+				trigger_else = {
+					prestige >= 500
+					wealth >= 300
 				}
-				conditional_tooltip = {
-					trigger = {
-						has_character_modifier = settled_crusader_state
-					}
-					NOT = {
-						has_character_modifier = settled_crusader_state
-					}
+
+				trigger_if = {
+					limit = { has_character_modifier = settled_crusader_state }
+					NOT = { has_character_modifier = settled_crusader_state }
 				}
 			}
+
 			custom_tooltip = {
-				text = "dynamic_crusader_state_tooltip"
+				text = dynamic_crusader_state_tooltip
 
 				NOT = {
 					any_direct_de_jure_vassal_title = {
 						location = {
-							NOT = {
-								controlled_by = FROM
-							}
+							NOT = { controlled_by = FROM }
 						}
 					}
 				}
 			}
+
 			custom_tooltip = {
-				text = "dynamic_crusader_state_tooltip_2"
+				text = dynamic_crusader_state_tooltip_2
 
 				NOT = {
 					any_direct_de_jure_vassal_title = {
-						NOT = {
-							owner = {
-								OR = {
-									has_pledged_crusade_defense = yes
-									is_crusade_target = yes
-									any_liege = {
-										OR = {
-											has_pledged_crusade_defense = yes
-											is_crusade_target = yes
-										}
+						holder_scope = {
+							NOR = {
+								has_pledged_crusade_defense = yes
+								is_crusade_target = yes
+
+								any_liege = {
+									OR = {
+										has_pledged_crusade_defense = yes
+										is_crusade_target = yes
 									}
 								}
 							}
@@ -176,13 +167,15 @@ title_decisions = {
 					}
 				}
 			}
+
 			custom_tooltip = {
-				text = "dynamic_crusader_state_tooltip_3"
+				text = dynamic_crusader_state_tooltip_3
 
 				any_direct_de_jure_vassal_title = {
 					location = {
 						OR = {
 							is_coastal = yes
+
 							any_neighbor_province = {
 								OR = {
 									AND = {
@@ -205,97 +198,109 @@ title_decisions = {
 					}
 				}
 			}
+
 			custom_tooltip = {
-				text = "dynamic_crusader_state_tooltip_4"
+				text = dynamic_crusader_state_tooltip_4
 
 				FROM = {
 					OR = {
 						crusade_beneficiary = {
 							always = yes
 						}
+
 						any_dynasty_member = {
 							is_lowborn = no
-							NOT = {
+							mercenary = no
+							is_landed = no
+							is_incapable = no
+
+							NOR = {
+								trait = monk
+								trait = nun
+
 								any_heir_title = {
 									always = yes
 								}
-							}
-							NAND = {
-								is_female = yes
-								age = 40
-							}
-							mercenary = no
-							is_landed = no
-							OR = {
-								is_adult = yes
-								AND = {
-									age = 12
-									is_female = no
-								}
-							}
-							NOR = {
-								is_incapable = yes
-								trait = monk
-								trait = nun
-							}
-							NAND = {
-								is_married = yes
-								spouse = {
-									OR = {
-										is_landed = yes
-										any_heir_title = {
-											always = yes
-										}
-									}
-								}
-							}
-							NAND = {
-								is_betrothed = yes
-								betrothed = {
-									OR = {
-										is_landed = yes
-										any_heir_title = {
-											always = yes
-										}
-									}
-								}
-							}
-							NOT = {
+
 								player_heir = {
 									OR = {
 										is_landed = yes
+
 										any_heir_title = {
 											always = yes
 										}
 									}
 								}
 							}
-							NAND = {
-								is_female = yes
-								any_child = {
-									is_landed = yes
+
+							trigger_if = {
+								limit = { is_female = yes }
+
+								age < 40
+
+								NOT = {
+									any_child = {
+										is_landed = yes
+									}
+								}
+							}
+
+							trigger_if = {
+								limit = { is_adult = no }
+
+								age >= 12
+								is_female = no
+							}
+
+							trigger_if = {
+								limit = { is_married = yes }
+
+								NOT = {
+									any_spouse = {
+										OR = {
+											is_landed = yes
+
+											any_heir_title = {
+												always = yes
+											}
+										}
+									}
+								}
+							}
+
+							trigger_if = {
+								limit = { is_betrothed = yes }
+
+								betrothed = {
+									NOR = {
+										is_landed = yes
+
+										any_heir_title = {
+											always = yes
+										}
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+
 			OR = {
 				custom_tooltip = {
 					text = dynamic_crusader_state_tooltip_5
 
 					ROOT = {
-						NOT = {
-							kingdom = {
-								FROM = {
-									crusade_target_title = {
-										title = PREVPREV
-									}
+						kingdom = {
+							FROM = {
+								crusade_target_title = {
+									NOT = { title = PREVPREV }
 								}
 							}
 						}
 					}
 				}
+
 				custom_tooltip = {
 					text = dynamic_crusader_state_tooltip_6
 
@@ -304,6 +309,7 @@ title_decisions = {
 							owner = {
 								OR = {
 									is_crusade_target = yes
+
 									any_liege = {
 										is_crusade_target = yes
 									}
@@ -316,8 +322,13 @@ title_decisions = {
 		}
 
 		effect = {
+			save_event_target_as = duchy_region
+
 			FROM = {
 				show_scope_change = no
+
+				save_event_target_as = crusader_lord
+
 				if = {
 					limit = {
 						any_owned_bloodline = {
@@ -332,13 +343,8 @@ title_decisions = {
 					prestige = -500
 					wealth = -300
 				}
-			}
-			ROOT = {
-				save_event_target_as = duchy_region
-			}
-			FROM = {
-				save_event_target_as = crusader_lord
-				character_event = { id = HFP.42100 }
+
+				character_event = { id = HFP.42100 } # Decide who gets the Crusader State
 			}
 		}
 	}
