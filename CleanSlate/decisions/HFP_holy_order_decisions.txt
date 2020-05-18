@@ -1,16 +1,20 @@
 decisions = {
 	form_knights_of_calatrava = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
+
+		only_playable = yes
 
 		potential = {
 			has_dlc = "Sons of Abraham"
+			NOT = { is_title_active = d_knights_calatrava }
 
-			any_demesne_title = {
-				tier = COUNT
-				NOT = {
-					title = c_calatrava
+			c_calatrava = {
+				holder_scope = {
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
 				}
 			}
 
@@ -18,9 +22,7 @@ decisions = {
 				higher_tier_than = DUKE
 				region = world_europe_west_iberia
 			}
-			NOT = {
-				is_title_active = d_knights_calatrava
-			}
+
 			OR = {
 				religion = catholic
 				religion = cathar
@@ -30,33 +32,33 @@ decisions = {
 			}
 
 			OR = {
-				has_landed_title = c_calatrava
-				any_realm_lord = {
-					has_landed_title = c_calatrava
-				}
-			}
-
-			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
 
-			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+			any_demesne_title = {
+				tier = COUNT
+				NOT = { title = c_calatrava }
 			}
-		}
-		allow = {
-			war = no
-			piety = 500
-			wealth = 500
-			is_heretic = no
-			culture_group = iberian
-			independent = yes
 
 			NOT = {
-				trait = excommunicated
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
+		}
+
+		allow = {
+			independent = yes
+			culture_group = iberian
+			is_heretic = no
+			NOT = { trait = excommunicated }
+			war = no
+			piety >= 500
+			wealth >= 500
 
 			custom_tooltip = {
 				text = only_one_vassalized_holy_order_TT
@@ -68,6 +70,7 @@ decisions = {
 				}
 			}
 		}
+
 		effect = {
 			wealth = -500
 			piety = -500
@@ -82,6 +85,7 @@ decisions = {
 					religion = ROOT
 					age = 25
 				}
+
 				new_character = {
 					set_government_type = order_government
 					add_trait = shrewd
@@ -89,20 +93,22 @@ decisions = {
 					add_trait = diligent
 					add_trait = inspiring_leader
 					add_trait = organizer
+
 					if = {
 						limit = {
-							NOT = {
-								trait = brilliant_strategist
-							}
+							NOT = { trait = brilliant_strategist }
 						}
+
 						remove_trait = misguided_warrior
 						remove_trait = tough_soldier
 						remove_trait = skilled_tactician
 						add_trait = brilliant_strategist
 					}
+
 					grant_title_no_opinion = d_knights_calatrava
 					grant_title_no_opinion = c_calatrava
 					set_defacto_liege = ROOT
+					add_friend = ROOT
 					save_event_target_as = grandmaster_of_calatrava
 
 					opinion = {
@@ -110,7 +116,6 @@ decisions = {
 						who = ROOT
 						years = 25
 					}
-					add_friend = ROOT
 
 					primary_title = {
 						holy_order_set_law_effect = yes
@@ -120,34 +125,28 @@ decisions = {
 				c_calatrava = {
 					any_direct_de_jure_vassal_title = {
 						limit = {
-							owner = {
+							holder_scope = {
 								OR = {
 									character = ROOT
-									any_liege = {
-										character = ROOT
-									}
+									is_vassal_or_below_of = ROOT
 								}
 							}
 						}
+
 						if = {
-							limit = {
-								owner = {
-									character = ROOT
-								}
-							}
+							limit = { holder = ROOT }
+
 							if = {
-								limit = {
-									holding_type = city
-								}
+								limit = { holding_type = city }
+
 								create_random_steward = {
 									random_traits = yes
 									dynasty = random
 								}
 							}
 							else_if = {
-								limit = {
-									holding_type = temple
-								}
+								limit = { holding_type = temple }
+
 								create_random_priest = {
 									random_traits = yes
 									dynasty = random
@@ -159,20 +158,14 @@ decisions = {
 									dynasty = random
 								}
 							}
+
 							new_character = {
 								grant_title_no_opinion = PREV
 								set_defacto_liege = event_target:grandmaster_of_calatrava
 							}
 						}
-						else_if = {
-							limit = {
-								owner = {
-									NOT = {
-										character = ROOT
-									}
-								}
-							}
-							owner = {
+						else = {
+							holder_scope = {
 								set_defacto_liege = event_target:grandmaster_of_calatrava
 								religion = ROOT
 							}
@@ -187,11 +180,8 @@ decisions = {
 				}
 			}
 
-			ROOT = {
-				narrative_event = { id = HFP.40029 }
-			}
-			any_playable_ruler = {
-				narrative_event = { id = HFP.40029 }
+			any_player = {
+				narrative_event = { id = HFP.40029 } # Notify
 			}
 
 			sound_effect = generic_click_01
@@ -200,42 +190,29 @@ decisions = {
 
 	vassalize_knights_of_calatrava = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
+
+		only_playable = yes
 
 		potential = {
 			is_title_active = d_knights_calatrava
 
-			any_demesne_title = {
-				tier = COUNT
-				NOT = {
-					title = c_calatrava
+			c_calatrava = {
+				holder_scope = {
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+						has_landed_title = d_knights_calatrava
+						is_vassal_or_below_of = d_knights_calatrava
+					}
 				}
 			}
-
-			any_demesne_title = {
-				higher_tier_than = DUKE
-				region = world_europe_west_iberia
-			}
-			OR = {
-				religion = catholic
-				religion = cathar
-				religion = fraticelli
-				religion = waldensian
-				religion = lollard
-			}
-
-			NOT = { has_character_modifier = expelled_d_knights_calatrava }
 
 			d_knights_calatrava = {
 				holder_scope = {
 					independent = yes
-				}
-			}
 
-			NOT = {
-				d_knights_calatrava = {
-					owner = {
+					NOT = {
 						has_opinion_modifier = {
 							who = ROOT
 							modifier = opinion_unfit_ruler
@@ -244,58 +221,60 @@ decisions = {
 				}
 			}
 
-			OR = {
-				has_landed_title = c_calatrava
-				any_realm_lord = {
-					has_landed_title = c_calatrava
-				}
-				d_knights_calatrava = {
-					owner = {
-						has_landed_title = c_calatrava
-					}
-				}
+			any_demesne_title = {
+				higher_tier_than = DUKE
+				region = world_europe_west_iberia
 			}
 
-			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+			OR = {
+				religion = catholic
+				religion = cathar
+				religion = fraticelli
+				religion = waldensian
+				religion = lollard
+			}
+
+			any_demesne_title = {
+				tier = COUNT
+				NOT = { title = c_calatrava }
+			}
+
+			NOR = {
+				has_character_modifier = expelled_d_knights_calatrava
+
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
-		allow = {
-			war = no
-			wealth = 300
-			is_heretic = no
-			culture_group = iberian
-			independent = yes
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						d_knights_calatrava = {
-							holder_scope = {
-								opinion = {
-									who = ROOT
-									value = 25
-								}
+		allow = {
+			independent = yes
+			culture_group = iberian
+			wealth >= 300
+			is_heretic = no
+			war = no
+			NOT = { trait = excommunicated }
+
+			trigger_if = {
+				limit = {
+					d_knights_calatrava = {
+						holder_scope = {
+							opinion = {
+								who = ROOT
+								value < 25
 							}
 						}
 					}
+
 				}
 
 				custom_tooltip = {
 					text = vassalize_knights_calatrava_opinion_TT
 
-					d_knights_templar = {
-						holder_scope = {
-							opinion = {
-								who = ROOT
-								value = 25
-							}
-						}
-					}
+					always = no
 				}
-			}
-			NOT = {
-				trait = excommunicated
 			}
 
 			custom_tooltip = {
@@ -308,18 +287,21 @@ decisions = {
 				}
 			}
 		}
+
 		effect = {
 			wealth = -300
 
 			d_knights_calatrava = {
 				show_scope_change = no
+
 				holder_scope = {
 					show_scope_change = no
+
 					grant_title_no_opinion = c_calatrava
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
 				d_knights_calatrava = {
 					holder_scope = {
 						save_event_target_as = grandmaster_of_calatrava
@@ -331,34 +313,28 @@ decisions = {
 				c_calatrava = {
 					any_direct_de_jure_vassal_title = {
 						limit = {
-							owner = {
+							holder_scope = {
 								OR = {
 									character = ROOT
-									any_liege = {
-										character = ROOT
-									}
+									is_vassal_or_below_of = ROOT
 								}
 							}
 						}
+
 						if = {
-							limit = {
-								owner = {
-									character = ROOT
-								}
-							}
+							limit = { holder = ROOT }
+
 							if = {
-								limit = {
-									holding_type = city
-								}
+								limit = { holding_type = city }
+
 								create_random_steward = {
 									random_traits = yes
 									dynasty = random
 								}
 							}
 							else_if = {
-								limit = {
-									holding_type = temple
-								}
+								limit = { holding_type = temple }
+
 								create_random_priest = {
 									random_traits = yes
 									dynasty = random
@@ -370,20 +346,14 @@ decisions = {
 									dynasty = random
 								}
 							}
+
 							new_character = {
 								grant_title_no_opinion = PREV
 								set_defacto_liege = event_target:grandmaster_of_calatrava
 							}
 						}
-						else_if = {
-							limit = {
-								owner = {
-									NOT = {
-										character = ROOT
-									}
-								}
-							}
-							owner = {
+						else = {
+							holder_scope = {
 								set_defacto_liege = event_target:grandmaster_of_calatrava
 								religion = ROOT
 							}
@@ -396,26 +366,24 @@ decisions = {
 
 	form_knights_of_santiago = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
+
+		only_playable = yes
 
 		potential = {
 			has_dlc = "Sons of Abraham"
+			NOT = { is_title_active = d_knights_santiago }
 
 			any_demesne_title = {
 				tier = COUNT
-				NOT = {
-					title = c_santiago
-				}
+				NOT = { title = c_santiago }
 			}
 
 			any_demesne_title = {
 				higher_tier_than = DUKE
 				region = world_europe_west_iberia
 			}
-			NOT = {
-				is_title_active = d_knights_santiago
-			}
+
 			OR = {
 				religion = catholic
 				religion = cathar
@@ -423,36 +391,39 @@ decisions = {
 				religion = waldensian
 				religion = lollard
 			}
-			is_heretic = no
 
-			culture_group = iberian
-
-			independent = yes
-
-			OR = {
-				has_landed_title = c_santiago
-				any_realm_lord = {
-					has_landed_title = c_santiago
+			c_santiago = {
+				holder_scope = {
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
 				}
 			}
 
 			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
 
 			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
+
 		allow = {
+			independent = yes
+			culture_group = iberian
+			is_heretic = no
+			NOT = { trait = excommunicated }
 			war = no
-			piety = 500
-			wealth = 500
-			NOT = {
-				trait = excommunicated
-			}
+			piety >= 500
+			wealth >= 500
 
 			custom_tooltip = {
 				text = only_one_vassalized_holy_order_TT
@@ -464,6 +435,7 @@ decisions = {
 				}
 			}
 		}
+
 		effect = {
 			wealth = -500
 			piety = -500
@@ -478,6 +450,7 @@ decisions = {
 					religion = ROOT
 					age = 25
 				}
+
 				new_character = {
 					set_government_type = order_government
 					add_trait = shrewd
@@ -485,20 +458,21 @@ decisions = {
 					add_trait = diligent
 					add_trait = inspiring_leader
 					add_trait = organizer
+
 					if = {
 						limit = {
-							NOT = {
-								trait = brilliant_strategist
-							}
+							NOT = { trait = brilliant_strategist }
 						}
 						remove_trait = misguided_warrior
 						remove_trait = tough_soldier
 						remove_trait = skilled_tactician
 						add_trait = brilliant_strategist
 					}
+
 					grant_title_no_opinion = d_knights_santiago
 					grant_title_no_opinion = c_santiago
 					set_defacto_liege = ROOT
+					add_friend = ROOT
 					save_event_target_as = grandmaster_of_santiago
 
 					opinion = {
@@ -506,7 +480,7 @@ decisions = {
 						who = ROOT
 						years = 25
 					}
-					add_friend = ROOT
+
 					primary_title = {
 						holy_order_set_law_effect = yes
 					}
@@ -515,34 +489,27 @@ decisions = {
 				c_santiago = {
 					any_direct_de_jure_vassal_title = {
 						limit = {
-							owner = {
+							holder_scope = {
 								OR = {
 									character = ROOT
-									any_liege = {
-										character = ROOT
-									}
+									is_vassal_or_below_of = ROOT
 								}
 							}
 						}
 						if = {
-							limit = {
-								owner = {
-									character = ROOT
-								}
-							}
+							limit = { holder = ROOT }
+
 							if = {
-								limit = {
-									holding_type = city
-								}
+								limit = { holding_type = city }
+
 								create_random_steward = {
 									random_traits = yes
 									dynasty = random
 								}
 							}
 							else_if = {
-								limit = {
-									holding_type = temple
-								}
+								limit = { holding_type = temple }
+
 								create_random_priest = {
 									random_traits = yes
 									dynasty = random
@@ -554,20 +521,14 @@ decisions = {
 									dynasty = random
 								}
 							}
+
 							new_character = {
 								grant_title_no_opinion = PREV
 								set_defacto_liege = event_target:grandmaster_of_santiago
 							}
 						}
-						else_if = {
-							limit = {
-								owner = {
-									NOT = {
-										character = ROOT
-									}
-								}
-							}
-							owner = {
+						else = {
+							holder_scope = {
 								set_defacto_liege = event_target:grandmaster_of_santiago
 								religion = ROOT
 							}
@@ -582,11 +543,8 @@ decisions = {
 				}
 			}
 
-			ROOT = {
-				narrative_event = { id = HFP.40030 }
-			}
-			any_playable_ruler = {
-				narrative_event = { id = HFP.40030 }
+			any_player = {
+				narrative_event = { id = HFP.40030 } # Notify
 			}
 
 			sound_effect = generic_click_01
@@ -595,16 +553,34 @@ decisions = {
 
 	vassalize_knights_of_santiago = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
+
+		only_playable = yes
 
 		potential = {
 			is_title_active = d_knights_santiago
 
-			any_demesne_title = {
-				tier = COUNT
-				NOT = {
-					title = c_calatrava
+			c_santiago = {
+				holder_scope = {
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+						has_landed_title = d_knights_santiago
+						is_vassal_or_below_of = d_knights_santiago
+					}
+				}
+			}
+
+			d_knights_santiago = {
+				holder_scope = {
+					independent = yes
+
+					NOT = {
+						has_opinion_modifier = {
+							who = ROOT
+							modifier = opinion_unfit_ruler
+						}
+					}
 				}
 			}
 
@@ -621,62 +597,36 @@ decisions = {
 				religion = lollard
 			}
 
-			NOT = { has_character_modifier = expelled_d_knights_santiago }
-
-			d_knights_santiago = {
-				holder_scope = {
-					independent = yes
-				}
+			any_demesne_title = {
+				tier = COUNT
+				NOT = { title = c_santiago }
 			}
 
-			NOT = {
-				d_knights_santiago = {
-					owner = {
-						has_opinion_modifier = {
-							who = ROOT
-							modifier = opinion_unfit_ruler
-						}
-					}
-				}
-			}
+			NOR = {
+				has_character_modifier = expelled_d_knights_santiago
 
-			OR = {
-				has_landed_title = c_santiago
-				any_realm_lord = {
-					has_landed_title = c_santiago
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
 				}
-				d_knights_santiago = {
-					holder_scope = {
-						OR = {
-							has_landed_title = c_santiago
-							any_realm_lord = {
-								has_landed_title = c_santiago
-							}
-						}
-					}
-				}
-			}
-
-			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
 			}
 		}
-		allow = {
-			war = no
-			wealth = 300
-			is_heretic = no
-			culture_group = iberian
-			independent = yes
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						d_knights_santiago = {
-							holder_scope = {
-								opinion = {
-									who = ROOT
-									value = 25
-								}
+		allow = {
+			independent = yes
+			culture_group = iberian
+			war = no
+			wealth >= 300
+			is_heretic = no
+			NOT = { trait = excommunicated }
+
+			trigger_if = {
+				limit = {
+					d_knights_santiago = {
+						holder_scope = {
+							opinion = {
+								who = ROOT
+								value < 25
 							}
 						}
 					}
@@ -685,18 +635,8 @@ decisions = {
 				custom_tooltip = {
 					text = vassalize_knights_santiago_opinion_TT
 
-					d_knights_templar = {
-						holder_scope = {
-							opinion = {
-								who = ROOT
-								value = 25
-							}
-						}
-					}
+					always = no
 				}
-			}
-			NOT = {
-				trait = excommunicated
 			}
 
 			custom_tooltip = {
@@ -709,18 +649,21 @@ decisions = {
 				}
 			}
 		}
+
 		effect = {
 			wealth = -300
 
 			d_knights_santiago = {
 				show_scope_change = no
+
 				holder_scope = {
 					show_scope_change = no
+
 					grant_title_no_opinion = c_santiago
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
 				d_knights_santiago = {
 					holder_scope = {
 						save_event_target_as = grandmaster_of_santiago
@@ -732,34 +675,28 @@ decisions = {
 				c_santiago = {
 					any_direct_de_jure_vassal_title = {
 						limit = {
-							owner = {
+							holder_scope = {
 								OR = {
 									character = ROOT
-									any_liege = {
-										character = ROOT
-									}
+									is_vassal_or_below_of = ROOT
 								}
 							}
 						}
+
 						if = {
-							limit = {
-								owner = {
-									character = ROOT
-								}
-							}
+							limit = { holder = ROOT }
+
 							if = {
-								limit = {
-									holding_type = city
-								}
+								limit = { holding_type = city }
+
 								create_random_steward = {
 									random_traits = yes
 									dynasty = random
 								}
 							}
 							else_if = {
-								limit = {
-									holding_type = temple
-								}
+								limit = { holding_type = temple }
+
 								create_random_priest = {
 									random_traits = yes
 									dynasty = random
@@ -771,20 +708,14 @@ decisions = {
 									dynasty = random
 								}
 							}
+
 							new_character = {
 								grant_title_no_opinion = PREV
 								set_defacto_liege = event_target:grandmaster_of_santiago
 							}
 						}
-						else_if = {
-							limit = {
-								owner = {
-									NOT = {
-										character = ROOT
-									}
-								}
-							}
-							owner = {
+						else = {
+							holder_scope = {
 								set_defacto_liege = event_target:grandmaster_of_santiago
 							}
 						}
@@ -796,17 +727,20 @@ decisions = {
 
 	form_teutonic_order = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		potential = {
-			any_demesne_title = {
-				higher_tier_than = DUKE
-			}
-			NOT = {
+			independent = yes
+			higher_real_tier_than = DUKE
+			culture = german
+
+			NOR = {
 				is_title_active = d_teutonic_order
 				is_title_active = k_teutonic_state
 			}
+
 			OR = {
 				religion = catholic
 				religion = cathar
@@ -814,38 +748,35 @@ decisions = {
 				religion = waldensian
 				religion = lollard
 			}
-			OR = {
+
+			trigger_if = {
+				limit = { is_title_active = e_hre }
 				has_landed_title = e_hre
-				NOT = {
-					is_title_active = e_hre
-				}
 			}
 
-			culture = german
-
-			independent = yes
-
 			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
 
 			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
 
 		allow = {
-			war = no
-			piety = 500
-			wealth = 500
-			is_heretic = no
 			culture = german
+			is_heretic = no
+			NOT = { trait = excommunicated }
+			war = no
+			piety >= 500
+			wealth >= 500
 
-			NOT = {
-				trait = excommunicated
-			}
 			custom_tooltip = {
 				text = form_teutonic_order_jerusalem_TT
 
@@ -871,6 +802,7 @@ decisions = {
 					religion = ROOT
 					age = 25
 				}
+
 				new_character = {
 					set_government_type = order_government
 					add_trait = shrewd
@@ -878,18 +810,20 @@ decisions = {
 					add_trait = diligent
 					add_trait = inspiring_leader
 					add_trait = organizer
+
 					if = {
 						limit = {
-							NOT = {
-								trait = brilliant_strategist
-							}
+							NOT = { trait = brilliant_strategist }
 						}
+
 						remove_trait = misguided_warrior
 						remove_trait = tough_soldier
 						remove_trait = skilled_tactician
 						add_trait = brilliant_strategist
 					}
+
 					grant_title_no_opinion = d_teutonic_order
+					add_friend = ROOT
 				#	save_event_target_as = teutonic_hochmeister
 
 					opinion = {
@@ -897,18 +831,15 @@ decisions = {
 						who = ROOT
 						years = 25
 					}
-					add_friend = ROOT
+
 					primary_title = {
 						holy_order_set_law_effect = yes
 					}
 				}
 			}
 
-			ROOT = {
-				narrative_event = { id = HFP.40031 }
-			}
-			any_playable_ruler = {
-				narrative_event = { id = HFP.40031 }
+			any_player = {
+				narrative_event = { id = HFP.40031 } # Notify
 			}
 
 			sound_effect = generic_click_01
@@ -917,139 +848,121 @@ decisions = {
 
 	vassalize_teutonic_knights = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
+
+		only_playable = yes
 
 		potential = {
 			religion_group = christian
+			is_heretic = no
+
 			any_owned_bloodline = {
 				has_bloodline_flag = northern_crusade_bloodline
 			}
-			OR = {
-				AND = {
-					is_title_active = d_teutonic_order
-					d_teutonic_order = {
-						holder_scope = {
-							independent = yes
-						}
-					}
-				}
-				AND = {
-					is_title_active = k_teutonic_state
-					k_teutonic_state = {
-						holder_scope = {
-							independent = yes
+
+			trigger_if = {
+				limit = { is_title_active = d_teutonic_order }
+
+				d_teutonic_order = {
+					holder_scope = {
+						independent = yes
+
+						NOT = {
+							has_opinion_modifier = {
+								who = ROOT
+								modifier = opinion_unfit_ruler
+							}
 						}
 					}
 				}
 			}
-			NOR = {
-				d_teutonic_order = {
-					holder_scope = {
-						has_opinion_modifier = {
-							who = ROOT
-							modifier = opinion_unfit_ruler
-						}
-					}
-				}
+			trigger_else = {
+				is_title_active = k_teutonic_state
+
 				k_teutonic_state = {
 					holder_scope = {
-						has_opinion_modifier = {
-							who = ROOT
-							modifier = opinion_unfit_ruler
+						independent = yes
+
+						NOT = {
+							has_opinion_modifier = {
+								who = ROOT
+								modifier = opinion_unfit_ruler
+							}
 						}
 					}
 				}
-				has_character_modifier = expelled_d_teutonic_order
 			}
 
 			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
 
-			is_heretic = no
+			NOR = {
+				has_character_modifier = expelled_d_teutonic_order
+				has_character_modifier = expelled_k_teutonic_state
 
-			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
 
 		allow = {
 			independent = yes
-			piety = 300
+			piety >= 300
 
 			custom_tooltip = {
 				text = higher_tier_than_teutonic_knights_TT
 
-				OR = {
-					AND = {
-						is_title_active = d_teutonic_order
-						higher_tier_than = DUKE
-					}
-					AND = {
-						is_title_active = k_teutonic_state
-						higher_tier_than = KING
-					}
+				trigger_if = {
+					limit = { is_title_active = d_teutonic_order }
+					higher_real_tier_than = DUKE
+				}
+				trigger_else = {
+					is_title_active = k_teutonic_state
+					real_tier = EMPEROR
 				}
 			}
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						d_teutonic_order = {
-							holder_scope = {
-								opinion = {
-									who = ROOT
-									value = 25
-								}
+			trigger_if = {
+				limit = {
+					d_teutonic_order = {
+						holder_scope = {
+							opinion = {
+								who = ROOT
+								value < 25
 							}
 						}
 					}
-					is_title_active = d_teutonic_order
 				}
 
 				custom_tooltip = {
 					text = teutonic_order_opinion_TT
 
-					d_teutonic_order = {
-						holder_scope = {
-							opinion = {
-								who = ROOT
-								value = 25
-							}
-						}
-					}
+					always = no
 				}
 			}
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						k_teutonic_state = {
-							holder_scope = {
-								opinion = {
-									who = ROOT
-									value = 25
-								}
+			trigger_if = {
+				limit = {
+					k_teutonic_state = {
+						holder_scope = {
+							opinion = {
+								who = ROOT
+								value < 25
 							}
 						}
 					}
-					is_title_active = k_teutonic_state
 				}
 
 				custom_tooltip = {
 					text = teutonic_state_opinion_TT
 
-					k_teutonic_state = {
-						holder_scope = {
-							opinion = {
-								who = ROOT
-								value = 25
-							}
-						}
-					}
+					always = no
 				}
 			}
 
@@ -1066,13 +979,13 @@ decisions = {
 
 		effect = {
 			piety = -300
+
 			custom_tooltip = {
 				text = vassalize_teutonic_knights_TT
 
 				if = {
-					limit = {
-						is_title_active = d_teutonic_order
-					}
+					limit = { is_title_active = d_teutonic_order }
+
 					d_teutonic_order = {
 						holder_scope = {
 							set_defacto_liege = ROOT
@@ -1080,9 +993,7 @@ decisions = {
 					}
 				}
 				else_if = {
-					limit = {
-						is_title_active = k_teutonic_state
-					}
+					limit = { is_title_active = k_teutonic_state }
 					k_teutonic_state = {
 						holder_scope = {
 							set_defacto_liege = ROOT
@@ -1095,18 +1006,18 @@ decisions = {
 
 	hire_teutonic_honor_guard = {
 		is_high_prio = yes
-		only_playable = yes
+
 		ai = no
 
 		potential = {
 			any_owned_bloodline = {
 				has_bloodline_flag = northern_crusade_bloodline
 			}
+
 			religion_group = christian
 			is_heretic = no
-			NOT = {
-				has_earmarked_regiments = teutonic_honor_guard
-			}
+			NOT = { has_earmarked_regiments = teutonic_honor_guard }
+
 			OR = {
 				is_title_active = d_teutonic_order
 				is_title_active = k_teutonic_state
@@ -1114,52 +1025,52 @@ decisions = {
 		}
 
 		allow = {
-			piety = 300
 			war = yes
-			conditional_tooltip = {
-				trigger = {
-					d_teutonic_order = {
-						holder_scope = {
-							is_foe = ROOT
-						}
-					}
-					is_title_active = d_teutonic_order
-				}
+			piety >= 300
 
-				NOT = {
+			trigger_if = {
+				limit = {
 					d_teutonic_order = {
 						holder_scope = {
 							is_foe = ROOT
 						}
 					}
 				}
-			}
-			conditional_tooltip = {
-				trigger = {
-					k_teutonic_state = {
+
+				d_teutonic_order = {
+					show_scope_change = no
+
+					holder_scope = {
 						show_scope_change = no
+
+						NOT = { is_foe = ROOT }
+					}
+				}
+			}
+
+
+			trigger_if = {
+				limit = {
+					k_teutonic_state = {
 						holder_scope = {
-							show_scope_change = no
 							is_foe = ROOT
 						}
 					}
-					is_title_active = k_teutonic_state
 				}
 
-				NOT = {
-					k_teutonic_state = {
+				k_teutonic_state = {
+					show_scope_change = no
+
+					holder_scope = {
 						show_scope_change = no
-						holder_scope = {
-							show_scope_change = no
-							is_foe = ROOT
-						}
+
+						NOT = {	is_foe = ROOT}
 					}
 				}
 			}
-			conditional_tooltip = {
-				trigger = {
-					has_character_modifier = hire_teutonic_honor_guard_cooldown
-				}
+
+			trigger_if = {
+				limit = { has_character_modifier = hire_teutonic_honor_guard_cooldown }
 
 				custom_tooltip = {
 					text = hire_teutonic_honor_guard_cooldown_TT
@@ -1172,50 +1083,54 @@ decisions = {
 		effect = {
 			piety = -300
 
-			capital_scope = {
-				show_scope_change = no
-				ROOT = {
-					show_scope_change = no
-					spawn_unit = {
-						owner = ROOT
-						province = PREV
-						home = PREV
-						troops = {
-							heavy_infantry = { 1500 1500 }
-							light_infantry = { 1500 1500 }
-							archers = { 1000 1000 }
-						}
-						attrition = 1.0
-						disband_on_peace = yes
-						maintenance_multiplier = 0.4
-						earmark = teutonic_honor_guard
-					}
+			spawn_unit = {
+				owner = ROOT
+				province = capital_scope
+				home = capital_scope
+
+				troops = {
+					heavy_infantry = { 1500 1500 }
+					light_infantry = { 1500 1500 }
+					archers = { 1000 1000 }
 				}
+
+				attrition = 1.0
+				disband_on_peace = yes
+				maintenance_multiplier = 0.4
+				earmark = teutonic_honor_guard
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				sound_effect = generic_click_01
+
 				add_character_modifier = {
 					name = hire_teutonic_honor_guard_cooldown
 					hidden = yes
 					years = 1
 				}
 			}
-			sound_effect = generic_click_01
 		}
 	}
 
 	form_holy_sepulchre = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		potential = {
-			any_demesne_title = {
-				higher_tier_than = BARON
+			higher_real_tier_than = COUNT
+			NOT = { is_title_active = d_holy_sepulchre }
+
+			c_jerusalem = {
+				holder_scope = {
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
 			}
-			NOT = {
-				is_title_active = d_holy_sepulchre
-			}
+
 			OR = {
 				religion = orthodox
 				religion = bogomilist
@@ -1224,48 +1139,43 @@ decisions = {
 				religion = paulician
 			}
 
-			is_heretic = no
-
 			OR = {
-				has_landed_title = c_jerusalem
-				any_realm_lord = {
-					has_landed_title = c_jerusalem
-				}
-			}
-
-			independent = yes
-
-			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
 
 			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
+
 		allow = {
-			war = no
-			piety = 500
-			wealth = 500
-			is_heretic = no
 			independent = yes
-			NOT = {
-				trait = excommunicated
-			}
+			is_heretic = no
+			NOT = { trait = excommunicated }
+			war = no
+			piety >= 500
+			wealth >= 500
 
 			custom_tooltip = {
 				text = form_holy_sepulchre_jerusalem_TT
 
-				OR = {
-					has_landed_title = c_jerusalem
-					any_realm_lord = {
-						has_landed_title = c_jerusalem
+				c_jerusalem = {
+					holder_scope = {
+						OR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
 					}
 				}
 			}
 		}
+
 		effect = {
 			wealth = -500
 			piety = -500
@@ -1280,6 +1190,7 @@ decisions = {
 					religion = ROOT
 					age = 25
 				}
+
 				new_character = {
 					set_government_type = order_government
 					add_trait = shrewd
@@ -1287,25 +1198,27 @@ decisions = {
 					add_trait = diligent
 					add_trait = inspiring_leader
 					add_trait = organizer
+
 					if = {
 						limit = {
-							NOT = {
-								trait = brilliant_strategist
-							}
+							NOT = { trait = brilliant_strategist }
 						}
+
 						remove_trait = misguided_warrior
 						remove_trait = tough_soldier
 						remove_trait = skilled_tactician
 						add_trait = brilliant_strategist
 					}
+
 					grant_title_no_opinion = d_holy_sepulchre
+					add_friend = ROOT
 
 					opinion = {
 						name = opinion_formed_order
 						who = ROOT
 						years = 25
 					}
-					add_friend = ROOT
+
 					primary_title = {
 						holy_order_set_law_effect = yes
 					}
@@ -1315,6 +1228,7 @@ decisions = {
 			if = {
 				limit = {
 					higher_tier_than = DUKE
+
 					NOT = {
 						any_realm_lord = {
 							holy_order = yes
@@ -1333,11 +1247,8 @@ decisions = {
 				}
 			}
 
-			ROOT = {
-				narrative_event = { id = HFP.40032 }
-			}
-			any_playable_ruler = {
-				narrative_event = { id = HFP.40032 }
+			any_player = {
+				narrative_event = { id = HFP.40032 } # Notify
 			}
 
 			sound_effect = generic_click_01
@@ -1346,13 +1257,22 @@ decisions = {
 
 	vassalize_holy_sepulchre = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		potential = {
-			any_demesne_title = {
-				higher_tier_than = DUKE
+			higher_tier_than = DUKE
+
+			c_jerusalem = {
+				holder_scope = {
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
 			}
+
 			OR = {
 				religion = orthodox
 				religion = bogomilist
@@ -1361,24 +1281,11 @@ decisions = {
 				religion = paulician
 			}
 
-			OR = {
-				has_landed_title = c_jerusalem
-				any_realm_lord = {
-					has_landed_title = c_jerusalem
-				}
-			}
-
-			independent = yes
-
 			d_holy_sepulchre = {
 				holder_scope = {
 					independent = yes
-				}
-			}
 
-			NOT = {
-				d_holy_sepulchre = {
-					owner = {
+					NOT = {
 						has_opinion_modifier = {
 							who = ROOT
 							modifier = opinion_unfit_ruler
@@ -1387,47 +1294,51 @@ decisions = {
 				}
 			}
 
-			NOT = { has_character_modifier = expelled_d_holy_sepulchre }
-
 			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
 
-			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+			NOR = {
+				has_character_modifier = expelled_d_holy_sepulchre
+
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
+
 		allow = {
-			war = no
-			piety = 500
-			wealth = 500
-			is_heretic = no
 			independent = yes
-			NOT = {
-				trait = excommunicated
-			}
+			is_heretic = no
+			NOT = { trait = excommunicated }
+			war = no
+			piety >= 500
+			wealth >= 500
+
 			custom_tooltip = {
 				text = form_holy_sepulchre_jerusalem_TT
 
-				OR = {
-					has_landed_title = c_jerusalem
-					any_realm_lord = {
-						has_landed_title = c_jerusalem
+				c_jerusalem = {
+					holder_scope = {
+						OR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
 					}
 				}
 			}
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						d_holy_sepulchre = {
-							holder_scope = {
-								opinion = {
-									who = ROOT
-									value = 25
-								}
+			trigger_if = {
+				limit = {
+					d_holy_sepulchre = {
+						holder_scope = {
+							opinion = {
+								who = ROOT
+								value < 25
 							}
 						}
 					}
@@ -1436,14 +1347,7 @@ decisions = {
 				custom_tooltip = {
 					text = vassalize_holy_sepulchre_TT
 
-					d_holy_sepulchre = {
-						holder_scope = {
-							opinion = {
-								who = ROOT
-								value = 25
-							}
-						}
-					}
+					always = no
 				}
 			}
 
@@ -1457,6 +1361,7 @@ decisions = {
 				}
 			}
 		}
+
 		effect = {
 			wealth = -500
 			piety = -500
@@ -1477,64 +1382,67 @@ decisions = {
 targeted_decisions = {
 
 	order_to_join_holy_order = {
-		only_playable = yes
 		filter = court
 		ai_target_filter = court
 		third_party_filter = all
 		show_third_party_potential = no
-		ai_check_interval = 1200 #Check every 1200 months
+		ai_check_interval = 1200
+
+		only_playable = yes
 
 		from_potential = {
-			is_playable = yes
+			is_heretic = no
+			is_adult = yes
 			has_regent = no
 			prisoner = no
-			is_adult = yes
-			is_heretic = no
 		}
 
 		third_party_potential = {
 			FROMFROM = {
-				religion = FROM
 				holy_order = yes
+				religion = FROM
 			}
 		}
 
 		potential = {
+			host = { character = FROM }
 			is_adult = yes
 			is_ruler = no
 			is_female = no
 			religion = FROM
-			NOT = {
-				is_incapable = yes
-			}
-			host = { character = FROM }
+			is_incapable = no
 			holy_order_check_active_trigger = yes
 		}
 
 		allow = {
-			OR = {
-				AND = {
-					is_married = no
-					custom_tooltip = {
-						text = NOT_HEIR_TITLE_TT
+			trigger_if = {
+				limit = { prisoner = no }
 
-						NOT = {
-							any_heir_title = {
-								always = yes
-							}
+				is_married = no
+
+				custom_tooltip = {
+					text = NOT_HEIR_TITLE_TT
+
+					NOT = {
+						any_heir_title = {
+							always = yes
 						}
 					}
 				}
-				prisoner = yes
 			}
-			FROM = { piety = 50 }
+
+			FROM = {
+				piety >= 50
+			}
 		}
 
 		effect = {
+			imprison = no
+
 			FROM = {
+				show_scope_change = no
 				piety = -50
 			}
-			prisoner = no
 
 			if = {
 				limit = {
@@ -1549,8 +1457,10 @@ targeted_decisions = {
 						trait = celibate
 					}
 				}
+
 				move_character = FROMFROM
-				hidden_tooltip = {
+
+				hidden_effect = {
 					add_trait = celibate
 				}
 			}
@@ -1558,32 +1468,34 @@ targeted_decisions = {
 				random_list = {
 					80 = {
 						# Intrigue based chance modifiers for FROM
-						modifier = {
+						mult_modifier = {
 							factor = 0.5
-							NOT = {
-								FROM = {
-									intrigue = 5
-								}
+							FROM = {
+								intrigue < 5
 							}
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
 							FROM = {
-								intrigue = 10
+								intrigue >= 10
 							}
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
 							FROM = {
-								intrigue = 15
+								intrigue >= 15
 							}
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
 							FROM = {
-								intrigue = 20
+								intrigue >= 20
 							}
 						}
+
 						custom_tooltip = {
 							text = join_holy_order_success_TT
 
@@ -1591,76 +1503,92 @@ targeted_decisions = {
 							add_trait = celibate
 						}
 					}
+
 					20 = {
 						# Traits making ROOT more likely to join a Holy Order
-						modifier = {
+						mult_modifier = {
 							factor = 0.5
 							trait = diligent
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 0.5
 							trait = temperate
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 0.5
 							trait = chaste
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 0.5
 							trait = brave
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 0.5
 							is_married = yes
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 0.5
 							trait = holy_warrior
 						}
+
 						# Traits making ROOT less likely to join a Holy order
-						modifier = {
+
+						mult_modifier = {
 							factor = 2
 							trait = ambitious
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
 							trait = greedy
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
 							trait = cynical
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
 							trait = envious
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
 							trait = proud
 						}
+
 						# Intrigue based chance modifiers for ROOT
-						modifier = {
+						mult_modifier = {
 							factor = 0.5
-							NOT = {
-								intrigue = 5
-							}
+							intrigue < 5
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
-							intrigue = 10
+							intrigue >= 10
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
-							intrigue = 15
+							intrigue >= 15
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
-							intrigue = 20
+							intrigue >= 20
 						}
-						modifier = {
+
+						mult_modifier = {
 							factor = 1.5
-							intrigue = 25
+							intrigue >= 25
 						}
+
 						# Tooltip
 						custom_tooltip = {
 							text = join_holy_order_flee_TT
@@ -1675,15 +1603,18 @@ targeted_decisions = {
 	}
 
 	ask_teutonic_for_help_teutonic = {
-		only_playable = yes
 		filter = independent_rulers
 		ai_target_filter = independent_rulers
 		third_party_filter = independent_rulers
 		show_third_party_potential = no
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		from_potential = {
+			has_global_flag = northern_crusades_active
 			independent = yes
+
 			any_demesne_title = {
 				higher_tier_than = DUKE
 				OR = {
@@ -1692,6 +1623,7 @@ targeted_decisions = {
 					region = custom_russia
 				}
 			}
+
 			OR = {
 				religion = catholic
 				religion = cathar
@@ -1699,11 +1631,11 @@ targeted_decisions = {
 				religion = waldensian
 				religion = lollard
 			}
+
 			is_heretic = no
-			NOT = {
+
+			NOR = {
 				has_global_flag = northern_crusade_failure
-			}
-			NOT = {
 				has_character_flag = northern_crusade_asked_for_help
 			}
 		}
@@ -1711,8 +1643,23 @@ targeted_decisions = {
 		third_party_potential = {
 			FROMFROM = {
 				independent = yes
-				conditional_tooltip = {
-					trigger = {
+				NOT = { religion_group = christian }
+				NOT = { reverse_has_truce = ROOT }
+				holy_order = no
+				mercenary = no
+
+				any_demesne_title = {
+					higher_tier_than = BARON
+
+					OR = {
+						region = world_europe_north
+						region = custom_eastern_baltic
+						region = custom_russia
+					}
+				}
+
+				trigger_if = {
+					limit = {
 						NOR = {
 							d_teutonic_order = {
 								has_title_flag = northern_crusade_target
@@ -1722,35 +1669,22 @@ targeted_decisions = {
 							}
 						}
 					}
+
 					higher_tier_than = COUNT
 				}
-				NOR = {
-					holy_order = yes
-					mercenary = yes
-				}
-				NOT = {
-					religion_group = christian
-				}
-				any_demesne_title = {
-					higher_tier_than = BARON
-					OR = {
-						region = world_europe_north
-						region = custom_eastern_baltic
-						region = custom_russia
-					}
-				}
-				NOT = {
-					reverse_has_truce = ROOT
-				}
-				OR = {
-					NOR = {
-						d_teutonic_order = {
-							has_title_flag = northern_crusade_target
-						}
-						k_teutonic_state = {
-							has_title_flag = northern_crusade_target
+
+				trigger_if = {
+					limit = {
+						OR = {
+							d_teutonic_order = {
+								has_title_flag = northern_crusade_target
+							}
+							k_teutonic_state = {
+								has_title_flag = northern_crusade_target
+							}
 						}
 					}
+
 					any_demesne_title = {
 						kingdom = {
 							has_title_flag = northern_crusade_active_target
@@ -1761,38 +1695,47 @@ targeted_decisions = {
 		}
 
 		potential = {
-			has_global_flag = northern_crusades_active
+			religion = FROM
+
 			OR = {
 				has_landed_title = d_teutonic_order
 				has_landed_title = k_teutonic_state
 			}
+
 			NOT = {
 				any_war = {
 					using_cb = northern_crusade_war
 				}
 			}
-			religion = FROM
 		}
 
 		allow = {
 			FROM = {
 				show_scope_change = no
-				piety = 200
-				#custom_tooltip = {
-					#text = northern_crusade_targeted_decision_TT
-					#d_teutonic_order = {
-						#holder_scope = {
-							#opinion = {
-								#who = PREVPREV
-								#value = 10
-							# }
-						# }
-					# }
-				# }
+
+				piety >= 200
+
+			#	custom_tooltip = {
+			#		text = northern_crusade_targeted_decision_TT
+			#
+			#		d_teutonic_order = {
+			#			holder_scope = {
+			#				opinion = {
+			#					who = PREVPREV
+			#					value >= 10
+			#				}
+			#			}
+			#		}
+			#	}
 			}
+
 			any_independent_ruler = {
-				conditional_tooltip = {
-					trigger = {
+				NOT = { religion_group = christian }
+				holy_order = no
+				mercenary = no
+
+				trigger_if = {
+					limit = {
 						NOR = {
 							d_teutonic_order = {
 								has_title_flag = northern_crusade_target
@@ -1802,20 +1745,15 @@ targeted_decisions = {
 							}
 						}
 					}
+
 					custom_tooltip = {
 						text = higher_tier_than_count_TT
 						higher_tier_than = COUNT
 					}
 				}
-				NOR = {
-					holy_order = yes
-					mercenary = yes
-				}
-				NOT = {
-					religion_group = christian
-				}
-				conditional_tooltip = {
-					trigger = {
+
+				trigger_if = {
+					limit = {
 						OR = {
 							d_teutonic_order = {
 								has_title_flag = northern_crusade_target
@@ -1825,23 +1763,28 @@ targeted_decisions = {
 							}
 						}
 					}
+
 					custom_tooltip = {
 						text = northern_crusade_fitting_title_TT
+
 						any_demesne_title = {
 							higher_tier_than = BARON
+
 							OR = {
 								region = world_europe_north
 								region = custom_eastern_baltic
 								region = custom_russia
 							}
+
 							kingdom = {
 						 		has_title_flag = northern_crusade_active_target
 							}
 						}
 					}
 				}
-				conditional_tooltip = {
-					trigger = {
+
+				trigger_if = {
+					limit = {
 						NOR = {
 							d_teutonic_order = {
 								has_title_flag = northern_crusade_target
@@ -1851,19 +1794,20 @@ targeted_decisions = {
 							}
 						}
 					}
+
 					custom_tooltip = {
 						text = northern_crusade_fitting_title_02_TT
 					}
 				}
+
 				custom_tooltip = {
 					text = not_reverse_truce_TT
-					NOT = {
-						reverse_has_truce = ROOT
-					}
+					NOT = { reverse_has_truce = ROOT }
 				}
 			}
-			conditional_tooltip = {
-				trigger = {
+
+			trigger_if = {
+				limit = {
 					FROM = {
 						has_character_modifier = northern_crusade_targeted_decision_cooldown
 					}
@@ -1872,49 +1816,44 @@ targeted_decisions = {
 				custom_tooltip = {
 					text = northern_crusade_decision_cooldown_TT
 
-					FROM = {
-						NOT = {
-							has_character_modifier = northern_crusade_targeted_decision_cooldown
-						}
-					}
+					always = no
 				}
 			}
 		}
 
 		effect = {
-			FROM = {
-				set_character_flag = northern_crusade_asked_for_help
-				save_event_target_as = northern_crusade_asker
-			}
-			FROMFROM = {
-				save_event_target_as = northern_crusade_potential_target
-			}
-			if = {
-				limit = {
-					is_title_active = d_teutonic_order
-				}
-				d_teutonic_order = {
-					owner = {
-						character_event = { id = HF.49105 }
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					is_title_active = k_teutonic_state
-				}
-				k_teutonic_state = {
-					owner = {
-						character_event = { id = HF.49105 }
-					}
-				}
-			}
-			hidden_tooltip = {
+			hidden_effect = {
 				FROM = {
+					set_character_flag = northern_crusade_asked_for_help
+					save_event_target_as = northern_crusade_asker
+
 					add_character_modifier = {
 						name = northern_crusade_targeted_decision_cooldown
+						months = 6
 						hidden = yes
-						duration = 180
+					}
+				}
+
+				FROMFROM = {
+					save_event_target_as = northern_crusade_potential_target
+				}
+
+				if = {
+					limit = { is_title_active = d_teutonic_order }
+
+					d_teutonic_order = {
+						holder_scope = {
+							character_event = { id = HF.49105 } # Teutonic Order receives target suggestion
+						}
+					}
+				}
+				else_if = {
+					limit = { is_title_active = k_teutonic_state }
+
+					k_teutonic_state = {
+						holder_scope = {
+							character_event = { id = HF.49105 } # Teutonic Order receives target suggestion
+						}
 					}
 				}
 			}
@@ -1922,20 +1861,30 @@ targeted_decisions = {
 	}
 
 	ask_teutonic_for_help_pagan = {
-		only_playable = yes
 		filter = independent_rulers
+
 		ai = no
 
 		from_potential = {
+			has_global_flag = northern_crusades_active
+
+			OR = {
+				is_title_active = d_teutonic_order
+				is_title_active = k_teutonic_state
+			}
+
 			independent = yes
+
 			any_demesne_title = {
 				higher_tier_than = DUKE
+
 				OR = {
 					region = world_europe_north
 					region = custom_eastern_baltic
 					region = custom_russia
 				}
 			}
+
 			OR = {
 				religion = catholic
 				religion = cathar
@@ -1943,20 +1892,23 @@ targeted_decisions = {
 				religion = waldensian
 				religion = lollard
 			}
+
 			is_heretic = no
-			NOT = {
+
+			NOR = {
 				has_global_flag = northern_crusade_failure
-			}
-			NOT = {
 				has_character_flag = northern_crusade_asked_for_help
 			}
 		}
 
 		potential = {
-			has_global_flag = northern_crusades_active
 			independent = yes
-			conditional_tooltip = {
-				trigger = {
+			holy_order = no
+			mercenary = no
+			NOT = { religion_group = christian }
+
+			trigger_if = {
+				limit = {
 					NOR = {
 						d_teutonic_order = {
 							has_title_flag = northern_crusade_target
@@ -1966,110 +1918,114 @@ targeted_decisions = {
 						}
 					}
 				}
+
 				higher_tier_than = COUNT
 			}
-			OR = {
-				is_title_active = d_teutonic_order
-				is_title_active = k_teutonic_state
-			}
-			NOR = {
-				holy_order = yes
-				mercenary = yes
-			}
-			NOT = {
-				religion_group = christian
-			}
+
 			any_demesne_title = {
 				higher_tier_than = BARON
+
 				OR = {
 					region = world_europe_north
 					region = custom_eastern_baltic
 					region = custom_russia
 				}
 			}
+
 			NOR = {
 				d_teutonic_order = {
-					owner = {
-						has_truce = ROOT
+					holder_scope = {
+						OR = {
+							has_truce = ROOT
+
+							any_war = {
+								using_cb = northern_crusade_war
+							}
+						}
 					}
 				}
 				k_teutonic_state = {
-					owner = {
-						has_truce = ROOT
+					holder_scope = {
+						OR = {
+							has_truce = ROOT
+
+							any_war = {
+								using_cb = northern_crusade_war
+							}
+						}
 					}
 				}
 			}
-			OR = {
-				NOR = {
-					d_teutonic_order = {
-						has_title_flag = northern_crusade_target
-					}
-					k_teutonic_state = {
-						has_title_flag = northern_crusade_target
+
+			trigger_if = {
+				limit = {
+					OR = {
+						d_teutonic_order = {
+							has_title_flag = northern_crusade_target
+						}
+						k_teutonic_state = {
+							has_title_flag = northern_crusade_target
+						}
 					}
 				}
+
 				any_demesne_title = {
 					kingdom = {
 						has_title_flag = northern_crusade_active_target
 					}
 				}
 			}
-			NOR = {
-				d_teutonic_order = {
-					any_war = {
-						using_cb = northern_crusade_war
-					}
-				}
-				k_teutonic_state = {
-					any_war = {
-						using_cb = northern_crusade_war
-					}
-				}
-			}
 		}
 
 		allow = {
-			conditional_tooltip = {
-				trigger = {
-					is_title_active = d_teutonic_order
-				}
-				d_teutonic_order = {
-					show_scope_change = no
+			d_teutonic_order = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { has_holder = yes }
+
 					holder_scope = {
 						show_scope_change = no
+
 						religion = FROM
 					}
 				}
 			}
-			conditional_tooltip = {
-				trigger = {
-					is_title_active = k_teutonic_state
-				}
-				k_teutonic_state = {
-					show_scope_change = no
+			k_teutonic_state = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { has_holder = yes }
+
 					holder_scope = {
 						show_scope_change = no
+
 						religion = FROM
 					}
 				}
 			}
+
 			FROM = {
 				show_scope_change = no
-				piety = 200
-				#custom_tooltip = {
-					#text = northern_crusade_targeted_decision_TT
-					#d_teutonic_order = {
-						#holder_scope = {
-							#opinion = {
-								#who = PREVPREV
-								#value = 10
-							# }
-						# }
-					# }
-				# }
+
+				piety >= 200
+
+			#	custom_tooltip = {
+			#		text = northern_crusade_targeted_decision_TT
+			#
+			#		d_teutonic_order = {
+			#			holder_scope = {
+			#				opinion = {
+			#					who = PREVPREV
+			#					value >= 10
+			#				}
+			#			}
+			#		}
+			#	}
 			}
-			conditional_tooltip = {
-				trigger = {
+
+			trigger_if = {
+				limit = {
 					NOR = {
 						d_teutonic_order = {
 							has_title_flag = northern_crusade_target
@@ -2079,10 +2035,12 @@ targeted_decisions = {
 						}
 					}
 				}
+
 				higher_tier_than = COUNT
 			}
-			conditional_tooltip = {
-				trigger = {
+
+			trigger_if = {
+				limit = {
 					FROM = {
 						has_character_modifier = northern_crusade_targeted_decision_cooldown
 					}
@@ -2091,19 +2049,26 @@ targeted_decisions = {
 				custom_tooltip = {
 					text = northern_crusade_decision_cooldown_TT
 
-					FROM = {
-						NOT = {
-							has_character_modifier = northern_crusade_targeted_decision_cooldown
-						}
-					}
+					always = no
 				}
 			}
-			conditional_tooltip = {
-				trigger = {
-					d_teutonic_order = {
-						has_title_flag = northern_crusade_target
+
+			trigger_if = {
+				limit = {
+					trigger_if = {
+						limit = { is_title_active = d_teutonic_order }
+
+						d_teutonic_order = {
+							has_title_flag = northern_crusade_target
+						}
 					}
-					is_title_active = d_teutonic_order
+					trigger_else = {
+						is_title_active = k_teutonic_state
+
+						k_teutonic_state = {
+							has_title_flag = northern_crusade_target
+						}
+					}
 				}
 
 				custom_tooltip = {
@@ -2122,70 +2087,37 @@ targeted_decisions = {
 					}
 				}
 			}
-			conditional_tooltip = {
-				trigger = {
-					k_teutonic_state = {
-						has_title_flag = northern_crusade_target
+
+			trigger_if = {
+				limit = {
+					trigger_if = {
+						limit = { is_title_active = d_teutonic_order }
+
+						d_teutonic_order = {
+							holder_scope = {
+								war = yes
+							}
+						}
 					}
-					is_title_active = k_teutonic_state
+					trigger_else = {
+						is_title_active =k_teutonic_state
+						k_teutonic_state = {
+							holder_scope = {
+								war = yes
+							}
+						}
+					}
 				}
 
-				custom_tooltip = {
-					text = northern_crusade_correct_kingdom_teutonic_order_TT
-
-					any_demesne_title = {
-						higher_tier_than = BARON
-						OR = {
-							region = world_europe_north
-							region = custom_eastern_baltic
-							region = custom_russia
-						}
-						kingdom = {
-					 		has_title_flag = northern_crusade_active_target
-						}
-					}
-				}
-			}
-			conditional_tooltip = {
-				trigger = {
-					is_title_active = d_teutonic_order
-					d_teutonic_order = {
-						owner = {
-							war = yes
-						}
-					}
-				}
 				custom_tooltip = {
 					text = teutonic_order_at_peace_TT
 
-					d_teutonic_order = {
-						owner = {
-							war = no
-						}
-					}
+					always = no
 				}
 			}
-			conditional_tooltip = {
-				trigger = {
-					is_title_active = k_teutonic_state
-					k_teutonic_state = {
-						owner = {
-							war = yes
-						}
-					}
-				}
-				custom_tooltip = {
-					text = teutonic_state_at_peace_TT
 
-					k_teutonic_state = {
-						owner = {
-							war = no
-						}
-					}
-				}
-			}
-			conditional_tooltip = {
-				trigger = {
+			trigger_if = {
+				limit = {
 					NOR = {
 						d_teutonic_order = {
 							has_title_flag = northern_crusade_target
@@ -2195,22 +2127,19 @@ targeted_decisions = {
 						}
 					}
 				}
+
 				custom_tooltip = {
 					text = northern_crusade_fitting_title_02_TT
 				}
 			}
-			NOR = {
-				holy_order = yes
-				mercenary = yes
-			}
-			NOT = {
-				religion_group = christian
-			}
+
+			NOT = { religion_group = christian }
+			holy_order = no
+			mercenary = no
+
 			custom_tooltip = {
 				text = not_reverse_truce_TT
-				NOT = {
-					reverse_has_truce = ROOT
-				}
+				NOT = { reverse_has_truce = ROOT }
 			}
 		}
 
@@ -2222,32 +2151,32 @@ targeted_decisions = {
 			ROOT = {
 				save_event_target_as = northern_crusade_potential_target
 			}
+
 			if = {
-				limit = {
-					is_title_active = d_teutonic_order
-				}
+				limit = { is_title_active = d_teutonic_order }
+
 				d_teutonic_order = {
-					owner = {
-						character_event = { id = HF.49105 }
+					holder_scope = {
+						character_event = { id = HF.49105 } # Teutonic Order receives target suggestion
 					}
 				}
 			}
 			else_if = {
-				limit = {
-					is_title_active = k_teutonic_state
-				}
+				limit = { is_title_active = k_teutonic_state }
+
 				k_teutonic_state = {
-					owner = {
-						character_event = { id = HF.49105 }
+					holder_scope = {
+						character_event = { id = HF.49105 } # Teutonic Order receives target suggestion
 					}
 				}
 			}
-			hidden_tooltip = {
+
+			hidden_effect = {
 				FROM = {
 					add_character_modifier = {
 						name = northern_crusade_targeted_decision_cooldown
+						months = 6
 						hidden = yes
-						duration = 180
 					}
 				}
 			}
