@@ -38,14 +38,14 @@ republic_governments = {
 
 					# Require at least one province and be Duke tier or higher
 					higher_real_tier_than = COUNT
-					any_demesne_province = {
-						always = yes
-					}
+					num_of_count_titles >= 1
 
-					NOT = { # MR can't be under MR
+					# MR can't be under MR
+					trigger_if = {
+						limit = { independent = no }
+
 						liege_before_war = {
-							NOT = { character = PREV }
-							is_merchant_republic = yes
+							is_merchant_republic = no
 						}
 					}
 				}
@@ -54,20 +54,24 @@ republic_governments = {
 				AND = {
 					is_patrician = yes
 
-					liege_before_war = { # Liege must be MR
-						NOT = { character = PREV }
+					# Liege must be MR
+					liege_before_war = {
 						is_merchant_republic = yes
 
-						NOT = {
-							liege_before_war = { # MR can't be under MR
-								NOT = { character = PREV }
-								is_merchant_republic = yes
+						# MR can't be under MR
+						trigger_if = {
+							limit = { independent = no }
+
+							liege_before_war = {
+								is_merchant_republic = no
 							}
 						}
 					}
 				}
 			}
+		}
 
+		allow = {
 			NOT = { is_government_allowed = theocracy_government }
 		}
 
@@ -115,8 +119,12 @@ republic_governments = {
 		color = { 209 125 130 }
 
 		potential = {
-			# Necessary to keep Merchant Republics from reverting on some successions
-			NOT = { is_government_potential = merchant_republic_government }
+			NOR = {
+				# Necessary to keep Merchant Republics from reverting on some successions
+				is_government_potential = merchant_republic_government
+				# For landless religious heads, such as the Paulician Patriarch
+				is_government_allowed = theocracy_government
+			}
 		}
 
 		can_build_tribal = no
