@@ -32,7 +32,7 @@ is_unimportant_trigger = {
 		has_minor_title = yes
 
 		AND = {
-			NOT = { dynasty = none }
+			is_lowborn = no
 			num_of_dynasty_members >= 2
 		}
 
@@ -58,10 +58,10 @@ sad_example_trigger = {
 }
 
 can_be_prophet_of_doom_trigger = {
+	trait = zealous
 	ai = yes
 	is_adult = yes
 	is_married = no
-	trait = zealous
 	is_landed = no
 
 	OR = {
@@ -76,10 +76,7 @@ can_be_prophet_of_doom_trigger = {
 
 	NOR = {
 		trait = content
-		trait = cynical
 		trait = temperate
-		is_main_spouse = yes
-		is_landed = yes
 		is_close_relative = ROOT
 	}
 }
@@ -98,10 +95,10 @@ block_general_event_trigger = {
 useless_character_trigger = {
 	OR = {
 		health < 2.5
+		is_incapable = yes
 		trait = lunatic
 		trait = maimed
 		trait = infirm
-		is_incapable = yes
 		trait = mangled
 		trait = severely_injured
 		trait = imbecile
@@ -111,19 +108,19 @@ useless_character_trigger = {
 
 interesting_face_trigger = {
 	OR = {
+		is_ill = yes
+		has_scarred_trait_trigger = yes
+		is_strong_trigger = yes
+		is_weak_trigger = yes
 		trait = fair
 		trait = groomed
 		trait = ugly
 		trait = uncouth
-		has_scarred_trait_trigger = yes
-		is_ill = yes
 		trait = disfigured
 		trait = blinded
 		trait = one_eyed
 		trait = leper
 		trait = harelip
-		is_strong_trigger = yes
-		is_weak_trigger = yes
 		trait = lunatic
 		trait = possessed
 		trait = rabies
@@ -199,12 +196,21 @@ is_ascetic_trigger = {
 }
 
 is_virgin_trigger = {
+	OR = {
+		age < 25
+		trait = celibate
+		trait = chaste
+		trait = shy
+		is_ascetic_trigger = yes
+	}
+
+	has_children = no
+	has_lover = no
+	is_pregnant = no
+
 	NOR = {
-		any_lover = { always = yes }
-		any_child_even_if_dead = { always = yes }
 		any_spouse_even_if_dead = { always = yes }
 		has_focus = focus_seduction
-		is_pregnant = yes
 		trait = pregnant
 		trait = lustful
 		trait = hedonist
@@ -213,14 +219,6 @@ is_virgin_trigger = {
 		trait = lovers_pox
 		trait = has_aztec_disease
 		trait = syphilitic
-	}
-
-	OR = {
-		age < 25
-		trait = celibate
-		trait = chaste
-		trait = shy
-		is_ascetic_trigger = yes
 	}
 }
 
@@ -258,10 +256,10 @@ can_be_asked_to_leave_court_trigger = {
 			is_adult = no
 		}
 
-		prisoner = yes
-		is_incapable = yes
 		is_ruler = yes
 		has_job_title = yes
+		prisoner = yes
+		is_incapable = yes
 
 		custom_tooltip = {
 			text = is_regent_commander_or_physician_tt
@@ -315,19 +313,24 @@ can_be_asked_to_leave_court_trigger = {
 		custom_tooltip = {
 			text = is_character_in_important_chain_of_events_tt
 
-			has_character_flag = eternal_life_mystic
-			has_character_flag = immortal_rival
-			has_character_flag = flag_special_event_character
-			has_character_flag = is_death
-			is_immune_to_pruning = yes
-			historical = yes
+			OR = {
+				has_character_flag = eternal_life_mystic
+				has_character_flag = immortal_rival
+				has_character_flag = flag_special_event_character
+				has_character_flag = is_death
+				is_immune_to_pruning = yes
+				historical = yes
+			}
 		}
 
 		trigger_if = {
-			limit = {
-				trait = horse
-			}
-			trait = horse
+			limit = { trait = horse }
+			trait = horse # Glitterhoof
+		}
+
+		trigger_if = {
+			limit = { trait = cat }
+			trait = cat # Mittens
 		}
 	}
 }
@@ -405,7 +408,7 @@ proselytize_convert_independent_trigger = {
 		religion_group = pagan_group
 		is_within_diplo_range = FROM
 
-		NOT = {
+		NOR = {
 			religion = FROM
 			controls_religion = yes
 			is_reformed_religion = yes
@@ -888,20 +891,8 @@ this_is_spiritual_culture_trigger = {
 	}
 }
 
+# Used in succession voting to decide valid candidates
 parent_for_elective_succession_trigger = {
-	NOR = {
-		character = ROOT # Not the current ruler
-		is_ascetic_trigger = yes
-		is_theocracy = yes
-		is_republic = yes
-		is_merchant_republic = yes
-		trait = disinherited
-		trait = eunuch
-		trait = bastard
-		trait = cat
-		trait = horse
-	}
-
 	OR = {
 		has_claim = ROOT_FROMFROM
 
@@ -961,6 +952,19 @@ parent_for_elective_succession_trigger = {
 	trigger_if = {
 		limit = { ROOT = { controls_religion = yes } }
 		religion = ROOT
+	}
+
+	NOR = {
+		character = ROOT # Not the current ruler
+		is_ascetic_trigger = yes
+		is_theocracy = yes
+		is_republic = yes
+		is_merchant_republic = yes
+		trait = disinherited
+		trait = eunuch
+		trait = bastard
+		trait = cat
+		trait = horse
 	}
 }
 
@@ -1023,12 +1027,22 @@ is_mongol_empire_leader_trigger = {
 		has_landed_title = e_il-khanate
 		has_landed_title = e_golden_horde
 		has_landed_title = e_mongol_empire
-		liege = { has_landed_title = e_il-khanate }
-		liege = { has_landed_title = e_golden_horde }
-		liege = { has_landed_title = e_mongol_empire }
-		top_liege = { has_landed_title = e_il-khanate }
-		top_liege = { has_landed_title = e_golden_horde }
-		top_liege = { has_landed_title = e_mongol_empire }
+
+		liege = {
+			OR = {
+				has_landed_title = e_il-khanate
+				has_landed_title = e_golden_horde
+				has_landed_title = e_mongol_empire
+			}
+		}
+
+		top_liege = {
+			OR = {
+				has_landed_title = e_il-khanate
+				has_landed_title = e_golden_horde
+				has_landed_title = e_mongol_empire
+			}
+		}
 	}
 }
 
