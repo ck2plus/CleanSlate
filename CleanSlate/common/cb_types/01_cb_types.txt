@@ -181,19 +181,23 @@ dejure_duchy_claim = { # New1
 	ai_will_do = {
 		factor = 1
 
-		coronation_factor = yes
+		trigger = {
+			trigger_if = {
+				limit = {
+					attacker = {
+						has_character_flag = is_temujin
+						has_landed_title = e_mongol_empire
+						demesne_size >= 1
+					}
+				}
 
-		mult_modifier = {
-			factor = 0
-			attacker = {
-				has_character_flag = is_temujin
-				has_landed_title = e_mongol_empire
-				demesne_size >= 1
-			}
-			defender = {
-				has_landed_title = e_china_west_governor
+				defender = {
+					NOT = { has_landed_title = e_china_west_governor
+				}
 			}
 		}
+
+		coronation_factor = yes
 	}
 }
 
@@ -918,14 +922,13 @@ ducal_county_conquest = { # New4
 	ai_will_do = {
 		factor = 1
 
-		coronation_factor = yes
-
-		mult_modifier = {
-			factor = 0
+		trigger = {
 			attacker = {
-				NOT = { scaled_wealth = 1.25 }
+				scaled_wealth = 1.25
 			}
 		}
+
+		coronation_factor = yes
 	}
 }
 
@@ -2404,56 +2407,45 @@ unjust_conquest = { # New7
 	}
 
 	ai_will_do = {
-		factor = 1
+		factor = 0.7 # Prefer using CB's without on_add costs
 
-		coronation_factor = yes
-
-		mult_modifier = {
-			factor = 0.7 # Prefer using CB's without on_add costs
-		}
-		mult_modifier = {
-			factor = 0
-			attacker = {
-				independent = no
-				same_liege = defender
-			}
-		}
-		mult_modifier = {
-			factor = 0
-			attacker = {
-				higher_tier_than = DUKE
-				num_of_count_titles_in_realm >= 10
-			}
-		}
-		mult_modifier = {
-			factor = 0
+		trigger = {
 			attacker = {
 				OR = {
-					trait = just
-					trait = content
-				}
-			}
-		}
-		mult_modifier = {
-			factor = 0
-			attacker = {
-				NOR = {
 					trait = arbitrary
 					trait = ambitious
 				}
+
+				trigger_if = {
+					limit = { independent = no }
+					NOT = { same_liege = defender }
+				}
+
+				trigger_if = {
+					limit = { higher_tier_than = DUKE }
+					num_of_count_titles_in_realm < 10
+				}
+
+				NOR = {
+					trait = just
+					trait = content
+				}
+
+				trigger_if = {
+					limit = {
+						has_character_flag = is_temujin
+						has_landed_title = e_mongol_empire
+						demesne_size >= 1
+					}
+
+					defender = {
+						NOT = { has_landed_title = e_china_west_governor
+					}
+				}
 			}
 		}
-		mult_modifier = {
-			factor = 0
-			attacker = {
-				has_character_flag = is_temujin
-				has_landed_title = e_mongol_empire
-				demesne_size >= 1
-			}
-			defender = {
-				has_landed_title = e_china_west_governor
-			}
-		}
+
+		coronation_factor = yes
 	}
 }
 
@@ -2794,11 +2786,7 @@ tributary_permanent_cb = { # New8
 	}
 
 	ai_will_do = {
-		factor = 1
-
-		mult_modifier = {
-			factor = 0.5  # Low prio CB
-		}
+		factor = 0.5 # Low prio CB
 
 		coronation_factor = yes
 	}
@@ -3254,22 +3242,26 @@ tributary_nomad_cb = { # New9
 	ai_will_do = {
 		factor = 1
 
-		mult_modifier = { # In general, Nomads only want to make smaller nomads their tributaries
+		trigger = {
+			# The Mongol Empire just wants to take land
+			attacker = {
+				NOT = { has_landed_title = e_mongol_empire
+			}
+		}
+
+		# In general, Nomads only want to make smaller nomads their tributaries
+		mult_modifier = {
 			factor = 0.1
+
 			attacker = {
 				relative_realm_size = {
 					who = defender
 					size < 1.1
 				}
 			}
+
 			defender = {
 				is_nomadic = yes
-			}
-		}
-		mult_modifier = { # The Mongol Empire just wants to take land
-			factor = 0
-			attacker = {
-				has_landed_title = e_mongol_empire
 			}
 		}
 	}
@@ -5537,18 +5529,23 @@ pepin_religious = {
 
 		mult_modifier = {
 			factor = 2
+
 			attacker = {
 				has_landed_title = e_hre
 			}
 		}
+
 		mult_modifier = {
 			factor = 2
+
 			attacker = {
 				has_landed_title = e_france
 			}
 		}
+
 		mult_modifier = {
 			factor = 0.25
+
 			attacker = {
 				NOT = { trait = zealous }
 			}
@@ -5557,6 +5554,7 @@ pepin_religious = {
 		# I like the Pope and I will help him
 		mult_modifier = {
 			factor = 1.5
+
 			attacker = {
 				religion_head = {
 					reverse_opinion = {
@@ -5566,8 +5564,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 1.5
+
 			attacker = {
 				religion_head = {
 					reverse_opinion = {
@@ -5577,8 +5577,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 1.5
+
 			attacker = {
 				religion_head = {
 					reverse_opinion = {
@@ -5588,8 +5590,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 2
+
 			attacker = {
 				religion_head = {
 					reverse_opinion = {
@@ -5599,8 +5603,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 2
+
 			attacker = {
 				religion_head = {
 					reverse_opinion = {
@@ -5610,17 +5616,22 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = { # Heathens are holding Italy, take action!
 			factor = 5
+
 			attacker = {
 				NOT = { trait = cynical }
 			}
+
 			defender = {
 				NOT = { religion = attacker }
 			}
 		}
+
 		mult_modifier = { # The Papacy doesn't hold Rome, take action!
 			factor = 5
+
 			d_latium = {
 				OR = {
 					holder_scope = {
@@ -5629,14 +5640,17 @@ pepin_religious = {
 							is_vassal_or_below_of = defender
 						}
 					}
+
 					any_de_jure_vassal_title = {
 						holder = defender
 					}
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 2
+
 			d_spoleto = {
 				OR = {
 					holder_scope = {
@@ -5645,14 +5659,17 @@ pepin_religious = {
 							is_vassal_or_below_of = defender
 						}
 					}
+
 					any_de_jure_vassal_title = {
 						holder = defender
 					}
 				}
 			}
 		}
+
 		mult_modifier = { # Historical tweaking
 			factor = 0.25
+
 			d_benevento = {
 				OR = {
 					holder_scope = {
@@ -5661,14 +5678,17 @@ pepin_religious = {
 							is_vassal_or_below_of = defender
 						}
 					}
+
 					any_de_jure_vassal_title = {
 						holder = defender
 					}
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 0.8
+
 			attacker = {
 				distance_from_realm = {
 					who = defender
@@ -5676,8 +5696,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 0.8
+
 			attacker = {
 				distance_from_realm = {
 					who = defender
@@ -5685,8 +5707,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 0.75
+
 			attacker = {
 				distance_from_realm = {
 					who = defender
@@ -5694,8 +5718,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 0.5
+
 			attacker = {
 				distance_from_realm = {
 					who = defender
@@ -5703,8 +5729,10 @@ pepin_religious = {
 				}
 			}
 		}
+
 		mult_modifier = {
 			factor = 0.25
+
 			attacker = {
 				distance_from_realm = {
 					who = defender
@@ -7280,15 +7308,20 @@ matriarchal_deposition_war = {
 
 		mult_modifier = {
 			factor = 10
+
 			attacker = { religion = defender } # Intolerable circumstances
 		}
+
 		mult_modifier = {
 			factor = 5
+
 			attacker = { has_religion_feature = religion_patriarchal }
 			defender = { has_religion_feature = religion_matriarchal }
 		}
+
 		mult_modifier = {
 			factor = 5
+
 			attacker = { has_religion_feature = religion_matriarchal }
 			defender = { has_religion_feature = religion_patriarchal }
 		}
@@ -7765,15 +7798,20 @@ patriarchal_deposition_war = {
 
 		mult_modifier = {
 			factor = 10
+
 			attacker = { religion = defender } #Intolerable circumstances.
 		}
+
 		mult_modifier = {
 			factor = 5
+
 			attacker = { has_religion_feature = religion_patriarchal }
 			defender = { has_religion_feature = religion_matriarchal }
 		}
+
 		mult_modifier = {
 			factor = 5
+
 			attacker = { has_religion_feature = religion_matriarchal }
 			defender = { has_religion_feature = religion_patriarchal }
 		}
