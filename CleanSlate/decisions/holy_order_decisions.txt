@@ -11,76 +11,62 @@
 decisions = {
 
 	borrow_money_knights_templar = {
-		only_playable = yes
 		ai_check_interval = 120
+
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-			is_nomadic = no
-			OR = {
-				religion = catholic
-				religion = cathar
-				religion = fraticelli
-				religion = waldensian
-				religion = lollard
-			}
-			is_heretic = no
-			is_title_active = d_knights_templar
-			OR = {
-				ai = no
-				AND = {
-					ai = yes
-					higher_tier_than = COUNT
-					independent = yes
-				}
-			}
-			NOT = { has_character_modifier = borrowed_from_knights_templar }
-			NOT = { has_character_modifier = expelled_d_knights_templar }
-			NOT = { government = order_government }
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_knights_templar
+			religion = d_knights_templar
+			is_nomadic = no
 
-			d_knights_templar = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			trigger_if = {
+				limit = { ai = yes }
+
+				higher_tier_than = COUNT
+				independent = yes
+			}
+
+			NOR = {
+				has_character_modifier = borrowed_from_knights_templar
+				has_character_modifier = expelled_d_knights_templar
+				government = order_government
+				is_liege_of = d_knights_templar
 			}
 		}
 
 		allow = {
 			d_knights_templar = {
 				holder_scope = {
-					wealth = 300
-					ROOT = {
-						NOT = { excommunicated_for = PREV }
-					}
+					wealth >= 300
 				}
 			}
-			piety = 100
+
+			NOT = { trait = excommunicated }
+			piety >= 100
 
 			custom_tooltip = {
 				text = knights_templar_loan_money_TT
 
-				d_knights_templar = {
-					holder_scope = {
-						opinion = {
-							who = ROOT
-							value = 25
-						}
-					}
+				reverse_opinion = {
+					who = d_knights_templar
+					value >= 25
 				}
 			}
 		}
 
 		effect = {
+			wealth = 300
+			piety = -100
+
 			add_character_modifier = {
 				name = borrowed_from_knights_templar
 				duration = -1
 				inherit = yes
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
 				d_knights_templar = {
 					holder_scope = {
 						character_event = {
@@ -89,78 +75,55 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = 300
-			piety = -100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0
-				wealth = 0
-			}
-			modifier = {
-				factor = 0.5 # Slow it down
+			factor = 0.5
+
+			trigger = {
+				wealth < 0
 			}
 		}
 	}
 
 	expel_the_knights_templar = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = catholic
-				religion = cathar
-				religion = fraticelli
-				religion = waldensian
-				religion = lollard
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_knights_templar
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_knights_templar
 			NOT = { has_character_modifier = expelled_d_knights_templar }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_knights_templar = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_knights_templar
+						is_vassal_or_below_of = d_knights_templar
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_knights_templar_check }
-				}
+				NOT = { has_character_flag = expel_the_knights_templar_check }
 			}
 		}
 
 		effect = {
 			set_character_flag = expel_the_knights_templar_check
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -168,59 +131,43 @@ decisions = {
 	}
 
 	expel_the_knights_hospitaler = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = catholic
-				religion = cathar
-				religion = fraticelli
-				religion = waldensian
-				religion = lollard
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_knights_hospitaler
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_knights_hospitaler
 			NOT = { has_character_modifier = expelled_d_knights_hospitaler }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_knights_hospitaler = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_knights_hospitaler
+						is_vassal_or_below_of = d_knights_hospitaler
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_knights_hospitaler_check }
-				}
+				NOT = { has_character_flag = expel_the_knights_hospitaler_check }
 			}
 		}
 
 		effect = {
 			set_character_flag = expel_the_knights_hospitaler_check
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -228,59 +175,43 @@ decisions = {
 	}
 
 	expel_the_teutonic_order = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = catholic
-				religion = cathar
-				religion = fraticelli
-				religion = waldensian
-				religion = lollard
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_teutonic_order
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_teutonic_order
 			NOT = { has_character_modifier = expelled_d_teutonic_order }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_teutonic_order = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_teutonic_order
+						is_vassal_or_below_of = d_teutonic_order
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_teutonic_order_check }
-				}
+				NOT = { has_character_flag = expel_the_teutonic_order_check }
 			}
 		}
 
 		effect = {
 			set_character_flag = expel_the_teutonic_order_check
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -288,55 +219,43 @@ decisions = {
 	}
 
 	expel_the_jomsvikings = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = norse_pagan
-				religion = norse_pagan_reformed
-			}
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_jomsvikings
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_jomsvikings
 			NOT = { has_character_modifier = expelled_d_jomsvikings }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_jomsvikings = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_jomsvikings
+						is_vassal_or_below_of = d_jomsvikings
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_jomsvikings_check }
-				}
+				NOT = { has_character_flag = expel_the_jomsvikings_check }
 			}
 		}
 
 		effect = {
 			set_character_flag = expel_the_jomsvikings_check
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -344,58 +263,47 @@ decisions = {
 	}
 
 	expel_the_assassins = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = shiite
-				religion = druze
-				religion = hurufi
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_hashshashin
-			NOT = { has_character_modifier = expelled_d_hashshashin }
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_hashshashin
+
+			NOR = {
+				has_character_modifier = expelled_d_hashshashin
+				society_member_of = the_assassins
+			}
 
 			any_realm_province = {
 				any_province_lord = {
-					d_hashshashin = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_hashshashin
+						is_vassal_or_below_of = d_hashshashin
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
-			NOT = { society_member_of = the_assassins }
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_assassins_check }
-				}
+				NOT = { has_character_flag = expel_the_assassins_check }
 			}
 		}
 
 		effect = {
 			set_character_flag = expel_the_assassins_check
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+				character_event = { id = SoA.2990 } # Actual expelling
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -403,87 +311,75 @@ decisions = {
 	}
 
 	donate_money_to_knights_templar = {
-		only_playable = yes
 		ai_check_interval = 80
-		potential = {
-			is_playable = yes
 
-			OR = {
-				AND = {
-					OR = {
+		only_playable = yes
+
+		potential = {
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_knights_templar
+			religion = d_knights_templar
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 600
+
+				trigger_if = {
+					limit = {
 						NOR = {
-							trait = cynical
-							piety = 300
-						}
-						AND = {
 							trait = zealous
 							trait = charitable
 						}
 					}
-					wealth = 600
-				}
-				ai = no
-			}
 
-			is_title_active = d_knights_templar
-			NOT = { government = order_government }
-
-			d_knights_templar = {
-				holder_scope = {
-					religion = ROOT
+					NOT = { trait = cynical }
+					piety < 300
 				}
 			}
 
-			NOT = { has_character_modifier = expelled_d_knights_templar }
-
-			OR = {
-				AND = {
-					NOT = { is_title_active = d_teutonic_order }
-					NOT = { is_title_active = d_knights_santiago }
-					NOT = { is_title_active = d_knights_calatrava }
-				}
-				AND = {
-					NOT = { is_title_active = d_teutonic_order }
-					NOT = { culture_group = iberian }
-					NOT = { culture_group = west_african }
-					NOT = { culture = maghreb_arabic }
-					NOT = { culture = occitan }
-				}
-				AND = {
-					NOT = { is_title_active = d_knights_santiago }
-					NOT = { is_title_active = d_knights_calatrava }
-					NOT = { culture_group = north_germanic }
-					NOT = { culture_group = central_germanic }
-					NOT = { culture_group = magyar }
-					NOT = { culture_group = south_slavic }
-					NOT = { culture_group = west_slavic }
-				}
-				AND = {
-					NOT = { culture_group = iberian }
-					NOT = { culture_group = west_african }
-					NOT = { culture = maghreb_arabic }
-					NOT = { culture = occitan }
-					NOT = { culture_group = north_germanic }
-					NOT = { culture_group = central_germanic }
-					NOT = { culture_group = magyar }
-					NOT = { culture_group = south_slavic }
-					NOT = { culture_group = west_slavic }
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_knights_templar
+				is_liege_of = d_knights_templar
 			}
 
-			has_dlc = "Sons of Abraham"
-
-			d_knights_templar = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
+			trigger_if = {
+				limit = {
+					OR = {
+						culture_group = iberian
+						culture_group = west_african
+						culture = maghreb_arabic
+						culture = occitan
 					}
+				}
+
+				NOR = {
+					is_title_active = d_knights_calatrava
+					is_title_active = d_knights_santiago
+				}
+			}
+			trigger_else_if = {
+				limit = {
+					OR = {
+						culture_group = north_germanic
+						culture_group = central_germanic
+						culture_group = magyar
+						culture_group = south_slavic
+						culture_group = west_slavic
+					}
+				}
+
+				NOR = {
+					is_title_active = d_teutonic_order
+					is_title_active = k_teutonic_state
 				}
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -491,123 +387,102 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_knights_templar = {
 					holder_scope = {
 						character_event = {
-							id = SoA.1140
+							id = SoA.1140 # Notify
 						}
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.5 # Slow it down
-			}
+			factor = 0.5
 		}
 	}
 
 	donate_money_to_knights_hospitaler = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			is_title_active = d_knights_hospitaler
-			NOT = { government = order_government }
-
-			d_knights_hospitaler = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_knights_hospitaler }
-
-			OR = {
-				AND = {
-					NOT = { is_title_active = d_teutonic_order }
-					NOT = { is_title_active = d_knights_santiago }
-					NOT = { is_title_active = d_knights_calatrava }
-				}
-				AND = {
-					NOT = { is_title_active = d_teutonic_order }
-					NOT = { culture_group = iberian }
-					NOT = { culture_group = west_african }
-					NOT = { culture = maghreb_arabic }
-					NOT = { culture = occitan }
-				}
-				AND = {
-					NOT = { is_title_active = d_knights_santiago }
-					NOT = { is_title_active = d_knights_calatrava }
-					NOT = { culture_group = north_germanic }
-					NOT = { culture_group = central_germanic }
-					NOT = { culture_group = magyar }
-					NOT = { culture_group = south_slavic }
-					NOT = { culture_group = west_slavic }
-				}
-				AND = {
-					NOT = { culture_group = iberian }
-					NOT = { culture_group = west_african }
-					NOT = { culture = maghreb_arabic }
-					NOT = { culture = occitan }
-					NOT = { culture_group = north_germanic }
-					NOT = { culture_group = central_germanic }
-					NOT = { culture_group = magyar }
-					NOT = { culture_group = south_slavic }
-					NOT = { culture_group = west_slavic }
-				}
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_knights_hospitaler
+			religion = d_knights_hospitaler
 
-			d_knights_hospitaler = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOR = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_knights_hospitaler
+				is_liege_of = d_knights_hospitaler
+			}
+
+			trigger_if = {
+				limit = {
+					OR = {
+						culture_group = iberian
+						culture_group = west_african
+						culture = maghreb_arabic
+						culture = occitan
 					}
+				}
+
+				NOR = {
+					is_title_active = d_knights_santiago
+					is_title_active = d_knights_calatrava
+				}
+			}
+			trigger_else_if = {
+				limit = {
+					OR = {
+						culture_group = north_germanic
+						culture_group = central_germanic
+						culture_group = magyar
+						culture_group = south_slavic
+						culture_group = west_slavic
+					}
+				}
+
+				NOR = {
+					is_title_active = d_teutonic_order
+					is_title_active = k_teutonic_state
 				}
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -615,109 +490,113 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_knights_hospitaler = {
 					holder_scope = {
 						character_event = {
-							id = SoA.1140
+							id = SoA.1140 # Notify
 						}
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	donate_money_to_teutonic_order = {
-		only_playable = yes
 		ai_check_interval = 80
+
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			is_title_active = d_teutonic_order
-			NOT = { government = order_government }
-
-			d_teutonic_order = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_teutonic_order }
-
-			OR = {
-				AND = {
-					NOT = { is_title_active = d_knights_hospitaler }
-					NOT = { is_title_active = d_knights_templar }
-					NOT = { is_title_active = d_knights_santiago }
-					NOT = { is_title_active = d_knights_calatrava }
-				}
-				AND = {
-					NOT = { is_title_active = d_knights_hospitaler }
-					NOT = { is_title_active = d_knights_templar }
-					NOT = { culture_group = iberian }
-					NOT = { culture_group = west_african }
-					NOT = { culture = maghreb_arabic }
-					NOT = { culture = occitan }
-				}
-				culture_group = north_germanic
-				culture_group = central_germanic
-				culture_group = magyar
-				culture_group = south_slavic
-				culture_group = west_slavic
-			}
-
 			has_dlc = "Sons of Abraham"
 
-			d_teutonic_order = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
+			trigger_if = {
+				limit = { is_title_active = d_teutonic_order }
+				religion = d_teutonic_order
+			}
+			trigger_else = {
+				is_title_active = k_teutonic_state
+				religion = k_teutonic_state
+			}
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_teutonic_order
+				has_character_modifier = expelled_k_teutonic_state
+				is_liege_of = d_teutonic_order
+				is_liege_of = k_teutonic_state
+			}
+
+			trigger_if = {
+				limit = {
+					OR = {
+						culture_group = iberian
+					    culture_group = west_african
+					    culture = maghreb_arabic
+					    culture = occitan
 					}
+				}
+
+				NOR = {
+					is_title_active = d_knights_santiago
+					is_title_active = d_knights_calatrava
+				}
+			}
+			trigger_else_if = {
+				limit = {
+					NOR = {
+						culture_group = north_germanic
+						culture_group = central_germanic
+						culture_group = magyar
+						culture_group = south_slavic
+						culture_group = west_slavic
+					}
+				}
+
+				NOR = {
+					is_title_active = d_knights_hospitaler
+					is_title_active = d_knights_templar
+					is_title_active = d_knights_santiago
+					is_title_active = d_knights_calatrava
 				}
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -725,87 +604,74 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_teutonic_order = {
 					holder_scope = {
 						character_event = {
-							id = SoA.1340
+							id = SoA.1340 # Notify
 						}
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	donate_money_to_jomsvikings = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			OR = {
-				religion = norse_pagan
-				religion = norse_pagan_reformed
-			}
-
-			is_title_active = d_jomsvikings
-			NOT = { government = order_government }
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_jomsvikings
 
-			d_jomsvikings = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			OR = {
+				religion = d_jomsvikings
+				is_heresy_of = d_jomsvikings
 			}
 
-			NOT = { has_character_modifier = expelled_d_jomsvikings }
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_jomsvikings
+				is_liege_of = d_jomsvikings
+			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -813,24 +679,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_jomsvikings = {
 					holder_scope = {
 						character_event = {
@@ -839,91 +708,81 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	borrow_money_assassins = {
-		only_playable = yes
 		ai_check_interval = 120
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-			OR = {
-				religion = shiite
-				religion = druze
-				religion = hurufi
-			}
-			is_heretic = no
-			is_title_active = d_hashshashin
-			OR = {
-				ai = no
-				AND = {
-					ai = yes
-					higher_tier_than = COUNT
-					independent = yes
-				}
-			}
-			NOT = { has_character_modifier = borrowed_from_assassins }
-			NOT = { has_character_modifier = expelled_d_hashshashin }
-			NOT = { is_nomadic = yes }
-
 			has_dlc = "Sons of Abraham"
-			NOT = { society_member_of = the_assassins }
-			NOT = { government = order_government }
+			is_title_active = d_hashshashin
+			religion = d_hashshashin
+			is_nomadic = no
 
-			d_hashshashin = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			trigger_if = {
+				limit = { ai = no }
+
+				independent = yes
+				higher_tier_than = COUNT
 			}
 
-			NOT = { has_character_modifier = assassins_debt } #From MNM.6001
+			NOR = {
+				has_character_modifier = borrowed_from_assassins
+				has_character_modifier = expelled_d_hashshashin
+				has_character_modifier = assassins_debt #From MNM.6001
+				society_member_of = the_assassins
+				government = order_government
+				is_liege_of = d_hashshashin
+			}
 		}
 
 		allow = {
 			d_hashshashin = {
 				holder_scope = {
-					wealth = 300
+					wealth >= 300
 				}
 			}
 
-			piety = 100
+			piety >= 100
 
 			custom_tooltip = {
 				text = hashshashin_loan_money_TT
 
-				d_hashshashin = {
-					holder_scope = {
-						opinion = {
-							who = ROOT
-							value = 25
-						}
-					}
+				reverse_opinion = {
+					who = d_hashshashin
+					value >= 25
 				}
 			}
 		}
 
 		effect = {
+			wealth = 300
+			piety = -100
+
 			add_character_modifier = {
 				name = borrowed_from_assassins
 				duration = -1
 				inherit = yes
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				if = {
+					limit = { has_dlc = "Mystics" }
+
+					set_variable = {
+						which = assassins_debt
+						value = 300
+					}
+				}
+
 				d_hashshashin = {
 					holder_scope = {
 						character_event = {
@@ -932,77 +791,47 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = 300
-
-			piety = -100
-
-			hidden_effect = {
-				if = {
-					limit = { has_dlc = "Mystics" }
-					set_variable = { which = assassins_debt value = 300 }
-				}
-			}
 		}
 
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0
-				wealth = 0
-			}
-			modifier = {
-				factor = 0.5 # Slow it down
+			factor = 0.5
+
+			trigger = {
+				wealth < 0
 			}
 		}
 	}
 
 	donate_money_to_assassins = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_hashshashin
-
-			d_hashshashin = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_hashshashin }
-
-			NOT = { society_member_of = the_assassins }
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_hashshashin
+			religion = d_hashshashin
 
-			d_hashshashin = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_hashshashin
+				society_member_of = the_assassins
+				is_liege_of = d_hashshashin
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -1010,15 +839,16 @@ decisions = {
 		}
 
 		effect = {
+			wealth = -300
+			piety = 100
+
 			hidden_effect = {
 				add_character_modifier = {
 					modifier = donate_to_holy_order_cooldown
-					hidden = yes
 					years = 1
+					hidden = yes
 				}
-			}
 
-			hidden_tooltip = {
 				d_hashshashin = {
 					holder_scope = {
 						character_event = {
@@ -1027,88 +857,69 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	borrow_money_bektashi = {
-		only_playable = yes
 		ai_check_interval = 120
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-			OR = {
-				religion = sunni
-				religion = zikri
-				religion = yazidi
-			}
-			is_heretic = no
-			is_title_active = d_bektashi
-			OR = {
-				ai = no
-				AND = {
-					ai = yes
-					higher_tier_than = COUNT
-					independent = yes
-				}
-			}
-			NOT = { has_character_modifier = borrowed_from_bektashi }
-			NOT = { has_character_modifier = expelled_d_bektashi }
-			NOT = { is_nomadic = yes }
-			NOT = { government = order_government }
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_bektashi
+			religion = d_bektashi
+			is_nomadic = no
 
-			d_bektashi = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			trigger_if = {
+				limit = { ai = yes }
+
+				independent = yes
+				higher_tier_than = COUNT
+			}
+
+			NOR = {
+				has_character_modifier = borrowed_from_bektashi
+				has_character_modifier = expelled_d_bektashi
+				government = order_government
+				is_liege_of = d_bektashi
 			}
 		}
 
 		allow = {
 			d_bektashi = {
 				holder_scope = {
-					wealth = 300
+					wealth >= 300
 				}
 			}
 
-			piety = 100
+			piety >= 100
 
 			custom_tooltip = {
 				text = bektashi_loan_money_TT
 
-				d_bektashi = {
-					holder_scope = {
-						opinion = {
-							who = ROOT
-							value = 25
-						}
-					}
+				reverse_opinion = {
+					who = d_bektashi
+					value >= 25
 				}
 			}
 		}
 
 		effect = {
+			wealth = 300
+			piety = -100
+
 			add_character_modifier = {
 				name = borrowed_from_bektashi
 				duration = -1
 				inherit = yes
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
 				d_bektashi = {
 					holder_scope = {
 						character_event = {
@@ -1117,65 +928,46 @@ decisions = {
 					}
 				}
 			}
-			wealth = 300
-			piety = -100
 		}
 
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0
-				wealth = 0
-			}
-			modifier = {
-				factor = 0.5 # Slow it down
+			factor = 0.5
+
+			trigger = {
+				wealth < 0
 			}
 		}
 	}
 
 	donate_money_to_bektashi = {
-		only_playable = yes
 		ai_check_interval = 80
+
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_bektashi
-
-			d_bektashi = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_bektashi
+			religion = d_bektashi
 
-			NOT = { has_character_modifier = expelled_d_bektashi }
+			trigger_if = {
+				limit = { ai = yes }
 
-			d_bektashi = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_bektashi
+				is_liege_of = d_bektashi
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -1183,15 +975,16 @@ decisions = {
 		}
 
 		effect = {
+			wealth = -300
+			piety = 100
+
 			hidden_effect = {
 				add_character_modifier = {
 					modifier = donate_to_holy_order_cooldown
-					hidden = yes
 					years = 1
+					hidden = yes
 				}
-			}
 
-			hidden_tooltip = {
 				d_bektashi = {
 					holder_scope = {
 						character_event = {
@@ -1200,72 +993,52 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_the_bektashi = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			OR = {
-				religion = sunni
-				religion = zikri
-				religion = yazidi
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_bektashi
+			independent = yes
+			higher_tier_than = DUKE
+			religion = d_bektashi
 			NOT = { has_character_modifier = expelled_d_bektashi }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_bektashi = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_bektashi
+						is_vassal_or_below_of = d_bektashi
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_bektashi_check }
-				}
+				NOT = { has_character_flag = expel_the_bektashi_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_the_bektashi_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_the_bektashi_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -1273,72 +1046,61 @@ decisions = {
 	}
 
 	borrow_money_haruriyyah = {
-		only_playable = yes
 		ai_check_interval = 120
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-			OR = {
-				religion = ibadi
-				religion = kharijite
-			}
-			is_heretic = no
-			is_title_active = d_haruriyyah
-			OR = {
-				ai = no
-				AND = {
-					ai = yes
-					higher_tier_than = COUNT
-					independent = yes
-				}
-			}
-			NOT = { has_character_modifier = borrowed_from_haruriyyah }
-			NOT = { has_character_modifier = expelled_d_haruriyyah }
-			NOT = { is_nomadic = yes }
-			NOT = { government = order_government }
-
 			has_dlc = "Charlemagne"
+			is_title_active = d_haruriyyah
+			religion = d_haruriyyah
+			is_nomadic = no
 
-			d_haruriyyah = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			trigger_if = {
+				limit = { ai = yes }
+
+				independent = yes
+				higher_tier_than = COUNT
+			}
+
+			NOR = {
+				has_character_modifier = borrowed_from_haruriyyah
+				has_character_modifier = expelled_d_haruriyyah
+				government = order_government
+				is_liege_of = d_haruriyyah
 			}
 		}
 
 		allow = {
 			d_haruriyyah = {
 				holder_scope = {
-					wealth = 300
+					wealth >= 300
 				}
 			}
 
-			piety = 100
+			piety >= 100
 
 			custom_tooltip = {
 				text = haruriyyah_loan_money_TT
 
-				d_haruriyyah = {
-					holder_scope = {
-						opinion = {
-							who = ROOT
-							value = 25
-						}
-					}
+				reverse_opinion = {
+					who = d_haruriyyah
+					value >= 25
 				}
 			}
 		}
 
 		effect = {
+			wealth = 300
+			piety = -100
+
 			add_character_modifier = {
 				name = borrowed_from_haruriyyah
 				duration = -1
 				inherit = yes
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
 				d_haruriyyah = {
 					holder_scope = {
 						character_event = {
@@ -1347,67 +1109,45 @@ decisions = {
 					}
 				}
 			}
-			wealth = 300
-
-			piety = -100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0
-				wealth = 0
-			}
-			modifier = {
-				factor = 0.5 # Slow it down
+			factor = 0.5
+
+			trigger = {
+				wealth < 0
 			}
 		}
 	}
 
 	donate_money_to_haruriyyah = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_haruriyyah
-
-			d_haruriyyah = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
 			has_dlc = "Charlemagne"
+			is_title_active = d_haruriyyah
+			religion  = d_haruriyyah
 
-			NOT = { has_character_modifier = expelled_d_haruriyyah }
+			trigger_if = {
+				limit = { ai = yes }
 
-			d_haruriyyah = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_haruriyyah
+				is_liege_of = d_haruriyyah
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -1415,15 +1155,16 @@ decisions = {
 		}
 
 		effect = {
+			wealth = -300
+			piety = 100
+
 			hidden_effect = {
 				add_character_modifier = {
 					modifier = donate_to_holy_order_cooldown
-					hidden = yes
 					years = 1
+					hidden = yes
 				}
-			}
 
-			hidden_tooltip = {
 				d_haruriyyah = {
 					holder_scope = {
 						character_event = {
@@ -1432,71 +1173,51 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_the_haruriyyah = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = ibadi
-				religion = kharijite
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Charlemagne"
 			is_title_active = d_haruriyyah
+			independent = yes
+			higher_tier_than = DUKE
+			religion = d_haruriyyah
 			NOT = { has_character_modifier = expelled_d_haruriyyah }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_haruriyyah = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_haruriyyah
+						is_vassal_or_below_of = d_haruriyyah
 					}
 				}
 			}
-
-			has_dlc = "Charlemagne"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_haruriyyah_check }
-				}
+				NOT = { has_character_flag = expel_the_haruriyyah_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_the_haruriyyah_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_the_haruriyyah_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -1504,12 +1225,15 @@ decisions = {
 	}
 
 	vassalize_knights_templar = {
-		only_playable = yes
 		is_high_prio = yes
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_landed_title = k_jerusalem
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_knights_templar
 
 			OR = {
 				religion = catholic
@@ -1519,78 +1243,55 @@ decisions = {
 				religion = lollard
 			}
 
-			NOT = { has_character_modifier = expelled_d_knights_templar }
+			NOR = {
+				has_character_modifier = expelled_d_knights_templar
 
-			NOT = {
-				d_knights_templar = {
-					owner = {
-						has_opinion_modifier = {
-							who = ROOT
-							modifier = opinion_unfit_ruler
-						}
-					}
+				reverse_has_opinion_modifier = {
+					who = d_knights_templar
+					modifier = opinion_unfit_ruler
+				}
+
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
 				}
 			}
-
-			is_title_active = d_knights_templar
-
-			has_landed_title = k_jerusalem
-
-			has_dlc = "Sons of Abraham"
 
 			d_knights_templar = {
-				holder_scope = {
-					NOT = { has_truce = ROOT }
-					ROOT = { NOT = { has_truce = PREV } }
-					liege = {
-						NOT = { character = ROOT }
-					}
-					NOT = { num_of_count_titles = 3 }
-					independent = yes
-					primary_title = { title = d_knights_templar }
-				}
-			}
+				is_primary_holder_title = yes
 
-			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				holder_scope = {
+					independent = yes
+					num_of_count_titles < 3
+
+					NOR = {
+						vassal_of = ROOT
+						has_truce = ROOT
+						reverse_has_truce = ROOT
+					}
+				}
 			}
 		}
 
 		allow = {
-			wealth = 500
-			is_heretic = no
 			independent = yes
+			is_heretic = no
+			NOT = { trait = excommunicated }
+			wealth >= 500
 
-			conditional_tooltip = {
+			trigger_if = {
 				trigger = {
-					NOT = {
-						d_knights_templar = {
-							owner = {
-								opinion = {
-									who = ROOT
-									value = 25
-								}
-							}
-						}
+					reverse_opinion = {
+						who = d_knights_templar
+						value = 25
 					}
 				}
 
 				custom_tooltip = {
 					text = vassalize_knights_templar_opinion_TT
 
-					d_knights_templar = {
-						owner = {
-							opinion = {
-								who = ROOT
-								value = 25
-							}
-						}
-					}
+					always = no
 				}
-			}
-
-			NOT = {
-				trait = excommunicated
 			}
 
 			custom_tooltip = {
@@ -1607,10 +1308,11 @@ decisions = {
 		effect = {
 			wealth = -500
 
-			hidden_tooltip = {
+			hidden_effect = {
 				d_knights_templar = {
 					holder_scope = {
 						wealth = 500
+
 						character_event = {
 							id = SoA.1015
 						}
@@ -1619,19 +1321,22 @@ decisions = {
 			}
 		}
 
-
 		ai_will_do = {
 			factor = 1
 		}
 	}
 
 	vassalize_knights_hospitaler = {
-		only_playable = yes
 		is_high_prio = yes
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_landed_title = k_jerusalem
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_knights_hospitaler
+
 			OR = {
 				religion = catholic
 				religion = cathar
@@ -1640,78 +1345,55 @@ decisions = {
 				religion = lollard
 			}
 
-			NOT = { has_character_modifier = expelled_d_knights_hospitaler }
+			NOR = {
+				has_character_modifier = expelled_d_knights_hospitaler
 
-			NOT = {
-				d_knights_hospitaler = {
-					owner = {
-						has_opinion_modifier = {
-							who = ROOT
-							modifier = opinion_unfit_ruler
-						}
-					}
+				reverse_has_opinion_modifier = {
+					who = d_knights_hospitaler
+					modifier = opinion_unfit_ruler
+				}
+
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
 				}
 			}
-
-			is_title_active = d_knights_hospitaler
-
-			has_landed_title = k_jerusalem
 
 			d_knights_hospitaler = {
+				is_primary_holder_title = yes
+
 				holder_scope = {
-					NOT = { has_truce = ROOT }
-					ROOT = { NOT = { has_truce = PREV } }
-					liege = {
-						NOT = { character = ROOT }
-					}
-					NOT = { num_of_count_titles = 3 }
 					independent = yes
-					primary_title = { title = d_knights_hospitaler }
+					num_of_count_titles < 3
+
+					NOR = {
+						has_truce = ROOT
+						reverse_has_truce = ROOT
+						vassal_of = ROOT
+					}
 				}
-			}
-
-			has_dlc = "Sons of Abraham"
-
-			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
 			}
 		}
 
 		allow = {
-			wealth = 500
-			is_heretic = no
 			independent = yes
+			is_heretic = no
+			NOT = { trait = excommunicated }
+			wealth >= 500
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = {
-						d_knights_hospitaler = {
-							owner = {
-								opinion = {
-									who = ROOT
-									value = 25
-								}
-							}
-						}
+			trigger_if = {
+				limit = {
+					reverse_opinion = {
+						who = d_knights_hospitaler
+						value < 25
 					}
 				}
 
 				custom_tooltip = {
 					text = vassalize_knights_hospitaller_opinion_TT
 
-					d_knights_hospitaler = {
-						owner = {
-							opinion = {
-								who = ROOT
-								value = 25
-							}
-						}
-					}
+					always = no
 				}
-			}
-
-			NOT = {
-				trait = excommunicated
 			}
 
 			custom_tooltip = {
@@ -1728,10 +1410,11 @@ decisions = {
 		effect = {
 			wealth = -500
 
-			hidden_tooltip = {
+			hidden_effect = {
 				d_knights_hospitaler = {
 					holder_scope = {
 						wealth = 500
+
 						character_event = {
 							id = SoA.1115
 						}
@@ -1740,66 +1423,49 @@ decisions = {
 			}
 		}
 
-
 		ai_will_do = {
 			factor = 1
 		}
 	}
 
 	expel_the_holy_sepulchre = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = orthodox
-				religion = bogomilist
-				religion = monothelite
-				religion = iconoclast
-				religion = paulician
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_holy_sepulchre
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_holy_sepulchre
 			NOT = { has_character_modifier = expelled_d_holy_sepulchre }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_holy_sepulchre = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_holy_sepulchre
+						is_vassal_or_below_of = d_holy_sepulchre
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_the_holy_sepulchre_check }
-				}
+				NOT = { has_character_flag = expel_the_holy_sepulchre_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_the_holy_sepulchre_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_the_holy_sepulchre_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -1807,48 +1473,33 @@ decisions = {
 	}
 
 	donate_money_to_holy_sepulchre = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_holy_sepulchre
-
-			d_holy_sepulchre = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_holy_sepulchre }
-
-			d_holy_sepulchre = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_holy_sepulchre
+			religion = d_holy_sepulchre
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_holy_sepulchre
+				is_liege_of = d_holy_sepulchre
+			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -1856,24 +1507,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_holy_sepulchre = {
 					holder_scope = {
 						character_event = {
@@ -1882,71 +1536,52 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_saint_anthony = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			OR = {
-				religion = miaphysite
-				religion = monophysite
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_saint_anthony
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_saint_anthony
 			NOT = { has_character_modifier = expelled_d_saint_anthony }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_saint_anthony = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_saint_anthony
+						is_vassal_or_below_of = d_saint_anthony
 					}
 				}
 			}
 
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_saint_anthony_check }
-				}
+				NOT = { has_character_flag = expel_saint_anthony_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_saint_anthony_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_saint_anthony_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -1954,47 +1589,33 @@ decisions = {
 	}
 
 	donate_money_to_saint_anthony = {
-		only_playable = yes
 		ai_check_interval = 80
+
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_saint_anthony
-
-			d_saint_anthony = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_saint_anthony }
-
-			d_saint_anthony = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_saint_anthony
+			religion = d_saint_anthony
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_saint_anthony
+				is_liege_of = d_saint_anthony
+			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2002,24 +1623,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_saint_anthony = {
 					holder_scope = {
 						character_event = {
@@ -2028,71 +1652,52 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_immortals = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			OR = {
-				religion = zoroastrian
-				religion = mazdaki
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_immortals
+			religion = d_immortals
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_immortals }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_immortals = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_immortals
+						is_vassal_or_below_of = d_immortals
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_immortals_check }
-				}
+				NOT = { has_character_flag = expel_immortals_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_immortals_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_immortals_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -2100,47 +1705,33 @@ decisions = {
 	}
 
 	donate_money_to_the_immortals = {
-		only_playable = yes
 		ai_check_interval = 80
+
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_immortals
-
-			d_immortals = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_immortals }
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_immortals
+			religion = d_immortals
 
-			d_immortals = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth > 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_immortals
+				is_liege_of = d_immortals
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2148,24 +1739,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_immortals = {
 					holder_scope = {
 						character_event = {
@@ -2174,72 +1768,51 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_zealots = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			OR = {
-				religion = jewish
-				religion = samaritan
-				religion = karaite
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_zealots
+			religion = d_zealots
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_zealots }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_zealots = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_zealots
+						is_vassal_or_below_of = d_zealots
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety > 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_zealots_check }
-				}
+				NOT = { has_character_flag = expel_zealots_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_zealots_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_zealots_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -2247,48 +1820,33 @@ decisions = {
 	}
 
 	donate_money_to_the_zealots = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_zealots
-
-			d_zealots = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_zealots
+			religion = d_zealots
 
-			NOT = { has_character_modifier = expelled_d_zealots }
+			trigger_if = {
+				limit = { ai = yes }
 
-			d_zealots = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+				wealth > 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_zealots
+				is_liege_of = d_zealots
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2296,24 +1854,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_zealots = {
 					holder_scope = {
 						character_event = {
@@ -2322,67 +1883,52 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_sky_lords = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			religion = tengri_pagan_reformed
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_sky_lords
+			religion = d_sky_lords
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_sky_lords }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_sky_lords = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_sky_lords
+						is_vassal_or_below_of = d_sky_lords
 					}
 				}
 			}
 
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_sky_lords_check }
-				}
+				NOT = { has_character_flag = expel_sky_lords_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_sky_lords_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_sky_lords_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -2390,44 +1936,33 @@ decisions = {
 	}
 
 	donate_money_to_sky_lords = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_sky_lords
+			religion = d_sky_lords
 
-			religion = tengri_pagan_reformed
+			trigger_if = {
+				limit = { ai = yes }
 
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
+				wealth > 1000
+				piety < 50
+				NOT = { trait = cynical }
 			}
 
-			NOT = { government = order_government }
-
-			is_title_active = d_sky_lords
-
-			has_dlc = "Sons of Abraham"
-
-			NOT = { has_character_modifier = expelled_d_sky_lords }
-
-			d_sky_lords = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_sky_lords
+				is_liege_of = d_sky_lords
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2435,13 +1970,9 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
@@ -2452,7 +1983,13 @@ decisions = {
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_sky_lords = {
 					holder_scope = {
 						character_event = {
@@ -2461,67 +1998,51 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_spirit_guardians = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			religion = west_african_pagan_reformed
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_spirit_guardians
+			religion = d_spirit_guardians
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_spirit_guardians }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_spirit_guardians = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_spirit_guardians
+						is_vassal_or_below_of = d_spirit_guardians
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_spirit_guardians_check }
-				}
+				NOT = { has_character_flag = expel_spirit_guardians_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_spirit_guardians_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_spirit_guardians_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -2529,44 +2050,33 @@ decisions = {
 	}
 
 	donate_money_to_spirit_guardians = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_spirit_guardians
+			religion = d_spirit_guardians
 
-			religion = west_african_pagan_reformed
+			trigger_if = {
+				limit = { ai = yes }
 
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
 			}
 
-			NOT = { government = order_government }
-
-			is_title_active = d_spirit_guardians
-
-			has_dlc = "Sons of Abraham"
-
-			NOT = { has_character_modifier = expelled_d_spirit_guardians }
-
-			d_spirit_guardians = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_spirit_guardians
+				is_liege_of = d_spirit_guardians
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2574,24 +2084,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_spirit_guardians = {
 					holder_scope = {
 						character_event = {
@@ -2600,67 +2113,52 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_warriors_perun = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			religion = slavic_pagan_reformed
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_warriors_perun
+			religion = d_warriors_perun
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_warriors_perun }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_warriors_perun = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_warriors_perun
+						is_vassal_or_below_of = d_warriors_perun
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_warriors_perun_check }
-				}
+				NOT = { has_character_flag = expel_warriors_perun_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_warriors_perun_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_warriors_perun_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -2668,44 +2166,33 @@ decisions = {
 	}
 
 	donate_money_to_warriors_perun = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_warriors_perun
+			religion = d_warriors_perun
 
-			religion = slavic_pagan_reformed
+			trigger_if = {
+				limit = { ai = yes }
 
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
 			}
 
-			NOT = { government = order_government }
-
-			is_title_active = d_warriors_perun
-
-			NOT = { has_character_modifier = expelled_d_warriors_perun }
-
-			has_dlc = "Sons of Abraham"
-
-			d_warriors_perun = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_warriors_perun
+				is_liege_of = d_warriors_perun
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2713,24 +2200,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_warriors_perun = {
 					holder_scope = {
 						character_event = {
@@ -2739,67 +2229,51 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_chosen_perkunas = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			religion = baltic_pagan_reformed
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_chosen_perkunas
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_chosen_perkunas
 			NOT = { has_character_modifier = expelled_d_chosen_perkunas }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_chosen_perkunas = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_chosen_perkunas
+						is_vassal_or_below_of = d_chosen_perkunas
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_chosen_perkunas_check }
-				}
+				NOT = { has_character_flag = expel_chosen_perkunas_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_chosen_perkunas_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_chosen_perkunas_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -2807,44 +2281,33 @@ decisions = {
 	}
 
 	donate_money_to_chosen_perkunas = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_chosen_perkunas
+			religion = d_chosen_perkunas
 
-			religion = baltic_pagan_reformed
+			trigger_if = {
+				limit = { ai = yes }
 
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
 			}
 
-			NOT = { government = order_government }
-
-			is_title_active = d_chosen_perkunas
-
-			has_dlc = "Sons of Abraham"
-
-			NOT = { has_character_modifier = expelled_d_chosen_perkunas }
-
-			d_chosen_perkunas = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_chosen_perkunas
+				is_liege_of = d_chosen_perkunas
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2852,24 +2315,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_chosen_perkunas = {
 					holder_scope = {
 						character_event = {
@@ -2878,67 +2344,51 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_sons_kaleva = {
-		only_independent = yes
 		ai = no
 
 		potential = {
-			religion = finnish_pagan_reformed
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_sons_kaleva
+			independent = yes
+			higher_real_tier_than = DUKE
+			religion = d_sons_kaleva
 			NOT = { has_character_modifier = expelled_d_sons_kaleva }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_chosen_perkunas = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_sons_kaleva
+						is_vassal_or_below_of = d_sons_kaleva
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_sons_kaleva_check }
-				}
+				NOT = { has_character_flag = expel_sons_kaleva_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_sons_kaleva_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_sons_kaleva_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -2946,44 +2396,33 @@ decisions = {
 	}
 
 	donate_money_to_sons_kaleva = {
-		only_playable = yes
 		ai_check_interval = 80
 
-		potential = {
-			is_playable = yes
+		only_playable = yes
 
+		potential = {
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_sons_kaleva
 			religion = finnish_pagan_reformed
 
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
 			}
 
-			NOT = { government = order_government }
-
-			is_title_active = d_sons_kaleva
-
-			has_dlc = "Sons of Abraham"
-
-			NOT = { has_character_modifier = expelled_d_sons_kaleva }
-
-			d_sons_kaleva = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_sons_kaleva
+				is_liege_of = d_sons_kaleva
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -2991,24 +2430,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_sons_kaleva = {
 					holder_scope = {
 						character_event = {
@@ -3017,67 +2459,52 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_huitzilopochtli = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			religion = aztec_reformed
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_huitzilopochtli
+			religion = d_huitzilopochtli
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_huitzilopochtli }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_huitzilopochtli = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_huitzilopochtli
+						is_vassal_or_below_of = d_huitzilopochtli
 					}
 				}
 			}
 
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_huitzilopochtli_check }
-				}
+				NOT = { has_character_flag = expel_huitzilopochtli_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_huitzilopochtli_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_huitzilopochtli_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -3085,44 +2512,33 @@ decisions = {
 	}
 
 	donate_money_to_huitzilopochtli = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_dlc = "Sons of Abraham"
+			is_title_active = d_huitzilopochtli
+			religion = d_huitzilopochtli
 
-			religion = aztec_reformed
+			trigger_if = {
+				limit = { ai = yes }
 
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
 			}
 
-			NOT = { government = order_government }
-
-			is_title_active = d_huitzilopochtli
-
-			has_dlc = "Sons of Abraham"
-
-			NOT = { has_character_modifier = expelled_d_huitzilopochtli }
-
-			d_huitzilopochtli = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_huitzilopochtli
+				is_liege_of = d_huitzilopochtli
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -3130,24 +2546,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_huitzilopochtli = {
 					holder_scope = {
 						character_event = {
@@ -3156,74 +2575,53 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_knights_santiago = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			OR = {
-				religion = catholic
-				religion = cathar
-				religion = fraticelli
-				religion = waldensian
-				religion = lollard
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_knights_santiago
+			religion = d_knights_santiago
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_knights_santiago }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_knights_santiago = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_knights_santiago
+						is_vassal_or_below_of = d_knights_santiago
 					}
 				}
 			}
 
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_knights_santiago_check }
-				}
+				NOT = { has_character_flag = expel_knights_santiago_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_knights_santiago_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_knights_santiago_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -3231,69 +2629,69 @@ decisions = {
 	}
 
 	donate_money_to_knights_santiago = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_knights_santiago
-
-			d_knights_santiago = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_knights_santiago }
-
-			OR = {
-				AND = {
-					NOT = { is_title_active = d_knights_hospitaler }
-					NOT = { is_title_active = d_knights_templar }
-					NOT = { is_title_active = d_teutonic_order }
-				}
-				AND = {
-					NOT = { is_title_active = d_knights_templar }
-					NOT = { is_title_active = d_knights_hospitaler }
-					NOT = { culture_group = north_germanic }
-					NOT = { culture_group = central_germanic }
-					NOT = { culture_group = magyar }
-					NOT = { culture_group = south_slavic }
-					NOT = { culture_group = west_slavic }
-				}
-				culture_group = iberian
-				culture_group = west_african
-				culture = maghreb_arabic
-				culture = occitan
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_knights_santiago
+			religion = d_knights_santiago
 
-			d_knights_santiago = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			trigger_if = {
+				limit = {
+					NOR = {
+						culture_group = iberian
+						culture_group = west_african
+						culture = maghreb_arabic
+						culture = occitan
 					}
 				}
+
+				trigger_if = {
+					limit = {
+						NOR = {
+							is_title_active = d_teutonic_order
+							is_title_active = k_teutonic_state
+							is_title_active = d_knights_hospitaler
+							is_title_active = d_knights_templar
+						}
+					}
+
+					OR = {
+						culture_group = north_germanic
+						culture_group = central_germanic
+						culture_group = magyar
+						culture_group = south_slavic
+						culture_group = west_slavic
+					}
+				}
+				trigger_else = {
+					NOR = {
+						is_title_active = d_knights_hospitaler
+						is_title_active = d_knights_templar
+					}
+				}
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_knights_santiago
+				is_liege_of = d_knights_santiago
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -3301,24 +2699,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_knights_santiago = {
 					holder_scope = {
 						character_event = {
@@ -3327,74 +2728,51 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_knights_calatrava = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			OR = {
-				religion = catholic
-				religion = cathar
-				religion = fraticelli
-				religion = waldensian
-				religion = lollard
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_knights_calatrava
+			religion = d_knights_calatrava
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_knights_calatrava }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_knights_calatrava = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_knights_calatrava
+						is_vassal_or_below_of = d_knights_calatrava
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_knights_calatrava_check }
-				}
+				NOT = { has_character_flag = expel_knights_calatrava_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_knights_calatrava_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_knights_calatrava_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -3402,69 +2780,69 @@ decisions = {
 	}
 
 	donate_money_to_knights_calatrava = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_knights_calatrava
-
-			d_knights_calatrava = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_knights_calatrava }
-
-			OR = {
-				AND = {
-					NOT = { is_title_active = d_knights_hospitaler }
-					NOT = { is_title_active = d_knights_templar }
-					NOT = { is_title_active = d_teutonic_order }
-				}
-				AND = {
-					NOT = { is_title_active = d_knights_templar }
-					NOT = { is_title_active = d_knights_hospitaler }
-					NOT = { culture_group = north_germanic }
-					NOT = { culture_group = central_germanic }
-					NOT = { culture_group = magyar }
-					NOT = { culture_group = south_slavic }
-					NOT = { culture_group = west_slavic }
-				}
-				culture_group = iberian
-				culture_group = west_african
-				culture = maghreb_arabic
-				culture = occitan
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_knights_calatrava
+			religion = d_knights_calatrava
 
-			d_knights_calatrava = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			trigger_if = {
+				limit = {
+					NOR = {
+						culture_group = iberian
+						culture_group = west_african
+						culture = maghreb_arabic
+						culture = occitan
 					}
 				}
+
+				trigger_if = {
+					limit = {
+						NOR = {
+							is_title_active = d_teutonic_order
+							is_title_active = k_teutonic_state
+							is_title_active = d_knights_hospitaler
+							is_title_active = d_knights_templar
+						}
+					}
+
+					OR = {
+						culture_group = north_germanic
+						culture_group = central_germanic
+						culture_group = magyar
+						culture_group = south_slavic
+						culture_group = west_slavic
+					}
+				}
+				trigger_else = {
+					NOR = {
+						is_title_active = d_knights_hospitaler
+						is_title_active = d_knights_templar
+					}
+				}
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_knights_calatrava
+				is_liege_of = d_knights_calatrava
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -3472,24 +2850,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_knights_calatrava = {
 					holder_scope = {
 						character_event = {
@@ -3498,71 +2879,51 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	expel_order_of_addai = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			OR = {
-				religion = nestorian
-				religion = messalian
-			}
-			is_heretic = no
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Sons of Abraham"
 			is_title_active = d_saint_addai
+			religion = d_saint_addai
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_saint_addai }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_saint_addai = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_saint_addai
+						is_vassal_or_below_of = d_saint_addai
 					}
 				}
 			}
-
-			has_dlc = "Sons of Abraham"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_order_of_addai_check }
-				}
+				NOT = { has_character_flag = expel_order_of_addai_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_order_of_addai_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_order_of_addai_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
@@ -3570,47 +2931,33 @@ decisions = {
 	}
 
 	donate_money_to_order_of_addai = {
-		only_playable = yes
 		ai_check_interval = 80
+
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
-
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
-			}
-
-			NOT = { government = order_government }
-
-			is_title_active = d_saint_addai
-
-			d_saint_addai = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-
-			NOT = { has_character_modifier = expelled_d_saint_addai }
-
-			d_saint_addai = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
-			}
-
 			has_dlc = "Sons of Abraham"
+			is_title_active = d_saint_addai
+			religion = d_saint_addai
+
+			trigger_if = {
+				limit = { ai = yes }
+
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
+			}
+
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_saint_addai
+				is_liege_of = d_saint_addai
+			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -3618,24 +2965,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_saint_addai = {
 					holder_scope = {
 						character_event = {
@@ -3644,109 +2994,85 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
-
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
+
 	expel_zun_warriors = {
-		only_independent = yes
 		ai = no
+		only_independent = yes
 
 		potential = {
-			religion = zun_pagan_reformed
-			higher_tier_than = DUKE
-			independent = yes
+			has_dlc = "Charlemagne"
 			is_title_active = d_zun_warriors
+			religion = d_zun_warriors
+			higher_real_tier_than = DUKE
 			NOT = { has_character_modifier = expelled_d_zun_warriors }
 
 			any_realm_province = {
 				any_province_lord = {
-					d_zun_warriors = {
-						holder_scope = {
-							OR = {
-								character = PREVPREV
-								is_vassal_or_below = PREVPREV
-							}
-						}
+					OR = {
+						character = d_zun_warriors
+						is_vassal_or_below_of = d_zun_warriors
 					}
 				}
 			}
-			has_dlc = "Charlemagne"
 		}
 
 		allow = {
-			piety = 1000
+			piety >= 1000
+
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_flag = expel_zun_warriors_check }
-				}
+				NOT = { has_character_flag = expel_zun_warriors_check }
 			}
 		}
 
 		effect = {
-			set_character_flag = expel_zun_warriors_check
 			custom_tooltip = {
 				text = expelling_holy_order_decision_tooltip_b
-				hidden_tooltip = {
-					character_event = { id = SoA.2990 }
-				}
+
+				set_character_flag = expel_zun_warriors_check
+				character_event = { id = SoA.2990 }
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 0
 		}
 	}
+
 	donate_money_to_zun_warriors = {
-		only_playable = yes
 		ai_check_interval = 80
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
+			has_dlc = "Charlemagne"
+			is_title_active = d_zun_warriors
+			religion = d_zun_warriors
 
-			religion = zun_pagan_reformed
+			trigger_if = {
+				limit = { ai = yes }
 
-			OR = {
-				AND = {
-					wealth = 1000
-					NOR = {
-						trait = cynical
-						piety = 50
-					}
-				}
-				ai = no
+				wealth >= 1000
+				piety < 50
+				NOT = { trait = cynical }
 			}
 
-			NOT = { government = order_government }
-
-			is_title_active = d_zun_warriors
-
-			has_dlc = "Charlemagne"
-
-			NOT = { has_character_modifier = expelled_d_zun_warriors }
-
-			d_zun_warriors = {
-				holder_scope = {
-					liege = {
-						NOT = { character = ROOT }
-					}
-				}
+			NOR = {
+				government = order_government
+				has_character_modifier = expelled_d_zun_warriors
+				is_liege_of = d_zun_warriors
 			}
 		}
 
 		allow = {
-			wealth = 300
+			wealth >= 300
+
 			custom_tooltip = {
 				text = holy_order_donate_cooldown_tt
 				NOT = { has_character_modifier = donate_to_holy_order_cooldown }
@@ -3754,24 +3080,27 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					modifier = donate_to_holy_order_cooldown
-					hidden = yes
-					years = 1
-				}
-			}
+			wealth = -300
+			piety = 100
+
 			if = {
 				limit = {
 					NOT = { has_character_modifier = donated_to_holy_order }
 				}
+
 				add_character_modifier = {
 					name = donated_to_holy_order
 					duration = -1
 				}
 			}
 
-			hidden_tooltip = {
+			hidden_effect = {
+				add_character_modifier = {
+					modifier = donate_to_holy_order_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				d_zun_warriors = {
 					holder_scope = {
 						character_event = {
@@ -3780,50 +3109,56 @@ decisions = {
 					}
 				}
 			}
-
-			wealth = -300
-			piety = 100
 		}
 
-
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # Slow it down
-			}
+			factor = 0.1
 		}
 	}
 
 	form_st_anthony = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
+
+		only_playable = yes
 
 		potential = {
 			has_dlc = "Sons of Abraham"
 			religion = miaphysite
-			NOT = { is_title_active = d_saint_anthony }
 			is_heretic = no
+			NOT = { is_title_active = d_saint_anthony }
+
 			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
+
 			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
+
 		allow = {
-			piety = 1000
-			wealth = 500
-			num_of_holy_sites = 1
-			religion_authority = 0.5
+			num_of_holy_sites >= 1
+			religion_authority >= 0.50
+			piety >= 1000
+			wealth >= 500
 		}
 		effect = {
 			piety = -1000
 			wealth = -500
-			narrative_event = { id = 39810 tooltip = evt_39810_TT }
+
+			narrative_event = {
+				id = 39810
+				tooltip = evt_39810_TT
+			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}
@@ -3831,34 +3166,48 @@ decisions = {
 
 	form_st_addai = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
+
+		only_playable = yes
 
 		potential = {
 			has_dlc = "Sons of Abraham"
 			religion = nestorian
-			NOT = { is_title_active = d_saint_addai }
 			is_heretic = no
+			NOT = { is_title_active = d_saint_addai }
+
 			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
+
 			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
+
 		allow = {
-			piety = 1000
-			wealth = 500
-			num_of_holy_sites = 1
-			religion_authority = 0.5
+			num_of_holy_sites >= 1
+			religion_authority >= 0.50
+			piety >= 1000
+			wealth >= 500
 		}
+
 		effect = {
 			piety = -1000
 			wealth = -500
-			narrative_event = { id = 39811 tooltip = evt_39811_TT }
+
+			narrative_event = {
+				id = 39811
+				tooltip = evt_39811_TT
+			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}
@@ -3866,36 +3215,52 @@ decisions = {
 
 	organize_army_light = {
 		is_high_prio = yes
-		only_playable = yes
 		ai_check_interval = 60
 
+		only_playable = yes
+
 		potential = {
-			is_female = no
-			prisoner = no
-			is_adult = yes
 			religion = manichean
+			is_female = no
+			is_adult = yes
+			prisoner = no
+
 			NOT = { has_global_flag = army_light_founded }
+
 			OR = {
-				has_global_flag = christian_crusades_unlocked #Prevent Army from being created at start.
+				# Prevent Army from being created at start
+				has_global_flag = christian_crusades_unlocked
 				has_global_flag = pagan_ghws_unlocked
 				has_global_flag = muslim_jihads_unlocked
 			}
+
 			NOT = {
-				has_alternate_start_parameter = { key = religion_names value = random }
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 			}
 		}
+
 		allow = {
-			piety = 1000
-			wealth = 500
-			num_of_holy_sites = 1
-			religion_authority = 0.5
+			num_of_holy_sites >= 1
+			religion_authority >= 0.50
+			piety >= 1000
+			wealth >= 500
 		}
+
 		effect = {
-			set_global_flag = army_light_founded
 			prestige = -300
 			wealth = -300
-			activate_title = { title = d_army_light status = yes }
-			hidden_tooltip = {
+
+			activate_title = {
+				title = d_army_light
+				status = yes
+			}
+
+			hidden_effect = {
+				set_global_flag = army_light_founded
+
 				create_character = {
 					random_traits = yes
 					religion = manichean
@@ -3905,14 +3270,14 @@ decisions = {
 					age = 34
 					trait = skilled_tactician
 				}
+
 				new_character = {
-					d_army_light = {
-						grant_title = PREV
-					}
+					grant_title = d_army_light
 					set_defacto_liege = ROOT
 				}
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}

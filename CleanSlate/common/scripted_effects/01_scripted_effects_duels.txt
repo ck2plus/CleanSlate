@@ -2460,32 +2460,22 @@ handle_claim_duel_result_effect = {
 						text = you_take_their_titles_and_all_under_it_tt
 
 						event_target:combatant_2 = { # Seize titles from target...!
-							while = {
-								limit = {
-									event_target:combatant_2 = {
-										any_demesne_title = {
-											event_target:combatant_1 = { has_strong_claim = PREV }
-										}
+							any_demesne_title = {
+								limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
+
+								event_target:combatant_1 = {
+									usurp_title = {
+										target = PREV
+										type = duel
+									}
+									vassalize_or_take_under_title = {
+										title = PREV
+										enemy = event_target:combatant_2
+										type = duel
 									}
 								}
 
-								random_demesne_title = {
-									limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
-
-									event_target:combatant_1 = {
-										usurp_title = {
-											target = PREV
-											type = duel
-										}
-										vassalize_or_take_under_title = {
-											title = PREV
-											enemy = event_target:combatant_2
-											type = duel
-										}
-									}
-								}
-
-								log = "[This.GetBestName] is seized by [combatant_1.GetBestName]"
+								log = "[This.GetFullName] is seized by [combatant_1.GetBestName]"
 							}
 						}
 					}
@@ -2509,11 +2499,16 @@ handle_claim_duel_result_effect = {
 									type = duel
 								}
 							}
+
+							log = "[This.GetFullName] is seized by [combatant_1.GetBestName]"
 						}
 					}
 				}
 				if = {
-					limit = { ai = no }
+					limit = {
+						ai = no
+						is_ironman = yes
+					}
 					set_character_flag = achievement_over_your_dead_body
 				}
 			}
@@ -2537,9 +2532,7 @@ handle_claim_duel_result_effect = {
 
 						event_target:combatant_2 = {
 							any_demesne_title = {
-								limit = {
-									event_target:combatant_1 = { has_strong_claim = PREV }
-								}
+								limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
 
 								event_target:combatant_1 = {
 									remove_claim = PREV
@@ -2548,7 +2541,6 @@ handle_claim_duel_result_effect = {
 							}
 						}
 					}
-
 				}
 
 				if = { # If defender happens to have claims of their own, *they* take titles....
@@ -2560,7 +2552,7 @@ handle_claim_duel_result_effect = {
 						}
 					}
 
-					custom_tooltip = { text = they_take_your_titles_tt }
+					custom_tooltip = { text = they_take_your_titles_tt } # Happens below, on defender side
 				}
 			}
 		}
@@ -2588,7 +2580,10 @@ handle_claim_duel_result_effect = {
 					}
 
 					if = {
-						limit = { ai = no }
+						limit = {
+							ai = no
+							is_ironman = yes
+						}
 						set_character_flag = achievement_over_your_dead_body
 					}
 
@@ -2606,30 +2601,22 @@ handle_claim_duel_result_effect = {
 							text = you_take_their_titles_and_all_under_it_tt
 
 							event_target:combatant_1 = { # Grab titles from target...!
-								while = {
-									limit = {
-										any_demesne_title = {
-											event_target:combatant_2 = { has_strong_claim = PREV }
+								any_demesne_title = {
+									limit = { event_target:combatant_2 = { has_strong_claim = PREV } }
+
+									event_target:combatant_2 = {
+										usurp_title = {
+											target = PREV
+											type = duel
+										}
+										vassalize_or_take_under_title = {
+											title = PREV
+											enemy = event_target:combatant_1
+											type = duel
 										}
 									}
 
-									random_demesne_title = {
-										limit = { event_target:combatant_2 = { has_strong_claim = PREV } }
-
-										event_target:combatant_2 = {
-											usurp_title = {
-												target = PREV
-												type = duel
-											}
-											vassalize_or_take_under_title = {
-												title = PREV
-												enemy = event_target:combatant_1
-												type = duel
-											}
-										}
-									}
-
-									log = "[This.GetBestName] is grabbed by [combatant_2.GetBestName]"
+									log = "[This.GetFullName] is grabbed by [combatant_2.GetBestName]"
 								}
 							}
 						}

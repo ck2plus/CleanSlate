@@ -6,50 +6,52 @@
 
 targeted_decisions = {
 
-	#Power: Summon familiar
+	# Power: Summon familiar
 	devil_worshipers_summon_familiar = {
-		is_in_society = yes
-
 		filter = self
 		ai_target_filter = self
 		ai_check_interval = 12
 
+		is_in_society = yes
+
 		potential = {
+			has_dlc = "Mystics"
+			is_devil_worshiper_trigger = yes
+			society_rank >= 2
 			prisoner = no
 			is_incapable = no
-			character = FROM
-			has_dlc = "Mystics"
-			society_rank >= 2
-			is_devil_worshiper_trigger = yes
 		}
 
 		allow = {
+			has_society_currency_major_trigger = yes
+
 			custom_tooltip = {
 				text = devil_worshipers_summon_familiar_cd_tooltip
+
 				NOT = { has_character_modifier = summon_familiar_cooldown }
 			}
-			has_society_currency_major_trigger = yes
 		}
 
 		effect = {
 			increase_visibility_effect = yes
+			detract_society_currency_major_effect = yes
+
 			hidden_effect = {
 				add_character_modifier = {
 					name = summon_familiar_cooldown
 					years = 5
 					hidden = yes
 				}
+
 				character_event = { id = MNM.7815 }
 			}
-			detract_society_currency_major_effect = yes
 		}
-
 
 		ai_will_do = {
 			factor = 1
-			modifier = {
-				factor = 0
-				OR = {
+
+			trigger = {
+				NOR = {
 					has_character_modifier = wolf_familiar
 					has_character_modifier = cat_familiar
 					has_character_modifier = owl_familiar
@@ -59,79 +61,71 @@ targeted_decisions = {
 		}
 	}
 
-	#Power: Tainted touch
+	# Power: Tainted touch
 	the_devil_worshipers_tainted_touch = {
-		is_in_society = yes
-
 		ai_target_filter = realm
 		ai_check_interval = 6
 
+		is_in_society = yes
+
 		from_potential = {
+			is_devil_worshiper_trigger = yes
+			society_rank > 1
 			prisoner = no
 			is_incapable = no
 
-			OR = {
+			trigger_if = {
+				limit = { ai = yes }
+
 				has_society_currency_major_trigger = yes
-				ai = no
-			}
 
-			OR = {
-				war = yes
-				num_of_rivals = 1
-				ai = no
+				OR = {
+					war = yes
+					num_of_rivals >= 1
+				}
 			}
-
-			is_devil_worshiper_trigger = yes
-			society_rank > 1
-			#NOT = { character = FROM }
 		}
 
 		potential = {
-			NOT = { character = FROM }
+			# Ai requirements
+			trigger_if = {
+				limit = { FROM = { ai = yes } }
 
-			OR = {
+				same_realm = FROM
+				character_disease_trigger = yes
+
+				# Makes sure the AI does good choices
+				OR = {
+					is_foe = FROM
+					war_with = FROM
+					holds_favor_on = FROM
+
+					# Unfaithful spouse
+					any_spouse = {
+						character = FROM
+
+						any_lover = {
+							NOT = { character = FROM }
+						}
+					}
+
+					any_lover = {
+						OR = {
+							is_married = FROM # Lover of my spouse
+							is_lover = FROM # Lover of my lover
+						}
+					}
+				}
+
 				NOR = {
-					character_disease_trigger = yes
 					has_character_flag = developing_illness
 					has_character_flag = disease_not_serious
-				}
-				FROM = {
-					ai = no
-				}
-			}
-
-			OR = {
-				NOT = {
 					has_character_modifier = curse_cooldown_timer
 				}
-				FROM = {
-					ai = no
-				}
 			}
-
-			OR = {
-				AND = {
-					FROM = { ai = no }
-					is_within_diplo_range = FROM
-				}
-				AND = {
-					FROM = { ai = yes }
-					same_realm = FROM
-				}
-			}
-
-			#Makes sure the AI does good choices
-			OR = {
-				FROM = { ai = no }
-				is_foe = FROM
-				war_with = FROM
-				holds_favor_on = FROM
-				any_spouse = { #Unfaithful spouse
-					character = FROM
-					any_lover = { NOT = { character = FROM } }
-				}
-				any_lover = { any_spouse = { character = FROM } } #Lover of spouse
-				any_lover = { any_lover = { character = FROM } } #Lover of lover
+			# Player requirements
+			trigger_else = {
+				is_within_diplo_range = FROM
 			}
 		}
 
@@ -147,17 +141,16 @@ targeted_decisions = {
 
 			custom_tooltip = {
 				text = the_devil_worshipers_tainted_touch_allow_2_tt
-				hidden_tooltip = {
-					NOT = {
-						has_character_modifier = curse_cooldown_timer
-					}
-				}
+
+				NOT = { has_character_modifier = curse_cooldown_timer }
 			}
 
 			custom_tooltip = {
 				text = the_devil_worshipers_tainted_touch_allow_tt
+
+				character_disease_trigger = no
+
 				NOR = {
-					character_disease_trigger = yes
 					has_character_flag = developing_illness
 					has_character_flag = disease_not_serious
 				}
@@ -166,23 +159,32 @@ targeted_decisions = {
 
 		effect = {
 			FROM = { increase_visibility_effect = yes }
+
 			hidden_tooltip = {
 				add_character_modifier = {
 					name = curse_cooldown_timer
-					hidden = yes
 					years = 10
+					hidden = yes
 				}
 			}
+
 			custom_tooltip = {
 				text = the_devil_worshipers_tainted_touch_tooltip
 
 				if = {
 					limit = { has_dlc = "Reapers" }
-					character_event = { id = MNM.7819 days = 3 }
+
+					character_event = {
+						id = MNM.7819
+						days = 3
+					}
 				}
-				if = {
-					limit = { NOT = { has_dlc = "Reapers" } }
-					character_event = { id = MNM.7819 days = 14 random = 14 }
+				else = {
+					character_event = {
+						id = MNM.7819
+						days = 14
+						random = 14
+					}
 				}
 			}
 
@@ -192,14 +194,12 @@ targeted_decisions = {
 			}
 		}
 
-
 		ai_will_do = {
 			factor = 1
 		}
 	}
 
-
-	#Power: dark divorce
+	# Power: dark divorce
 	devil_worshipers_dark_divorce = {
 		is_in_society = yes
 
@@ -217,52 +217,60 @@ targeted_decisions = {
 
 		potential = {
 			ai = yes
-			any_spouse = { character = FROM }
+			is_within_diplo_range = FROM
+			is_married = FROM
 			NOT = { has_character_flag = being_dark_divorced }
 
-			is_within_diplo_range = FROM
+			# Reasons allowing dark divorce for ai
+			trigger_if = {
+				limit = { FROM = { ai = yes } }
 
-			#Reasons allowing dark divorce for ai
-			OR = {
-				FROM = { ai = no }
-				NOT = {
+				OR = {
 					reverse_opinion = {
 						who = FROM
-						value = 0
+						value < 0
 					}
-				}
-				is_rival = FROM
-				has_character_modifier = adulterer
-				has_character_modifier = adulteress
-				has_character_modifier = incestuous_adulterer
-				has_character_modifier = incestuous_adulteress
-				AND = {
-					FROM = { is_ruler = yes }
-					is_female = yes
-					OR = {
-						age = 45
-						NOT = { fertility = 0.3 }
-					}
-					FROM = { current_heir = { dynasty = FROM } }
-				}
-				trait = lunatic
-				trait = possessed
-				trait = cruel
-				is_any_kinslayer_trigger = yes
-				trait = cannibal_trait
-				AND = {
-					trait = wroth
-					trait = drunkard
-				}
-				AND = {
-					trait = zealous
-					is_devil_worshiper_trigger = no
-				}
-			}
 
-			#Stopping the ai from making stupid choices
-			OR = {
-				FROM = { ai = no }
+					trigger_if = {
+						limit = { FROM = { is_ruler = yes } }
+
+						is_female = yes
+
+						FROM = {
+							current_heir = {
+								dynasty = FROM
+							}
+						}
+
+						OR = {
+							age >= 45
+							fertility < 0.30
+						}
+					}
+
+					is_rival = FROM
+					has_character_modifier = adulterer
+					has_character_modifier = adulteress
+					has_character_modifier = incestuous_adulterer
+					has_character_modifier = incestuous_adulteress
+					is_any_kinslayer_trigger = yes
+					trait = lunatic
+					trait = possessed
+					trait = cruel
+					trait = cannibal_trait
+
+					AND = {
+						trait = wroth
+						trait = drunkard
+					}
+
+					AND = {
+						trait = zealous
+						is_devil_worshiper_trigger = no
+					}
+				}
+
+				# Stopping the ai from making stupid choices
 				NOR = {
 					is_friend = FROM
 					is_lover = FROM
@@ -273,101 +281,123 @@ targeted_decisions = {
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = recently_did_dark_divorce }
 				has_society_currency_minor_trigger = yes
+				NOT = { has_character_modifier = recently_did_dark_divorce }
 			}
 		}
 
 		effect = {
-			FROM = { increase_visibility_effect = yes }
-			set_character_flag = being_dark_divorced
 			FROM = {
+				increase_visibility_effect = yes
+
 				add_character_modifier = {
 					name = recently_did_dark_divorce
 					years = 2
 				}
 			}
+
 			hidden_effect = {
-				character_event = { id = MNM.7800 days = 1 }
+				set_character_flag = being_dark_divorced
+
+				character_event = {
+					id = MNM.7800
+					days = 1
+				}
 			}
 		}
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.01 # slow down
-			}
-			modifier = {
+			factor = 0.01
+
+			mult_modifier = {
 				factor = 0.5
 				FROM = { is_benevolent_trigger = yes }
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 100
 				FROM = { is_evil_trigger = yes }
 			}
-			modifier = {
-				is_heir = yes
+
+			mult_modifier = {
 				factor = 0.01
+				is_heir = yes
 			}
 		}
 	}
+
 }
 
 title_decisions = {
-	#Execute desecrate temple mission
 
+	# Execute desecrate temple mission
 	devil_worshiper_desecrate_temple_decision = {
-		only_playable = yes
-
 		ai_target_filter = realm_owned
 		ai_check_interval = 12
 
+		only_playable = yes
+		is_in_society = yes
+
 		from_potential = {
+			has_dlc = "Mystics"
+			is_devil_worshiper_trigger = yes
+			has_quest = quest_devil_worshipers_desecrate_temple
 			prisoner = no
 			is_incapable = no
-			has_dlc = "Mystics"
-			has_quest = quest_devil_worshipers_desecrate_temple
 			NOT = { has_character_flag = desecration_in_progress }
-			is_devil_worshiper_trigger = yes
 		}
 
 		potential = {
-			OR = {
-				tier = BARON
-				tier = COUNT
-			}
+			lower_tier_than = DUKE
+
 			OR = {
 				is_quest_target_of = FROM
-				location = { capital_holding = { is_quest_target_of = FROM } }
+
+				location = {
+					capital_holding = {
+						is_quest_target_of = FROM
+					}
+				}
 			}
-			FROM = { NOT = { has_character_flag = desecration_in_progress } }
+
+			FROM = {
+				NOT = { has_character_flag = desecration_in_progress }
+			}
 		}
 
 		allow = {
 			FROM = { has_quest = quest_devil_worshipers_desecrate_temple }
+
 			OR = {
 				is_quest_target_of = FROM
-				location = { capital_holding = { is_quest_target_of = FROM } }
+
+				location = {
+					capital_holding = {
+						is_quest_target_of = FROM
+					}
+				}
 			}
 		}
 
 		effect = {
 			FROM = {
 				increase_visibility_minor_effect = yes
+
 				custom_tooltip = {
 					text = devil_worshiper_desecrate_temple_decision_tt
+
+					set_character_flag = desecration_in_progress
 				}
-				set_character_flag = desecration_in_progress
 
 				ROOT = {
 					if = {
-						limit = {
-							owner = { character = FROM }
-						}
+						limit = { holder = FROM }
+
 						add_holding_modifier = {
 							name = desecrated_temple
 							years = 5
 						}
+
 						FROM = {
 							sound_effect = devil_worshippers_desecrate_temple
 							clr_quest = quest_devil_worshipers_desecrate_temple
@@ -375,25 +405,36 @@ title_decisions = {
 							break = yes
 						}
 					}
+					else = {
+						hidden_effect = {
+							FROM = {
+								character_event = {
+									id = MNM.7112
+									days = 7
+								}
+							}
+						}
+					}
 				}
-				hidden_effect = { character_event = { id = MNM.7112 days = 7 } }
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}
 	}
+
 }
 
 society_decisions = {
 	#Power: Invite disciple of devil
 	devil_worshipers_invite_disciple_of_devil = {
-		only_playable = yes
+		ai = no
 
 		potential = {
 			has_dlc = "Mystics"
-			society_rank >= 3
 			is_devil_worshiper_trigger = yes
+			society_rank >= 3
 			NOT = { has_character_flag = disciple_arriving }
 		}
 
@@ -403,22 +444,32 @@ society_decisions = {
 		}
 
 		effect = {
-			#increase_visibility_effect = yes
+			# increase_visibility_effect = yes
 			set_character_flag = disciple_arriving
 			detract_society_currency_minor_effect = yes
 
 			custom_tooltip = {
 				text = devil_worshipers_invite_disciple_of_devil_tt
-				character_event = { id = MNM.7822 days = 7 }
+
+				character_event = {
+					id = MNM.7822
+					days = 7
+				}
 			}
 		}
+
 		ai_will_do = {
 			factor = 0
+
 		#	factor = 0.001
-		#	modifier = {
+		#
+		#	mult_modifier = {
 		#		factor = 0.1
-		#		any_courtier = { is_devil_worshiper_trigger = yes } #Less likely to invite if there is already someone else at court
+		#		any_courtier = {
+		#			is_devil_worshiper_trigger = yes # Less likely to invite if there is already someone else at court
+		#		}
 		#	}
 		}
 	}
+
 }

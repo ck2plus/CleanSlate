@@ -1,64 +1,60 @@
 decisions = {
 
 	extort_subjects = {
-		only_playable = yes
 		is_high_prio = yes
 		ai_check_interval = 12
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
 			has_ambition = obj_build_a_war_chest
 			is_tribal = no
 			is_merchant_republic = no
 		}
+
 		allow = {
 			prisoner = no
-			NOR = {
-				is_incapable = yes
-				is_inaccessible_trigger = yes
-			}
-			#war = no
+			is_incapable = no
+			is_inaccessible_trigger = no
+
 			custom_tooltip = {
 				text = extort_cooldown_custom_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_modifier = extort_timer }
-				}
+
+				NOT = { has_character_modifier = extort_timer }
 			}
 		}
+
 		effect = {
 			custom_tooltip = {
 				text = extort_consequences_custom_tooltip
-				hidden_tooltip = {
-					add_character_modifier = {
-					   modifier = extort_timer
-					   months = 6
-					   hidden = yes
-					}
-					character_event = {	id = ZE.21000 }
+
+				add_character_modifier = {
+				   modifier = extort_timer
+				   months = 6
+				   hidden = yes
 				}
+
+				character_event = {	id = ZE.21000 }
 			}
 		}
+
 		ai_will_do = {
-			factor = 1
+			factor = 0.1
 
-			modifier = {
-				factor = 0.1
-				always = yes
+			trigger = {
+				NAND = {
+					trait = kind
+					trait = just
+					trait = charitable
+				}
 			}
 
-			modifier = {
-				factor = 0
-				trait = kind
-				trait = just
-				trait = charitable
-			}
-
-			modifier = {
+			mult_modifier = {
 				factor = 0.2
 				any_liege = { ai = no }
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.2
 				OR = {
 					AND = {
@@ -76,43 +72,43 @@ decisions = {
 				}
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 5
-				NOT = { wealth = 0 }
+				wealth < 0
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
-				NOT = { wealth = 100 }
 				independent = yes
+				wealth < 100
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = patient
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 3
 				trait = greedy
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = cruel
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = arbitrary
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = stressed
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.5
 				trait = kind
 				NOR = {
@@ -121,7 +117,7 @@ decisions = {
 				}
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.5
 				trait = just
 				NOR = {
@@ -130,7 +126,7 @@ decisions = {
 				}
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.5
 				trait = charitable
 				NOR = {
@@ -139,7 +135,7 @@ decisions = {
 				}
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.5
 				trait = content
 			}
@@ -147,103 +143,99 @@ decisions = {
 	}
 
 	donate_to_liege = {
-		only_playable = yes
 		is_high_prio = yes
 		ai_check_interval = 10
 
+		only_playable = yes
+
 		potential = {
-			is_playable = yes
 			liege = { has_ambition = obj_build_a_war_chest }
 			NOT = { has_ambition = obj_build_a_war_chest }
 			higher_tier_than = BARON
 		}
+
 		allow = {
 			prisoner = no
-			NOR = {
-				is_incapable = yes
-				is_inaccessible_trigger = yes
-			}
+			is_incapable = no
+			is_inaccessible_trigger = no
+
 			war = no
-			#liege = { war = no }
-			wealth = 200
-			NOT = { liege = { owes_favor_to = ROOT } }
+			wealth >= 200
+
+			NOT = { holds_favor_on = liege }
+
 			custom_tooltip = {
 				text = donation_cooldown_custom_tooltip
-				hidden_tooltip = {
-					NOT = { has_character_modifier = donation_offer_timer }
-				}
+
+				NOT = { has_character_modifier = donation_offer_timer }
 			}
 		}
+
 		effect = {
+			wealth = -200
+
 			custom_tooltip = {
 				text = offer_donation_custom_tooltip
-				hidden_tooltip = {
-					add_character_modifier = {
-					   modifier = donation_offer_timer
-					   years = 5
-					   hidden = yes
+
+				add_character_modifier = {
+				   modifier = donation_offer_timer
+				   years = 5
+				   hidden = yes
+				}
+
+				liege = {
+					character_event = {
+						id = ZE.22000
+						days = 5
 					}
-					liege = { character_event = { id = ZE.22000 days = 5 } }
 				}
 			}
-			wealth = -200
 		}
+
 		ai_will_do = {
-			factor = 1
+			factor = 0.1
 
-			modifier = {
-				factor = 0.1
-				always = yes
+			trigger = {
+				opinion = {
+					who = liege
+					value > 25
+				}
+				wealth >= 300
+
+				NOR = {
+					is_rival = liege
+					trait = greedy
+				}
 			}
 
-			modifier = {
-				factor = 0
-				trait = greedy
-			}
-
-			modifier = {
-				factor = 0
-				NOT = { opinion = { who = LIEGE value = 25 } }
-			}
-
-			modifier = {
-				factor = 0
-				is_rival = LIEGE
-			}
-
-			modifier = {
-				factor = 0
-				NOT = { wealth = 300 }
-			}
-
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				is_councillor = yes
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = charitable
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
-				wealth = 600
+				wealth >= 600
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
-				wealth = 800
+				wealth >= 800
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
-				wealth = 1000
+				wealth >= 1000
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 10
-				is_friend = LIEGE
+				is_friend = liege
 			}
 		}
 	}
