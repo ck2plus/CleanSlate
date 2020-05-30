@@ -25,13 +25,16 @@ claim = {
 			# gender requirements
 			trigger_if = {
 				limit = { is_female = yes }
-				NOR = {
-					religion_group = muslim
-					has_religion_feature = religion_patriarchal
+				OR = {
+					is_ruler = yes
+					FROM = { NOT = { has_law = agnatic_succession } }
 				}
 			}
 			trigger_else = {
-				NOT = { has_religion_feature = religion_matriarchal }
+				OR = {
+					is_ruler = yes
+					FROM = { NOT = { has_law = enatic_succession } }
+				}
 			}
 
 			trigger_if = {
@@ -43,33 +46,43 @@ claim = {
 				}
 				has_weak_claim = PREV
 
-				PREV = { # claimed title
+				PREV = { # Claimed Title
 					trigger_if = {
 						limit = {
-							is_pretender = no # Checks vs ROOT character
-							is_contested = no # Already being contested in some war
-							holder_scope = { has_regent = no }
-						}
-						ROOT = { # attacking claimant
-							trigger_if = {
-								limit = { is_female = yes }
-
-								has_law = status_of_women_4
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_equal
-								has_religion_feature = religion_feature_bon
+							OR = {
+								is_pretender = no # Checks vs ROOT character
+								is_contested = no # Already being contested in some war
+								holder_scope = { has_regent = no }
 							}
 						}
-						holder_scope = { # title holder
-							is_female = yes
-							NOR = {
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_equal
-								has_religion_feature = religion_feature_bon
-								has_law = status_of_women_4
-								has_game_rule = {
-									name = gender
-									value = all
+
+						trigger_if = {
+							limit = {
+								NOT = {
+									has_game_rule = {
+										name = gender
+										value = all
+									}
+								}
+							}
+							ROOT = { # attacking claimant
+								trigger_if = {
+									limit = { is_female = yes }
+									OR = {
+										has_law = status_of_women_4
+										has_religion_feature = religion_matriarchal
+										has_religion_feature = religion_equal
+										has_religion_feature = religion_feature_bon
+									}
+								}
+							}
+							holder_scope = { # title holder
+								is_female = yes
+								NOR = {
+									has_religion_feature = religion_matriarchal
+									has_religion_feature = religion_equal
+									has_religion_feature = religion_feature_bon
+									has_law = status_of_women_4
 								}
 							}
 						}
