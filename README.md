@@ -180,7 +180,7 @@ job_marshal.txt
 job_offmap.txt
 job_spymaster.txt
 job_steward.txt
-												knights_of_st_john_events.txt
+knights_of_st_john_events.txt
 knights_templar_events.txt
 learning_scenario_events.txt
 legends_events.txt
