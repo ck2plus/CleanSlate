@@ -58,11 +58,11 @@ replace_path = "common/triggered_modifiers"
 replace_path = "common/wonder_upgrades"
 replace_path = "common/wonders"
 
-#replace_path = "decisions"
+replace_path = "decisions"
 #replace_path = "dlc_metadata"
 #replace_path = "dlc_metadata/dlc_characters"
 #replace_path = "dlc_metadata/dlc_recommendations"
-#replace_path = "events"
+replace_path = "events"
 
 #replace_path = "gfx"
 replace_path = "gfx/ambitions"

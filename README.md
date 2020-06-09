@@ -66,14 +66,14 @@ achievement_events.txt
 												adventurers_negotiation.txt
 												adventures_the_old_gods.txt
 												ambition_events.txt
-												bankruptcy_events.txt
-												bastard_events.txt
-												battle_events.txt
+bankruptcy_events.txt
+bastard_events.txt
+battle_events.txt
 												bear_events.txt
-												birth_events.txt
+birth_events.txt
 												byzantine_events.txt
-												campaign_events.txt
-												childhood_personality_traits_events.txt
+campaign_events.txt
+childhood_personality_traits_events.txt
 												chronicle_events.txt
 												civil_war_events.txt
 												cm_charlemagne_story_events.txt
@@ -102,7 +102,7 @@ achievement_events.txt
 												furusiyya_events.txt
 												game_rule_events.txt
 												gbc_events.txt
-												guardian_events.txt
+guardian_events.txt
 												hashshashin_order_events.txt
 												health_events.txt
 												hedge_knights_events.txt
@@ -266,10 +266,9 @@ lovers_events.txt
 												soa_various_events.txt
 												summer_fair_events.txt
 												sunset_invasion.txt
-												test_events.txt
 												teutonic_order_events.txt
 												tournament_events.txt
-												trait_notification.txt
+trait_notification.txt
 												traits_effects_events.txt
 												trans_saharan_trade_events.txt
 												tutorial_events.txt
