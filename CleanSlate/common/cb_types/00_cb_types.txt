@@ -369,24 +369,19 @@ other_claim = {
 				limit = { is_female = yes }
 
 				NOR = {
-					religion_group = muslim
-					has_religion_feature = religion_patriarchal
-
-					PREV = { # claimed title
-						succ_law_title = {
-							has_law = agnatic_succession
-						}
+					has_law = agnatic_succession
+					FROMFROM = { has_law = agnatic_succession }
+					PREV = { # Claimed Title
+						succ_law_title = { has_law = agnatic_succession }
 					}
 				}
 			}
 			trigger_else = {
 				NOR = {
-					has_religion_feature = religion_matriarchal
-
-					PREV = { # claimed title
-						succ_law_title = {
-							has_law = enatic_succession
-						}
+					has_law = enatic_succession
+					FROMFROM = { has_law = enatic_succession }
+					PREV = {
+						succ_law_title = { has_law = enatic_succession }
 					}
 				}
 			}
@@ -528,6 +523,8 @@ other_claim = {
 	# FROM is defender
 	# FROMFROM is attacker
 	on_success_title = {
+		log = "[FromFrom.GetBestName] (ID: [FromFrom.GetID]) succeeded with their war for [Root.GetBestName]'s (ID: [Root.GetID]) claim on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		hidden_effect = {
 			ROOT = {
 				show_scope_change = no
@@ -596,14 +593,14 @@ other_claim = {
 
 				ROOT = {
 					OR = {
-						AND = {
-							is_ruler = yes
-							is_vassal_or_below_of = FROMFROM
-						}
 						PREV = {
 							de_jure_liege_or_above = FROMFROM
 						}
 						dynasty = FROMFROM
+						trigger_if = {
+							limit = { is_ruler = yes }
+							is_vassal_or_below_of = FROMFROM
+						}
 					}
 				}
 			}
@@ -728,6 +725,10 @@ other_claim = {
 			limit = { NOT = { character = defender } }
 			hidden_effect = { participation_scaled_prestige = 100 }
 		}
+	}
+
+	on_invalidation = {
+		log = "CB(other_claim): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
 	}
 
 	# Starting scope is attacker
