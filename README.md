@@ -1,10 +1,311 @@
 CleanSlate
 
-===Completed Decision Files===
+=== Complete 									===	Incomplete
 conversion_decisions.txt
 councillor_decision.txt
 dynasty_decisions.txt
 employment_decisions.txt
+faction_decisions.txt
+fort_decisions.txt
+HF_baptism_decisions.txt
+HF_bloodline_decisions.txt
+HF_coronation_decisions.txt
+HF_realm_decisions.txt
+HF_religious_decisions.txt
+HF_sway_antagonize_decisions.txt
+hf_warrior_lodge_decisions.txt
+HFP_crusades.txt
+HFP_holy_order_decisions.txt
+HFP_minor_decisions.txt
+HFP_realm_decisions.txt
+HL_clan_decisions.txt
+HL_decisions.txt
+HL_mercenary_decisions.txt
+HL_title_decisions.txt
+holy_order_decisions.txt
+hospital_decisions.txt
+indian_holy_order_decisions.txt
+jd_bon_decisions.txt
+jd_decisions.txt
+jd_grace_decisions.txt
+jd_jewish_decisions.txt
+jd_taoist_decisions.txt
+jd_zoroastrian_decisions.txt
+lifestyle_decisions.txt
+LT_936_decisions.txt
+LT_decisions.txt
+minor_decisions.txt
+mnm_devil_worshipers_decisions.txt
+mnm_hermetics_decisions.txt
+mnm_monastic_order_decisions.txt
+mnm_secret_religious_societies_decisions.txt
+mnm_society_decisions.txt
+norse_minor_decisions.txt
+plot_decisions.txt
+realm_decisions.txt
+religious_decisions.txt
+rip_torture_decisions.txt
+rip_various_decisions.txt
+settlement_decisions.txt
+sunset_invasion.txt
+title_decisions.txt
+trade_post_decisions.txt
+unit_decisions.txt
+vassal_decisions.txt
+way_of_life_decisions.txt
+wonder_decisions.txt
+ze_ambition_decisions.txt
+ze_decisions.txt
+ze_war_chest.txt
 
-===Completed Event Files===
+
+
+
+=== Complete									=== Incomplete
 achievement_events.txt
+												adventurers_negotiation.txt
+												adventures_the_old_gods.txt
+												ambition_events.txt
+bankruptcy_events.txt
+bastard_events.txt
+battle_events.txt
+												bear_events.txt
+birth_events.txt
+												byzantine_events.txt
+campaign_events.txt
+childhood_personality_traits_events.txt
+												chronicle_events.txt
+												civil_war_events.txt
+												cm_charlemagne_story_events.txt
+												cm_culture_conversion_events.txt
+												cm_major_events.txt
+												cm_misc_zun_events.txt
+												cm_murder_plot_events.txt
+												cm_religious_events.txt
+												cm_various_events.txt
+												councillor_events.txt
+												court_events.txt
+												critical_events.txt
+												crusade_events.txt
+												culture_conversion_events.txt
+												decadence_events.txt
+												dutch_renaming_events.txt
+												dynasty_events.txt
+												emperor_ticket_easter_eggs.txt
+												evil_events.txt
+												family_events.txt
+												fatwa_events.txt
+												feast_events.txt
+												female_councillor_events.txt
+												feudal_life_events.txt
+												friends_rivals_events.txt
+												furusiyya_events.txt
+												game_rule_events.txt
+												gbc_events.txt
+guardian_events.txt
+												hashshashin_order_events.txt
+												health_events.txt
+												hedge_knights_events.txt
+												hf_african_flavor_events.txt
+												HF_alternate_start_events.txt
+												HF_ancestor_worship_events.txt
+												HF_antagonize_events.txt
+												HF_baptism_events.txt
+												HF_battle_events.txt
+												HF_bloodline_acquisition_events.txt
+												HF_bloodline_events.txt
+												HF_childrens_crusade_events.txt
+												HF_coronation_events.txt
+												HF_crusade_events.txt
+												HF_reconquista_events.txt
+												HF_religious_events.txt
+												HF_saint_flavour_events.txt
+												HF_sainthood_events.txt
+												HF_saintly_bloodlines_events.txt
+												HF_saintly_pilgrimage_events.txt
+												HF_sway_additional_events.txt
+												HF_sway_events.txt
+												HF_tribal_events.txt
+												HF_warrior_lodge_child_events.txt
+												hf_warrior_lodge_events.txt
+												HF_warrior_lodge_feast_events.txt
+												HF_warrior_lodge_flavor_events.txt
+												hf_warrior_lodge_legends_events.txt
+												HF_warrior_lodge_mission_events.txt
+												HF_warrior_lodge_powers_events.txt
+												hf_warrior_lodge_war_aid_events.txt
+												HF_warrior_lodges_hunting_events.txt
+												HFP_crusade_events.txt
+												HFP_crusade_flavour.txt
+												hfp_duel_events.txt
+												HFP_eldership_events.txt
+												HFP_health_events.txt
+												HFP_holy_order_events.txt
+												HFP_pregnancy_events.txt
+												HFP_random_flavor_events.txt
+												HFP_realm_events.txt
+												HFP_religious_events.txt
+												hippodrome_events.txt
+												hl_extra_events.txt
+												hl_horse_events.txt
+												hl_horse_events_2.txt
+												hl_mercenary_events.txt
+												hl_misc_events.txt
+												hl_nomad_events.txt
+												hl_raiding_adventurers_events.txt
+												hl_silk_route_events.txt
+												hl_tournament_events.txt
+												hl_wolf_events.txt
+												hunting_events.txt
+												imprisoned_events.txt
+												indian_holy_order_events.txt
+												indian_pilgrim_events.txt
+												interesting_muslims.txt
+												jd_artifact_events.txt
+												jd_CB_events.txt
+												jd_china_succession_events.txt
+												jd_chinese_diplomacy_events.txt
+												jd_chinese_invasion_events.txt
+												jd_chinese_status_and_policy_events.txt
+												jd_chinese_war_events.txt
+												jd_grace_decision_events.txt
+												jd_kowtow_events.txt
+												jd_muslim_adventurers.txt
+												jd_radhanite_events.txt
+												jd_raiding_china.txt
+job_chancellor.txt
+job_flavour_events.txt
+job_lord_spiritual.txt
+job_marshal.txt
+job_offmap.txt
+job_spymaster.txt
+job_steward.txt
+knights_of_st_john_events.txt
+knights_templar_events.txt
+learning_scenario_events.txt
+legends_events.txt
+lifestyle_event.txt
+lovers_events.txt
+												LT_936_events.txt
+												LT_court_maintenance_events.txt
+												LT_featured_ruler.txt
+												LT_war_events.txt
+												LT_wonder_flavor_event_2.txt
+												LT_wonder_flavor_events.txt
+												LT_wonder_maintenance_events.txt
+												married_life_events.txt
+												misc_old_gods_events.txt
+												mnm_artifacts_events.txt
+												mnm_assassins_events.txt
+												mnm_devil_worshipers_events.txt
+												mnm_grand_debate_events.txt
+												mnm_hermetics_events.txt
+												mnm_misc_events.txt
+												mnm_monastic_orders_events.txt
+												mnm_secret_religious_societies_events.txt
+												mongol_events.txt
+												mourning_events.txt
+												muslim_honorary_titles_events.txt
+												muslim_religion_events.txt
+												news_flavor_events.txt
+												norse_flavor_events.txt
+												oldgods_ancestor_worship_events.txt
+												oldgods_blot_events.txt
+												oldgods_culture_conversion.txt
+												oldgods_historical_events.txt
+												oldgods_holmgang_events.txt
+												oldgods_mongol_events.txt
+												oldgods_pagan_feasts.txt
+												oldgods_runestone_events.txt
+												oldgods_various_events.txt
+												oldgods_zoroastrian_events.txt
+												on_action_events.txt
+												on_hajj.txt
+												personality_traits_events.txt
+												pet_events.txt
+												pilgrim_events.txt
+												plot_events.txt
+												polygamy_events.txt
+												pope_free_investiture.txt
+												province_lordship_events.txt
+												ramadan_events.txt
+												rebel_events.txt
+												rebel_events_horse_lords.txt
+												rebel_events_the_old_gods.txt
+												regency_events.txt
+												religious_events.txt
+												republic_dynastic_feuds.txt
+												republic_trade_events.txt
+												rip_dancing_plague_events.txt
+												rip_eod_events.txt
+												rip_epidemic_events.txt
+												rip_eternal_life_events.txt
+												rip_flavor_events.txt
+												rip_hospital_events.txt
+												rip_maimed_events.txt
+												rip_outbreak_events.txt
+												rip_physician_events.txt
+												rip_prosperity_events.txt
+												rip_seclusion_events.txt
+												rip_symptom_events.txt
+												rip_torture_events.txt
+												rip_treatment_events.txt
+												roi_feast_events.txt
+												roi_guru_events.txt
+												roi_hunting_events.txt
+												roi_various_events.txt
+												roman_events.txt
+												rumours_events.txt
+												schism_events.txt
+												siege_events.txt
+												soa_heresy_events.txt
+												soa_holy_order_events.txt
+												soa_jewish_events.txt
+												soa_misc_religious_events.txt
+												soa_muslim_schools.txt
+												soa_various_events.txt
+												summer_fair_events.txt
+												sunset_invasion.txt
+												teutonic_order_events.txt
+												tournament_events.txt
+trait_notification.txt
+												traits_effects_events.txt
+												trans_saharan_trade_events.txt
+												tutorial_events.txt
+												various_notification_events.txt
+												various_traits_events.txt
+												vassal_request_events.txt
+												ward_events.txt
+												wol_business_events.txt
+												wol_carousing_events.txt
+												wol_family_events.txt
+												wol_hunting_events.txt
+												wol_intrigue_events.txt
+												wol_lover_events.txt
+												wol_rulership_events.txt
+												wol_scholarship_events.txt
+												wol_seduction_events.txt
+												wol_theology_events.txt
+												wol_war_events.txt
+												ze_adolescence_events.txt
+												ze_alliance_events.txt
+												ze_alliance_events_2.txt
+												ze_ambition_events.txt
+												ze_ambition_events_2.txt
+												ze_chancellor_events.txt
+												ze_childhood_events.txt
+												ze_council_events_steward.txt
+												ze_education_trait_events.txt
+												ze_extra_events.txt
+												ze_favor_events.txt
+												ze_introduce_heir.txt
+												ze_lord_spiritual_events.txt
+												ze_lunatic.txt
+												ze_marshal_events.txt
+												ze_mercenary_events.txt
+												ze_mercenary_events_02.txt
+												ze_spymaster_events.txt
+												ze_various_events.txt
+												ze_war_chest_extortion.txt
+												ze_war_chest_passive.txt
+												zoroastrian_holy_pets.txt
