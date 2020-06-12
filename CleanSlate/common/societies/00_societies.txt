@@ -18,18 +18,20 @@ hermetics = {
 	}
 
 	show_society = {
-		OR = {
-			has_religion_feature = religion_astrology
-			religion_group = christian
-			religion_group = muslim
-			religion_group = jewish_group
-			religion_group = zoroastrian_group
-			religion = zun_pagan
-			religion = zun_pagan_reformed
-			religion = hellenic_pagan
-			religion = hellenic_pagan_reformed
-			religion = taoist
-			society_member_of = hermetics
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = hermetics }
+			}
+			OR = {
+				has_religion_feature = religion_astrology
+				religion_group = christian
+				religion_group = jewish_group
+				religion_group = muslim
+				religion_group = zoroastrian_group
+				religion = taoist
+				religion_openly_zun_or_reformed_trigger = yes
+				religion_openly_hellenic_or_reformed_trigger = yes
+			}
 		}
 	}
 
@@ -45,54 +47,40 @@ hermetics = {
 			}
 		}
 
-		hidden_trigger = {
-			OR = {
-				is_landed = yes
+		trigger_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			learning >= 10
+
+			mercenary = no
+			is_nomadic = no
+			is_tribal = no
+
+			trigger_if = {
+				limit = { is_landed = no }
 				is_patrician = yes
 			}
-			mercenary = no
-			NOT = { has_character_flag = society_join_block }
-		}
 
-		is_adult = yes
-		learning >= 10
+			OR = {
+				has_religion_feature = religion_astrology
+				religion_group = christian
+				religion_group = muslim
+				religion_group = jewish_group
+				religion_group = zoroastrian_group
+				religion = taoist
 
-		OR = {
-			has_religion_feature = religion_astrology
-			religion_group = christian
-			religion_group = muslim
-			religion_group = jewish_group
-			religion_group = zoroastrian_group
-
-			custom_tooltip = {
-				text = zunist_hermetic_join_tooltip
-
-				OR = {
-					religion = zun_pagan
-					religion = zun_pagan_reformed
+				custom_tooltip = {
+					text = zunist_hermetic_join_tooltip
+					religion_openly_zun_or_reformed_trigger = yes
+				}
+				custom_tooltip = {
+					text = hellenic_hermetic_join_tooltip
+					religion_openly_hellenic_or_reformed_trigger = yes
 				}
 			}
-
-			custom_tooltip = {
-				text = hellenic_hermetic_join_tooltip
-
-				OR = {
-					religion = hellenic_pagan
-					religion = hellenic_pagan_reformed
-				}
-			}
-
-			religion = taoist
-		}
-
-		NOR = {
-			is_nomadic = yes
-			is_tribal = yes
-		}
-
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
 		}
 	}
 
