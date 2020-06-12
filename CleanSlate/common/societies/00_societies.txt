@@ -66,11 +66,12 @@ hermetics = {
 
 			OR = {
 				has_religion_feature = religion_astrology
+
+				religion = taoist
 				religion_group = christian
 				religion_group = muslim
 				religion_group = jewish_group
 				religion_group = zoroastrian_group
-				religion = taoist
 
 				custom_tooltip = {
 					text = zunist_hermetic_join_tooltip
@@ -296,15 +297,13 @@ hermetics = {
 			}
 
 			OR = {
-				religion_group = christian
-				religion_group = muslim
-				religion_group = jewish_group
-				religion_group = zoroastrian_group
-				religion = zun_pagan
-				religion = zun_pagan_reformed
-				religion = hellenic_pagan
-				religion = hellenic_pagan_reformed
 				religion = taoist
+				religion_group = christian
+				religion_group = jewish_group
+				religion_group = muslim
+				religion_group = zoroastrian_group
+				religion_openly_hellenic_or_reformed_trigger = yes
+				religion_openly_zun_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -330,44 +329,30 @@ the_assassins = {
 	}
 
 	show_society = {
-		OR = {
-			society_member_of = the_assassins # You can always see the society you are a part of
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = the_assassins }
+			}
+			is_adult = yes
 
-			AND = {
-				OR = {
-					religion_group = muslim
-					secret_religion = shiite
-
-					trigger_if = {
-						limit = { ai = no }
-
-						NOT = { trait = zealous }
-
-						any_playable_ruler = {
-							religion = shiite
-
-							distance_from_realm = {
-								who = ROOT
-								value < 300
-							}
-						}
-					}
-				}
-
-				is_adult = yes
+			OR = {
+				religion_group = muslim
+				secret_religion = shiite
 
 				trigger_if = {
-					limit = { is_female = yes }
-					OR = {
-						has_game_rule = {
-							name = gender
-							value = all
-						}
-						has_religion_feature = religion_matriarchal
+					limit = {
+						ai = no
+						NOT = { trait = zealous }
 					}
-				}
-				trigger_else = {
-					NOT = { has_religion_feature = religion_matriarchal }
+
+					any_playable_ruler = {
+						religion = shiite
+
+						distance_from_realm = {
+							who = ROOT
+							value < 300
+						}
+					}
 				}
 			}
 		}
@@ -385,62 +370,12 @@ the_assassins = {
 			}
 		}
 
-		is_adult = yes
-
-		OR = {
-			true_religion = shiite
-			religion_group = muslim
-
-			AND = {
-				trait = sympathy_islam
-				trait = deceitful
-				NOT = { trait = zealous }
-
-				OR = {
-					trait = schemer
-					trait = elusive_shadow
-					intrigue >= 18
-				}
-			}
-
-			trigger_if = {
-				limit = { ai = no }
-
-				NOT = { trait = zealous }
-
-				any_playable_ruler = {
-					religion = shiite
-
-					distance_from_realm = {
-						who = ROOT
-						value < 300
-					}
-				}
-			}
-		}
-
 		trigger_if = {
-			limit = { is_female = yes }
-
-			OR = {
-				has_game_rule = {
-					name = gender
-					value = all
-				}
-				has_religion_feature = religion_matriarchal
-			}
+			limit = { has_character_flag = society_join_block }
+			always = no
 		}
 		trigger_else = {
-			NOT = { has_religion_feature = religion_matriarchal }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
-		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			has_assassins_prerequisites = yes
 		}
 	}
 
@@ -448,6 +383,9 @@ the_assassins = {
 		OR = {
 			religion = shiite
 			secret_religion = shiite
+			# Added this for consistency with the above
+			religion_group = muslim
+			trait = sympathy_islam
 		}
 	}
 
@@ -458,8 +396,10 @@ the_assassins = {
 
 		modifier = {
 			is_visible = {
-				OR = {
-					society_member_of = the_assassins
+				trigger_if = {
+					limit = {
+						NOT = { society_member_of = the_assassins }
+					}
 					FROM = { is_society_discovered = yes }
 				}
 			}
@@ -482,8 +422,10 @@ the_assassins = {
 
 		modifier = {
 			is_visible = {
-				OR = {
-					society_member_of = the_assassins
+				trigger_if = {
+					limit = {
+						NOT = { society_member_of = the_assassins }
+					}
 					FROM = { is_society_discovered = yes }
 				}
 			}
@@ -506,8 +448,10 @@ the_assassins = {
 
 		modifier = {
 			is_visible = {
-				OR = {
-					society_member_of = the_assassins
+				trigger_if = {
+					limit = {
+						NOT = { society_member_of = the_assassins }
+					}
 					FROM = { is_society_discovered = yes }
 				}
 			}
@@ -531,8 +475,10 @@ the_assassins = {
 
 		modifier = {
 			is_visible = {
-				OR = {
-					society_member_of = the_assassins
+				trigger_if = {
+					limit = {
+						NOT = { society_member_of = the_assassins }
+					}
 					FROM = { is_society_discovered = yes }
 				}
 			}
@@ -697,31 +643,15 @@ the_assassins = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			religion = shiite
 			is_adult = yes
+			true_religion = shiite
+			lower_tier_than = KING
 
-			trigger_if = {
-				limit = { is_female = yes }
+			controls_religion = no
+			mercenary = no
+			is_in_society = no
 
-				OR = {
-					has_game_rule = {
-						name = gender
-						value = all
-					}
-					has_religion_feature = religion_matriarchal
-				}
-			}
-			trigger_else = {
-				NOT = { has_religion_feature = religion_matriarchal	}
-			}
-
-			NOR = {
-				is_in_society = yes
-				higher_tier_than = DUKE
-				trait = decadent
-				mercenary = yes
-				controls_religion = yes
-			}
+			NOT = { trait = decadent }
 
 			OR = {
 				trait = zealous
@@ -733,9 +663,16 @@ the_assassins = {
 			}
 
 			trigger_if = {
-				limit = { holy_order = yes }
+				limit = { is_female = yes }
 
-				primary_title = { title = d_hashshashin }
+				has_game_rule = {
+					name = gender
+					value = all
+				}
+			}
+			trigger_if = {
+				limit = { holy_order = yes }
+				any_demesne_title = { title = d_hashshashin }
 			}
 		}
 	}
