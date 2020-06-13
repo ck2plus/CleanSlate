@@ -84,20 +84,20 @@ childhood_personality_traits_events.txt
 												cm_religious_events.txt
 												cm_various_events.txt
 												councillor_events.txt
-												court_events.txt
-												critical_events.txt
-												crusade_events.txt
+court_events.txt
+critical_events.txt
+crusade_events.txt
 												culture_conversion_events.txt
 												decadence_events.txt
 												dutch_renaming_events.txt
-												dynasty_events.txt
+dynasty_events.txt
 												emperor_ticket_easter_eggs.txt
-												evil_events.txt
-												family_events.txt
+evil_events.txt
+family_events.txt
 												fatwa_events.txt
-												feast_events.txt
+feast_events.txt
 												female_councillor_events.txt
-												feudal_life_events.txt
+feudal_life_events.txt
 												friends_rivals_events.txt
 												furusiyya_events.txt
 												game_rule_events.txt
