@@ -28,14 +28,14 @@ warrior_lodge_norse = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_norse_or_reformed_trigger = yes
+		trigger_if = {
+			limit = { NOT = { society_member_of = warrior_lodge_norse } }
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_norse_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_norse_or_reformed_trigger = yes }
@@ -43,14 +43,6 @@ warrior_lodge_norse = {
 					any_neighbor_independent_ruler = { religion_openly_norse_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_norse_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_norse
 		}
 	}
 
@@ -66,40 +58,41 @@ warrior_lodge_norse = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-
-			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+
+				NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_norse_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_norse_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				# Just here for the tooltip
+				religion_openly_norse_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -415,10 +408,11 @@ warrior_lodge_norse = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-		   	religion_openly_norse_or_reformed_trigger = yes
 			is_adult = yes
+
+			controls_religion = no
 			is_in_society = no
+			religion_openly_norse_or_reformed_trigger = yes
 
 			OR = {
 				trait = zealous
@@ -451,30 +445,24 @@ warrior_lodge_tengri = { # Also generally for Nomads
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_tengri_or_reformed_trigger = yes
-			is_nomadic = yes
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_tengri }
+			}
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_tengri_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
+					is_nomadic = yes
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_tengri_or_reformed_trigger = yes }
 					any_liege = { religion_openly_tengri_or_reformed_trigger = yes }
 					any_neighbor_independent_ruler = { religion_openly_tengri_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_tengri_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_tengri
 		}
 	}
 
@@ -490,40 +478,45 @@ warrior_lodge_tengri = { # Also generally for Nomads
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_tengri_or_reformed_trigger = yes
-			is_nomadic = yes
+			trigger_if = {
+				limit = {
+					religion_openly_tengri_or_reformed_trigger = no
+					is_nomadic = no
+				}
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				OR = {
+					religion_openly_tengri_or_reformed_trigger = yes
+					is_nomadic = yes
+				}
 			}
 		}
 	}
@@ -844,15 +837,15 @@ warrior_lodge_tengri = { # Also generally for Nomads
 	startup_populate = {
 		trigger = {
 			ai = yes
+			is_adult = yes
+
 			controls_religion = no
+			is_in_society = no
 
 			OR = {
 				religion_openly_tengri_or_reformed_trigger = yes
 				is_nomadic = yes
 			}
-
-			is_adult = yes
-			is_in_society = no
 
 			OR = {
 				trait = zealous
@@ -885,14 +878,16 @@ warrior_lodge_baltic = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_baltic_or_reformed_trigger = yes
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_baltic }
+			}
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_baltic_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_baltic_or_reformed_trigger = yes }
@@ -900,14 +895,6 @@ warrior_lodge_baltic = {
 					any_neighbor_independent_ruler = { religion_openly_baltic_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_baltic_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_baltic
 		}
 	}
 
@@ -923,40 +910,40 @@ warrior_lodge_baltic = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-
-			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_baltic_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_baltic_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				# Just here for the tooltip
+				religion_openly_baltic_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -964,7 +951,6 @@ warrior_lodge_baltic = {
 	potential = { #if you change religion or become zealous while NOT pagan, you are kicked out
 		trigger_if = {
 			limit = { religion_openly_baltic_or_reformed_trigger = no }
-
 			NOT = { trait = zealous }
 		}
 	}
@@ -1274,10 +1260,11 @@ warrior_lodge_baltic = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-		   	religion_openly_baltic_or_reformed_trigger = yes
 			is_adult = yes
+
+			controls_religion = no
 			is_in_society = no
+			religion_openly_baltic_or_reformed_trigger = yes
 
 			OR = {
 				trait = zealous
@@ -1310,14 +1297,16 @@ warrior_lodge_finnish = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_finnish_or_reformed_trigger = yes
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_finnish }
+			}
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_finnish_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_finnish_or_reformed_trigger = yes }
@@ -1325,14 +1314,6 @@ warrior_lodge_finnish = {
 					any_neighbor_independent_ruler = { religion_openly_finnish_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_finnish_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_finnish
 		}
 	}
 
@@ -1348,39 +1329,39 @@ warrior_lodge_finnish = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_finnish_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_finnish_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				# Just here for the tooltip
+				religion_openly_finnish_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -1388,7 +1369,6 @@ warrior_lodge_finnish = {
 	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
 		trigger_if = {
 			limit = { religion_openly_finnish_or_reformed_trigger = no }
-
 			NOT = { trait = zealous }
 		}
 	}
@@ -1698,9 +1678,11 @@ warrior_lodge_finnish = {
 	startup_populate = {
 		trigger = {
 			ai = yes
+			is_adult = yes
+
 			controls_religion = no
 		   	religion_openly_finnish_or_reformed_trigger = yes
-			is_adult = yes
+
 			is_in_society = no
 
 			OR = {
@@ -1734,14 +1716,16 @@ warrior_lodge_slavic = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_slavic_or_reformed_trigger = yes
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_slavic }
+			}
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_slavic_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_slavic_or_reformed_trigger = yes }
@@ -1749,14 +1733,6 @@ warrior_lodge_slavic = {
 					any_neighbor_independent_ruler = { religion_openly_slavic_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_slavic_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_slavic
 		}
 	}
 
@@ -1772,39 +1748,39 @@ warrior_lodge_slavic = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_slavic_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_slavic_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				# Just here for the tooltip
+				religion_openly_slavic_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -1812,7 +1788,6 @@ warrior_lodge_slavic = {
 	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
 		trigger_if = {
 			limit = { religion_openly_slavic_or_reformed_trigger = no }
-
 			NOT = { trait = zealous }
 		}
 	}
@@ -2122,10 +2097,12 @@ warrior_lodge_slavic = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-		   	religion_openly_slavic_or_reformed_trigger = yes
 			is_adult = yes
+
+			controls_religion = no
 			is_in_society = no
+
+		   	religion_openly_slavic_or_reformed_trigger = yes
 
 			OR = {
 				trait = zealous
@@ -2158,14 +2135,15 @@ warrior_lodge_west_african = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_west_african_or_reformed_trigger = yes
-
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_west_african }
+			}
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_west_african_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_west_african_or_reformed_trigger = yes }
@@ -2173,14 +2151,6 @@ warrior_lodge_west_african = {
 					any_neighbor_independent_ruler = { religion_openly_west_african_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_west_african_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_west_african
 		}
 	}
 
@@ -2196,39 +2166,39 @@ warrior_lodge_west_african = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_west_african_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_west_african_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				# Just here for the tooltip
+				religion_openly_west_african_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -2236,7 +2206,6 @@ warrior_lodge_west_african = {
 	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
 		trigger_if = {
 			limit = { religion_openly_west_african_or_reformed_trigger = no }
-
 			NOT = { trait = zealous }
 		}
 	}
@@ -2550,10 +2519,11 @@ warrior_lodge_west_african = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-		   	religion_openly_west_african_or_reformed_trigger = yes
 			is_adult = yes
+
+			controls_religion = no
 			is_in_society = no
+		   	religion_openly_west_african_or_reformed_trigger = yes
 
 			OR = {
 				trait = zealous
@@ -2586,14 +2556,16 @@ warrior_lodge_zun = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_zun_or_reformed_trigger = yes
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_zun }
+			}
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_zun_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_zun_or_reformed_trigger = yes }
@@ -2601,14 +2573,6 @@ warrior_lodge_zun = {
 					any_neighbor_independent_ruler = { religion_openly_zun_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_zun_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_zun
 		}
 	}
 
@@ -2624,39 +2588,39 @@ warrior_lodge_zun = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_zun_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_zun_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				# Just here for the tooltip
+				religion_openly_zun_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -2664,7 +2628,6 @@ warrior_lodge_zun = {
 	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
 		trigger_if = {
 			limit = { religion_openly_zun_or_reformed_trigger = no }
-
 			NOT = { trait = zealous }
 		}
 	}
@@ -2972,10 +2935,11 @@ warrior_lodge_zun = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-		   	religion_openly_zun_or_reformed_trigger = yes
 			is_adult = yes
+
+			controls_religion = no
 			is_in_society = no
+		   	religion_openly_zun_or_reformed_trigger = yes
 
 			OR = {
 				trait = zealous
@@ -3008,14 +2972,16 @@ warrior_lodge_bon = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_bon_or_reformed_trigger = yes
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_bon }
+			}
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_bon_or_reformed_trigger = no
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_bon_or_reformed_trigger = yes }
@@ -3023,14 +2989,6 @@ warrior_lodge_bon = {
 					any_neighbor_independent_ruler = { religion_openly_bon_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_bon_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_bon
 		}
 	}
 
@@ -3046,39 +3004,39 @@ warrior_lodge_bon = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-			hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				hidden_trigger = { NOT = { has_character_modifier = warrior_lodge_failed_joining_cd } }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_bon_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_bon_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				# Just here for the tooltip
+				religion_openly_bon_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -3086,7 +3044,6 @@ warrior_lodge_bon = {
 	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
 		trigger_if = {
 			limit = { religion_openly_bon_or_reformed_trigger = no }
-
 			NOT = { trait = zealous }
 		}
 	}
@@ -3387,7 +3344,7 @@ warrior_lodge_bon = {
 		value = 10
 
 		warrior_lodge_member_score = yes
-		
+
 		modifier = {
 			trait = kailash_guardian
 			factor = 1.1
@@ -3397,10 +3354,11 @@ warrior_lodge_bon = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-		   	religion_openly_bon_or_reformed_trigger = yes
 			is_adult = yes
+
+			controls_religion = no
 			is_in_society = no
+		   	religion_openly_bon_or_reformed_trigger = yes
 
 			OR = {
 				trait = zealous
@@ -3434,14 +3392,16 @@ warrior_lodge_hellenic = {
 	}
 
 	show_society = {
-		OR = {
-			# You are this religion: will show only this lodge (the other "show_society"'s will make sure)
-			religion_openly_hellenic_or_reformed_trigger = yes
+		trigger_if = {
+			limit = {
+				NOT = { society_member_of = warrior_lodge_hellenic }
+			}
 
-			AND = {
-				# You are of a religion that doesn't match *any* warrior lodge
-				has_religion_matching_available_warrior_lodge_trigger = no
-
+			trigger_if = {
+				limit = { has_religion_matching_available_warrior_lodge_trigger = yes }
+				religion_openly_hellenic_or_reformed_trigger = yes
+			}
+			trigger_else = {
 				OR = {
 					# You have neighbors, etc, of the correct religion...
 					any_vassal = { religion_openly_hellenic_or_reformed_trigger = yes }
@@ -3449,14 +3409,6 @@ warrior_lodge_hellenic = {
 					any_neighbor_independent_ruler = { religion_openly_hellenic_or_reformed_trigger = yes }
 				}
 			}
-
-			NOR = { # Hide if: you don't have a religion that corresponds to this lodge, but there is another society available to you already
-				religion_openly_hellenic_or_reformed_trigger = no
-				has_religion_matching_available_warrior_lodge_trigger = yes
-			}
-
-			# Always show if: You are already a member. Duh.
-			society_member_of = warrior_lodge_hellenic
 		}
 	}
 
@@ -3472,39 +3424,38 @@ warrior_lodge_hellenic = {
 			}
 		}
 
-		is_adult = yes
-
-		custom_tooltip = {
-			text = has_not_angered_society_tt
-			NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
-		}
-
-		hidden_trigger = {
-			NOT = { has_character_flag = society_join_block }
-		}
-
 		trigger_if = {
-			limit = { prisoner = yes }
-			prisoner = no
+			limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			custom_tooltip = {
+				text = has_not_angered_society_tt
+				NOT = { has_character_modifier = warrior_lodge_failed_joining_cd }
+			}
 		}
+		trigger_else_if = {
+			limit = { has_character_flag = society_join_block }
+			always = no
+		}
+		trigger_else = {
+			is_adult = yes
+			prisoner = no
 
-		OR = {
-			religion_openly_hellenic_or_reformed_trigger = yes
+			trigger_if = {
+				limit = { religion_openly_hellenic_or_reformed_trigger = no }
 
-			AND = {
+				NOT = { trait = zealous }
+				has_tribal_or_nomadic_government_trigger = yes
+
 				custom_tooltip = {
 					text = society_has_at_least_10_members_tt
 					FROM = { num_of_society_members >= 10 }
 				}
-
-				has_tribal_or_nomadic_government_trigger = yes
-
 				custom_tooltip = {
 					text = special_join_warrior_lodge_trigger_tt
 					special_join_warrior_lodge_trigger = yes
 				}
-
-				NOT = { trait = zealous }
+			}
+			trigger_else = {
+				religion_openly_hellenic_or_reformed_trigger = yes
 			}
 		}
 	}
@@ -3512,7 +3463,6 @@ warrior_lodge_hellenic = {
 	potential = { # If you change religion or become zealous while NOT pagan, you are kicked out
 		trigger_if = {
 			limit = { religion_openly_hellenic_or_reformed_trigger = no }
-
 			NOT = { trait = zealous }
 		}
 	}
@@ -3812,7 +3762,7 @@ warrior_lodge_hellenic = {
 		value = 10
 
 		warrior_lodge_member_score = yes
-		
+
 		modifier = {
 			trait = ares_own
 			factor = 1.1
@@ -3822,10 +3772,11 @@ warrior_lodge_hellenic = {
 	startup_populate = {
 		trigger = {
 			ai = yes
-			controls_religion = no
-		   	religion_openly_hellenic_or_reformed_trigger = yes
 			is_adult = yes
+
+			controls_religion = no
 			is_in_society = no
+		   	religion_openly_hellenic_or_reformed_trigger = yes
 
 			OR = {
 				trait = zealous
