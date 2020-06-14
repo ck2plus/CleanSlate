@@ -104,8 +104,8 @@ feudal_life_events.txt
 												gbc_events.txt
 guardian_events.txt
 												hashshashin_order_events.txt
-												health_events.txt
-												hedge_knights_events.txt
+health_events.txt
+hedge_knights_events.txt
 												hf_african_flavor_events.txt
 												HF_alternate_start_events.txt
 												HF_ancestor_worship_events.txt
@@ -156,7 +156,7 @@ guardian_events.txt
 												hl_silk_route_events.txt
 												hl_tournament_events.txt
 												hl_wolf_events.txt
-												hunting_events.txt
+hunting_events.txt
 												imprisoned_events.txt
 												indian_holy_order_events.txt
 												indian_pilgrim_events.txt
