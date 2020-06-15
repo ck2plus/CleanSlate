@@ -157,7 +157,7 @@ hedge_knights_events.txt
 												hl_tournament_events.txt
 												hl_wolf_events.txt
 hunting_events.txt
-												imprisoned_events.txt
+imprisoned_events.txt
 												indian_holy_order_events.txt
 												indian_pilgrim_events.txt
 												interesting_muslims.txt
@@ -193,7 +193,7 @@ lovers_events.txt
 												LT_wonder_flavor_event_2.txt
 												LT_wonder_flavor_events.txt
 												LT_wonder_maintenance_events.txt
-												married_life_events.txt
+married_life_events.txt
 												misc_old_gods_events.txt
 												mnm_artifacts_events.txt
 												mnm_assassins_events.txt
