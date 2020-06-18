@@ -814,33 +814,44 @@ claim_on_liege = {
 
 		# Attacker
 		ROOT = {
-			OR = {
-				has_strong_claim = PREV
-				has_character_flag = faction_claimant_ultimatum_taken
-				AND = {
-					has_weak_claim = PREV
+			trigger_if = {
+				limit = {
+					NOR = {
+						has_strong_claim = PREV
+						has_character_flag = faction_claimant_ultimatum_taken
+					}
+				}
+				has_weak_claim = PREV
 
+				PREV = { # Claimed Title
 					trigger_if = {
-						limit = { is_female = yes }
-
-						has_law = status_of_women_4
-
-						PREV = {
-							OR = {
-								holder_scope = {
-									is_female = yes
-									NOR = {
-										has_law = status_of_women_4
-										has_game_rule = {
-											name = gender
-											value = all
-										}
+						limit = {
+							is_pretender = no # Checks vs ROOT character
+							is_contested = no # Already being contested in some war
+							holder_scope = { has_regent = no }
+						}
+						trigger_if = {
+							limit = {
+								NOT = {
+									has_game_rule = {
+										name = gender
+										value = all
 									}
 								}
-								is_pretender = yes # Checked vs ROOT
-								holder_scope = { has_regent = yes }
-								is_contested = yes # Is already being contested in some form of Claim or Succession War
 							}
+							ROOT = { # attacking claimant
+								trigger_if = {
+									limit = { is_female = yes }
+									has_law = status_of_women_4
+								}
+							}
+							holder_scope = { # title holder
+								is_female = yes
+								NOT = { has_law = status_of_women_4 }
+							}
+						}
+						trigger_else = {
+							always = no
 						}
 					}
 				}
@@ -1145,6 +1156,8 @@ claim_on_liege_plot = {
 	}
 
 	on_add = {
+		log = "CB(claim_on_liege_plot): START: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		fire_haruspicy_event_effect = yes
 		anger_china_effect = yes
 	}
@@ -1188,6 +1201,8 @@ claim_on_liege_plot = {
 	}
 
 	on_success_title = {
+		log = "CB(claim_on_liege_plot): VICTORY: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		# Attacker
 		usurp_title_plus_barony_if_unlanded = {
 			target = attacker
@@ -1209,6 +1224,8 @@ claim_on_liege_plot = {
 	}
 
 	on_fail = {
+		log = "CB(claim_on_liege_plot): WHITEPEACE: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			prestige = -100
@@ -1239,6 +1256,8 @@ claim_on_liege_plot = {
 	}
 
 	on_reverse_demand = {
+		log = "CB(claim_on_liege_plot): DEFEAT: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			prestige = -200
@@ -1285,6 +1304,10 @@ claim_on_liege_plot = {
 			}
 		}
 		end_war = invalid
+	}
+
+	on_invalidation = {
+		log = "CB(claim_on_liege_plot): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
 	}
 
 	attacker_ai_victory_worth = {
@@ -1398,7 +1421,6 @@ claim_on_vassal_plot = {
 			show_scope_change = no
 			cancel_plot = plot_gain_vassal_title
 		}
-
 	}
 
 	on_reverse_demand = {
@@ -1934,6 +1956,8 @@ claim_all = {
 	}
 
 	on_success = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Claim All war against [From.GetBestName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -2762,6 +2786,8 @@ invasion = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Invasion CB of [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		custom_tooltip = {
 			text = invasion_succ_tip
 
