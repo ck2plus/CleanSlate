@@ -203,8 +203,8 @@ married_life_events.txt
 												mnm_misc_events.txt
 												mnm_monastic_orders_events.txt
 												mnm_secret_religious_societies_events.txt
-												mongol_events.txt
-												mourning_events.txt
+mongol_events.txt
+mourning_events.txt
 												muslim_honorary_titles_events.txt
 												muslim_religion_events.txt
 												news_flavor_events.txt
@@ -219,7 +219,7 @@ married_life_events.txt
 												oldgods_runestone_events.txt
 												oldgods_various_events.txt
 												oldgods_zoroastrian_events.txt
-												on_action_events.txt
+						on_action_events.txt
 												on_hajj.txt
 												personality_traits_events.txt
 												pet_events.txt
