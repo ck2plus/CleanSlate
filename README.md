@@ -219,9 +219,9 @@ mourning_events.txt
 												oldgods_runestone_events.txt
 												oldgods_various_events.txt
 												oldgods_zoroastrian_events.txt
-						on_action_events.txt
+on_action_events.txt
 												on_hajj.txt
-												personality_traits_events.txt
+personality_traits_events.txt
 												pet_events.txt
 												pilgrim_events.txt
 												plot_events.txt
