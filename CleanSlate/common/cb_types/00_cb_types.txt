@@ -98,7 +98,7 @@ claim = {
 				primary_title = {
 					trigger_if = {
 						limit = { is_primary_type_title = yes } # Static Mercs, the Pope, Holy Orders, etc.
-						NOT = { lower_tier_than = PREVPREV } # Should not titles above their own tier
+						NOT = { lower_tier_than = PREVPREV } # Should not claim titles above their own tier
 					}
 				}
 			}
@@ -130,6 +130,8 @@ claim = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Claim war on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		usurp_title_plus_barony_if_unlanded = {
 			target = attacker
 			type = claim
@@ -291,6 +293,10 @@ claim = {
 		}
 	}
 
+	on_invalidation = {
+		log = "CB(claim): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+	}
+
 	attacker_ai_victory_worth = {
 		factor = -1 # always accept
 	}
@@ -363,24 +369,19 @@ other_claim = {
 				limit = { is_female = yes }
 
 				NOR = {
-					religion_group = muslim
-					has_religion_feature = religion_patriarchal
-
-					PREV = { # claimed title
-						succ_law_title = {
-							has_law = agnatic_succession
-						}
+					has_law = agnatic_succession
+					FROMFROM = { has_law = agnatic_succession }
+					PREV = { # Claimed Title
+						succ_law_title = { has_law = agnatic_succession }
 					}
 				}
 			}
 			trigger_else = {
 				NOR = {
-					has_religion_feature = religion_matriarchal
-
-					PREV = { # claimed title
-						succ_law_title = {
-							has_law = enatic_succession
-						}
+					has_law = enatic_succession
+					FROMFROM = { has_law = enatic_succession }
+					PREV = {
+						succ_law_title = { has_law = enatic_succession }
 					}
 				}
 			}
@@ -522,6 +523,8 @@ other_claim = {
 	# FROM is defender
 	# FROMFROM is attacker
 	on_success_title = {
+		log = "[FromFrom.GetBestName] (ID: [FromFrom.GetID]) succeeded with their war for [Root.GetBestName]'s (ID: [Root.GetID]) claim on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		hidden_effect = {
 			ROOT = {
 				show_scope_change = no
@@ -590,14 +593,14 @@ other_claim = {
 
 				ROOT = {
 					OR = {
-						AND = {
-							is_ruler = yes
-							is_vassal_or_below_of = FROMFROM
-						}
 						PREV = {
 							de_jure_liege_or_above = FROMFROM
 						}
 						dynasty = FROMFROM
+						trigger_if = {
+							limit = { is_ruler = yes }
+							is_vassal_or_below_of = FROMFROM
+						}
 					}
 				}
 			}
@@ -724,6 +727,10 @@ other_claim = {
 		}
 	}
 
+	on_invalidation = {
+		log = "CB(other_claim): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+	}
+
 	# Starting scope is attacker
 	# ROOT is third-party claimant
 	# FROM is defender
@@ -807,33 +814,44 @@ claim_on_liege = {
 
 		# Attacker
 		ROOT = {
-			OR = {
-				has_strong_claim = PREV
-				has_character_flag = faction_claimant_ultimatum_taken
-				AND = {
-					has_weak_claim = PREV
+			trigger_if = {
+				limit = {
+					NOR = {
+						has_strong_claim = PREV
+						has_character_flag = faction_claimant_ultimatum_taken
+					}
+				}
+				has_weak_claim = PREV
 
+				PREV = { # Claimed Title
 					trigger_if = {
-						limit = { is_female = yes }
-
-						has_law = status_of_women_4
-
-						PREV = {
-							OR = {
-								holder_scope = {
-									is_female = yes
-									NOR = {
-										has_law = status_of_women_4
-										has_game_rule = {
-											name = gender
-											value = all
-										}
+						limit = {
+							is_pretender = no # Checks vs ROOT character
+							is_contested = no # Already being contested in some war
+							holder_scope = { has_regent = no }
+						}
+						trigger_if = {
+							limit = {
+								NOT = {
+									has_game_rule = {
+										name = gender
+										value = all
 									}
 								}
-								is_pretender = yes # Checked vs ROOT
-								holder_scope = { has_regent = yes }
-								is_contested = yes # Is already being contested in some form of Claim or Succession War
 							}
+							ROOT = { # attacking claimant
+								trigger_if = {
+									limit = { is_female = yes }
+									has_law = status_of_women_4
+								}
+							}
+							holder_scope = { # title holder
+								is_female = yes
+								NOT = { has_law = status_of_women_4 }
+							}
+						}
+						trigger_else = {
+							always = no
 						}
 					}
 				}
@@ -1138,6 +1156,8 @@ claim_on_liege_plot = {
 	}
 
 	on_add = {
+		log = "CB(claim_on_liege_plot): START: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		fire_haruspicy_event_effect = yes
 		anger_china_effect = yes
 	}
@@ -1181,6 +1201,8 @@ claim_on_liege_plot = {
 	}
 
 	on_success_title = {
+		log = "CB(claim_on_liege_plot): VICTORY: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		# Attacker
 		usurp_title_plus_barony_if_unlanded = {
 			target = attacker
@@ -1202,6 +1224,8 @@ claim_on_liege_plot = {
 	}
 
 	on_fail = {
+		log = "CB(claim_on_liege_plot): WHITEPEACE: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			prestige = -100
@@ -1232,6 +1256,8 @@ claim_on_liege_plot = {
 	}
 
 	on_reverse_demand = {
+		log = "CB(claim_on_liege_plot): DEFEAT: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			prestige = -200
@@ -1278,6 +1304,10 @@ claim_on_liege_plot = {
 			}
 		}
 		end_war = invalid
+	}
+
+	on_invalidation = {
+		log = "CB(claim_on_liege_plot): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
 	}
 
 	attacker_ai_victory_worth = {
@@ -1391,7 +1421,6 @@ claim_on_vassal_plot = {
 			show_scope_change = no
 			cancel_plot = plot_gain_vassal_title
 		}
-
 	}
 
 	on_reverse_demand = {
@@ -1927,6 +1956,8 @@ claim_all = {
 	}
 
 	on_success = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Claim All war against [From.GetBestName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -2755,6 +2786,8 @@ invasion = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Invasion CB of [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		custom_tooltip = {
 			text = invasion_succ_tip
 
