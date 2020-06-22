@@ -224,7 +224,7 @@ on_action_events.txt
 personality_traits_events.txt
 												pet_events.txt
 												pilgrim_events.txt
-												plot_events.txt
+plot_events.txt
 												polygamy_events.txt
 												pope_free_investiture.txt
 												province_lordship_events.txt
