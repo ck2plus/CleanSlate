@@ -98,7 +98,7 @@ claim = {
 				primary_title = {
 					trigger_if = {
 						limit = { is_primary_type_title = yes } # Static Mercs, the Pope, Holy Orders, etc.
-						NOT = { lower_tier_than = PREVPREV } # Should not titles above their own tier
+						NOT = { lower_tier_than = PREVPREV } # Should not claim titles above their own tier
 					}
 				}
 			}
@@ -130,6 +130,8 @@ claim = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Claim war on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		usurp_title_plus_barony_if_unlanded = {
 			target = attacker
 			type = claim
@@ -291,6 +293,10 @@ claim = {
 		}
 	}
 
+	on_invalidation = {
+		log = "CB(claim): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+	}
+
 	attacker_ai_victory_worth = {
 		factor = -1 # always accept
 	}
@@ -363,24 +369,19 @@ other_claim = {
 				limit = { is_female = yes }
 
 				NOR = {
-					religion_group = muslim
-					has_religion_feature = religion_patriarchal
-
-					PREV = { # claimed title
-						succ_law_title = {
-							has_law = agnatic_succession
-						}
+					has_law = agnatic_succession
+					FROMFROM = { has_law = agnatic_succession }
+					PREV = { # Claimed Title
+						succ_law_title = { has_law = agnatic_succession }
 					}
 				}
 			}
 			trigger_else = {
 				NOR = {
-					has_religion_feature = religion_matriarchal
-
-					PREV = { # claimed title
-						succ_law_title = {
-							has_law = enatic_succession
-						}
+					has_law = enatic_succession
+					FROMFROM = { has_law = enatic_succession }
+					PREV = {
+						succ_law_title = { has_law = enatic_succession }
 					}
 				}
 			}
@@ -522,6 +523,8 @@ other_claim = {
 	# FROM is defender
 	# FROMFROM is attacker
 	on_success_title = {
+		log = "[FromFrom.GetBestName] (ID: [FromFrom.GetID]) succeeded with their war for [Root.GetBestName]'s (ID: [Root.GetID]) claim on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		hidden_effect = {
 			ROOT = {
 				show_scope_change = no
@@ -590,14 +593,14 @@ other_claim = {
 
 				ROOT = {
 					OR = {
-						AND = {
-							is_ruler = yes
-							is_vassal_or_below_of = FROMFROM
-						}
 						PREV = {
 							de_jure_liege_or_above = FROMFROM
 						}
 						dynasty = FROMFROM
+						trigger_if = {
+							limit = { is_ruler = yes }
+							is_vassal_or_below_of = FROMFROM
+						}
 					}
 				}
 			}
@@ -724,6 +727,10 @@ other_claim = {
 		}
 	}
 
+	on_invalidation = {
+		log = "CB(other_claim): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+	}
+
 	# Starting scope is attacker
 	# ROOT is third-party claimant
 	# FROM is defender
@@ -807,33 +814,44 @@ claim_on_liege = {
 
 		# Attacker
 		ROOT = {
-			OR = {
-				has_strong_claim = PREV
-				has_character_flag = faction_claimant_ultimatum_taken
-				AND = {
-					has_weak_claim = PREV
+			trigger_if = {
+				limit = {
+					NOR = {
+						has_strong_claim = PREV
+						has_character_flag = faction_claimant_ultimatum_taken
+					}
+				}
+				has_weak_claim = PREV
 
+				PREV = { # Claimed Title
 					trigger_if = {
-						limit = { is_female = yes }
-
-						has_law = status_of_women_4
-
-						PREV = {
-							OR = {
-								holder_scope = {
-									is_female = yes
-									NOR = {
-										has_law = status_of_women_4
-										has_game_rule = {
-											name = gender
-											value = all
-										}
+						limit = {
+							is_pretender = no # Checks vs ROOT character
+							is_contested = no # Already being contested in some war
+							holder_scope = { has_regent = no }
+						}
+						trigger_if = {
+							limit = {
+								NOT = {
+									has_game_rule = {
+										name = gender
+										value = all
 									}
 								}
-								is_pretender = yes # Checked vs ROOT
-								holder_scope = { has_regent = yes }
-								is_contested = yes # Is already being contested in some form of Claim or Succession War
 							}
+							ROOT = { # attacking claimant
+								trigger_if = {
+									limit = { is_female = yes }
+									has_law = status_of_women_4
+								}
+							}
+							holder_scope = { # title holder
+								is_female = yes
+								NOT = { has_law = status_of_women_4 }
+							}
+						}
+						trigger_else = {
+							always = no
 						}
 					}
 				}
@@ -1138,6 +1156,8 @@ claim_on_liege_plot = {
 	}
 
 	on_add = {
+		log = "CB(claim_on_liege_plot): START: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		fire_haruspicy_event_effect = yes
 		anger_china_effect = yes
 	}
@@ -1181,6 +1201,8 @@ claim_on_liege_plot = {
 	}
 
 	on_success_title = {
+		log = "CB(claim_on_liege_plot): VICTORY: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		# Attacker
 		usurp_title_plus_barony_if_unlanded = {
 			target = attacker
@@ -1202,6 +1224,8 @@ claim_on_liege_plot = {
 	}
 
 	on_fail = {
+		log = "CB(claim_on_liege_plot): WHITEPEACE: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			prestige = -100
@@ -1232,6 +1256,8 @@ claim_on_liege_plot = {
 	}
 
 	on_reverse_demand = {
+		log = "CB(claim_on_liege_plot): DEFEAT: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			prestige = -200
@@ -1278,6 +1304,10 @@ claim_on_liege_plot = {
 			}
 		}
 		end_war = invalid
+	}
+
+	on_invalidation = {
+		log = "CB(claim_on_liege_plot): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
 	}
 
 	attacker_ai_victory_worth = {
@@ -1391,7 +1421,6 @@ claim_on_vassal_plot = {
 			show_scope_change = no
 			cancel_plot = plot_gain_vassal_title
 		}
-
 	}
 
 	on_reverse_demand = {
@@ -1927,6 +1956,8 @@ claim_all = {
 	}
 
 	on_success = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Claim All war against [From.GetBestName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
@@ -2755,6 +2786,8 @@ invasion = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Invasion CB of [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		custom_tooltip = {
 			text = invasion_succ_tip
 
@@ -2814,7 +2847,7 @@ invasion = {
 					}
 					 # Help AI William by usurping extra land
 					if = {
-						limit = { ai = yes 	}
+						limit = { ai = yes }
 
 						any_de_jure_vassal_title = {
 							limit = {
@@ -3045,65 +3078,52 @@ tribal_invasion = {
 
 			OR = {
 				AND = {
+					independent = yes
 					higher_tier_than = COUNT
 
-					trigger_if = {
-						limit = { has_dlc = "Horse Lords" }
-						OR = {
-							has_character_flag = horde_invader
-							AND = {
-								independent = yes
-								religion_group = pagan_group
-								OR = {
-									culture_group = altaic
-									culture_group = magyar
-									culture_group = mesoamerican
-								}
-								FROM = { # Defender
-									NOT = { religion_group = pagan_group } # Should subjugate these instead
-								}
-								OR = {
-									is_tribal = yes
-									primary_title = {
-										has_law = succ_elective_gavelkind
-									}
-									has_landed_title = e_mongol_empire
-									has_landed_title = e_mexikha
-								}
+					OR = {
+						culture_group = altaic
+						culture_group = magyar
+						culture_group = mesoamerican
+					}
+
+					OR = {
+						is_tribal = yes
+						primary_title = { has_law = succ_elective_gavelkind }
+
+						trigger_if = {
+							limit = { has_dlc = "Horse Lords" }
+							OR = {
+								has_landed_title = e_mongol_empire
+								has_landed_title = e_mexikha
 							}
 						}
 					}
+
+					trigger_if = {
+						limit = { has_horde_culture = yes }
+
+						NOT = { religion_group = christian }
+					}
 					trigger_else = {
-						independent = yes
-						OR = {
-							religion_group = pagan_group
-							AND = {
-								OR = {
-									has_horde_culture = yes
-									has_character_flag = horde_invader
-								}
-								NOT = { religion_group = christian }
-							}
+						religion_group = pagan_group
+
+						# Should subjugate these instead
+						FROM = {
+							NOT = { religion_group = pagan_group }
 						}
-						OR = {
-							culture_group = altaic
-							culture_group = magyar
-							culture_group = mesoamerican
+					}
+				}
+				AND = {
+					independent = yes
+					higher_tier_than = COUNT
+					has_character_flag = horde_invader
+
+					trigger_if = {
+						limit = {
+							NOT = { has_dlc = "Horse Lords" }
 						}
-						OR = {
-							has_horde_culture = yes
-							has_character_flag = horde_invader
-							FROM = { # Defender
-								NOT = { religion_group = pagan_group } # Should subjugate these instead
-							}
-						}
-						OR = {
-							has_character_flag = horde_invader
-							is_tribal = yes
-							primary_title = {
-								has_law = succ_elective_gavelkind
-							}
-						}
+						NOT = { religion_group = christian }
 					}
 				}
 				AND = {
@@ -3125,10 +3145,14 @@ tribal_invasion = {
 			}
 		}
 
-		OR = { # This ensures that the AI doesn't declare this type of war against someone who only holds a few counties within the targeted title...
+		# This ensures that the AI doesn't declare this type of war against someone who only holds a few counties within the targeted title.
+		trigger_if = {
+			limit = {
+				ROOT = { ai = yes }
+			}
+
 			# Attacker
 			ROOT = {
-				ai = no
 				OR = {
 					has_landed_title = e_mongol_empire
 					has_landed_title = e_mexikha
@@ -3210,6 +3234,8 @@ tribal_invasion = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Tribal Invasion CB of the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 			if = {
@@ -3613,7 +3639,9 @@ crusade = {
 	can_use_title = {
 		# Defender
 		FROM = {
-			independent = yes # Don't declare Crusades on revolters - chances are high the war will invalidate
+			independent = yes
+			in_revolt = no # Don't declare Crusades on revolters - chances are high the war will invalidate
+
 			num_of_realm_counties = {
 				value >= 6
 				title = PREV
@@ -3658,6 +3686,7 @@ crusade = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their crusade for the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
 
 		# Should we give the seized land to its current king?
 		if = {
@@ -4206,6 +4235,7 @@ new_crusade = {
 	}
 
 	on_success_title = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Holy Fury crusade for the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
 
 		custom_tooltip = {
 			text = new_crusade_win_TT
@@ -4251,7 +4281,6 @@ new_crusade = {
 		}
 
 		hidden_effect = {
-
 			if = { # Achievement
 				limit = {
 					event_target:new_crusade_target_char = {
@@ -4679,7 +4708,7 @@ new_crusade = {
 						}
 					}
 				}
-			#	save_event_target_as = crusade_attacker
+				# save_event_target_as = crusade_attacker
 				character_event = { id = HFP.41007 } # Beneficiary event - AI only
 			}
 
@@ -6181,6 +6210,8 @@ excommunicated_ruler = {
 	}
 
 	on_success = {
+		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their excommunication war against [From.GetBestName] (ID: [From.GetID])"
+
 		attacker = {
 			show_scope_change = no
 
@@ -6256,6 +6287,12 @@ excommunicated_ruler = {
 			show_scope_change = no
 			piety = -50
 			prestige = -100
+
+			hidden_effect = { # Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever
+				attacker = {
+					clr_character_flag = flag_excommunicated_for_coronation
+				}
+			}
 		}
 	}
 
@@ -6280,7 +6317,6 @@ excommunicated_ruler = {
 			prestige = 200
 		}
 	}
-
 
 	attacker_ai_victory_worth = {
 		factor = -1 # always accept
