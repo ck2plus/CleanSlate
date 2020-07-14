@@ -65,17 +65,17 @@ ze_war_chest.txt
 achievement_events.txt
 												adventurers_negotiation.txt
 												adventures_the_old_gods.txt
-												ambition_events.txt
+ambition_events.txt
 bankruptcy_events.txt
 bastard_events.txt
 battle_events.txt
-												bear_events.txt
+bear_events.txt
 birth_events.txt
 												byzantine_events.txt
 campaign_events.txt
 childhood_personality_traits_events.txt
 												chronicle_events.txt
-												civil_war_events.txt
+civil_war_events.txt
 												cm_charlemagne_story_events.txt
 												cm_culture_conversion_events.txt
 												cm_major_events.txt
@@ -83,25 +83,25 @@ childhood_personality_traits_events.txt
 												cm_murder_plot_events.txt
 												cm_religious_events.txt
 												cm_various_events.txt
-												councillor_events.txt
+councillor_events.txt
 court_events.txt
 critical_events.txt
 crusade_events.txt
-												culture_conversion_events.txt
+culture_conversion_events.txt
 												decadence_events.txt
 												dutch_renaming_events.txt
 dynasty_events.txt
-												emperor_ticket_easter_eggs.txt
+emperor_ticket_easter_eggs.txt
 evil_events.txt
 family_events.txt
 												fatwa_events.txt
 feast_events.txt
-												female_councillor_events.txt
+female_councillor_events.txt
 feudal_life_events.txt
-												friends_rivals_events.txt
+friends_rivals_events.txt
 												furusiyya_events.txt
-												game_rule_events.txt
-												gbc_events.txt
+game_rule_events.txt
+gbc_events.txt
 guardian_events.txt
 												hashshashin_order_events.txt
 health_events.txt
@@ -207,8 +207,8 @@ mongol_events.txt
 mourning_events.txt
 												muslim_honorary_titles_events.txt
 												muslim_religion_events.txt
-												news_flavor_events.txt
-												norse_flavor_events.txt
+news_flavor_events.txt
+norse_flavor_events.txt
 												oldgods_ancestor_worship_events.txt
 												oldgods_blot_events.txt
 												oldgods_culture_conversion.txt
@@ -222,18 +222,18 @@ mourning_events.txt
 on_action_events.txt
 												on_hajj.txt
 personality_traits_events.txt
-												pet_events.txt
+pet_events.txt
 												pilgrim_events.txt
 plot_events.txt
 												polygamy_events.txt
-												pope_free_investiture.txt
-												province_lordship_events.txt
+pope_free_investiture.txt
+province_lordship_events.txt
 												ramadan_events.txt
-												rebel_events.txt
+rebel_events.txt
 												rebel_events_horse_lords.txt
 												rebel_events_the_old_gods.txt
-												regency_events.txt
-												religious_events.txt
+regency_events.txt
+religious_events.txt
 												republic_dynastic_feuds.txt
 												republic_trade_events.txt
 												rip_dancing_plague_events.txt
@@ -255,27 +255,27 @@ plot_events.txt
 												roi_hunting_events.txt
 												roi_various_events.txt
 												roman_events.txt
-												rumours_events.txt
+rumours_events.txt
 												schism_events.txt
-												siege_events.txt
+siege_events.txt
 												soa_heresy_events.txt
 												soa_holy_order_events.txt
 												soa_jewish_events.txt
 												soa_misc_religious_events.txt
 												soa_muslim_schools.txt
 												soa_various_events.txt
-												summer_fair_events.txt
+summer_fair_events.txt
 												sunset_invasion.txt
-												teutonic_order_events.txt
-												tournament_events.txt
+teutonic_order_events.txt
+tournament_events.txt
 trait_notification.txt
-												traits_effects_events.txt
+traits_effects_events.txt
 												trans_saharan_trade_events.txt
-												tutorial_events.txt
-												various_notification_events.txt
-												various_traits_events.txt
-												vassal_request_events.txt
-												ward_events.txt
+tutorial_events.txt
+various_notification_events.txt
+various_traits_events.txt
+vassal_request_events.txt
+ward_events.txt
 												wol_business_events.txt
 												wol_carousing_events.txt
 												wol_family_events.txt
