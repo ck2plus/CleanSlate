@@ -5,28 +5,34 @@
 #######################################################
 # Written by Johan Andersson
 
-#Death of a loved wife...
+# Death of a loved wife...
 character_event = {
 	id = 24500
 	desc = EVTDESC24500
 	picture = GFX_evt_death
 
+	is_triggered_only = yes # on_death
+
 	only_women = yes
 	is_married = yes
 
-	is_triggered_only = yes
-
 	trigger = {
 		immortal = no
-		spouse = {
-			is_alive = yes
-			is_abroad = no
+
+		any_spouse = {
 			is_ruler = yes
-			opinion = { who = ROOT value = 50 }
+			is_abroad = no
+
+			opinion = {
+				who = ROOT
+				value >= 50
+			}
+
 			OR = {
 				trait = kind
 				trait = charitable
 			}
+
 			NOR = {
 				trait = kinslayer
 				trait = celibate
@@ -38,7 +44,38 @@ character_event = {
 
 	option = {
 		name = EVTOPTA24500
-		spouse = { character_event = { id = 24501 days = 64 tooltip = EVTTOOLTIP24501 } }
+
+		any_spouse = {
+			show_scope_change = no
+
+			limit = {
+				is_ruler = yes
+				is_abroad = no
+
+				opinion = {
+					who = ROOT
+					value >= 50
+				}
+
+				OR = {
+					trait = kind
+					trait = charitable
+				}
+
+				NOR = {
+					trait = kinslayer
+					trait = celibate
+					trait = depressed
+					trait = eunuch
+				}
+			}
+
+			character_event = {
+				id = 24501
+				days = 64
+				tooltip = EVTTOOLTIP24501
+			}
+		}
 	}
 }
 
@@ -49,6 +86,7 @@ character_event = {
 	picture = GFX_evt_death
 
 	is_triggered_only = yes
+
 	trigger = {
 		spouse_even_if_dead = {
 			is_alive = no
@@ -58,61 +96,68 @@ character_event = {
 
 	option = {
 		name = EVTOPTA24501
+
 		random_list = {
-			90 = {
-				add_trait = lustful
-			}
-			10 = {
-				add_trait = incapable
-			}
+			90 = { add_trait_lustful_effect = yes }
+			10 = { add_trait_incapable_effect = yes }
 		}
 	}
 
 	option = {
 		name = EVTOPTB24501
-		add_trait = depressed
+
+		add_trait_silently_depressed_effect = yes
+
 		if = {
-			limit = {
-				religion_group = christian
-			}
-			add_trait = celibate
+			limit = { religion_group = christian }
+			add_trait_silently_celibate_effect = yes
 		}
 	}
 }
 
 
-#Death of a good son
+# Death of a good son
 character_event = {
 	id = 24502
 	desc = EVTDESC24502
 	picture = GFX_evt_death
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 
 	only_men = yes
 	min_age = 15
 
 	trigger = {
 		is_primary_heir = yes
-		martial = 8
-		stewardship = 8
+		martial >= 8
+		stewardship >= 8
 
 		father = {
 			is_alive = yes
 			is_ruler = yes
 			NOT = { trait = stressed }
 		}
+
 		any_sibling = {
 			is_adult = yes
 			is_female = no
 			is_alive = yes
-			NOT = { martial = 8 }
+			martial < 8
 		}
 	}
 
 	option = {
 		name = EVTOPTA24502
-		father = { character_event = { id = 24503 days = 128 tooltip = EVTTOOLTIP24503 } }
+
+		father = {
+			show_scope_change = no
+
+			character_event = {
+				id = 24503
+				days = 128
+				tooltip = EVTTOOLTIP24503
+			}
+		}
 	}
 }
 
@@ -126,42 +171,44 @@ character_event = {
 
 	option = {
 		name = EVTOPTA24503
+
 		trigger = {
 			is_married = yes
-			spouse = {
-				NOT = { age = 30 }
+
+			any_spouse = {
+				practical_age < 30
 				is_pregnant = no
-				fertility = 0.4
+				fertility >= 0.40
 			}
 		}
-		character_event = { id = 24504 days = 2 tooltip = EVTTOOLTIP24504 }
+
+		character_event = {
+			id = 24504
+			days = 2
+			tooltip = EVTTOOLTIP24504
+		}
 	}
 
 	option = {
 		name = EVTOPTB24503
+
 		random_child = {
 			limit = {
 				is_adult = yes
 				is_female = no
 				is_alive = yes
-				NOT = { martial = 8 }
+				martial < 8
 			}
+
 			random_list = {
-				90 = {
-					if = {
-						limit = { NOT = { trait = berserker } }
-						add_trait = craven
-					}
-				}
-				10 = {
-					add_trait = brave
-				}
+				90 = { add_trait_craven_effect = yes }
+				10 = { add_trait_brave_effect = yes }
 			}
 		}
 	}
 }
 
-#and the final part...
+# and the final part...
 character_event = {
 	id = 24504
 	desc = EVTDESC24504
@@ -171,47 +218,57 @@ character_event = {
 
 	option = {
 		name = EVTOPTA24504
-		spouse = {
-			impregnate_cuckoo = PREV
-			add_trait = stressed
+
+		random_spouse = {
+			limit = {
+				practical_age < 30
+				is_pregnant = no
+				fertility >= 0.40
+			}
+
+			impregnate = PREV
+			add_trait_stressed_effect = yes
 		}
 	}
 }
 
-#Suspicious death: Start
+# Suspicious death: Start
 character_event = {
 	id = 24505
 	desc = EVTDESC24505
 	picture = GFX_evt_death
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 
 	trigger = {
 		death_murder_unknown_trigger = yes
 		NOT = { has_character_flag = was_murdered_by_plot }
-		OR = {
-			AND = {
-				age = 15
-				NOT = {
-					age = 35
+
+		trigger_if = {
+			limit = {
+				NOT = { has_character_flag = murdered_by_guardian }
+			}
+
+			practical_age >= 15
+			practical_age < 35
+
+			any_courtier = {
+				is_abroad = no
+				in_command = no
+				prisoner = no
+				practical_age >= 14
+				is_incapable = no
+
+				opinion = {
+					who = ROOT
+					value >= 50
 				}
-				any_courtier = {
-					is_abroad = no
-					in_command = no
-					prisoner = no
-					age = 14
-					is_incapable = no
-					NOT = { character = ROOT }
-					opinion = { who = ROOT value = 50 }
-					NOT = {
-						is_liege_of = ROOT
-					}
-				}
-				NOT = {
-					has_character_flag = murdered_by_guardian
+
+				NOR = {
+					character = ROOT
+					is_liege_of = ROOT
 				}
 			}
-			has_character_flag = murdered_by_guardian
 		}
 	}
 
@@ -221,24 +278,33 @@ character_event = {
 
 	option = {
 		name = EVTOPTA24505
+
 		trigger = {
-			NOT = {
-				has_character_flag = murdered_by_guardian
-			}
+			NOT = { has_character_flag = murdered_by_guardian }
 		}
+
 		random_courtier = {
+			show_scope_change  = no
+
 			limit = {
+				practical_age >= 14
+
+				opinion = {
+					who = ROOT
+					value >= 50
+				}
+
 				is_abroad = no
 				in_command = no
 				prisoner = no
-				age = 14
 				is_incapable = no
-				NOT = { character = ROOT }
-				NOT = {
+
+				NOR = {
+					character = ROOT
 					is_liege_of = ROOT
 				}
-				opinion = { who = ROOT value = 50 }
 			}
+
 			character_event = {
 				id = 24506
 				tooltip = EVTTOOLTIP24506
@@ -248,45 +314,50 @@ character_event = {
 
 	option = {
 		name = EVTOPTA24505
-		trigger = {
-			has_character_flag = murdered_by_guardian
-		}
-		if = {
-			limit = {
-				father = {
-					is_alive = yes
-				}
-			}
-			father = {
+
+		trigger = { has_character_flag = murdered_by_guardian }
+
+		father = {
+			show_scope_change = no
+
+			if = {
+				limit = { is_alive = yes }
+
 				set_character_flag = guardian_murdered_child
+
 				character_event = {
 					id = 24506
 					tooltip = EVTTOOLTIP24506
 				}
 			}
 		}
-		if = {
-			limit = {
-				mother = {
+
+		mother = {
+			show_scope_change = no
+
+			if = {
+				limit = {
 					is_alive = yes
+
+					father_even_if_dead = {
+						is_alive = no
+					}
 				}
-				father_even_if_dead = {
-					is_alive = no
-				}
-			}
-			mother = {
+
 				set_character_flag = guardian_murdered_child
+
 				character_event = {
 					id = 24506
 					tooltip = EVTTOOLTIP24506
 				}
 			}
 		}
+
 		clr_character_flag = murdered_by_guardian
 	}
 }
 
-#Suspicious death: Courtier
+# Suspicious death: Courtier
 character_event = {
 	id = 24506
 	desc = EVTDESC24506
@@ -295,99 +366,120 @@ character_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = EVTOPTA24506 #Keep my grudge
+		name = EVTOPTA24506 # Keep my grudge
+
 		trigger = {
-			NOT = {
-				has_character_flag = guardian_murdered_child
-			}
+			NOT = { has_character_flag = guardian_murdered_child }
 		}
+
 		random_courtier = {
+			show_scope_change = no
+
 			limit = {
-				intrigue = 8
-				NOT = { character = ROOT }
-				NOT = { character = FROM }
-				prisoner = no
 				is_adult = yes
+				intrigue >= 8
+				prisoner = no
 				is_incapable = no
+
+				NOR = {
+					character = ROOT
+					character = FROM
+				}
 			}
+
 			reverse_opinion = {
-				modifier = suspect_of_murder
+				name = suspect_of_murder
 				who = ROOT
 				years = 10
 			}
 		}
+
 		any_courtier = {
-			limit = {
-				has_character_flag = murder_suspect
-			}
+			limit = { has_character_flag = murder_suspect }
 			clr_character_flag = murder_suspect
 		}
 	}
 
 	option = {
 		name = EVTOPTB24506
+
 		trigger = {
 			is_ruler = yes
-			NOT = {
-				has_character_flag = guardian_murdered_child
-			}
+			NOT = { has_character_flag = guardian_murdered_child }
 		}
+
 		random_courtier = {
+			show_scope_change = no
+
 			limit = {
-				intrigue = 8
-				NOT = { character = ROOT }
-				NOT = { character = FROM }
-				prisoner = no
 				is_adult = yes
+				intrigue >= 8
+				prisoner = no
 				is_incapable = no
+
+				NOR = {
+					character = ROOT
+					character = FROM
+				}
 			}
+
 			imprison = ROOT
 		}
+
 		any_courtier = {
-			limit = {
-				has_character_flag = murder_suspect
-			}
+			limit = { has_character_flag = murder_suspect }
 			clr_character_flag = murder_suspect
 		}
 	}
+
 	option = {
 		name = EVTOPTC24506
+
 		trigger = {
 			is_ruler = no
-			NOT = {
-				has_character_flag = guardian_murdered_child
-			}
+			NOT = { has_character_flag = guardian_murdered_child }
 		}
+
 		random_courtier = {
 			limit = {
-				intrigue = 8
-				NOT = { character = ROOT }
-				NOT = { character = FROM }
-				prisoner = no
 				is_adult = yes
+				intrigue >= 8
+				prisoner = no
 				is_incapable = no
+
+				NOR = {
+					character = ROOT
+					character = FROM
+				}
 			}
 			set_character_flag = murder_suspect
 		}
+
 		liege = {
+			show_scope_change = no
+
 			character_event = {
 				id = 24507
 				tooltip = EVTTOOLTIP24507
 			}
 		}
 	}
+
 	option = {
-		name = EVTOPTA24506 #Keep my grudge
-		trigger = {
-			has_character_flag = guardian_murdered_child
-		}
+		name = EVTOPTA24506 # Keep my grudge
+
+		trigger = { has_character_flag = guardian_murdered_child }
+
 		FROM = {
+			show_scope_change = no
+
 			any_courtier = {
-				limit = {
-					has_character_flag = murdered_fosterling
-				}
+				show_scope_change = no
+
+				limit = { has_character_flag = murdered_fosterling }
+
 				reverse_opinion = {
-					modifier = suspect_of_murder
+					name = suspect_of_murder
 					who = ROOT
 					years = 10
 				}
@@ -397,43 +489,58 @@ character_event = {
 
 	option = {
 		name = EVTOPTB24506
+
 		trigger = {
 			is_ruler = yes
 			has_character_flag = guardian_murdered_child
 		}
+
 		FROM = {
+			show_scope_change = no
+
 			any_courtier = {
-				limit = {
-					has_character_flag = murdered_fosterling
-				}
+				show_scope_change = no
+
+				limit = { has_character_flag = murdered_fosterling }
+
 				reverse_opinion = {
-					modifier = suspect_of_murder
+					name = suspect_of_murder
 					who = ROOT
 					years = 10
 				}
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTC24506
+
 		trigger = {
 			is_ruler = no
 			has_character_flag = guardian_murdered_child
 		}
+
 		FROM = {
+			show_scope_change = no
+
 			any_courtier = {
-				limit = {
-					has_character_flag = murdered_fosterling
-				}
+				show_scope_change = no
+
+				limit = { has_character_flag = murdered_fosterling }
+
 				reverse_opinion = {
-					modifier = suspect_of_murder
+					name = suspect_of_murder
 					who = ROOT
 					years = 10
 				}
+
 				set_character_flag = murder_suspect
 			}
 		}
+
 		liege = {
+			show_scope_change = no
+
 			character_event = {
 				id = 24507
 				tooltip = EVTTOOLTIP24507
@@ -442,7 +549,7 @@ character_event = {
 	}
 }
 
-#Suspicious death: Liege
+# Suspicious death: Liege
 character_event = {
 	id = 24507
 	desc = EVTDESC24507
@@ -451,46 +558,51 @@ character_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = EVTOPTA24507 #Ignore
+		name = EVTOPTA24507 # Ignore
+
 		random_courtier = {
-			limit = {
-				has_character_flag = murder_suspect
-			}
+			limit = { has_character_flag = murder_suspect }
 			clr_character_flag = murder_suspect
 		}
+
 		any_courtier = {
-			limit = {
-				has_character_flag = murder_suspect
-			}
+			limit = { has_character_flag = murder_suspect }
 			clr_character_flag = murder_suspect
 		}
+
 		FROM = {
+			show_scope_change = no
+
 			opinion = {
-				modifier = opinion_betrayed
+				name = opinion_betrayed
 				who = ROOT
 				years = 5
 			}
 		}
 	}
-	option = {
-		name = EVTOPTB24507 #Imprison
-		random_courtier = {
-			limit = {
-				has_character_flag = murder_suspect
-			}
-			imprison = ROOT
 
+	option = {
+		name = EVTOPTB24507 # Imprison
+
+		random_courtier = {
+			show_scope_change = no
+
+			limit = { has_character_flag = murder_suspect }
+
+			imprison = ROOT
 			clr_character_flag = murder_suspect
 		}
+
 		any_courtier = {
-			limit = {
-				has_character_flag = murder_suspect
-			}
+			limit = { has_character_flag = murder_suspect }
 			clr_character_flag = murder_suspect
 		}
+
 		FROM = {
+			show_scope_change = no
+
 			opinion = {
-				modifier = opinion_satisfied
+				name = opinion_satisfied
 				who = ROOT
 				years = 2
 			}
@@ -498,48 +610,41 @@ character_event = {
 	}
 }
 
-#Death of a Councillor
+# Death of a Councillor
 character_event = {
 	id = 24510
 	desc = EVTDESC24510
 	picture = GFX_evt_death
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 
 	trigger = {
 		is_councillor = yes
 		independent = no
-		NOT = {
-			age = 50
-		}
+		practical_age < 50
+
 		OR = {
-			diplomacy = 15
-			martial = 15
-			intrigue = 15
-			learning = 15
-			stewardship = 15
+			diplomacy >= 15
+			martial >= 15
+			intrigue >= 15
+			learning >= 15
+			stewardship >= 15
 		}
+
 		liege = {
-			NOT = {
-				character = ROOT
-			}
 			ROOT = {
 				killer = {
-					NOT = {
-						character = PREVPREV
-					}
+					NOT = { character = PREVPREV }
 				}
 			}
+
 			OR = {
-				tier = duke
-				tier = count
+				real_tier = DUKE
+				real_tier = COUNT
 			}
-			NOT = {
-				spouse = {
-					character = ROOT
-				}
-			}
-			NOT = { is_inaccessible_trigger = yes }
+
+			NOT = { is_married = ROOT }
+			is_inaccessible_trigger = no
 		}
 	}
 
@@ -549,7 +654,10 @@ character_event = {
 
 	option = {
 		name = EVTOPTA24510
+
 		liege = {
+			show_scope_change = no
+
 			character_event = {
 				id = 4140
 				tooltip = EVTTOOLTIP4140
@@ -558,7 +666,7 @@ character_event = {
 	}
 }
 
-#Funeral Procession
+# Funeral Procession
 character_event = {
 	id = 4140
 	desc = EVTDESC4140
@@ -568,41 +676,43 @@ character_event = {
 
 	trigger = {
 		FROM = {
-			NOR = {
-				death_no_trace_trigger = yes
-				death_in_china_trigger = yes
-			}
+			death_no_trace_trigger = no
+			death_in_china_trigger = no
 		}
 	}
 
 	option = {
 		name = EVTOPTA4140
-		trigger = {
-			religion_group = christian
-		}
+
+		trigger = { religion_group = christian }
+
 		add_character_modifier = {
 			name = the_sincere
 			years = 5
 		}
 	}
+
 	option = {
 		name = EVTOPTD4140
-		trigger = {
-			religion_group = muslim
-		}
+
+		trigger = { religion_group = muslim }
+
 		add_character_modifier = {
 			name = the_sincere
 			years = 5
 		}
 	}
+
 	option = {
 		name = EVTOPTE4140
+
 		trigger = {
-			NOT = {
+			NOR = {
 				religion_group = muslim
 				religion_group = christian
 			}
 		}
+
 		add_character_modifier = {
 			name = the_sincere
 			years = 5
@@ -611,6 +721,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTB4140
+
 		add_character_modifier = {
 			name = the_cynical
 			years = 5
@@ -619,16 +730,22 @@ character_event = {
 
 	option = {
 		name = EVTOPTC4140
+
 		trigger = {
 			FROM = {
 				spouse = {
 					is_alive = yes
 				}
 			}
-			wealth = -10
+			wealth >= -10
 		}
+
 		FROM = {
+			show_scope_change = no
+
 			spouse = {
+				show_scope_change = no
+
 				opinion = {
 					modifier = charitable_pos
 					who = ROOT
