@@ -1,0 +1,1494 @@
+# add_grace_trivial_effect
+# add_grace_minor_effect
+# add_grace_medium_effect
+# add_grace_major_effect
+# add_grace_massive_effect
+# add_grace_super_huge_effect
+# detract_grace_trivial_effect
+# detract_grace_minor_effect
+# detract_grace_medium_effect
+# detract_grace_major_effect
+# detract_grace_massive_effect
+# detract_grace_super_huge_effect
+
+# set_china_boon_cd_effect
+# set_china_tribute_cd_effect
+
+# leave_court_for_china_effect
+# return_to_china_effect
+
+# china_spawn_commander_effect
+# china_war_spawn_troops_effect
+# china_war_spawn_troops_no_disband_effect
+# china_war_modify_variables_by_status_effect
+# china_war_modify_variables_by_century_effect
+
+# check_likes_or_dislikes_THIS_effect
+# print_china_status_update_effect
+# print_china_policy_update_effect
+# print_china_ruler_update_effect
+
+# abort_kow_tow_effect
+# return_to_travel_tombola_effect
+# return_to_china_tombola_effect
+# clean_up_after_kow_tow_effect
+
+# add_chinese_artifact_effect
+
+# Grace effects
+add_grace_trivial_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = 100
+	}
+}
+
+add_grace_minor_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = 200
+	}
+}
+
+add_grace_medium_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = 300
+	}
+}
+
+add_grace_major_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = 500
+	}
+}
+
+add_grace_massive_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = 1000
+	}
+}
+
+add_grace_super_huge_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = 2000
+	}
+}
+
+detract_grace_trivial_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = -100
+	}
+}
+
+detract_grace_minor_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = -200
+	}
+}
+
+detract_grace_medium_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = -300
+	}
+}
+
+detract_grace_major_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = -500
+	}
+}
+
+detract_grace_massive_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = -1000
+	}
+}
+
+detract_grace_super_huge_effect = {
+	add_offmap_currency = {
+		offmap = offmap_china
+		value = -2000
+	}
+}
+
+# Added via tribute to China decisions... Always one year.
+set_china_boon_cd_effect = {
+	add_character_modifier = {
+		hidden = yes
+		name = jd_china_boon_cd
+		years = 1 # If this is changed, edit china_offmap_boon_decisions_enabled_trigger_cd_tt
+	}
+}
+
+# Added via tribute to China decisions... Always one year
+set_china_tribute_cd_effect = {
+	add_character_modifier = {
+		hidden = yes
+		name = jd_china_tribute_cd
+		years = 1
+	}
+}
+
+# NOTE: this does not set a "killer", meaning if you want them to be ORDERED to go to China, a killer needs to be set (eg: "killer = ROOT")
+leave_court_for_china_effect = {
+	custom_tooltip = {
+		text = will_leave_for_china_tt
+
+		set_flag = ignore_refund
+		death = { death_reason = death_went_to_china }
+	}
+}
+
+# NOTE: this does not set a "killer", meaning if you want them to be ORDERED to go to China, a killer needs to be set (eg: "killer = ROOT")
+return_to_china_effect = {
+	custom_tooltip = {
+		text = will_return_to_china_tt
+
+		set_flag = ignore_refund
+		death = { death_reason = death_went_back_to_china }
+	}
+}
+
+# Utilizes china_war_minimum_commander_martial variable on the current scope to spawn characters with at least that amount of martial skill
+china_spawn_commander_effect = {
+	create_random_soldier = {
+		random_traits = yes
+		religion = liege
+		culture = liege
+		dynasty = none
+		female = no
+		age = 28
+	}
+	new_character = {
+		unsafe_give_minor_title = title_commander
+
+		set_variable = {
+			which = china_war_minimum_commander_martial
+			which = PREV
+		}
+
+		if = {
+			limit = {
+				NOT = { trait = brilliant_strategist }
+			}
+
+			# Make sure they have a tier 3 or tier 4 education
+			remove_trait = misguided_warrior
+			remove_trait = tough_soldier
+			add_trait = skilled_tactician
+		}
+
+		# Give a chance to get Chinese commander traits
+		random_list = {
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = master_of_flame }
+				}
+				add_trait = master_of_flame
+			}
+
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = logistics_expert }
+				}
+				add_trait = logistics_expert
+			}
+
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = levy_coordinator }
+				}
+				add_trait = levy_coordinator
+			}
+
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = sapper }
+				}
+				add_trait = sapper
+			}
+
+			90 = { }
+		}
+
+		# Increase the martial skill with base or martial traits until the minimum is reached
+		while = {
+			limit = { martial < china_war_minimum_commander_martial }
+
+			random_list = {
+				40 = { change_martial = 1 }
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = strong
+							trait = robust
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = strong
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = strong
+							trait = robust
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = robust
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = shrewd
+							trait = genius
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = shrewd
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = duelist
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = hunter
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+
+							calc_true_if = {
+								amount >= 3
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = strategist
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = architect
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = diligent
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = diligent
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = brave
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = brave
+				}
+
+				5 = {
+					trigger = {
+						NOR = {
+							trait = ambitious
+
+							calc_true_if = {
+								amount >= 3
+
+								trait = strong
+								trait = robust
+								trait = shrewd
+								trait = duelist
+								trait = hunter
+								trait = strategist
+								trait = architect
+								trait = diligent
+								trait = brave
+								trait = ambitious
+							}
+						}
+					}
+
+					add_trait = ambitious
+				}
+			}
+		}
+	}
+}
+
+china_war_spawn_troops_effect = {
+	# Requires the current things to function properly:
+	# event_target:spawn_province
+	# variable: china_war_troop_quality
+	# variable: china_war_troop_quantity
+
+	while = {
+		limit = {
+			check_variable = {
+				which = china_war_troop_quantity
+				value >= 1
+			}
+		}
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = -1
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value < 2
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 168 168 }
+					light_infantry = { 284 284 }
+					heavy_infantry = { 0 0 }
+					pikemen = { 0 0 }
+					light_cavalry = { 41 41 }
+					knights = { 0 0 }
+				}
+				#attrition = 1
+				disband_on_peace = yes
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 2
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 148 148 }
+					light_infantry = { 264 264 }
+					heavy_infantry = { 0 0 }
+					pikemen = { 0 0 }
+					light_cavalry = { 81 81 }
+					knights = { 0 0 }
+				}
+				#attrition = 1
+				disband_on_peace = yes
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 3
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 144 144 }
+					light_infantry = { 221 221 }
+					heavy_infantry = { 49 49 }
+					pikemen = { 0 0 }
+					light_cavalry = { 79 79 }
+					knights = { 0 0 }
+				}
+				#attrition = 1
+				disband_on_peace = yes
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 4
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 144 144 }
+					light_infantry = { 203 203 }
+					heavy_infantry = { 66 66 }
+					pikemen = { 19 19 }
+					light_cavalry = { 61 61 }
+					knights = { 0 0 }
+				}
+				#attrition = 1
+				disband_on_peace = yes
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 5
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 136 136 }
+					light_infantry = { 134 134 }
+					heavy_infantry = { 102 102 }
+					pikemen = { 41 41 }
+					light_cavalry = { 80 80 }
+					knights = { 0 0 }
+				}
+				#attrition = 1
+				disband_on_peace = yes
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 6
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 122 122 }
+					light_infantry = { 71 71 }
+					heavy_infantry = { 85 85 }
+					pikemen = { 78 78 }
+					light_cavalry = { 113 113 }
+					knights = { 24 24 }
+				}
+				#attrition = 1
+				disband_on_peace = yes
+				merge = yes
+			}
+		}
+		else = {
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 107 107 }
+					light_infantry = { 22 22 }
+					heavy_infantry = { 106 106 }
+					pikemen = { 96 96 }
+					light_cavalry = { 111 111 }
+					knights = { 51 51 }
+				}
+				#attrition = 1
+				disband_on_peace = yes
+				merge = yes
+			}
+		}
+	}
+}
+
+china_war_spawn_troops_no_disband_effect = {
+	# Requires the current things to function properly:
+	# event_target:spawn_province
+	# variable: china_war_troop_quality
+	# variable: china_war_troop_quantity
+
+	while = {
+		limit = {
+			check_variable = {
+				which = china_war_troop_quantity
+				value >= 1
+			}
+		}
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = -1
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value < 2
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 168 168 }
+					light_infantry = { 284 284 }
+					heavy_infantry = { 0 0 }
+					pikemen = { 0 0 }
+					light_cavalry = { 41 41 }
+					knights = { 0 0 }
+				}
+				attrition = 0.1
+				disband_on_peace = no
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 2
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 148 148 }
+					light_infantry = { 264 264 }
+					heavy_infantry = { 0 0 }
+					pikemen = { 0 0 }
+					light_cavalry = { 81 81 }
+					knights = { 0 0 }
+				}
+				attrition = 0.1
+				disband_on_peace = no
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 3
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 144 144 }
+					light_infantry = { 221 221 }
+					heavy_infantry = { 49 49 }
+					pikemen = { 0 0 }
+					light_cavalry = { 79 79 }
+					knights = { 0 0 }
+				}
+				attrition = 0.1
+				disband_on_peace = no
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 4
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 144 144 }
+					light_infantry = { 203 203 }
+					heavy_infantry = { 66 66 }
+					pikemen = { 19 19 }
+					light_cavalry = { 61 61 }
+					knights = { 0 0 }
+				}
+				attrition = 0.1
+				disband_on_peace = no
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 5
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 136 136 }
+					light_infantry = { 134 134 }
+					heavy_infantry = { 102 102 }
+					pikemen = { 41 41 }
+					light_cavalry = { 80 80 }
+					knights = { 0 0 }
+				}
+				attrition = 0.1
+				disband_on_peace = no
+				merge = yes
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = china_war_troop_quality
+					value == 6
+				}
+			}
+
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 122 122 }
+					light_infantry = { 71 71 }
+					heavy_infantry = { 85 85 }
+					pikemen = { 78 78 }
+					light_cavalry = { 113 113 }
+					knights = { 24 24 }
+				}
+				attrition = 0.1
+				disband_on_peace = no
+				merge = yes
+			}
+		}
+		else = {
+			spawn_unit = {
+				owner = THIS
+				province = event_target:spawn_province
+				home = event_target:spawn_province
+				troops = {
+					archers = { 107 107 }
+					light_infantry = { 22 22 }
+					heavy_infantry = { 106 106 }
+					pikemen = { 96 96 }
+					light_cavalry = { 111 111 }
+					knights = { 51 51 }
+				}
+				attrition = 0.1
+				disband_on_peace = no
+				merge = yes
+			}
+		}
+	}
+}
+
+china_war_modify_variables_by_status_effect = {
+	# variable: china_war_troop_quality
+	# variable: china_war_troop_quantity
+	# variable: china_war_minimum_commander_martial
+	# variable: china_war_target_match_mult
+
+	if = {
+		limit = {
+			offmap_china = { has_status = china_stable }
+		}
+
+		change_variable = { which = china_war_troop_quality value = 1 }
+		change_variable = { which = china_war_minimum_commander_martial value = 3 }
+	}
+	else_if = {
+		limit = {
+			offmap_china = { has_status = china_unrest }
+		}
+
+		change_variable = { which = china_war_troop_quantity value = -6 }
+		change_variable = { which = china_war_target_match_mult value = -0.15 }
+	}
+	else_if = {
+		limit = {
+			offmap_china = { has_status = china_civil_war }
+		}
+
+		change_variable = { which = china_war_troop_quantity value = -6 }
+		change_variable = { which = china_war_target_match_mult value = -0.25 }
+		change_variable = { which = china_war_troop_quality value = -1 }
+		change_variable = { which = china_war_minimum_commander_martial value = -6 }
+	}
+	else_if = {
+		limit = {
+			offmap_china = {
+				OR = {
+					has_status = china_jurchen_invasion
+					has_status = china_mongol_invasion
+				}
+			}
+		}
+
+		change_variable = { which = china_war_troop_quantity value = -7 }
+		change_variable = { which = china_war_target_match_mult value = -0.4 }
+		change_variable = { which = china_war_troop_quality value = -1 }
+		change_variable = { which = china_war_minimum_commander_martial value = -2 }
+	}
+	else_if = {
+		limit = {
+			offmap_china = { has_status = china_famine }
+		}
+
+		change_variable = { which = china_war_troop_quantity value = -4 }
+		change_variable = { which = china_war_target_match_mult value = -0.30 }
+		change_variable = { which = china_war_troop_quality value = -2 }
+		change_variable = { which = china_war_minimum_commander_martial value = -2 }
+	}
+	else_if = {
+		limit = {
+			offmap_china = { has_status = china_plague }
+		}
+
+		change_variable = { which = china_war_troop_quantity value = -6 }
+		change_variable = { which = china_war_target_match_mult value = -0.35 }
+		change_variable = { which = china_war_troop_quality value = -1 }
+		change_variable = { which = china_war_minimum_commander_martial value = -4 }
+	}
+	else_if = {
+		limit = {
+			offmap_china = { has_status = china_golden_age }
+		}
+
+		change_variable = { which = china_war_target_match_mult value = 0.65 }
+		change_variable = { which = china_war_troop_quality value = 2 }
+		change_variable = { which = china_war_minimum_commander_martial value = 5 }
+	}
+}
+
+china_war_modify_variables_by_century_effect = {
+	if = {
+		limit = {
+			year >= 800
+			year < 900
+		}
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = 2
+		}
+	}
+	else_if = {
+		limit = {
+			year >= 900
+			year < 1000
+		}
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = 3
+		}
+	}
+	else_if = {
+		limit = {
+			year >= 1000
+			year < 1100
+		}
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = 4
+		}
+	}
+	else_if = {
+		limit = {
+			year >= 1100
+			year < 1200
+		}
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = 5
+		}
+		change_variable = {
+			which = china_war_target_match_mult
+			value = 0.05
+		}
+	}
+	else_if = {
+		limit = {
+			year >= 1200
+			year < 1300
+		}
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = 7
+		}
+		change_variable = {
+			which = china_war_target_match_mult
+			value = 0.05
+		}
+		change_variable = {
+			which = china_war_troop_quality
+			value = 1
+		}
+	}
+	else_if = {
+		limit = { year >= 1300 }
+
+		change_variable = {
+			which = china_war_troop_quantity
+			value = 8
+		}
+		change_variable = {
+			which = china_war_target_match_mult
+			value = 0.05
+		}
+		change_variable = {
+			which = china_war_troop_quality
+			value = 1
+		}
+	}
+}
+
+# Checks whether the Emperor likes target and shows tooltips (used in event JD.10010)
+check_likes_or_dislikes_THIS_effect = {
+ 	if = {  # If the current Emperor LIKES target
+		limit = { is_liked_by_China_trigger = yes }
+
+		offmap_china = {
+			show_scope_change = no
+
+			custom_tooltip = { text = emperor_likes_THIS_tt }
+		}
+	}
+	else_if = { # If the current Emperor DISLIKES target
+		limit = { is_disliked_by_China_trigger = yes }
+		offmap_china = {
+			show_scope_change = no
+
+			custom_tooltip = { text = emperor_dislikes_THIS_tt }
+		}
+	}
+	else = { #If the current Emperor LIKES *and* DISLIKES target
+		offmap_china = {
+			show_scope_change = no
+
+			custom_tooltip = { text = emperor_has_ambiguous_feelings_of_THIS_tt }
+		}
+	}
+}
+
+print_china_status_update_effect = {
+	log = "----------------"
+	log = "China Logging:"
+	log = "China's status of [This.GetPrevStatus] ended after [global_temp_status_years.GetValue] years."
+	log = "China's new status is [This.GetStatus]."
+	log = "----------------"
+
+	set_variable = {
+		which = global_temp_status_years
+		value = 0
+	}
+
+	trigger_switch = {
+		on_trigger = has_status
+
+		china_stable = {
+			change_variable = {
+				which = global_amount_of_times_china_stable
+				value = 1
+			}
+		}
+		china_unrest = {
+			change_variable = {
+				which = global_amount_of_times_china_unrest
+				value = 1
+			}
+		}
+		china_civil_war = {
+			change_variable = {
+				which = global_amount_of_times_china_civil_war
+				value = 1
+			}
+		}
+		china_mongol_invasion = {
+			change_variable = {
+				which = global_amount_of_times_china_mongol_invasion
+				value = 1
+			}
+		}
+		china_jurchen_invasion = {
+			change_variable = {
+				which = global_amount_of_times_china_jurchen_invasion
+				value = 1
+			}
+		}
+		china_famine = {
+			change_variable = {
+				which = global_amount_of_times_china_famine
+				value = 1
+			}
+		}
+		china_plague = {
+			change_variable = {
+				which = global_amount_of_times_china_plague
+				value = 1
+			}
+		}
+		china_golden_age = {
+			if = {
+				limit = { has_policy = china_expansionist }
+
+				change_variable = {
+					which = global_amount_of_times_china_golden_age_expansionist
+					value = 1
+				}
+			}
+			else = {
+				change_variable = {
+					which = global_amount_of_times_china_golden_age
+					value = 1
+				}
+			}
+		}
+	}
+}
+
+print_china_policy_update_effect = {
+	log = "----------------"
+	log = "China Logging:"
+	log = "China's policy of [This.GetPrevPolicy] ended after [global_temp_policy_years.GetValue] years."
+	log = "China's new policy is [This.GetPolicy]."
+	log = "----------------"
+
+	set_variable = {
+		which = global_temp_policy_years
+		value = 0
+	}
+
+	trigger_switch = {
+		on_trigger = has_policy
+
+		china_open = {
+			# Currently nothing
+		}
+		china_isolationist = {
+			change_variable = {
+				which = global_amount_of_times_china_isolationist_policy
+				value = 1
+			}
+		}
+		china_expansionist = {
+			change_variable = {
+				which = global_amount_of_times_china_expansionist_policy
+				value = 1
+			}
+		}
+	}
+}
+
+print_china_ruler_update_effect = {
+	log = "----------------"
+	log = "Ruler of China died at the age of [From.GetAgeYears]."
+	log = "New Ruler of China is [Root.GetBestName] ([From.GetCulture], From.GetReligion])."
+	log = "----------------"
+}
+
+abort_kow_tow_effect = {
+	if = {
+		limit = {
+			NOT = { has_flag = kow_tow_hide_abort_notification }
+		}
+		character_event = { id = JD.32299 }
+	}
+
+	clear_delayed_event = { id = JD.32005 }
+	clear_delayed_event = { id = JD.32200 }
+	clear_delayed_event = { id = JD.32113 }
+	clear_delayed_event = { id = JD.32111 }
+	clear_delayed_event = { id = JD.32210 }
+	clear_delayed_event = { id = JD.32290 }
+	clr_flag = went_on_kow_tow_pilgrimage
+	clean_up_after_kow_tow_effect = yes
+}
+
+return_to_travel_tombola_effect = {
+	hidden_effect = {
+		event_target:kow_tow_traveler = {
+			subtract_variable = {
+				which = china_kow_tow_travel_events
+				value = 1
+			}
+
+			character_event = {
+				id = JD.32005 # Travel Tombola
+				days = 90
+				random = 60
+			}
+		}
+	}
+}
+
+return_to_china_tombola_effect = {
+	hidden_effect = {
+		event_target:kow_tow_traveler = {
+			subtract_variable = {
+				which = china_kow_tow_travel_events
+				value = 1
+			}
+
+			character_event = {
+				id = JD.32210 # Within China Tombola
+				days = 70
+				random = 30
+			}
+		}
+	}
+}
+
+clean_up_after_kow_tow_effect = {
+	remove_trait = kow_tow_travels
+	clr_flag = do_not_disturb
+
+	clr_flag = read_the_guanzi
+	clr_flag = missed_loved_one
+	clr_flag = met_mercenaries
+	clr_flag = met_traveling_merchant
+	clr_flag = visited_market
+	clr_flag = kow_tow_invited_by_local_lord
+	clr_flag = kow_tow_heavy_rain
+	clr_flag = kow_tow_played_go
+	clr_flag = kow_tow_hide_abort_notification
+	clr_flag = kow_tow_visited_temple
+}
+
+# Used in event JD.15016 (possible to use elsewhere!)
+add_chinese_artifact_effect = {
+	hidden_effect = {
+		random_list = {
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_artwork }
+					}
+				}
+
+				add_artifact = chinese_artwork
+
+				new_artifact = {
+					set_name = chinese_artwork_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_calligraphy }
+					}
+				}
+
+				add_artifact = chinese_calligraphy
+
+				new_artifact = {
+					set_name = chinese_calligraphy_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_sculpture }
+					}
+				}
+
+				add_artifact = chinese_sculpture
+
+				new_artifact = {
+					set_name = chinese_sculpture_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_ceremonial_robes }
+					}
+				}
+
+				add_artifact = chinese_ceremonial_robes
+			}
+
+			10 = {
+
+				add_artifact = chinese_prev_emperor_sculpture
+
+				new_artifact = {
+					set_name = chinese_figurine_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_arm_protector }
+					}
+				}
+
+				add_artifact = chinese_arm_protector
+
+				new_artifact = {
+					set_name = chinese_arm_protector_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_serpent_spear }
+					}
+				}
+
+				add_artifact = chinese_serpent_spear
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_ji }
+					}
+				}
+
+				add_artifact = chinese_ji
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_crossbow }
+					}
+				}
+
+				add_artifact = chinese_crossbow
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_bronze_sculpture }
+					}
+				}
+
+				add_artifact = chinese_bronze_sculpture
+
+				new_artifact = {
+					set_name = chinese_bronze_sculpture_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_book_health }
+					}
+				}
+
+				add_artifact = chinese_book_health
+
+				new_artifact = {
+					set_name = chinese_book_health_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_book_law }
+					}
+				}
+
+				add_artifact = chinese_book_law
+
+				new_artifact = {
+					set_name = chinese_book_law_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_book_history }
+					}
+				}
+
+				add_artifact = chinese_book_history
+
+				new_artifact = {
+					set_name = chinese_book_history_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_book_economy }
+					}
+				}
+
+				add_artifact = chinese_book_economy
+
+				new_artifact = {
+					set_name = chinese_book_economy_name
+				}
+			}
+
+			1 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_painting_of_glitterhoof }
+					}
+				}
+
+				add_artifact = chinese_painting_of_glitterhoof
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_tapestry }
+					}
+				}
+
+				random_independent_ruler = {
+					limit = {
+						any_realm_province = {
+							trade_route = silk_road
+						}
+					}
+
+					random_realm_province = {
+						limit = { trade_route = silk_road }
+
+						save_event_target_as = tapestry_target
+					}
+				}
+
+				add_artifact = chinese_tapestry
+
+				new_artifact = {
+					set_name = chinese_tapestry_name
+				}
+			}
+
+			10 = {
+				trigger = {
+					ROOT = {
+						NOT = { has_artifact = chinese_tapestry_grand }
+					}
+				}
+
+				add_artifact = chinese_tapestry_grand
+
+				new_artifact = {
+					set_name = chinese_tapestry_grand_name
+				}
+			}
+		}
+
+		new_artifact = {
+			save_event_target_as = chinese_artifact
+		}
+	}
+}

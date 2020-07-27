@@ -1,0 +1,62 @@
+# remove_assassins_debt_effect
+# pay_back_assassins_effect
+
+remove_assassins_debt_effect = {
+	if = {
+		limit = { has_character_modifier = assassins_debt }
+
+		remove_character_modifier = assassins_debt
+		clr_flag = assassins_target_debt
+		clear_delayed_event = { id = MNM.6009 }
+
+		hidden_effect = {
+			set_variable = {
+				which = assassins_debt
+				value = 0
+			}
+		}
+	}
+}
+
+pay_back_assassins_effect = {
+	# Unitialised variables automatically start at 0
+	subtract_variable = {
+		which = assassins_debt_negative
+		which = assassins_debt
+	}
+
+	wealth = assassins_debt_negative
+
+	log = "[This.GetBestName] paid [assassins_debt.GetValue] to [grand_master.GetBestName], paying back [This.GetHerHis] debt"
+
+	set_variable = {
+		which = assassins_debt_negative
+		value = 0
+	}
+
+	hidden_effect = {
+		event_target:grand_master = {
+			if = {
+				limit = {
+					ai = yes
+					primary_title = { title = d_hashshashin }
+				}
+
+				set_variable = {
+					which = assassins_debt	# variable name in this scope
+					which = assassins_debt	# variable name in other scope
+					which = PREV			# other scope
+				}
+
+				wealth = assassins_debt
+
+				log = "[This.GetBestName] was paid [assassins_debt.GetValue] by [Prev.GetBestName]"
+
+				set_variable = {
+					which = assassins_debt
+					value = 0
+				}
+			}
+		}
+	}
+}

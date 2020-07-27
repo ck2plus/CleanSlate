@@ -1,0 +1,600 @@
+# has_grace_trivial_trigger
+# has_grace_minor_trigger
+# has_grace_medium_trigger
+# has_grace_major_trigger
+# has_grace_massive_trigger
+
+# china_diplo_interaction_trigger
+# china_is_suffering_trigger
+# china_is_fine_trigger
+# china_is_stable_open_trigger
+# china_is_stable_expansionist_trigger
+# china_is_golden_age_open_trigger
+# china_is_golden_age_expansionist_trigger
+
+# china_offmap_boon_decisions_enabled_trigger
+# china_offmap_tribute_decisions_enabled_trigger
+# china_offmap_decisions_enabled_trigger
+# china_offmap_hostile_decisions_enabled_trigger
+
+# local_third_party_score_low_trigger
+# local_third_party_score_medium_trigger
+# local_third_party_score_great_trigger
+
+# is_liked_by_China_trigger
+# is_disliked_by_China_trigger
+# is_liked_and_disliked_by_China
+
+# valid_offmap_china_target
+# valid_offmap_china_target_location
+# valid_offmap_china_target_location_tributary_chain
+
+# likes_concubines
+# likes_eunuchs
+# likes_wealth
+# likes_tributaries
+# likes_indians
+# likes_dravidians
+# likes_tibetans
+# likes_germanics
+# likes_latino_iberians
+# likes_byzantines
+# likes_celts
+# likes_finno_ugrics
+# likes_altaics
+# likes_balto_slavics
+# likes_arabs
+# likes_iranians
+# likes_africans
+# likes_mesoamericans
+# likes_muslims
+# likes_christians
+# likes_jews
+# likes_mazdans
+# likes_zoroastrians
+# likes_mazdakis
+# likes_manicheans
+# likes_khurmaztans
+# likes_buddhists
+# likes_hindus
+# likes_jains
+# likes_tengris
+# likes_zunists
+# likes_bon
+
+# courtier_from_china_trigger
+# death_in_china_trigger
+
+###CHINA TRIGGERS###
+
+# Grace triggers
+has_grace_trivial_trigger = {
+	has_offmap_currency = {
+		offmap = offmap_china
+		value >= 10
+	}
+}
+
+has_grace_minor_trigger = {
+	has_offmap_currency = {
+		offmap = offmap_china
+		value >= 50
+	}
+}
+
+has_grace_medium_trigger = {
+	has_offmap_currency = {
+		offmap = offmap_china
+		value >= 150
+	}
+}
+
+has_grace_major_trigger = {
+	has_offmap_currency = {
+		offmap = offmap_china
+		value >= 500
+	}
+}
+
+has_grace_massive_trigger = {
+	has_offmap_currency = {
+		offmap = offmap_china
+		value >= 1000
+	}
+}
+
+# Always put this at the end of your triggers! - TODO: Find out why
+china_diplo_interaction_trigger = {
+	offmap_china = {
+		governor = {
+			NOT = { war_with = PREVPREV }
+			is_within_diplo_range = PREVPREV
+		}
+		NOT = { has_policy = china_isolationist }
+	}
+
+	trigger_if = {
+		limit = { government = chinese_imperial_government }
+
+		custom_tooltip = {
+			text = china_offmap_decisions_pretender_emperor_tt
+
+			always = no
+		}
+	}
+}
+
+china_is_suffering_trigger = {
+	offmap_china = {
+		OR = {
+			has_status = china_unrest
+			has_status = china_civil_war
+			has_status = china_famine
+			has_status = china_plague
+			has_status = china_mongol_invasion
+			has_status = china_jurchen_invasion
+		}
+	}
+}
+
+# "fine", read like "fiii-iine", i.e. China is currently treating the world as their oyster
+china_is_fine_trigger = {
+	offmap_china = {
+		OR = {
+			has_status = china_golden_age
+			has_status = china_stable
+		}
+
+		OR = {
+			has_policy = china_open
+			has_policy = china_expansionist
+		}
+	}
+}
+
+china_is_stable_open_trigger = {
+	offmap_china = {
+		has_status = china_stable
+		has_policy = china_open
+	}
+}
+
+china_is_stable_expansionist_trigger = {
+	offmap_china = {
+		has_status = china_stable
+		has_policy = china_expansionist
+	}
+}
+
+china_is_golden_age_open_trigger = {
+	offmap_china = {
+		has_status = china_golden_age
+		has_policy = china_open
+	}
+}
+
+china_is_golden_age_expansionist_trigger = {
+	offmap_china = {
+		has_status = china_golden_age
+		has_policy = china_expansionist
+	}
+}
+
+# Found in the 00_offmap_powers file... and the conditions for the decisions
+china_offmap_boon_decisions_enabled_trigger = {
+	china_offmap_decisions_enabled_trigger = yes
+
+	custom_tooltip = {
+		text = china_offmap_boon_decisions_enabled_trigger_cd_tt
+
+		FROM = { # FROM is player character
+			NOT = { # Boon cooldown, which is set in each decision (one year!)...
+				has_character_modifier = jd_china_boon_cd
+			}
+		}
+	}
+}
+
+# Found in the 00_offmap_powers file... and the conditions for the decisions, use custom tooltip for that decisions cooldown modifier
+china_offmap_tribute_decisions_enabled_trigger = {
+	china_offmap_decisions_enabled_trigger = yes
+}
+
+# What goes into the two triggers above...
+china_offmap_decisions_enabled_trigger = {
+	hidden_trigger = { has_dlc = "Jade Dragon" }
+
+	offmap_china = {
+		NOT = { has_policy = china_isolationist }
+
+		custom_tooltip = {
+			text = china_offmap_decisions_enabled_trigger_war_tt # "Is at peace with §Y[From.GetTitledFirstName]§!"
+
+			governor = {
+				NOT = { war_with = FROM }
+			}
+		}
+
+		governor = {
+			show_scope_change = no
+			is_within_diplo_range = FROM
+
+			hidden_trigger = {
+				NOT = { character = FROM } # Governor cannot use boon/tributes decisions
+			}
+		}
+	}
+
+	custom_tooltip = {
+		text = china_offmap_boon_decisions_enabled_trigger_raiding_tt
+
+		FROM = {
+			NOR = {
+				has_character_modifier = china_raid_active
+				has_character_modifier = china_raid_grace_cd
+			}
+		}
+	}
+
+	trigger_if = {
+		limit = {
+			FROM = {
+				primary_title = {
+					has_title_flag = rebel_general_title
+				}
+			}
+		}
+
+		custom_tooltip = {
+			text = china_offmap_decisions_pretender_emperor_tt
+			always = no
+		}
+	}
+
+	trigger_if = {
+		limit = {
+			FROM = {
+				has_character_modifier = failed_invasion_of_china
+			}
+		}
+
+		custom_tooltip = {
+			text = china_offmap_decisions_failed_invasion_tt
+			always = no
+		}
+	}
+}
+
+# Found in the 00_offmap_powers file... and the conditions for the force open china decision
+china_offmap_hostile_decisions_enabled_trigger = {
+	hidden_trigger = { has_dlc = "Jade Dragon" }
+
+	offmap_china = {
+		custom_tooltip = {
+			text = china_offmap_decisions_enabled_trigger_war_tt # "Is at peace with §Y[From.GetTitledFirstName]§!"
+
+			governor = {
+				NOT = { war_with = FROM }
+			}
+		}
+
+		governor = {
+			show_scope_change = no
+			is_within_diplo_range = FROM
+
+			hidden_trigger = {
+				NOT = { character = FROM } # Governor cannot use boon/tributes decisions
+			}
+		}
+
+		offmap_ruler = {
+			NOT = { dynasty = FROM }
+		}
+	}
+}
+
+# Used with Sending Tribute characters to China...
+local_third_party_score_low_trigger = {
+	check_variable = {
+		which = local_third_party_score
+		value <= 90
+	}
+}
+
+local_third_party_score_medium_trigger = {
+	check_variable = {
+		which = local_third_party_score
+		value > 90
+	}
+	check_variable = {
+		which = local_third_party_score
+		value <= 140
+	}
+}
+
+local_third_party_score_great_trigger = {
+	check_variable = {
+		which = local_third_party_score
+		value > 140
+	}
+}
+
+# For checking the Chinese Emperor's likes & dislikes
+is_liked_by_China_trigger = {
+	liked_by_offmap = {
+		type = offmap_china
+	}
+
+	NOT = {
+		disliked_by_offmap = {
+			type = offmap_china
+		}
+	}
+
+	offmap_china = {
+		show_scope_change = no
+		custom_tooltip = { text = emperor_likes_THIS_tt }
+	}
+}
+
+is_disliked_by_China_trigger = {
+	disliked_by_offmap = {
+		type = offmap_china
+	}
+
+	NOT = {
+		liked_by_offmap = {
+			type = offmap_china
+		}
+	}
+
+	offmap_china = {
+		show_scope_change = no
+		custom_tooltip = { text = emperor_dislikes_THIS_tt }
+	}
+}
+
+is_liked_and_disliked_by_China = {
+	disliked_by_offmap = {
+		type = offmap_china
+	}
+
+	liked_by_offmap = {
+		type = offmap_china
+	}
+
+	offmap_china = {
+		show_scope_change = no
+		custom_tooltip = { text = emperor_has_ambiguous_feelings_of_THIS_tt }
+	}
+}
+
+# Used in the invasion script...
+valid_offmap_china_target = {
+	is_landed = yes
+	higher_tier_than = BARON
+	is_within_diplo_range = ROOT
+	in_revolt = no
+
+	NOR = {
+		character = ROOT
+		has_character_modifier = peace_deal_with_china
+		has_character_flag = defeated_china
+		is_tributary = { suzerain = ROOT }
+
+		primary_title = {
+			has_title_flag = rebel_general_title # Uses special CB to target
+		}
+
+		offmap_china = {
+			offmap_ruler = {
+				dynasty = PREVPREV
+			}
+		}
+	}
+}
+
+valid_offmap_china_target_location = {
+	OR = {
+		any_realm_province = {
+			region = custom_chinese_invasion_target_region
+		}
+
+		any_neighbor_independent_ruler = {
+			has_landed_title = e_china_west_governor
+		}
+	}
+}
+
+valid_offmap_china_target_location_tributary_chain = {
+	OR = {
+		#any_realm_province = { region = custom_chinese_invasion_target_region }
+
+		any_neighbor_independent_ruler = {
+			has_landed_title = e_china_west_governor
+		}
+
+		any_neighbor_independent_ruler = {
+			is_tributary = yes
+
+			suzerain = {
+				has_landed_title = e_china_west_governor
+			}
+		}
+	}
+}
+
+# JADE DRAGON
+# EMPEROR LIKES & DISLIKES
+likes_concubines = {
+	context = concubine # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+}
+
+likes_eunuchs = {
+	context = eunuch # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+	trait = eunuch
+}
+
+likes_wealth = {
+	context = wealth # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+}
+
+likes_tributaries = {
+	context = tributary # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+}
+
+likes_indians = {
+	culture_group = indo_aryan_group
+}
+
+likes_dravidians = {
+	culture_group = dravidian_group
+}
+
+likes_tibetans = {
+	culture_group = tibetan_group
+}
+
+likes_germanics = {
+	OR = {
+		culture_group = north_germanic
+		culture_group = central_germanic
+		culture_group = west_germanic
+	}
+}
+
+likes_latino_iberians = {
+	OR = {
+		culture_group = latin
+		culture_group = iberian
+	}
+}
+
+likes_byzantines = {
+	culture_group = byzantine
+}
+
+likes_celts = {
+	culture_group = celtic
+}
+
+likes_finno_ugrics = {
+	OR = {
+		culture_group = finno_ugric
+		culture_group = magyar
+	}
+}
+
+likes_altaics = {
+	culture_group = altaic
+}
+
+likes_balto_slavics = {
+	OR = {
+		culture_group = baltic
+		culture_group = east_slavic
+		culture_group = west_slavic
+		culture_group = south_slavic
+	}
+}
+
+likes_arabs = {
+	culture_group = arabic
+}
+
+likes_iranians = {
+	culture_group = iranian
+}
+
+likes_africans = {
+	OR = {
+		culture_group = west_african
+		culture_group = east_african
+	}
+}
+
+likes_mesoamericans = {
+	culture_group = mesoamerican
+}
+
+likes_muslims = {
+	religion_group = muslim
+}
+
+likes_christians = {
+	religion_group = christian
+}
+
+likes_jews = {
+	religion_group = jewish_group
+}
+
+likes_mazdans = {
+	religion_group = zoroastrian_group
+}
+
+likes_zoroastrians = {
+	religion = zoroastrian
+}
+
+likes_mazdakis = {
+	religion = mazdaki
+}
+
+likes_manicheans = {
+	religion = manichean
+}
+
+likes_khurmaztans = {
+	religion = khurmazta
+}
+
+likes_buddhists = {
+	religion = buddhist
+}
+
+likes_hindus = {
+	religion = hindu
+}
+
+likes_jains = {
+	religion = jain
+}
+
+likes_tengris = {
+	OR = {
+		religion = tengri_pagan
+		religion = tengri_pagan_reformed
+	}
+}
+
+likes_zunists = {
+	OR = {
+		religion = zun_pagan
+		religion = zun_pagan_reformed
+	}
+}
+
+likes_bon = {
+	OR = {
+		religion = bon
+		religion = bon_reformed
+	}
+}
+
+courtier_from_china_trigger = {
+	custom_tooltip = {
+		text = courtier_from_china_trigger_tt
+
+		has_character_flag = originated_from_chinese_court
+	}
+}
+
+death_in_china_trigger = {
+	OR = {
+		death_reason = death_went_to_china
+		death_reason = death_offmap
+		death_reason = death_went_back_to_china
+		death_reason = death_in_china_historic
+	}
+}
