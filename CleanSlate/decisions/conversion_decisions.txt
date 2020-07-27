@@ -1025,7 +1025,10 @@ targeted_decisions = {
 
 		effect = {
 			piety = -50
-			abandon_heresy = yes
+
+			# Workaround for automatic usurption of theocratic characters
+			set_character_flag = convert_abandon_heresy
+			convert_religion_failsafe_effect = yes
 
 			hidden_effect = {
 				any_courtier = {
@@ -3046,7 +3049,11 @@ decisions = {
 			}
 
 			k_papal_state = {
+				show_scope_change = no
+
 				holder_scope = {
+					show_scope_change = no
+
 					opinion = {
 						who = ROOT
 						modifier = opinion_renounced_iconoclasm
@@ -3066,25 +3073,36 @@ decisions = {
 				}
 			}
 
-			activate_title = {
-				title = k_orthodox
-				status = yes
-			}
+			hidden_effect = {
+				d_iconoclast = {
+					show_scope_change = no
 
-			d_iconoclast = {
-				holder_scope = {
-					k_orthodox = {
-						grant_title = PREV
+					holder_scope = {
+						show_scope_change = no
+
+						# Workaround for automatic usurption of theocratic characters
+
+						set_character_flag = needs_temporary_fake_theocracy_government
+						set_government_type = temporary_fake_theocracy_government
+						unsafe_religion = orthodox
+						set_government_type = theocracy_government
+						clr_character_flag = usurpfix_pseudo_theocrat
+
+						activate_title = {
+							title = k_orthodox
+							status = yes
+						}
+
+						grant_title = k_orthodox
+						set_defacto_liege = ROOT
+						unsafe_destroy_landed_title = d_iconoclast
+
+						activate_title = {
+							title = d_iconoclast
+							status = no
+						}
 					}
-					unsafe_religion = orthodox  # Use this effect with care
-					set_defacto_liege = ROOT
 				}
-				hidden_effect = { unsafe_destroy_landed_title = THIS }
-			}
-
-			activate_title = {
-				title = d_iconoclast
-				status = no
 			}
 		}
 

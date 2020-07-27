@@ -2037,3 +2037,61 @@ reformation_god_names_changes_effect = {
 		}
 	}
 }
+
+convert_religion_failsafe_effect = {
+	hidden_effect = {
+		if = {
+			limit = {
+				is_theocracy = yes
+				is_ruler = yes
+			}
+
+			set_character_flag = needs_temporary_fake_theocracy_government
+			set_government_type = temporary_fake_theocracy_government
+		}
+	}
+
+	trigger_switch = {
+		on_trigger = has_character_flag
+
+		convert_secret = {
+			convert_to_secret_religion = yes
+			clr_character_flag = convert_secret
+		}
+
+		convert_heretic = {
+			become_heretic = yes
+			clr_character_flag = convert_heretic
+		}
+
+		convert_abandon_heresy = {
+			abandon_heresy = yes
+			clr_character_flag = convert_abandon_heresy
+		}
+
+		fallback = {
+			religion = event_target:target_religion
+			clear_event_target = target_religion
+		}
+	}
+
+	hidden_effect = {
+		if = {
+			limit = { government = temporary_fake_theocracy_government }
+
+			if = {
+				limit = { is_government_potential = muslim_government }
+				set_government_type = muslim_government
+			}
+			else_if = {
+				limit = { is_government_potential = theocratic_feudal_government }
+				set_government_type = theocratic_feudal_government
+			}
+			else = {
+				set_government_type = theocracy_government
+			}
+
+			clr_character_flag = usurpfix_pseudo_theocrat
+		}
+	}
+}
