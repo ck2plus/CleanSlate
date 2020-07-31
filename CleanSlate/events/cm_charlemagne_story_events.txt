@@ -1154,7 +1154,8 @@ character_event = {
 						NOT = {
 							has_character_flag = is_charlemagne
 						}
-						religion = catholic
+						is_catholic_branch = yes
+						is_heretic = no
 						is_feudal = yes
 					}
 				}
@@ -1176,7 +1177,8 @@ character_event = {
 			random_independent_ruler = {
 				limit = {
 					tier = KING
-					religion = catholic
+					is_catholic_branch = yes
+					is_heretic = no
 					is_feudal = yes
 					NOT = { has_character_flag = is_charlemagne }
 				}
@@ -1189,14 +1191,16 @@ character_event = {
 				NOT = {
 					any_independent_ruler = {
 						tier = KING
-						religion = catholic
+						is_catholic_branch = yes
+						is_heretic = no
 					}
 				}
 			}
 			random_independent_ruler = {
 				limit = {
 					tier = DUKE
-					religion = catholic
+					is_catholic_branch = yes
+					is_heretic = no
 					is_feudal = yes
 				}
 				character_event = { id = CM.1076 }
@@ -1505,10 +1509,7 @@ narrative_event = {
 			}
 		}
 		NOT = { has_global_flag = saxon_wars }
-		OR = {
-			primary_title = { tier = EMPEROR }
-			primary_title = { tier = KING }
-		}
+		higher_real_tier_than = DUKE
 		k_saxony = {
 			holder_scope = {
 				culture = old_saxon
@@ -1597,10 +1598,7 @@ narrative_event = {
 			any_independent_ruler = {
 				any_realm_character = {
 					limit = {
-						OR = {
-							religion = norse_pagan
-							religion = norse_pagan_reformed
-						}
+						religion_openly_norse_or_reformed_trigger = yes
 					}
 					add_character_modifier = { #Prevents rebuilding one immediately after.
 						name = recently_destroyed_great_pillar_cooldown
@@ -1618,8 +1616,7 @@ narrative_event = {
 					ai = no
 					NOT = { character = ROOT }
 					OR = {
-						religion = norse_pagan
-						religion = norse_pagan_reformed
+						religion_openly_norse_or_reformed_trigger = yes
 						religion_group = christian
 					}
 				}
@@ -1629,7 +1626,7 @@ narrative_event = {
 		custom_tooltip = { text = sacrilege_tooltip }
 	}
 	option = {
-		name = EVTOPTB_CM_1101 # Keep it and build a new Christian church on the cite
+		name = EVTOPTB_CM_1101 # Keep it and build a new Christian church on the site
 		ai_chance = {
 			factor = 0
 		}
@@ -1646,7 +1643,7 @@ narrative_event = {
 	}
 }
 
-# Notify all Norse and Christian players of destruction of Irminsul
+# Notify all Germanic and Christian players of destruction of Irminsul
 narrative_event = {
 	id = CM.1102
 	desc = EVTDESC_CM_1102
@@ -1658,20 +1655,14 @@ narrative_event = {
 	option = {
 		name = EVTOPTA_CM_1102
 		trigger = {
-			OR = {
-				religion = norse_pagan
-				religion = norse_pagan_reformed
-			}
+			religion_openly_norse_or_reformed_trigger = yes
 			culture = old_saxon
 		}
 	}
 	option = {
 		name = EVTOPTB_CM_1102
 		trigger = {
-			OR = {
-				religion = norse_pagan
-				religion = norse_pagan_reformed
-			}
+			religion_openly_norse_or_reformed_trigger = yes
 			NOT = { culture = old_saxon }
 		}
 	}
@@ -1703,27 +1694,18 @@ narrative_event = {
 	trigger = {
 		NOT = { year = 900 }
 		NOT = { has_global_flag = blood_court_of_verden }
-		OR = {
-			primary_title = { tier = EMPEROR }
-			primary_title = { tier = KING }
-		}
+		higher_real_tier_than = DUKE
 		NOT = { culture = old_saxon }
 		NOT = { religion_group = pagan_group }
 		any_realm_province = {
 			culture = old_saxon
-			OR = {
-				religion = norse_pagan
-				religion = norse_pagan_reformed
-			}
+			religion_openly_norse_or_reformed_trigger = yes
 		}
 		any_courtier = {
 			prisoner = yes
 			host = { character = ROOT }
 			culture = old_saxon
-			OR = {
-				religion = norse_pagan
-				religion = norse_pagan_reformed
-			}
+			religion_openly_norse_or_reformed_trigger = yes
 		}
 	}
 
@@ -1751,10 +1733,7 @@ narrative_event = {
 				prisoner = yes
 				host = { character = ROOT }
 				culture = old_saxon
-				OR = {
-					religion = norse_pagan
-					religion = norse_pagan_reformed
-				}
+				religion_openly_norse_or_reformed_trigger = yes
 			}
 			death = {
 				death_reason = death_execution_beheading
@@ -1781,18 +1760,30 @@ narrative_event = {
 	has_global_flag = saxon_wars
 
 	trigger = {
+		higher_real_tier_than = DUKE
 		NOT = { has_global_flag = widukind_spawned }
 		NOT = { culture = old_saxon }
 		NOT = { religion_group = pagan_group }
-		OR = {
-			has_landed_title = k_saxony
-			any_realm_character = { has_landed_title = k_saxony }
-			has_landed_title = d_saxony
-			any_realm_character = { has_landed_title = d_saxony }
-			has_landed_title = d_brunswick
-			any_realm_character = { has_landed_title = d_brunswick }
-			has_landed_title = d_holstein
-			any_realm_character = { has_landed_title = d_holstein }
+		trigger_if = {
+			limit = {
+				NOR = {
+					has_landed_title = k_saxony
+					k_saxony = {
+						holder_scope = { is_vassal_or_below_of = ROOT }
+					}
+				}
+			}
+
+			k_saxony = {
+				any_direct_de_jure_vassal_title = {
+					holder_scope = {
+						OR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
+					}
+				}
+			}
 		}
 		OR = {
 			has_character_flag = is_charlemagne
@@ -1806,16 +1797,9 @@ narrative_event = {
 				}
 			}
 		}
-		OR = {
-			primary_title = { tier = EMPEROR }
-			primary_title = { tier = KING }
-		}
 		any_realm_province = {
 			culture = old_saxon
-			OR = {
-				religion = norse_pagan
-				religion = norse_pagan_reformed
-			}
+			religion_openly_norse_or_reformed_trigger = yes
 		}
 	}
 
@@ -1833,10 +1817,7 @@ narrative_event = {
 		random_realm_province = {
 			limit = {
 				culture = old_saxon
-				OR = {
-					religion = norse_pagan
-					religion = norse_pagan_reformed
-				}
+				religion_openly_norse_or_reformed_trigger = yes
 			}
 			hidden_tooltip = { province_event = { id = CM.1106 } }
 		}
@@ -1879,10 +1860,9 @@ province_event = {
 			set_defacto_liege = THIS
 			prestige = 100
 			piety = 50
-			add_claim = k_saxony
-			add_claim = d_saxony
-			add_claim = d_brunswick
-			add_claim = d_holstein
+
+			save_event_target_as = widukind
+
 			create_title = {
 				tier = DUKE
 				landless = yes
@@ -1891,6 +1871,19 @@ province_event = {
 				name = "WIDUKIND_ARMY"
 				holder = THIS
 			}
+		}
+
+		# Give Widukind his claims
+		k_saxony = {
+			add_claim = event_target:widukind
+
+			any_direct_de_jure_vassal_title = {
+				event_target:widukind = { add_claim = PREV }
+			}
+		}
+
+		# Widukind gets his army
+		event_target:widukind = {
 			spawn_unit = {
 				owner = THIS
 				leader = THIS
@@ -1928,67 +1921,28 @@ province_event = {
 				}
 				attrition = 1.0
 			}
-			if = {
-				limit = {
-					FROM = { any_realm_title = { title = k_saxony }	}
-				}
-				k_saxony = {
-					FROM = {
-						reverse_war = {
-							target = PREVPREV
-							casus_belli = claim
-							thirdparty_title = PREV
-						}
-					}
-				}
+		}
+
+		# Pick the most relevant target
+		if = {
+			limit = { has_landed_title = k_saxony }
+
+			k_saxony = { save_event_target_as = widukind_target }
+		}
+		else = {
+			random_realm_title = {
+				limit = { de_jure_liege = k_saxony }
+
+				save_event_target_as = widukind_target
 			}
-			if = {
-				limit = {
-					FROM = { NOT = { any_realm_title = { title = k_saxony } } }
-					FROM = { any_realm_title = { title = d_brunswick } }
-				}
-				d_brunswick = {
-					FROM = {
-						reverse_war = {
-							target = PREVPREV
-							casus_belli = claim
-							thirdparty_title = PREV
-						}
-					}
-				}
-			}
-			if = {
-				limit = {
-					FROM = { NOT = { any_realm_title = { title = k_saxony } } }
-					FROM = { NOT = { any_realm_title = { title = d_brunswick } } }
-					FROM = { any_realm_title = { title = d_holstein } }
-				}
-				d_holstein = {
-					FROM = {
-						reverse_war = {
-							target = PREVPREV
-							casus_belli = claim
-							thirdparty_title = PREV
-						}
-					}
-				}
-			}
-			if = {
-				limit = {
-					FROM = { NOT = { any_realm_title = { title = k_saxony } } }
-					FROM = { NOT = { any_realm_title = { title = d_brunswick } } }
-					FROM = { NOT = { any_realm_title = { title = d_holstein } } }
-					FROM = { any_realm_title = { title = d_saxony } }
-				}
-				d_saxony = {
-					FROM = {
-						reverse_war = {
-							target = PREVPREV
-							casus_belli = claim
-							thirdparty_title = PREV
-						}
-					}
-				}
+		}
+
+		# Of course you realize, this means war.
+		event_target:widukind = {
+			war = {
+				target = FROM
+				casus_belli = claim
+				thirdparty_title = event_target:widukind_target
 			}
 		}
 	}
