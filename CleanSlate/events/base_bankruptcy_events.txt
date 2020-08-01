@@ -177,17 +177,22 @@ character_event = {
 			}
 
 			wealth >= 10
-			NOT = { has_character_flag = took_extra_tax }
+
+			check_variable = {
+				which = loaned_to_liege
+				value == 0
+			}
+		}
+
+		# This is mostly here for modders. As-written, this value should always be 0 once the event chain is concluded
+		check_variable = {
+			which = loan_size
+			value == 0
 		}
 	}
 
 	mean_time_to_happen = {
 		months = 60
-
-		mult_modifier = {
-			factor = 0.25
-			has_character_flag = loan_taken
-		}
 	}
 
 	option = {
@@ -202,7 +207,10 @@ character_event = {
 					value >= 0
 				}
 
-				NOT = { has_character_flag = took_extra_tax }
+				check_variable = {
+					which = loaned_to_liege
+					value == 0
+				}
 			}
 		}
 
@@ -221,7 +229,10 @@ character_event = {
 					value >= 0
 				}
 
-				NOT = { has_character_flag = took_extra_tax }
+				check_variable = {
+					which = loaned_to_liege
+					value == 0
+				}
 			}
 
 			opinion = {
@@ -232,7 +243,7 @@ character_event = {
 
 			hidden_effect = {
 				set_variable = {
-					which = loan_size
+					which = loaned_to_liege
 					value = -250
 				}
 
@@ -244,8 +255,6 @@ character_event = {
 				}
 			}
 
-			set_character_flag = took_extra_tax
-
 			character_event = {
 				id = 38011
 				days = 1
@@ -255,7 +264,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTC38010 # ask all vassals for medium
+		name = EVTOPTC38010 # ask one vassals for medium
 
 		trigger = {
 			any_vassal = {
@@ -265,7 +274,11 @@ character_event = {
 				}
 
 				wealth >= 50
-				NOT = { has_character_flag = took_extra_tax }
+
+				check_variable = {
+					which = loaned_to_liege
+					value == 0
+				}
 			}
 		}
 
@@ -283,7 +296,11 @@ character_event = {
 
 			limit = {
 				wealth >= 25
-				NOT = { has_character_flag = took_extra_tax }
+
+				check_variable = {
+					which = loaned_to_liege
+					value == 0
+				}
 			}
 
 			opinion = {
@@ -294,7 +311,7 @@ character_event = {
 
 			hidden_effect = {
 				set_variable = {
-					which = loan_size
+					which = loaned_to_liege
 					value = -50
 				}
 
@@ -306,8 +323,6 @@ character_event = {
 				}
 			}
 
-			set_character_flag = took_extra_tax
-
 			character_event = {
 				id = 38011
 				days = 1
@@ -317,7 +332,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB38010 # ask all vassal for small
+		name = EVTOPTB38010 # ask one vassal for small
 
 		trigger = {
 			any_vassal = {
@@ -327,7 +342,11 @@ character_event = {
 				}
 
 				wealth >= 10
-				NOT = { has_character_flag = took_extra_tax }
+
+				check_variable = {
+					which = loaned_to_liege
+					value == 0
+				}
 			}
 		}
 
@@ -339,7 +358,12 @@ character_event = {
 			show_scope_change = no
 
 			limit = {
-				NOT = { has_character_flag = took_extra_tax }
+				wealth >= 10
+
+				check_variable = {
+					which = loaned_to_liege
+					value == 0
+				}
 			}
 
 			opinion = {
@@ -350,7 +374,7 @@ character_event = {
 
 			hidden_effect = {
 				set_variable = {
-					which = loan_size
+					which = loaned_to_liege
 					value = -10
 				}
 
@@ -361,8 +385,6 @@ character_event = {
 					}
 				}
 			}
-
-			set_character_flag = took_extra_tax
 
 			character_event = {
 				id = 38011
@@ -382,12 +404,36 @@ character_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = EVTOPTA_38011
+		name = EVTOPTA_38011 # Give the money in exchange for a favor
 
 		trigger = {
 			has_dlc = "Conclave"
-			has_character_flag = large_payment_from_vassal
 			NOT = { holds_favor_on = FROM }
+			check_variable = {
+				which = loaned_to_liege
+				value == -250
+			}
+		}
+
+		custom_tooltip = {
+			text = EVTOPTA_38011_TOOLTIP
+
+			add_favor = FROM
+			wealth = loaned_to_liege
+
+			hidden_tooltip = {
+				set_variable = {
+					which = loaned_to_liege
+					value = 0
+				}
+			}
+
+			FROM = {
+				character_event = {
+					id = 38016 # Payment accepted, for favor
+					days = 1
+				}
+			}
 		}
 
 		ai_chance = {
@@ -427,24 +473,19 @@ character_event = {
 				}
 			}
 		}
-
-		custom_tooltip = {
-			text = EVTOPTA_38011_TOOLTIP
-
-			add_favor = FROM
-			wealth = -250
-
-			FROM = {
-				character_event = {
-					id = 38016
-					days = 1
-				}
-			}
-		}
 	}
 
 	option = {
-		name = ACCEPT
+		name = ACCEPT # Accept
+
+		wealth = loaned_to_liege
+
+		FROM = {
+			character_event = {
+				id = 38015 # Payment accepted
+				days = 1
+			}
+		}
 
 		ai_chance = {
 			factor = 1
@@ -483,26 +524,30 @@ character_event = {
 				}
 			}
 		}
+	}
 
-		wealth = loan_size
+	option = {
+		name = DECLINE
+
+		reverse_opinion = {
+			name = refused_money_request
+			who = FROM
+			years = 5
+		}
 
 		hidden_effect = {
 			set_variable = {
-				which = loan_size
+				which = loaned_to_liege
 				value = 0
 			}
 		}
 
 		FROM = {
 			character_event = {
-				id = 38015
+				id = 38014 # Refusal to pay
 				days = 1
 			}
 		}
-	}
-
-	option = {
-		name = DECLINE
 
 		ai_chance = {
 			factor = 1
@@ -523,26 +568,6 @@ character_event = {
 				}
 			}
 		}
-
-		reverse_opinion = {
-			name = refused_money_request
-			who = FROM
-			years = 5
-		}
-
-		hidden_effect = {
-			set_variable = {
-				which = loan_size
-				value = 0
-			}
-
-			FROM = {
-				character_event = {
-					id = 38014
-					days = 1
-				}
-			}
-		}
 	}
 }
 
@@ -558,6 +583,13 @@ character_event = {
 		name = OK
 
 		prestige = -1
+
+		hidden_effect = {
+			set_variable = {
+				which = loan_size
+				value = 0
+			}
+		}
 	}
 }
 
@@ -585,7 +617,7 @@ character_event = {
 
 }
 
-# Payment accepted, for favor
+# Payment accepted, for a favor
 character_event = {
 	id = 38016
 	desc = EVTDESC38016
@@ -599,6 +631,13 @@ character_event = {
 		custom_tooltip = {
 			text = EVTOPT_38016_TOOLTIP
 			wealth = 250
+		}
+
+		hidden_effect = {
+			set_variable = {
+				which = loan_size
+				value = 0
+			}
 		}
 	}
 }
