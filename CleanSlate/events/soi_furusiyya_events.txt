@@ -6,33 +6,36 @@
 #
 ##########################################
 
-
 # Invitation
 character_event = {
 	id = 88250
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88250"
-	picture = "GFX_evt_emissary_arabic"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88250
+	picture = GFX_evt_emissary_arabic
 
 	is_triggered_only = yes
 
-	trigger = { NOT = { is_inaccessible_trigger = yes } }
+	trigger = { is_inaccessible_trigger = no }
 
 	option = {
-		name = "EVTOPTA88250"
+		name = EVTOPTA88250
+
 		ai_chance = {
 			factor = 100
 		}
+
 		prestige = 50
 		set_character_flag = attending_tournament_furusiyya
-		hidden_tooltip = { character_event = { id = 88999 days = 300 } } # safety catch flag-clearing
-
+		set_character_flag = do_not_disturb
 	}
+
 	option = {
-		name = "EVTOPTB88250"
+		name = EVTOPTB88250
+
 		ai_chance = {
 			factor = 0.1
 		}
+
 		prestige = -100
 	}
 }
@@ -40,104 +43,208 @@ character_event = {
 # Start of tournament
 character_event = {
 	id = 88251
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88251"
-	picture = "GFX_evt_feast"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88251
+	picture = GFX_evt_feast
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
+
 	war = no
 
 	option = {
-		name = "EVTOPTA88251"
+		name = EVTOPTA88251
 
-		trigger = {
-		}
-
-		hidden_tooltip = {
-			set_character_flag = tournament_begins_furusiyya
+		hidden_effect = {
 			set_character_flag = attending_tournament_furusiyya
-			set_character_flag = tournament_60_days_furusiyya
+
 			chronicle = {
 				entry = CHRONICLE_FURUSIYYA
 				picture = GFX_evt_joust
 			}
-			#Injuries
+
+			# Injuries
 			any_realm_character = {
-				limit = {
-					has_character_flag = attending_tournament_furusiyya
+				limit = { has_character_flag = attending_tournament_furusiyya }
+
+				character_event = {
+					id = 88450 # random occurrence for attendees
+					days = 1
+					random = 15
 				}
-				character_event = { id = 88450 days = 1 random = 15 }
-				#Set score
-				character_event = { id = 88460 days = 46 }
-			}
-			#select winner
-			character_event = { id = 88461 days = 48 }
-			#select runner up
-			character_event = { id = 88462 days = 49 }
-			#select third place
-			character_event = { id = 88463 days = 50 }
-			#Notify winners
-			character_event = { id = 88464 days = 51 }
-		}
-	}
-	option = {
-		name = "EVTOPTB88251"
-		trigger = {
-			war = yes
-		}
-		wealth = 200
-		prestige = -100
-		decadence = 5
-		hidden_tooltip = {
-			any_realm_character = {
-				limit = {
-					has_character_flag = attending_tournament_furusiyya
+
+				# Set score
+				character_event = {
+					id = 88460
+					days = 46
 				}
-				character_event = { id = 88287 }
+			}
+
+			# Select winner
+			character_event = {
+				id = 88461
+				days = 48
+			}
+
+			# Select runner up
+			character_event = {
+				id = 88462
+				days = 49
+			}
+
+			# Select third place
+			character_event = {
+				id = 88463
+				days = 50
+			}
+
+			# Notify winners
+			character_event = {
+				id = 88464
+				days = 51
 			}
 		}
-		hidden_tooltip = { remove_character_modifier = epic_tournament_furusiyya }
 	}
 }
 
-# Tournament has been cancelled
+# Tournament called off due to war
 character_event = {
-	id = 88287
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88287"
-	picture = "GFX_evt_joust"
+	id = 88293
+
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		ROOT = {
+			if = {
+				limit = { has_character_flag = epic_tournament_furusiyya }
+				character_event = { id = 88294 }
+			}
+		}
+
+		FROM = {
+			if = {
+				limit = { has_character_flag = epic_tournament_furusiyya }
+				character_event = { id = 88294 }
+			}
+		}
+	}
+}
+
+# Tournament called off due to war - ruler
+character_event = {
+	id = 88294
+	title = FURUSIYYATITLE
+	desc = EVTDESC88287
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88287"
+		name = EVTOPTB88251
+
+		wealth = 200
+		prestige = -100
+		decadence = 5
+
+		hidden_effect = {
+			any_realm_character = {
+				limit = { has_character_flag = attending_tournament }
+				character_event = { id = 88287 }
+			}
+
+			remove_character_modifier = epic_tournament_furusiyya
+			clear_delayed_event = { id = 88251 }
+			clear_delayed_event = { id = 88450 }
+			clear_delayed_event = { id = 88460 }
+			clear_delayed_event = { id = 88461 }
+			clear_delayed_event = { id = 88462 }
+			clear_delayed_event = { id = 88463 }
+			clear_delayed_event = { id = 88464 }
+			clr_character_flag = epic_tournament_furusiyya
+			clr_character_flag = attending_tournament_furusiyya
+			clr_character_flag = do_not_disturb
+			clr_character_flag = no_msg_death_furusiyya
+			clr_character_flag = no_msg_maimed_furusiyya
+			clr_character_flag = no_msg_wounded_furusiyya
+			clr_character_flag = tournament_has_ended_furusiyya
+			clr_character_flag = tournament_third_place_furusiyya
+			clr_character_flag = tournament_second_place_furusiyya
+			clr_character_flag = tournament_winner_furusiyya
+		}
+	}
+}
+
+# Tournament has been cancelled - guest
+character_event = {
+	id = 88287
+	title = FURUSIYYATITLE
+	desc = EVTDESC88287
+	picture = GFX_evt_joust
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA88287
+
 		prestige = -50
 		clr_character_flag = attending_tournament_furusiyya
+		clr_character_flag = do_not_disturb
+		clr_character_flag = tournament_third_place_furusiyya
+		clr_character_flag = tournament_second_place_furusiyya
+		clr_character_flag = tournament_winner_furusiyya
+		clear_delayed_event = { id = 88259 }
+		clear_delayed_event = { id = 88260 }
+		clear_delayed_event = { id = 88261 }
+		clear_delayed_event = { id = 88262 }
+		clear_delayed_event = { id = 88263 }
+		clear_delayed_event = { id = 88264 }
+		clear_delayed_event = { id = 88265 }
+		clear_delayed_event = { id = 88266 }
+		clear_delayed_event = { id = 88267 }
+		clear_delayed_event = { id = 88268 }
+		clear_delayed_event = { id = 88269 }
+		clear_delayed_event = { id = 88273 }
+		clear_delayed_event = { id = 88274 }
+		clear_delayed_event = { id = 88275 }
+		clear_delayed_event = { id = 88276 }
+		clear_delayed_event = { id = 88277 }
+		clear_delayed_event = { id = 88278 }
+		clear_delayed_event = { id = 88279 }
+		clear_delayed_event = { id = 88280 }
+		clear_delayed_event = { id = 88281 }
+		clear_delayed_event = { id = 88282 }
+		clear_delayed_event = { id = 88284 }
+		clear_delayed_event = { id = 88285 }
+		clear_delayed_event = { id = 88286 }
+		clear_delayed_event = { id = 88450 }
+		clear_delayed_event = { id = 88460 }
 	}
 }
 
 # Message about death
 character_event = {
 	id = 88288
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88288"
-	picture = "GFX_evt_death"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88288
+	picture = GFX_evt_death
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	trigger = {
 		NOT = { has_character_flag = no_msg_death_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
 	}
 
 	option = {
-		name = "EVTOPTA88288"
+		name = EVTOPTA88288
 	}
+
 	option = {
-		name = "EVTOPTB88288"
+		name = EVTOPTB88288
+
 		set_character_flag = no_msg_death_furusiyya
 	}
 }
@@ -145,23 +252,24 @@ character_event = {
 # Message about maimed
 character_event = {
 	id = 88289
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88289"
-	picture = "GFX_evt_emissary"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88289
+	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	trigger = {
 		NOT = { has_character_flag = no_msg_maimed_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
 	}
 
 	option = {
-		name = "EVTOPTA88289"
+		name = EVTOPTA88289
 	}
+
 	option = {
-		name = "EVTOPTB88289"
+		name = EVTOPTB88289
+
 		set_character_flag = no_msg_maimed_furusiyya
 	}
 }
@@ -169,23 +277,24 @@ character_event = {
 # Message about wounded
 character_event = {
 	id = 88290
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88290"
-	picture = "GFX_evt_emissary"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88290
+	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_war
 
 	trigger = {
 		NOT = { has_character_flag = no_msg_wounded_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
 	}
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88290"
+		name = EVTOPTA88290
 	}
+
 	option = {
-		name = "EVTOPTB88290"
+		name = EVTOPTB88290
+
 		set_character_flag = no_msg_wounded_furusiyya
 	}
 }
@@ -193,99 +302,97 @@ character_event = {
 # Tournament is over
 character_event = {
 	id = 88252
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88252"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88252
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88252"
-		if = {
-			limit = {
-				has_dlc = "Reapers"
-			}
-			custom_tooltip = {
-				text = capital_prospers_custom_tooltip
-				hidden_tooltip = {
-					capital_scope = {
-						change_variable = { which = prosperity_value value = 15 }
-					}
-				}
-			}
-		}
-		hidden_tooltip = {
-			clr_character_flag = tournament_60_days_furusiyya
-			clr_character_flag = tournament_begins_furusiyya
-			clr_character_flag = winner_furusiyya
-			clr_character_flag = second_place_furusiyya
-			clr_character_flag = third_place_furusiyya
+		name = EVTOPTA88252
+
+		custom_tooltip = {
+			text = EVTOPTA70002_TOOLTIP
+
 			clr_character_flag = attending_tournament_furusiyya
-			clr_character_flag = attending_tournament_event_furusiyya
+			clr_character_flag = do_not_disturb
 			clr_character_flag = tournament_third_place_furusiyya
 			clr_character_flag = tournament_second_place_furusiyya
 			clr_character_flag = tournament_winner_furusiyya
-			set_character_flag = tournament_has_ended_furusiyya
+			clr_character_flag = epic_tournament_furusiyya
+
 			any_realm_character = {
-				limit = {
-					has_character_flag = attending_tournament_furusiyya
-					OR = {
-						has_character_flag = tournament_third_place_furusiyya
-						has_character_flag = tournament_second_place_furusiyya
-						has_character_flag = tournament_winner_furusiyya
-					}
-				}
-				set_character_flag = tournament_has_ended_furusiyya
-				clr_character_flag = tournament_third_place_furusiyya
-				clr_character_flag = tournament_second_place_furusiyya
-				clr_character_flag = tournament_winner_furusiyya
+				limit = { has_character_flag = attending_tournament_furusiyya }
+
+				clr_character_flag = attending_tournament_furusiyya
+				clr_character_flag = do_not_disturb
+
 				opinion = {
-					modifier = opinion_tournament_participant
+					name = opinion_tournament_participant
 					who = PREV
 					years = 5
 				}
-				clr_character_flag = attending_tournament_furusiyya
-				clr_character_flag = attending_tournament_event_furusiyya
+
+				if = {
+					limit = {
+						OR = {
+							has_character_flag = tournament_third_place_furusiyya
+							has_character_flag = tournament_second_place_furusiyya
+							has_character_flag = tournament_winner_furusiyya
+						}
+					}
+
+					clr_character_flag = tournament_third_place_furusiyya
+					clr_character_flag = tournament_second_place_furusiyya
+					clr_character_flag = tournament_winner_furusiyya
+				}
+				else_if = {
+					limit = {
+						NOT = { character = ROOT }
+					}
+
+					random_list = {
+						10 = { character_event = { id = 88253 } }
+						10 = { character_event = { id = 88254 } }
+						10 = { character_event = { id = 88255 } }
+						10 = { character_event = { id = 88256 } }
+						10 = { character_event = { id = 88257 } }
+						10 = { character_event = { id = 88258 } }
+					}
+
+					clr_character_flag = tourney_score_15
+					clr_character_flag = tourney_score_14
+					clr_character_flag = tourney_score_13
+					clr_character_flag = tourney_score_12
+					clr_character_flag = tourney_score_11
+					clr_character_flag = tourney_score_10
+					clr_character_flag = tourney_score_09
+					clr_character_flag = tourney_score_08
+					clr_character_flag = tourney_score_07
+					clr_character_flag = tourney_score_06
+					clr_character_flag = tourney_score_05
+					clr_character_flag = tourney_score_04
+					clr_character_flag = tourney_score_03
+					clr_character_flag = tourney_score_02
+					clr_character_flag = tourney_score_01
+					clr_character_flag = tourney_score_00
+				}
 			}
-			any_realm_character = {
-				limit = {
-					has_character_flag = attending_tournament_furusiyya
-					NOR = {
-						character = PREV
-						has_character_flag = tournament_third_place_furusiyya
-						has_character_flag = tournament_second_place_furusiyya
-						has_character_flag = tournament_winner_furusiyya
+		}
+
+		if = {
+			limit = { has_dlc = "Reapers" }
+
+			custom_tooltip = {
+				text = capital_prospers_custom_tooltip
+
+				capital_scope = {
+					change_variable = {
+						which = prosperity_value
+						value = 15
 					}
 				}
-				random_list = {
-					10 = {
-						character_event = { id = 88253 }
-					}
-					10 = {
-						character_event = { id = 88254 }
-					}
-					10 = {
-						character_event = { id = 88255 }
-					}
-					10 = {
-						character_event = { id = 88256 }
-					}
-					10 = {
-						character_event = { id = 88257 }
-					}
-					10 = {
-						character_event = { id = 88258 }
-					}
-				}
-				opinion = {
-					modifier = opinion_tournament_participant
-					who = PREV
-					years = 5
-				}
-				set_character_flag = tournament_has_ended_furusiyya
-				clr_character_flag = attending_tournament_furusiyya
-				clr_character_flag = attending_tournament_event_furusiyya
 			}
 		}
 	}
@@ -294,15 +401,16 @@ character_event = {
 # End of tournament event
 character_event = {
 	id = 88253
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88253"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88253
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88253"
+		name = EVTOPTA88253
+
 		prestige = 50
 	}
 }
@@ -310,15 +418,16 @@ character_event = {
 # End of tournament event
 character_event = {
 	id = 88254
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88254"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88254
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88254"
+		name = EVTOPTA88254
+
 		prestige = 100
 	}
 }
@@ -326,15 +435,16 @@ character_event = {
 # End of tournament event
 character_event = {
 	id = 88255
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88255"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88255
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88255"
+		name = EVTOPTA88255
+
 		prestige = -50
 	}
 }
@@ -342,15 +452,16 @@ character_event = {
 # End of tournament event
 character_event = {
 	id = 88256
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88256"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88256
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88256"
+		name = EVTOPTA88256
+
 		prestige = -100
 	}
 }
@@ -358,15 +469,16 @@ character_event = {
 # End of tournament event
 character_event = {
 	id = 88257
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88257"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88257
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88257"
+		name = EVTOPTA88257
+
 		change_martial = 1
 	}
 }
@@ -374,15 +486,16 @@ character_event = {
 # End of tournament event
 character_event = {
 	id = 88258
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88258"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88258
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88258"
+		name = EVTOPTA88258
+
 		change_martial = -1
 	}
 }
@@ -390,9 +503,9 @@ character_event = {
 # Character is killed
 character_event = {
 	id = 88259
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88259"
-	picture = "GFX_evt_death"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88259
+	picture = GFX_evt_death
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -402,38 +515,18 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		clr_character_flag = attending_tournament_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88259"
+		name = EVTOPTA88259
+
 		death = {
 			death_reason = death_battle
 		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					top_liege = {
-						NOT = {
-							character = ROOT
-						}
-					}
-				}
-				top_liege = { character_event = { id = 88288 } }
+
+		if = {
+			limit = { independent = no }
+
+			top_liege = {
+				character_event = { id = 88288 }
 			}
 		}
 	}
@@ -442,9 +535,9 @@ character_event = {
 # Character is maimed
 character_event = {
 	id = 88260
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88260"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88260
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -455,17 +548,7 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
 		can_be_maimed_trigger = yes
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
 	}
 
 	immediate = {
@@ -473,18 +556,15 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTA88260"
+		name = EVTOPTA88260
+
 		add_maimed_trait_effect = yes
-		hidden_tooltip = {
-			if = {
-				limit = {
-					top_liege = {
-						NOT = {
-							character = ROOT
-						}
-					}
-				}
-				top_liege = { character_event = { id = 88289 } }
+
+		if = {
+			limit = { independent = no }
+
+			top_liege = {
+				character_event = { id = 88289 }
 			}
 		}
 	}
@@ -493,9 +573,9 @@ character_event = {
 # Character is wounded
 character_event = {
 	id = 88261
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88261"
-	picture = "GFX_evt_council"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88261
+	picture = GFX_evt_council
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -506,42 +586,20 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
-		NOT = {
-			trait = wounded
-		}
-		NOT = {
-			is_maimed_trigger = yes
-		}
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
+		NOT = { trait = wounded }
+		is_maimed_trigger = no
 	}
 
 	option = {
-		name = "EVTOPTA88261"
+		name = EVTOPTA88261
+
 		add_trait = wounded
-		hidden_tooltip = {
-			if = {
-				limit = {
-					top_liege = {
-						NOT = {
-							character = ROOT
-						}
-					}
-				}
-				top_liege = { character_event = { id = 88290 } }
+
+		if = {
+			limit = { independent = no }
+
+			top_liege = {
+				character_event = { id = 88290 }
 			}
 		}
 	}
@@ -550,9 +608,9 @@ character_event = {
 # Character becomes craven
 character_event = {
 	id = 88262
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88262"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88262
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -563,28 +621,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
-		NOT = {
-			trait = craven
-		}
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
+		NOT = { trait = craven }
 	}
 
 	option = {
-		name = "EVTOPTA88262"
+		name = EVTOPTA88262
+
 		add_trait = craven
 	}
 }
@@ -592,9 +634,9 @@ character_event = {
 # Character becomes brave
 character_event = {
 	id = 88263
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88263"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88263
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -605,28 +647,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
-		NOT = {
-			trait = brave
-		}
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
+		NOT = { trait = brave }
 	}
 
 	option = {
-		name = "EVTOPTA88263"
+		name = EVTOPTA88263
+
 		add_trait = brave
 	}
 }
@@ -634,9 +660,9 @@ character_event = {
 # Character becomes tough soldier
 character_event = {
 	id = 88264
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88264"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88264
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -647,26 +673,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
 		trait = misguided_warrior
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
 	}
 
 	option = {
-		name = "EVTOPTA88264"
+		name = EVTOPTA88264
+
 		remove_trait = misguided_warrior
 		add_trait = tough_soldier
 	}
@@ -675,9 +687,9 @@ character_event = {
 # Character becomes skilled tactician
 character_event = {
 	id = 88265
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88265"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88265
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -688,26 +700,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
 		trait = tough_soldier
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
 	}
 
 	option = {
-		name = "EVTOPTA88265"
+		name = EVTOPTA88265
+
 		remove_trait = tough_soldier
 		add_trait = skilled_tactician
 	}
@@ -716,9 +714,9 @@ character_event = {
 # Character becomes brilliant strategist
 character_event = {
 	id = 88266
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88266"
-	picture = "GFX_evt_council"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88266
+	picture = GFX_evt_council
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -729,26 +727,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
 		trait = skilled_tactician
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
 	}
 
 	option = {
-		name = "EVTOPTA88266"
+		name = EVTOPTA88266
+
 		remove_trait = skilled_tactician
 		add_trait = brilliant_strategist
 	}
@@ -757,9 +741,9 @@ character_event = {
 # Character becomes skilled tactician
 character_event = {
 	id = 88267
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88267"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88267
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -770,26 +754,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
 		trait = brilliant_strategist
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
 	}
 
 	option = {
-		name = "EVTOPTA88267"
+		name = EVTOPTA88267
+
 		remove_trait = brilliant_strategist
 		add_trait = skilled_tactician
 	}
@@ -798,9 +768,9 @@ character_event = {
 # Character becomes tough soldier
 character_event = {
 	id = 88268
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88268"
-	picture = "GFX_evt_council"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88268
+	picture = GFX_evt_council
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -811,26 +781,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
 		trait = skilled_tactician
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
 	}
 
 	option = {
-		name = "EVTOPTA88268"
+		name = EVTOPTA88268
+
 		remove_trait = skilled_tactician
 		add_trait = tough_soldier
 	}
@@ -839,9 +795,9 @@ character_event = {
 # Character becomes misguided warrior
 character_event = {
 	id = 88269
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88269"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88269
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	min_age = 16
@@ -852,26 +808,12 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = {
-			has_character_flag = tournament_has_ended_furusiyya
-		}
 		trait = tough_soldier
-		top_liege = {
-			has_character_flag = tournament_begins_furusiyya
-			NOT = {
-				has_character_flag = tournament_has_ended_furusiyya
-			}
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
 	}
 
 	option = {
-		name = "EVTOPTA88269"
+		name = EVTOPTA88269
+
 		remove_trait = tough_soldier
 		add_trait = misguided_warrior
 	}
@@ -880,161 +822,143 @@ character_event = {
 # Character gets top 3
 character_event = {
 	id = 88270
-	title = "FURUSIYYATITLE"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
 
 	desc = {
-		trigger = {
-			has_character_flag = tournament_winner_furusiyya
-		}
-		text = "EVTDESC88270"
+		trigger = { has_character_flag = tournament_winner_furusiyya }
+		text = EVTDESC88270
 	}
 
 	desc = {
-		trigger = {
-			has_character_flag = tournament_second_place_furusiyya
-		}
-		text = "EVTDESC88271"
+		trigger = { has_character_flag = tournament_second_place_furusiyya }
+		text = EVTDESC88271
 	}
 
 	desc = {
-		trigger = {
-			has_character_flag = tournament_third_place_furusiyya
-		}
-		text = "EVTDESC88272"
+		trigger = { has_character_flag = tournament_third_place_furusiyya }
+		text = EVTDESC88272
 	}
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		trigger = {
-			has_character_flag = tournament_winner_furusiyya
-		}
-		name = "EVTOPTA88270"
+		name = EVTOPTA88270
+
+		trigger = { has_character_flag = tournament_winner_furusiyya }
+
 		wealth = 100
 		prestige = 300
-		if = {
-			limit = {
-				NOT = {
-					top_liege = {
-						dynasty = ROOT
-					}
-				}
-			}
-			decadence = -3
-		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					top_liege = {
-						NOT = {
-							character = ROOT
-						}
-					}
-				}
-				top_liege = { character_event = { id = 88284 days = 3 } }
-			}
-			any_dynasty_member = {
-				limit = {
-					is_offmap_ruler = no
-					ai = no
-					NOT = { character = ROOT }
-				}
-				character_event = { id = 88301 }
-			}
-		}
-	}
 
-	option = {
-		trigger = {
-			has_character_flag = tournament_second_place_furusiyya
-		}
-		name = "EVTOPTA88271"
-		wealth = 75
-		prestige = 250
 		if = {
 			limit = {
 				uses_decadence = yes
-				NOT = {
-					top_liege = {
-						dynasty = ROOT
-					}
-				}
+				NOT = { dynasty = top_liege }
 			}
-			decadence = -2
+
+			decadence = -3
 		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					top_liege = {
-						NOT = {
-							character = ROOT
-						}
-					}
+
+		if = {
+			limit = { independent = no }
+
+			top_liege = {
+				character_event = {
+					id = 88284
+					days = 3
 				}
-				top_liege = { character_event = { id = 88285 days = 2 } }
 			}
-			any_dynasty_member = {
-				limit = {
-					is_offmap_ruler = no
-					ai = no
-					NOT = { character = ROOT }
-				}
-				character_event = { id = 88302 }
+		}
+
+		any_player = {
+			limit = {
+				dynasty = ROOT
+				NOT = { character = ROOT }
 			}
+
+			character_event = { id = 88301 }
 		}
 	}
 
 	option = {
-		trigger = {
-			has_character_flag = tournament_third_place_furusiyya
-		}
-		name = "EVTOPTA88272"
-		wealth = 50
-		prestige = 200
+		name = EVTOPTA88271
+
+		trigger = { has_character_flag = tournament_second_place_furusiyya }
+
+		wealth = 75
+		prestige = 250
+
 		if = {
 			limit = {
-				NOT = {
-					top_liege = {
-						dynasty = ROOT
-					}
+				uses_decadence = yes
+				NOT = { dynasty = top_liege }
+			}
+
+			decadence = -2
+		}
+
+		if = {
+			limit = { independent = no }
+
+			top_liege = {
+				character_event = {
+					id = 88285
+					days = 2
 				}
 			}
+		}
+
+		any_player = {
+			limit = {
+				dynasty = ROOT
+				NOT = { character = ROOT }
+			}
+
+			character_event = { id = 88302 }
+		}
+	}
+
+	option = {
+		name = EVTOPTA88272
+
+		trigger = { has_character_flag = tournament_third_place_furusiyya }
+
+		wealth = 50
+		prestige = 200
+
+		if = {
+			limit = {
+				uses_decadence = yes
+				NOT = { dynasty = top_liege }
+			}
+
 			decadence = -1
 		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					top_liege = {
-						NOT = {
-							character = ROOT
-						}
-					}
+
+		if = {
+			limit = { independent = no }
+
+			top_liege = {
+				character_event = {
+					id = 88286
+					days = 1
 				}
-				top_liege = { character_event = { id = 88286 days = 1 } }
 			}
-			any_dynasty_member = {
-				limit = {
-					is_offmap_ruler = no
-					ai = no
-					NOT = { character = ROOT }
-				}
-				character_event = { id = 88303 }
+		}
+
+		any_player = {
+			limit = {
+				dynasty = ROOT
+				NOT = { character = ROOT }
 			}
+
+			character_event = { id = 88303 }
 		}
 	}
 }
@@ -1042,51 +966,52 @@ character_event = {
 # Inform about winner
 character_event = {
 	id = 88284
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88284"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88284
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88284"
+		name = EVTOPTA88284
+
 		opinion = {
-			modifier = opinion_tournament_winner
+			name = opinion_tournament_winner
 			who = FROM
 			years = 20
 		}
+
 		if = {
-			limit = {
-				FROM = { dynasty = ROOT }
-			}
+			limit = { dynasty = FROM }
 			decadence = -3
 		}
-		hidden_tooltip = { character_event = { id = 88252 } }
+
+		character_event = { id = 88252 }
 	}
 }
 
 # Inform about second place
 character_event = {
 	id = 88285
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88285"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88285
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88285"
+		name = EVTOPTA88285
+
 		opinion = {
-			modifier = opinion_tournament_second_place
+			name = opinion_tournament_second_place
 			who = FROM
 			years = 15
 		}
+
 		if = {
-			limit = {
-				FROM = { dynasty = ROOT }
-			}
+			limit = { dynasty = FROM }
 			decadence = -2
 		}
 	}
@@ -1095,24 +1020,24 @@ character_event = {
 # Inform about third place
 character_event = {
 	id = 88286
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88286"
-	picture = "GFX_evt_joust"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88286
+	picture = GFX_evt_joust
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA88286"
+		name = EVTOPTA88286
+
 		opinion = {
-			modifier = opinion_tournament_third_place
+			name = opinion_tournament_third_place
 			who = FROM
 			years = 10
 		}
+
 		if = {
-			limit = {
-				FROM = { dynasty = ROOT }
-			}
+			limit = { dynasty = FROM }
 			decadence = -1
 		}
 	}
@@ -1121,33 +1046,29 @@ character_event = {
 # Character becomes homosexual
 character_event = {
 	id = 88273
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88273"
-	picture = "GFX_evt_lunatic_arabic"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88273
+	picture = GFX_evt_lunatic_arabic
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-		NOT = {
+		NOR = {
 			trait = homosexual
+			trait = celibate
+			trait = eunuch
 		}
 	}
 
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88273"
+		name = EVTOPTA88273
+
 		add_trait = homosexual
 	}
 }
@@ -1155,34 +1076,28 @@ character_event = {
 # Character becomes syphilitic
 character_event = {
 	id = 88274
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88274"
-	picture = "GFX_evt_sultan"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88274
+	picture = GFX_evt_sultan
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-		NOT = {
+		NOR = {
 			trait = syphilitic
 			trait = celibate
 		}
 	}
 
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88274"
+		name = EVTOPTA88274
+
 		add_trait = syphilitic
 	}
 }
@@ -1190,33 +1105,25 @@ character_event = {
 # Character becomes drunkard
 character_event = {
 	id = 88275
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88275"
-	picture = "GFX_evt_drunk"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88275
+	picture = GFX_evt_drunk
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-		NOT = {
-			trait = drunkard
-		}
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
+		NOT = { trait = drunkard }
 	}
 
 	option = {
-		name = "EVTOPTA88275"
+		name = EVTOPTA88275
+
 		add_trait = drunkard
 	}
 }
@@ -1224,34 +1131,33 @@ character_event = {
 # Character becomes duelist
 character_event = {
 	id = 88276
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88276"
-	picture = "GFX_evt_melee"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88276
+	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
-	lacks_dlc = "Way of Life"
-
-	is_triggered_only = yes
 
 	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-		NOT = {
-			lifestyle_traits = 1
+		lifestyle_traits < 1
+		martial >= 5
+		is_weak_trigger = no
+
+		NOR = {
+			trait = content
+			trait = kind
+			trait = craven
 		}
 	}
 
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88276"
+		name = EVTOPTA88276
+
 		add_trait = duelist
 	}
 }
@@ -1259,30 +1165,21 @@ character_event = {
 # Character gains intrigue
 character_event = {
 	id = 88277
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88277"
-	picture = "GFX_evt_whispers"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88277
+	picture = GFX_evt_whispers
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88277"
+		name = EVTOPTA88277
+
 		change_intrigue = 1
 	}
 }
@@ -1290,30 +1187,21 @@ character_event = {
 # Character loses intrigue
 character_event = {
 	id = 88278
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88278"
-	picture = "GFX_evt_whispers"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88278
+	picture = GFX_evt_whispers
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88278"
+		name = EVTOPTA88278
+
 		change_intrigue = -1
 	}
 }
@@ -1321,30 +1209,21 @@ character_event = {
 # Character gains stewardship
 character_event = {
 	id = 88279
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88279"
-	picture = "GFX_evt_market"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88279
+	picture = GFX_evt_market
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88279"
+		name = EVTOPTA88279
+
 		change_stewardship = 1
 	}
 }
@@ -1352,30 +1231,21 @@ character_event = {
 # Character loses stewardship
 character_event = {
 	id = 88280
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88280"
-	picture = "GFX_evt_market"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88280
+	picture = GFX_evt_market
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88280"
+		name = EVTOPTA88280
+
 		change_stewardship = -1
 	}
 }
@@ -1383,30 +1253,21 @@ character_event = {
 # Character gains diplomacy
 character_event = {
 	id = 88281
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88281"
-	picture = "GFX_evt_council"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88281
+	picture = GFX_evt_council
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88281"
+		name = EVTOPTA88281
+
 		change_diplomacy = 1
 	}
 }
@@ -1414,30 +1275,21 @@ character_event = {
 # Character loses diplomacy
 character_event = {
 	id = 88282
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88282"
-	picture = "GFX_evt_council"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88282
+	picture = GFX_evt_council
 	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
 
 	min_age = 16
 	only_men = yes
 	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = attending_tournament_furusiyya
-		NOT = { has_character_flag = attending_tournament_event_furusiyya }
-		NOT = { has_character_flag = tournament_has_ended_furusiyya }
-	}
-
-	immediate = {
-		set_character_flag = attending_tournament_event_furusiyya
-	}
-
 	option = {
-		name = "EVTOPTA88282"
+		name = EVTOPTA88282
+
 		change_diplomacy = -1
 	}
 }
@@ -1445,17 +1297,22 @@ character_event = {
 # Invitations have gone out
 character_event = {
 	id = 88283
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88283"
-	picture = "GFX_evt_moors"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88283
+	picture = GFX_evt_moors
+	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EXCELLENT"
-		hidden_tooltip = {
-			character_event = { id = 88251 days = 60 } # Tournament start
-			clr_character_flag = tournament_has_ended_furusiyya
+		name = EXCELLENT
+
+		hidden_effect = {
+			character_event = {
+				id = 88251 # Tournament start
+				days = 60
+			}
+
 			any_realm_character = {
 				limit = {
 					OR = {
@@ -1463,22 +1320,25 @@ character_event = {
 						is_tribal = yes
 						is_nomadic = yes
 					}
-					NOT = { has_job_title = job_spiritual }
+
+					is_female = no
 					is_adult = yes
-					NOT = { age = 50 }
+					practical_age < 50
 					is_incapable = no
 					prisoner = no
-					is_female = no
+					NOT = { has_job_title = job_spiritual }
+					is_inaccessible_trigger = no
 				}
-				clr_character_flag = tournament_has_ended_furusiyya
+
 				character_event = { id = 88250 }
 			}
-			any_dynasty_member = {
+
+			any_player = {
 				limit = {
-					is_offmap_ruler = no
-					ai = no
+					dynasty = ROOT
 					NOT = { character = ROOT }
 				}
+
 				character_event = { id = 88300 }
 			}
 		}
@@ -1488,61 +1348,89 @@ character_event = {
 # Ruler has died, the tournament is over
 character_event = {
 	id = 88291
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88291"
-	picture = "GFX_evt_death"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88291
+	picture = GFX_evt_death
 	border = GFX_event_normal_frame_war
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 
-	trigger = {
-		has_character_flag = tournament_begins_furusiyya
-	}
+	trigger = { has_character_flag = epic_tournament_furusiyya }
 
 	immediate = {
-		clr_character_flag = tournament_begins_furusiyya
-		clr_character_flag = winner_furusiyya
-		clr_character_flag = second_place_furusiyya
-		clr_character_flag = third_place_furusiyya
 		clr_character_flag = attending_tournament_furusiyya
-		clr_character_flag = attending_tournament_event_furusiyya
 		clr_character_flag = tournament_third_place_furusiyya
 		clr_character_flag = tournament_second_place_furusiyya
 		clr_character_flag = tournament_winner_furusiyya
+		clr_character_flag = do_not_disturb
+		clear_delayed_event = { id = 88251 }
+		clear_delayed_event = { id = 88450 }
+		clear_delayed_event = { id = 88460 }
+		clear_delayed_event = { id = 88461 }
+		clear_delayed_event = { id = 88462 }
+		clear_delayed_event = { id = 88463 }
+		clear_delayed_event = { id = 88464 }
+
 		any_realm_character = {
-			limit = {
-				has_character_flag = attending_tournament_furusiyya
-			}
+			limit = { has_character_flag = attending_tournament_furusiyya }
+
 			letter_event = {
-				id = 88292
+				id = 88292 # Inform of tournament cancellation
 				days = 2
 				random = 2
-				tooltip = "EVTTOOLTIP70042"
 			}
-			set_character_flag = tournament_has_ended_furusiyya
+
 			clr_character_flag = tournament_third_place_furusiyya
 			clr_character_flag = tournament_second_place_furusiyya
 			clr_character_flag = tournament_winner_furusiyya
 			clr_character_flag = attending_tournament_furusiyya
-			clr_character_flag = attending_tournament_event_furusiyya
+			clr_character_flag = do_not_disturb
+			clear_delayed_event = { id = 88259 }
+			clear_delayed_event = { id = 88260 }
+			clear_delayed_event = { id = 88261 }
+			clear_delayed_event = { id = 88262 }
+			clear_delayed_event = { id = 88263 }
+			clear_delayed_event = { id = 88264 }
+			clear_delayed_event = { id = 88265 }
+			clear_delayed_event = { id = 88266 }
+			clear_delayed_event = { id = 88267 }
+			clear_delayed_event = { id = 88268 }
+			clear_delayed_event = { id = 88269 }
+			clear_delayed_event = { id = 88273 }
+			clear_delayed_event = { id = 88274 }
+			clear_delayed_event = { id = 88275 }
+			clear_delayed_event = { id = 88276 }
+			clear_delayed_event = { id = 88277 }
+			clear_delayed_event = { id = 88278 }
+			clear_delayed_event = { id = 88279 }
+			clear_delayed_event = { id = 88280 }
+			clear_delayed_event = { id = 88281 }
+			clear_delayed_event = { id = 88282 }
+			clear_delayed_event = { id = 88284 }
+			clear_delayed_event = { id = 88285 }
+			clear_delayed_event = { id = 88286 }
+			clear_delayed_event = { id = 88450 }
+			clear_delayed_event = { id = 88460 }
 		}
 	}
 
 	option = {
-		name = "EVTOPTA88291"
+		name = EVTOPTA88291
 	}
 }
 
-#The tournament has been cancelled due to Ruler's death
+# The tournament has been cancelled due to Ruler's death
 letter_event = {
 	id = 88292
-	title = "FURUSIYYATITLE"
-	desc = "EVTDESC88292"
+	title = FURUSIYYATITLE
+	desc = EVTDESC88292
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
-		name = "EVTOPTA88292"
+		name = EVTOPTA88292
 	}
 }
 
@@ -1551,60 +1439,68 @@ letter_event = {
 # Furusiyya held
 character_event = {
 	id = 88300
-	desc = "EVTDESC88300"
-	picture = "GFX_evt_joust_arabic"
+	desc = EVTDESC88300
+	picture = GFX_evt_joust_arabic
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
-		name = "EVTOPTA88300"
+		name = EVTOPTA88300
 	}
 }
 
 # Tournament Winner
 character_event = {
 	id = 88301
-	desc = "EVTDESC88301"
-	picture = "GFX_evt_joust_arabic"
+	desc = EVTDESC88301
+	picture = GFX_evt_joust_arabic
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
-		name = "EVTOPTA88301"
+		name = EVTOPTA88301
 	}
 }
 
 # Tournament Second Place
 character_event = {
 	id = 88302
-	desc = "EVTDESC88302"
-	picture = "GFX_evt_joust_arabic"
+	desc = EVTDESC88302
+	picture = GFX_evt_joust_arabic
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
-		name = "EVTOPTA88302"
+		name = EVTOPTA88302
 	}
 }
 
 # Tournament Third Place
 character_event = {
 	id = 88303
-	desc = "EVTDESC88303"
-	picture = "GFX_evt_joust_arabic"
+	desc = EVTDESC88303
+	picture = GFX_evt_joust_arabic
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
-		name = "EVTOPTA88303"
+		name = EVTOPTA88303
 	}
 }
 
-#Tournament attender event for random occurences
+# Tournament attender event for random occurences
 character_event = {
 	id = 88450
 	hide_window = yes
@@ -1613,380 +1509,511 @@ character_event = {
 
 	immediate = {
 		random_list = {
-			10 = { #character is killed
-				modifier = {
+			10 = { # character is killed
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 40
+					combat_rating >= 40
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 30
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 20
+					combat_rating >= 20
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 10
+					combat_rating >= 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 10 }
+					combat_rating < 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 0 }
+					combat_rating < 0
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
 					trait = craven
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
 					trait = brave
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
 					is_maimed_trigger = yes
 				}
-				character_event = { id = 88259 days = 1 random = 25 }
+
+				character_event = {
+					id = 88259
+					days = 1
+					random = 25
+				}
 			}
-			13 = { #character maimed
-				modifier = {
-					factor = 0.5
-					combat_rating = 40
+
+			13 = { # character maimed
+				trigger = {
+					can_be_maimed_trigger = yes
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 30
+					combat_rating >= 40
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 20
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 10
+					combat_rating >= 20
 				}
-				modifier = {
+
+				mult_modifier = {
+					factor = 0.5
+					combat_rating >= 10
+				}
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 10 }
+					combat_rating < 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 0 }
+					combat_rating < 0
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
 					trait = craven
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
 					trait = brave
 				}
-				modifier = {
-					factor = 0
-					is_maimed_trigger = yes
+
+				character_event = {
+					id = 88260
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88260 days = 1 random = 25 }
 			}
-			20 = { #character wounded
-				modifier = {
-					factor = 0.5
-					combat_rating = 40
+
+			20 = { # character wounded
+				trigger = {
+					is_maimed_trigger = no
+					NOT = { trait = wounded }
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 30
+					combat_rating >= 40
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 20
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 10
+					combat_rating >= 20
 				}
-				modifier = {
+
+				mult_modifier = {
+					factor = 0.5
+					combat_rating >= 10
+				}
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 10 }
+					combat_rating < 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 0 }
+					combat_rating < 0
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
 					trait = craven
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
 					trait = brave
 				}
-				modifier = {
-					factor = 0
-					is_maimed_trigger = yes
+
+				character_event = {
+					id = 88261
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88261 days = 1 random = 25 }
 			}
-			40 = { #gain craven
-				modifier = {
+
+			40 = { # gain craven
+				trigger = {
+					NOT = { trait = craven }
+				}
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 40
+					combat_rating >= 40
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 30
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 20
+					combat_rating >= 20
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 10
+					combat_rating >= 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 10 }
+					combat_rating < 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					NOT = { combat_rating = 0 }
+					combat_rating < 0
 				}
-				modifier = {
-					factor = 0
-					trait = craven
+
+				character_event = {
+					id = 88262
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88262 days = 1 random = 25 }
 			}
-			40 = { #gain brave
-				modifier = {
-					factor = 1.5
-					combat_rating = 40
+
+			40 = { # gain brave
+				trigger = {
+					NOT = { trait = brave }
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					combat_rating = 30
+					combat_rating >= 40
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					combat_rating = 20
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					combat_rating = 10
+					combat_rating >= 20
 				}
-				modifier = {
+
+				mult_modifier = {
+					factor = 1.5
+					combat_rating >= 10
+				}
+
+				mult_modifier = {
 					factor = 0.5
-					NOT = { combat_rating = 10 }
+					combat_rating < 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
-					NOT = { combat_rating = 0 }
+					combat_rating < 0
 				}
-				modifier = {
-					factor = 0
-					trait = brave
+
+				character_event = {
+					id = 88263
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88263 days = 1 random = 25 }
 			}
-			40 = { #promoted to tough soldier
-				modifier = {
-					factor = 0
-					NOT = { trait = misguided_warrior }
+
+			40 = { # promoted to tough soldier
+				trigger = { trait = misguided_warrior }
+
+				character_event = {
+					id = 88264
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88264 days = 1 random = 25 }
 			}
-			40 = { #promoted to skilled tactician
-				modifier = {
-					factor = 0
-					NOT = { trait = tough_soldier }
+
+			40 = { # promoted to skilled tactician
+				trigger = { trait = tough_soldier }
+
+				character_event = {
+					id = 88265
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88265 days = 1 random = 25 }
 			}
-			40 = { #promoted to brilliant strategist
-				modifier = {
-					factor = 0
-					NOT = { trait = skilled_tactician }
+
+			40 = { # promoted to brilliant strategist
+				trigger = { trait = skilled_tactician }
+
+				character_event = {
+					id = 88266
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88266 days = 1 random = 25 }
 			}
-			40 = { #demoted to skilled tactician
-				modifier = {
-					factor = 0
-					NOT = { trait = brilliant_strategist }
+
+			40 = { # demoted to skilled tactician
+				trigger = { trait = brilliant_strategist }
+
+				character_event = {
+					id = 88267
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88267 days = 1 random = 25 }
 			}
-			40 = { #demoted to tough soldier
-				modifier = {
-					factor = 0
-					NOT = { trait = skilled_tactician }
+
+			40 = { # demoted to tough soldier
+				trigger = { trait = skilled_tactician }
+
+				character_event = {
+					id = 88268
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88268 days = 1 random = 25 }
 			}
-			40 = { #demoted to misguided warrior
-				modifier = {
-					factor = 0
-					NOT = { trait = tough_soldier }
+
+			40 = { # demoted to misguided warrior
+				trigger = { trait = tough_soldier }
+
+				character_event = {
+					id = 88269
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88269 days = 1 random = 25 }
 			}
-			13 = { #gain homosexual
-				modifier = {
-					factor = 1.2
-					trait = drunkard
-				}
-				modifier = {
-					factor = 1.5
-					trait = hedonist
-				}
-				modifier = {
-					factor = 1.2
-					trait = lustful
-				}
-				modifier = {
-					factor = 0.5
-					trait = temperate
-				}
-				modifier = {
-					factor = 0.3
-					trait = chaste
-				}
-				modifier = {
-					factor = 0.3
-					trait = zealous
-				}
-				modifier = {
-					factor = 0
-					OR = {
+
+			13 = { # gain homosexual
+				trigger = {
+					NOR = {
 						trait = homosexual
 						trait = celibate
 						trait = eunuch
 					}
 				}
-				character_event = { id = 88273 days = 1 random = 25 }
-			}
-			13 = { #gain syphilitic
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.2
 					trait = drunkard
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = hedonist
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.2
 					trait = lustful
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
 					trait = temperate
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.3
 					trait = chaste
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.3
 					trait = zealous
 				}
-				modifier = {
-					factor = 0
-					OR = {
+
+				character_event = {
+					id = 88273
+					days = 1
+					random = 25
+				}
+			}
+
+			13 = { # gain syphilitic
+				trigger = {
+					NOR = {
 						trait = syphilitic
 						trait = celibate
 						trait = eunuch
 					}
 				}
-				character_event = { id = 88274 days = 1 random = 25 }
+
+				mult_modifier = {
+					factor = 1.2
+					trait = drunkard
+				}
+
+				mult_modifier = {
+					factor = 1.5
+					trait = hedonist
+				}
+
+				mult_modifier = {
+					factor = 1.2
+					trait = lustful
+				}
+
+				mult_modifier = {
+					factor = 0.5
+					trait = temperate
+				}
+
+				mult_modifier = {
+					factor = 0.3
+					trait = chaste
+				}
+
+				mult_modifier = {
+					factor = 0.3
+					trait = zealous
+				}
+
+				character_event = {
+					id = 88274
+					days = 1
+					random = 25
+				}
 			}
-			20 = { #gain drunkard
-				modifier = {
+
+			20 = { # gain drunkard
+				trigger = {
+					NOT = { trait = drunkard }
+				}
+
+				mult_modifier = {
 					factor = 1.3
 					trait = gluttonous
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = lustful
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.3
 					trait = temperate
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.5
 					trait = chaste
 				}
-				modifier = {
-					factor = 0
-					trait = drunkard
+
+				character_event = {
+					id = 88275
+					days = 1
+					random = 25
 				}
-				character_event = { id = 88275 days = 1 random = 25 }
 			}
-			20 = { #gain duelist
-				modifier = {
-					factor = 1.3
-					trait = diligent
-				}
-				modifier = {
-					factor = 1.3
-					trait = wroth
-				}
-				modifier = {
-					factor = 1.3
-					trait = brave
-				}
-				modifier = {
-					factor = 1.3
-					is_strong_trigger = yes
-				}
-				modifier = {
-					factor = 1.3
-					martial = 10
-				}
-				modifier = {
-					factor = 1.3
-					martial = 15
-				}
-				modifier = {
-					factor = 1.3
-					martial = 20
-				}
-				modifier = {
-					factor = 0
-					OR = {
+
+			20 = { # gain duelist
+				trigger = {
+					NOT = { has_dlc = "Way of Life" }
+					lifestyle_traits < 1
+					is_weak_trigger = no
+
+					NOR = {
 						trait = content
 						trait = kind
 						trait = craven
-						is_weak_trigger = yes
-						lifestyle_traits = 1
 					}
 				}
-				character_event = { id = 88276 days = 1 random = 25 }
+
+				mult_modifier = {
+					factor = 1.3
+					trait = diligent
+				}
+
+				mult_modifier = {
+					factor = 1.3
+					trait = wroth
+				}
+
+				mult_modifier = {
+					factor = 1.3
+					trait = brave
+				}
+
+				mult_modifier = {
+					factor = 1.3
+					is_strong_trigger = yes
+				}
+
+				mult_modifier = {
+					factor = 1.3
+					martial >= 10
+				}
+
+				mult_modifier = {
+					factor = 1.3
+					martial >= 15
+				}
+
+				mult_modifier = {
+					factor = 1.3
+					martial >= 20
+				}
+
+				character_event = {
+					id = 88276
+					days = 1
+					random = 25
+				}
 			}
-			40 = { #increase intrigue
-				modifier = {
+
+			40 = { # increase intrigue
+				mult_modifier = {
 					factor = 1.2
 					trait = elusive_shadow
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = intricate_webweaver
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = flamboyant_schemer
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
 					trait = amateurish_plotter
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
+
 					NOR = {
 						trait = elusive_shadow
 						trait = intricate_webweaver
@@ -1994,45 +2021,58 @@ character_event = {
 						trait = amateurish_plotter
 					}
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = deceitful
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
 					trait = honest
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.25
-					martial = 10
+					martial >= 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.2
-					NOT = {
-						martial = 5
-					}
+					martial < 5
 				}
-				character_event = { id = 88277 days = 1 random = 25 }
+
+				character_event = {
+					id = 88277
+					days = 1
+					random = 25
+				}
 			}
-			40 = { #decrease intrigue
-				modifier = {
+
+			40 = { # decrease intrigue
+				mult_modifier = {
 					factor = 0.8
 					trait = elusive_shadow
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = intricate_webweaver
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = flamboyant_schemer
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = amateurish_plotter
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
+
 					NOR = {
 						trait = elusive_shadow
 						trait = intricate_webweaver
@@ -2040,45 +2080,58 @@ character_event = {
 						trait = amateurish_plotter
 					}
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = deceitful
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = honest
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.25
-					martial = 10
+					martial >= 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.2
-					NOT = {
-						martial = 5
-					}
+					martial < 5
 				}
-				character_event = { id = 88278 days = 1 random = 25 }
+
+				character_event = {
+					id = 88278
+					days = 1
+					random = 25
+				}
 			}
-			40 = { #increase stewardship
-				modifier = {
+
+			40 = { # increase stewardship
+				mult_modifier = {
 					factor = 1.5
 					trait = midas_touched
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = fortune_builder
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = thrifty_clerk
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.8
 					trait = indulgent_wastrel
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
+
 					NOR = {
 						trait = midas_touched
 						trait = fortune_builder
@@ -2086,35 +2139,58 @@ character_event = {
 						trait = indulgent_wastrel
 					}
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = diligent
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = slothful
 				}
-				character_event = { id = 88279 days = 1 random = 25 }
+
+				mult_modifier = {
+					factor = 0.25
+					martial >= 10
+				}
+
+				mult_modifier = {
+					factor = 1.2
+					martial < 5
+				}
+
+				character_event = {
+					id = 88279
+					days = 1
+					random = 25
+				}
 			}
-			40 = { #decrease stewardship
-				modifier = {
+
+			40 = { # decrease stewardship
+				mult_modifier = {
 					factor = 0.8
 					trait = midas_touched
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = fortune_builder
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = thrifty_clerk
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = indulgent_wastrel
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
+
 					NOR = {
 						trait = midas_touched
 						trait = fortune_builder
@@ -2122,45 +2198,58 @@ character_event = {
 						trait = indulgent_wastrel
 					}
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = diligent
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = slothful
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.25
-					martial = 10
+					martial >= 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.2
-					NOT = {
-						martial = 5
-					}
+					martial < 5
 				}
-				character_event = { id = 88280 days = 1 random = 25 }
+
+				character_event = {
+					id = 88280
+					days = 1
+					random = 25
+				}
 			}
-			40 = { #increase diplomacy
-				modifier = {
+
+			40 = { # increase diplomacy
+				mult_modifier = {
 					factor = 1.5
 					trait = grey_eminence
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = charismatic_negotiator
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = underhanded_rogue
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.8
 					trait = naive_appeaser
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
+
 					NOR = {
 						trait = grey_eminence
 						trait = charismatic_negotiator
@@ -2168,35 +2257,48 @@ character_event = {
 						trait = naive_appeaser
 					}
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = gregarious
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = shy
 				}
-				character_event = { id = 88281 days = 1 random = 25 }
+
+				character_event = {
+					id = 88281
+					days = 1
+					random = 25
+				}
 			}
-			40 = { #decrease diplomacy
-				modifier = {
+
+			40 = { # decrease diplomacy
+				mult_modifier = {
 					factor = 0.8
 					trait = grey_eminence
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = charismatic_negotiator
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.1
 					trait = underhanded_rogue
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = naive_appeaser
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.7
+
 					NOR = {
 						trait = grey_eminence
 						trait = charismatic_negotiator
@@ -2204,26 +2306,34 @@ character_event = {
 						trait = naive_appeaser
 					}
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					trait = gregarious
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
 					trait = shy
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.25
-					martial = 10
+					martial >= 10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.2
-					NOT = {
-						martial = 5
-					}
+					martial < 5
 				}
-				character_event = { id = 88282 days = 1 random = 25 }
+
+				character_event = {
+					id = 88282
+					days = 1
+					random = 25
+				}
 			}
+
 			1000 = { }
 		}
 	}
@@ -2231,7 +2341,7 @@ character_event = {
 
 
 ###########################################
-#SCORING, LOOK AWAY FRAGILE EYES		  #
+# SCORING, LOOK AWAY FRAGILE EYES		  #
 ###########################################
 
 character_event = {
@@ -2244,164 +2354,135 @@ character_event = {
 	immediate = {
 		random_list = {
 			10 = {
+				trigger = { combat_rating >= 130 }
+
 				set_character_flag = tourney_score_15
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 130 }
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 120
+					combat_rating < 170
+				}
+
 				set_character_flag = tourney_score_14
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 120 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 170
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 110
+					combat_rating < 160
+				}
+
 				set_character_flag = tourney_score_13
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 110 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 160
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 100
+					combat_rating < 150
+				}
+
 				set_character_flag = tourney_score_12
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 100 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 150
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 90
+					combat_rating < 140
+				}
+
 				set_character_flag = tourney_score_11
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 90 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 140
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 80
+					combat_rating < 130
+				}
+
 				set_character_flag = tourney_score_10
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 80 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 130
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 70
+					combat_rating < 120
+				}
+
 				set_character_flag = tourney_score_09
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 70 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 120
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 60
+					combat_rating < 110
+				}
+
 				set_character_flag = tourney_score_08
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 60 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 110
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 50
+					combat_rating < 100
+				}
+
 				set_character_flag = tourney_score_07
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 50 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 100
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 40
+					combat_rating < 90
+				}
+
 				set_character_flag = tourney_score_06
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 40 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 90
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 30
+					combat_rating < 80
+				}
+
 				set_character_flag = tourney_score_05
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 30 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 80
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 20
+					combat_rating < 70
+				}
+
 				set_character_flag = tourney_score_04
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 20 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 70
-				}
 			}
+
 			10 = {
+				trigger = {
+					combat_rating >= 10
+					combat_rating < 60
+				}
+
 				set_character_flag = tourney_score_03
-				modifier = {
-					factor = 0
-					NOT = { combat_rating = 10 }
-				}
-				modifier = {
-					factor = 0
-					combat_rating = 60
-				}
 			}
+
 			10 = {
+				trigger = { combat_rating < 50 }
+
 				set_character_flag = tourney_score_02
-				modifier = {
-					factor = 0
-					combat_rating = 50
-				}
 			}
+
 			10 = {
+				trigger = { combat_rating < 40 }
+
 				set_character_flag = tourney_score_01
-				modifier = {
-					factor = 0
-					combat_rating = 40
-				}
 			}
+
 			10 = {
+				trigger = { combat_rating < 30 }
+
 				set_character_flag = tourney_score_00
-				modifier = {
-					factor = 0
-					combat_rating = 30
-				}
 			}
 		}
 	}
@@ -2411,12 +2492,10 @@ character_event = {
 # First place   WINNER!                   #
 ###########################################
 
-
 character_event = {
 	id = 88461
 
 	hide_window = yes
-
 	is_triggered_only = yes
 
 	immediate = {
@@ -2522,12 +2601,10 @@ character_event = {
 # Second place                            #
 ###########################################
 
-
 character_event = {
 	id = 88462
 
 	hide_window = yes
-
 	is_triggered_only = yes
 
 	immediate = {
@@ -2633,12 +2710,10 @@ character_event = {
 # Third place                           #
 ###########################################
 
-
 character_event = {
 	id = 88463
 
 	hide_window = yes
-
 	is_triggered_only = yes
 
 	immediate = {
@@ -2748,7 +2823,6 @@ character_event = {
 	id = 88464
 
 	hide_window = yes
-
 	is_triggered_only = yes
 
 	immediate = {
@@ -2760,6 +2834,7 @@ character_event = {
 					has_character_flag = tournament_third_place_furusiyya
 				}
 			}
+
 			character_event = { id = 88270 }
 		}
 	}
@@ -2769,28 +2844,4 @@ character_event = {
 # Flag management                         #
 ###########################################
 
-# Safety catch - clears character flags and modifiers
-character_event = {
-	id = 88999
-
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		clr_character_flag = do_not_disturb
-		clr_character_flag = attending_tournament_furusiyya
-		clr_character_flag = no_msg_death_furusiyya
-		clr_character_flag = no_msg_maimed_furusiyya
-		clr_character_flag = no_msg_wounded_furusiyya
-		clr_character_flag = tournament_has_ended_furusiyya
-		clr_character_flag = attending_tournament_event_furusiyya
-		clr_character_flag = tournament_winner_furusiyya
-		clr_character_flag = winner_furusiyya
-		clr_character_flag = tournament_second_place_furusiyya
-		clr_character_flag = second_place_furusiyya
-		clr_character_flag = tournament_third_place_furusiyya
-		clr_character_flag = third_place_furusiyya
-		clr_character_flag = tournament_begins_furusiyya
-	}
-}
+# Safety catch - clears character flags and modifiers - removed by CleanSlate
