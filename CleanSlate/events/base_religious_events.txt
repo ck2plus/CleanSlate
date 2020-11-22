@@ -46,7 +46,7 @@ province_event = {
 
 		mult_modifier = {
 			factor = 2.0
-			religion_authority = 0.60
+			religion_authority = 0.6
 		}
 
 		mult_modifier = {
@@ -328,7 +328,7 @@ province_event = {
 				opinion = {
 					name = pope_disappointed_over_heretic_province
 					who = PREV
-					months = 60
+					years = 5
 				}
 			}
 		}
@@ -543,6 +543,7 @@ letter_event = {
 				religion_group = christian
 				prisoner = no
 			}
+
 			save_event_target_as = heretic_to_target
 		}
 	}
@@ -774,6 +775,7 @@ province_event = {
 
 				ROOT = {
 					any_neighbor_province = {
+						has_owner = yes
 						is_heresy_of = ROOT
 						NOT = { province_id = PREVPREV }
 					}
@@ -979,6 +981,7 @@ character_event = {
 					value >= 25
 				}
 
+				is_heretic = no
 				prisoner = no
 				is_incapable = no
 			}
@@ -1370,8 +1373,8 @@ narrative_event = {
 
 		new_character = {
 			d_knights_hospitaler = {
-				grant_title = PREV
 				religion = PREV
+				grant_title = PREV
 			}
 
 			set_defacto_liege = THIS
@@ -1500,8 +1503,8 @@ narrative_event = {
 
 		new_character = {
 			d_knights_templar = {
-				grant_title = PREV
 				religion = PREV
+				grant_title = PREV
 			}
 
 			set_defacto_liege = THIS
@@ -1623,8 +1626,8 @@ narrative_event = {
 
 		new_character = {
 			d_teutonic_order = {
-				grant_title = PREV
 				religion = PREV
+				grant_title = PREV
 			}
 
 			set_defacto_liege = THIS
@@ -1885,15 +1888,16 @@ character_event = {
 		any_independent_ruler = {
 			religion = ROOT
 			is_any_kinslayer_trigger = yes
+			NOT = { trait = tribal_kinslayer }
 			piety >= 100
+
+			religion_head = {
+				character = ROOT
+			}
 
 			reverse_opinion = {
 				who = ROOT
 				value >= 0
-			}
-
-			religion_head = {
-				character = ROOT
 			}
 
 			NOT = { has_character_flag = kinslaying_offered }
@@ -1904,43 +1908,36 @@ character_event = {
 		months = 24
 	}
 
-	immediate = {
+	option = {
+		name = EVTOPTA39210
+
+		ai_chance = { factor = 100 }
+
 		random_independent_ruler = {
 			limit = {
 				religion = ROOT
 				is_any_kinslayer_trigger = yes
+				NOT = { trait = tribal_kinslayer }
 				piety >= 100
+
+				religion_head = {
+					character = ROOT
+				}
 
 				reverse_opinion = {
 					who = ROOT
 					value >= 0
 				}
 
-				religion_head = {
-					character = ROOT
-				}
-
 				NOT = { has_character_flag = kinslaying_offered }
 			}
 
 			set_character_flag = kinslaying_offered
-		}
-	}
 
-	option = {
-		name = "EVTOPTA39210"
-		ai_chance = { factor = 100 }
-
-		random_independent_ruler = {
-			limit = {
-				religion = ROOT
-				rightful_religious_head = ROOT
-				is_any_kinslayer_trigger = yes
-				piety = 100
-				reverse_opinion = { who = ROOT value = 0 }
+			character_event = {
+				id = 39211
+				tooltip = EVTTOOLTIP39211
 			}
-
-			character_event = { id = 39211 tooltip = EVTTOOLTIP39211 }
 		}
 	}
 
@@ -2078,7 +2075,7 @@ character_event = {
 		religion_head = {
 			reverse_opinion = {
 				who = ROOT
-				value = 25
+				value >= 25
 			}
 		}
 
@@ -3007,7 +3004,7 @@ character_event = {
 	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # realm_decisions.txt
 
 	option = {
 		name = EVTOPTA39250
@@ -3032,7 +3029,7 @@ character_event = {
 	picture = GFX_evt_pope
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes # realm_decisions.txt
+	is_triggered_only = yes
 
 	option = {
 		name = GLORY_TO_HIGHGOD
@@ -3259,7 +3256,7 @@ character_event = {
 #
 # 			opinion = {
 # 				name = refused_making_repentance
-# 				who = FROM
+# 				who = ROOT
 # 				years = 5
 # 			}
 # 		}
@@ -4067,10 +4064,7 @@ province_event = {
 
 		owner = {
 			religion_group = muslim
-
-			top_liege = {
-				religion_group = muslim
-			}
+			religion_group = top_liege
 		}
 	}
 
@@ -4149,11 +4143,7 @@ province_event = {
 	}
 
 	immediate = {
-		owner = {
-			ROOT = {
-				religion = PREV
-			}
-		}
+		religion = owner
 	}
 
 	option = {
@@ -4167,27 +4157,25 @@ province_event = {
 
 		hidden_effect = {
 			owner = {
-				top_liege = {
-					if = {
-						limit = {
-							NOT = { character = PREV }
-						}
+				if = {
+					limit = { independent = no }
 
+					top_liege = {
 						character_event = {
 							id = 39501
 							days = 1
 						}
-					}
 
-					any_vassal = {
-						limit = {
-							NOT = { character = PREVPREV }
-							higher_real_tier_than = BARON
-						}
+						any_vassal = {
+							limit = {
+								NOT = { character = PREVPREV }
+								is_playable = yes
+							}
 
-						character_event = {
-							id = 39501
-							days = 1
+							character_event = {
+								id = 39501
+								days = 1
+							}
 						}
 					}
 				}
@@ -4511,7 +4499,7 @@ character_event = {
 
 			# Pragmatism
 			mult_modifier = {
-				factor = 3  # Powerful rulers want a modern religion
+				factor = 3 # Powerful rulers want a modern religion
 
 				real_tier = KING
 				realm_size >= 12
@@ -4654,7 +4642,7 @@ character_event = {
 		ai_chance = {
 			factor = 1
 
-			trigger = { is_reformed_religion = no }
+			trigger = { is_unreformed_pagan_trigger = yes }
 
 			# Traits
 			mult_modifier = {
@@ -4860,7 +4848,7 @@ character_event = {
 
 			# Pragmatism
 			mult_modifier = {
-				factor = 3  # Powerful rulers want a modern religion
+				factor = 3 # Powerful rulers want a modern religion
 
 				real_tier = KING
 				realm_size >= 12
@@ -4934,10 +4922,7 @@ character_event = {
 					religion = aztec
 
 					any_neighbor_independent_ruler = {
-						trigger_if = {
-							limit = { religion_group = pagan_group }
-							is_reformed_religion = yes
-						}
+						is_not_unreformed_pagan_trigger = yes
 
 						any_realm_province = {
 							TECH_RECRUITMENT >= 4 # More cocky when pagan homeland attrition effect is active against neighbors
@@ -4992,52 +4977,38 @@ character_event = {
 				}
 			}
 
+			# Not losing religious wars
 			mult_modifier = {
 				factor = 0.3
 
-				any_war = {
-					NOT = {
-						using_cb = religious
+				NOT = {
+					any_war = {
+						defender = { character = ROOT }
+						war_score >= 50
 
-						defender = {
-							character = ROOT
-						}
-					}
-
-					NOT = {
 						OR = {
+							using_cb = religious
 							using_cb = crusade
 							using_cb = new_crusade
 						}
-						defender = {
-							character = ROOT
-						}
 					}
-
-					war_score < 50
 				}
 			}
 
 			mult_modifier = {
 				factor = 0.3
 
-				any_war = {
-					NOT = {
-						using_cb = religious
-						defender = {
-							character = ROOT
-						}
-					}
-					NOT = {
+				NOT = {
+					any_war = {
+						defender = { character = ROOT }
+						war_score >= 10
+
 						OR = {
+							using_cb = religious
 							using_cb = crusade
 							using_cb = new_crusade
 						}
-						defender = {
-							character = ROOT
-						}
 					}
-					war_score < 10
 				}
 			}
 		}
@@ -5048,8 +5019,7 @@ character_event = {
 			limit = {
 				independent = yes
 				has_dlc = "Holy Fury"
-				religion_group = pagan_group
-				is_reformed_religion = no
+				is_unreformed_pagan_trigger = yes
 				higher_real_tier_than = COUNT
 				is_tribal = yes
 				is_incapable = no
@@ -5058,14 +5028,10 @@ character_event = {
 				FROM = {
 					liege = {
 						independent = yes
+						higher_real_tier_than = DUKE
+						is_not_unreformed_pagan_trigger = yes
 						is_tribal = no
 						is_nomadic = no
-						higher_real_tier_than = DUKE
-
-						trigger_if = {
-							limit = { religion_group = pagan_group }
-							is_reformed_religion = yes
-						}
 
 						NOR = {
 							religion = ROOT
@@ -5535,6 +5501,8 @@ character_event = {
 		name = EVTOPTA39603
 
 		FROMFROM = {
+			show_scope_change = no
+
 			liege = {
 				show_scope_change = no
 
@@ -5774,7 +5742,10 @@ character_event = {
 		hidden_effect = {
 			location = {
 				owner = {
-					character_event = { id = 39603 days = 1 }
+					character_event = {
+						id = 39603
+						days = 1
+					}
 				}
 			}
 		}
@@ -6607,9 +6578,9 @@ narrative_event = {
 	hide_new = yes
 
 	only_playable = yes
+	religion = catholic
 	min_age = 16
 	only_men = yes
-	religion = catholic
 
 	trigger = {
 		controls_religion = yes
@@ -6768,7 +6739,7 @@ narrative_event = {
 	id = 39670
 	title = EVTNAME39670
 	desc = EVTDESC39670
-	picture = GFX_evt_bishop
+	picture = GFX_evt_bishop_muslim
 	border = GFX_event_narrative_frame_religion
 
 	major = yes
@@ -6903,7 +6874,7 @@ narrative_event = {
 
 	trigger = {
 		controls_religion = yes
-		year = 900
+		year >= 900
 
 		NOR = {
 			has_alternate_start_parameter = {
@@ -6968,7 +6939,7 @@ narrative_event = {
 
 	trigger = {
 		controls_religion = yes
-		year = 900
+		year >= 900
 
 		NOR = {
 			has_alternate_start_parameter = {
@@ -7884,7 +7855,7 @@ character_event = {
 character_event = {
 	id = 39804
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_character_convert_religion
 	hide_window = yes
 
 	trigger = {
@@ -7905,7 +7876,7 @@ character_event = {
 character_event = {
 	id = 39805
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_character_convert_religion
 	hide_window = yes
 
 	trigger = {
@@ -7925,7 +7896,7 @@ character_event = {
 character_event = {
 	id = 39806
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_character_convert_religion
 	hide_window = yes
 
 	trigger = {
@@ -7955,7 +7926,15 @@ narrative_event = {
 	}
 
 	immediate = {
-		activate_title = { title = d_saint_anthony status = yes }
+		religion_scope = {
+			save_event_target_as = holy_order_religion
+		}
+
+		activate_title = {
+			title = d_saint_anthony
+			status = yes
+		}
+
 		create_character = {
 			random_traits = no
 			dynasty = random
@@ -7963,19 +7942,29 @@ narrative_event = {
 			culture = ROOT
 			female = no
 			age = 31
-			trait = brilliant_strategist
-			trait = zealous
-			trait = humble
-			trait = ambitious
-			trait = strategist
-			trait = holy_warrior
+			add_trait = brilliant_strategist
+			add_trait = zealous
+			add_trait = humble
+			add_trait = ambitious
+			add_trait = strategist
+			add_trait = holy_warrior
 		}
+
 		new_character = {
-			wealth = 500
 			d_saint_anthony = {
+				religion = PREV
 				grant_title = PREV
+
+				save_persistent_event_target = {
+					name = holy_order_religion
+					scope = event_target:holy_order_religion
+				}
 			}
+
+			set_defacto_liege = THIS
+			wealth = 500
 			set_government_type = order_government
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -7984,6 +7973,7 @@ narrative_event = {
 				female = no
 				age = 16
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -7992,6 +7982,7 @@ narrative_event = {
 				female = no
 				age = 18
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -8000,6 +7991,7 @@ narrative_event = {
 				female = no
 				age = 18
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -8008,6 +8000,7 @@ narrative_event = {
 				female = no
 				age = 20
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -8016,6 +8009,7 @@ narrative_event = {
 				female = no
 				age = 25
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -8024,6 +8018,7 @@ narrative_event = {
 				female = no
 				age = 26
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -8032,6 +8027,7 @@ narrative_event = {
 				female = no
 				age = 28
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -8040,6 +8036,7 @@ narrative_event = {
 				female = yes
 				age = 16
 			}
+
 			create_character = {
 				random_traits = yes
 				dynasty = random
@@ -8082,6 +8079,10 @@ narrative_event = {
 	}
 
 	immediate = {
+		religion_scope = {
+			save_event_target_as = holy_order_religion
+		}
+
 		activate_title = {
 			title = d_saint_addai
 			status = yes
@@ -8103,7 +8104,16 @@ narrative_event = {
 		}
 
 		new_character = {
-			grant_title = d_saint_addai
+			d_saint_addai = {
+				religion = PREV
+				grant_title = PREV
+
+				save_persistent_event_target = {
+					name = holy_order_religion
+					scope = event_target:holy_order_religion
+				}
+			}
+
 			wealth = 500
 			set_government_type = order_government
 

@@ -11,6 +11,7 @@
 character_event = {
 	id = 71000
 	desc = EVTDESC71000
+	picture = GFX_evt_emissary
 
 	is_triggered_only = yes
 
@@ -20,8 +21,6 @@ character_event = {
 	prisoner = no
 	war = no
 	in_command = no
-
-	picture = GFX_evt_emissary
 
 	trigger = {
 		job_chancellor = {
@@ -188,6 +187,7 @@ character_event = {
 		set_character_flag = hedge_knights_visiting
 		prestige = 10
 
+		remove_trait_silently_shy_effect = yes
 		add_trait_silently_gregarious_effect = yes
 
 		if = {
@@ -337,9 +337,9 @@ character_event = {
 			dynasty = random
 			female = no
 			age = 16
-			trait = brave
-			trait = ambitious
-			trait = humble
+			add_trait = brave
+			add_trait = ambitious
+			add_trait = humble
 			health = 10
 
 			attributes = {
@@ -368,7 +368,6 @@ character_event = {
 	religion = catholic
 	min_age = 16
 	prisoner = no
-
 
 	trigger = {
 	 	any_courtier = {
@@ -432,9 +431,7 @@ character_event = {
 		 		}
 		 	}
 
-			count = 1
-
-		 	score_value = { # Prioritizes selecting an interesting courtier...
+		 	score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
@@ -446,7 +443,6 @@ character_event = {
 			}
 	 	}
 	}
-
 }
 
 # A young woman has been seduced by a hedge knight
@@ -480,6 +476,37 @@ character_event = {
 
 	immediate = {
 		set_character_flag = hedge_knight_woman_seduced
+
+		create_character = {
+			random_traits = yes
+			dynasty = random
+			fertility = 0.6
+			female = no
+			age = 24
+	 	}
+
+		new_character = {
+			save_event_target_as = hedge_knight
+		}
+
+		any_courtier = {
+	 		limit = {
+	 			is_female = yes
+	 			is_adult = yes
+	 			practical_age < 20
+				fertility >= 0.3
+	 			is_married = no
+	 			is_pregnant = no
+				has_lover = no
+	 		}
+
+	 		score_value = {
+				value = 10
+				interesting_courtier_selection_score = yes
+			}
+
+	 		save_event_target_as = seduced_courtier
+	 	}
 	}
 
 	mean_time_to_happen = {
@@ -494,39 +521,17 @@ character_event = {
 	option = {
 		name = EVTOPTA71004 # Stay
 
-		any_courtier = {
-	 		limit = {
-	 			is_female = yes
-	 			is_adult = yes
-	 			practical_age < 20
-				fertility >= 0.3
-	 			is_married = no
-	 			is_pregnant = no
-				has_lover = no
-	 		}
-
-			count = 1
-
-	 		score_value = { # Prioritizes selecting an interesting courtier...
-				value = 10
-				interesting_courtier_selection_score = yes
-			}
+		event_target:seduced_courtier = {
+			show_scope_change = no
 
 	 		add_trait = lustful
+		}
 
-	 		create_character = {
-				random_traits = yes
-				dynasty = random
-				fertility = 0.6
-				female = no
-				age = 24
-	 		}
+		event_target:hedge_knight = {
+			show_scope_change = no
 
-			new_character = {
-	 			impregnate_cuckoo = PREV
-	 			add_lover = PREV
-				add_trait = lustful
-	 		}
+			add_trait = lustful
+	 		impregnate_cuckoo = event_target:seduced_courtier
 	 	}
 
 	 	piety = -10
@@ -548,40 +553,18 @@ character_event = {
 			}
 		}
 
-		any_courtier = {
-	 		limit = {
-	 			is_female = yes
-	 			is_adult = yes
-	 			practical_age < 20
-				fertility >= 0.3
-	 			is_married = no
-	 			is_pregnant = no
-				has_lover = no
-	 		}
-
-			count = 1
-
-	 		score_value = { # Prioritizes selecting an interesting courtier...
-				value = 10
-				interesting_courtier_selection_score = yes
-			}
+		event_target:seduced_courtier = {
+			show_scope_change = no
 
 	 		add_trait = lustful
+		}
 
-			create_character = {
-				random_traits = yes
-				dynasty = random
-				fertility = 0.6
-				female = no
-				age = 24
-	 		}
+		event_target:hedge_knight = {
+			show_scope_change = no
 
-			new_character = {
-	 			impregnate_cuckoo = PREV
-	 			add_lover = PREV
-				add_trait = lustful
-				imprison = ROOT
-	 		}
+			add_trait = lustful
+	 		impregnate_cuckoo = event_target:seduced_courtier
+			imprison = ROOT
 	 	}
 	}
 }

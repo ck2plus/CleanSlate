@@ -228,18 +228,38 @@ character_event = {
 			20 = {
 				add_trait_wounded_effect = yes
 
-				character_event = {
-					id = 36003
-					days = 1
+				random_courtier = {
+					limit = {
+						has_plot = plot_kill_character
+
+						plot_target_char = {
+							character = ROOT
+						}
+					}
+
+					character_event = {
+						id = 36003
+						days = 1
+					}
 				}
 			}
 
 			4 = {
 				add_maimed_trait_effect = yes
 
-				character_event = {
-					id = 36003
-					days = 1
+				random_courtier = {
+					limit = {
+						has_plot = plot_kill_character
+
+						plot_target_char = {
+							character = ROOT
+						}
+					}
+
+					character_event = {
+						id = 36003
+						days = 1
+					}
 				}
 			}
 
@@ -536,9 +556,7 @@ character_event = {
 				is_abroad = no
 			}
 
-			count = 1
-
-			score_value = { # Prioritizes selecting an interesting courtier...
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
@@ -726,9 +744,24 @@ character_event = {
 
 		prestige = 5
 
-		random = {
-			chance = 30
-			add_trait_craven_effect = yes
+		if = {
+			limit = {
+				NOT = { trait = berserker }
+			}
+
+			random = {
+				chance = 30
+
+				tooltip = {
+					remove_trait_silently_brave_effect = yes
+					add_trait = craven
+				}
+
+				hidden_effect = {
+					remove_trait_silently_brave_effect = yes
+					add_trait_craven_effect = yes
+				}
+			}
 		}
 	}
 
@@ -1249,7 +1282,6 @@ character_event = {
 
 	immediate = {
 		set_character_flag = hunt_event_happened
-		set_character_flag = hunt_killed_something
 	}
 
 	mean_time_to_happen = {
@@ -1305,6 +1337,8 @@ character_event = {
 	option = {
 		name = EVTOPTB36040
 
+		set_character_flag = hunt_killed_something
+
 		any_courtier = {
 			show_scope_change = no
 
@@ -1314,9 +1348,7 @@ character_event = {
 				martial >= 8
 			}
 
-			count = 1
-
-			score_value = { # Prioritizes selecting an interesting courtier...
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
@@ -1367,7 +1399,6 @@ character_event = {
 
 	immediate = {
 		set_character_flag = hunt_event_happened
-		set_character_flag = hunt_killed_something
 	}
 
 	mean_time_to_happen = {
@@ -1608,6 +1639,7 @@ character_event = {
 	}
 }
 
+# Hunt begins
 character_event = {
 	id = 36080
 	desc = EVTDESC36080
@@ -1673,52 +1705,27 @@ character_event = {
 		name = EVTOPTA36080
 
 		trigger = { has_character_flag = white_stag }
-
-		if = {
-			limit = { NOT = { has_character_flag = epic_hunt } }
-
-			clr_character_flag = white_stag
-			clr_character_flag = white_bear
-			clr_character_flag = white_tiger
-			clr_character_flag = white_lion
-		}
 	}
 
 	option = {
 		name = EVTOPTB36080
 
 		trigger = { has_character_flag = white_bear }
-
-		if = {
-			limit = { NOT = { has_character_flag = epic_hunt } }
-
-			clr_character_flag = white_stag
-			clr_character_flag = white_bear
-			clr_character_flag = white_tiger
-			clr_character_flag = white_lion
-		}
 	}
 
 	option = {
 		name = EVTOPTC36080
 
 		trigger = { has_character_flag = white_tiger }
-
-		if = {
-			limit = { NOT = { has_character_flag = epic_hunt } }
-
-			clr_character_flag = white_stag
-			clr_character_flag = white_bear
-			clr_character_flag = white_tiger
-			clr_character_flag = white_lion
-		}
 	}
 
 	option = {
 		name = EVTOPTD36080
 
 		trigger = { has_character_flag = white_lion }
+	}
 
+	after = {
 		if = {
 			limit = { NOT = { has_character_flag = epic_hunt } }
 
@@ -1730,22 +1737,39 @@ character_event = {
 	}
 }
 
+character_event = {
+	id = 36088
+
+	is_triggered_only = yes # on_war_started
+	hide_window = yes
+
+	immediate = {
+		ROOT = {
+			if = {
+				limit = { has_character_modifier = holding_grand_hunt }
+				character_event = { id = 36089 }
+			}
+		}
+
+		FROM = {
+			if = {
+				limit = { has_character_modifier = holding_grand_hunt }
+				character_event = { id = 36089 }
+			}
+		}
+	}
+}
+
 # End if we go to war
 character_event = {
 	id = 36089
 	desc = EVTDESC36089
 	picture = GFX_evt_hunt
 
-	only_playable = yes
-	min_age = 16
-	war = yes
+	is_triggered_only = yes
 
 	trigger = {
 		has_character_modifier = holding_grand_hunt
-	}
-
-	mean_time_to_happen = {
-		days = 1
 	}
 
 	immediate = {
@@ -1875,9 +1899,7 @@ character_event = {
 				in_command = no
 			}
 
-			count = 1
-
-			score_value = { # Prioritizes selecting an interesting courtier...
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}

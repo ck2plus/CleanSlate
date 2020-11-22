@@ -356,7 +356,6 @@ character_event = {
 
 	trigger = {
 		FROM = {
-			prisoner = yes
 			is_alive = yes
 		}
 	}
@@ -1052,8 +1051,7 @@ character_event = {
 					limit = {
 						OR = {
 							has_religion_feature = religion_ritual_sacrifice
-							religion = aztec
-							religion = aztec_reformed
+							religion_openly_aztec_or_reformed_trigger = yes
 						}
 					}
 
@@ -1181,8 +1179,10 @@ character_event = {
 	notification = yes
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
-		name = OK # EVTOPTA50022 is missing, but not needed (notification only)
+		name = EVTOPTA50022 # Loc key is missing
 	}
 }
 
@@ -1208,11 +1208,13 @@ character_event = {
 		liege = {
 			num_of_prisoners >= 1
 
-			any_realm_lord = {
-				is_friend = ROOT
-				prisoner = yes
-				host = { character = PREV }
-				NOT = { has_character_modifier = petition_release_prisoner_timer }
+			ROOT = {
+				any_friend = {
+					prisoner = yes
+					is_vassal_or_below_of = PREVPREV # liege
+					host = { character = PREVPREVPREV } # liege
+					NOT = { has_character_flag = petition_release_prisoner }
+				}
 			}
 		}
 	}
@@ -1221,71 +1223,55 @@ character_event = {
 		months = 50
 	}
 
+	immediate = {
+		liege = {
+			ROOT = {
+				any_friend = {
+					limit = {
+						prisoner = yes
+						is_vassal_or_below_of = PREVPREV # liege
+						host = { character = PREVPREVPREV } # liege
+						NOT = { has_character_flag = petition_release_prisoner }
+					}
+
+					score_value = {
+						value = 10
+						interesting_courtier_selection_score = yes
+					}
+
+					save_event_target_as = imprisoned_friend
+				}
+			}
+		}
+	}
+
 	option = {
 		name = EVTOPTA50025
 
 		liege = {
 			show_scope_change = no
 
-			any_realm_lord = {
-				show_scope_change = no
-
-				limit = {
-					is_friend = ROOT
-					prisoner = yes
-					host = { character = PREV }
-				}
-
-				count = 1
-
-				score_value = { # Prioritizes selecting an interesting courtier...
-					value = 10
-					interesting_courtier_selection_score = yes
-				}
-
-				hidden_effect = {
-					add_character_modifier = {
-						name = petition_release_prisoner_timer
-						duration = -1
-						hidden = yes
-					}
-				}
-			}
-
 			character_event = {
 				id = 50026
 				tooltip = EVTTOOLTIP50026
 			}
+		}
+
+		event_target:imprisoned_friend = {
+			set_character_flag = petition_release_prisoner
 		}
 	}
 
 	option = {
 		name = EVTOPTB50025
 
-		liege = {
+		event_target:imprisoned_friend = {
 			show_scope_change = no
 
-			any_realm_lord = {
-				show_scope_change = no
-
-				limit = {
-					is_friend = ROOT
-					prisoner = yes
-					host = { character = PREV }
-				}
-
-				count = 1
-
-				score_value = { # Prioritizes selecting an interesting courtier...
-					value = 10
-					interesting_courtier_selection_score = yes
-				}
-
-				opinion = {
-					name = opinion_disgruntled
-					who = ROOT
-					years = 5
-				}
+			opinion = {
+				name = opinion_disgruntled
+				who = ROOT
+				years = 5
 			}
 		}
 	}
@@ -1304,13 +1290,8 @@ character_event = {
 
 		prestige = -50
 
-		random_realm_lord = {
+		event_target:imprisoned_friend = {
 			show_scope_change = no
-
-			limit = {
-				prisoner = yes
-				has_character_modifier = petition_release_prisoner_timer
-			}
 
 			imprison = no
 		}

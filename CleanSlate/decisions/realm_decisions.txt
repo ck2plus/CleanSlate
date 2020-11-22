@@ -40,12 +40,6 @@ decisions = {
 			prisoner = no
 			in_command = no
 			is_inaccessible_trigger = no
-
-			custom_tooltip = {
-				text = is_not_busy_trigger_tooltip
-
-				NOT = { has_character_flag = do_not_disturb }
-			}
 		}
 
 		effect = {
@@ -137,10 +131,9 @@ decisions = {
 		only_playable = yes
 
 		potential = {
+			higher_real_tier_than = BARON # Low nobility requires somebody else to ask their religious head to Lift the Excommunication on their behalf
 			is_landed = yes
-			higher_tier_than = BARON # Low nobility requires somebody else to ask their religious head to Lift the Excommunication on their behalf
 			is_adult = yes
-			#religion = catholic #Fraticelli, Reformed Pagans, etc.
 
 			rightful_religious_head_scope = {
 				ROOT = {
@@ -160,15 +153,15 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					name = asked_repentance_from_sins_cooldown
-					years = 4
-					hidden = yes
-				}
+			add_character_modifier = {
+				name = asked_repentance_from_sins_cooldown
+				years = 4
+				hidden = yes
 			}
 
 			rightful_religious_head_scope = {
+				show_scope_change = no
+
 				character_event = {
 					id = HFP.23003
 					days = 5
@@ -231,8 +224,8 @@ decisions = {
 
 				NOT = {
 					has_opinion_modifier = {
+						name = requested_land
 						who = ROOT
-						modifier = requested_land
 					}
 				}
 			}
@@ -242,10 +235,12 @@ decisions = {
 			prestige = -60
 
 			liege = {
+				show_scope_change = no
+
 				opinion = {
+					name = requested_land
 					who = ROOT
 					years = 2
-					modifier = requested_land
 				}
 
 				random_demesne_title = {
@@ -295,8 +290,8 @@ decisions = {
 					character = ROOT
 
 					has_opinion_modifier = {
+						name = opinion_sadaqah
 						who = ROOT
-						modifier = opinion_sadaqah
 					}
 				}
 			}
@@ -313,6 +308,8 @@ decisions = {
 			piety = 25
 
 			rightful_religious_head_scope = {
+				show_scope_change = no
+
 				character_event = {
 					id = 31000
 					days = 5
@@ -978,13 +975,14 @@ decisions = {
 		only_playable = yes
 
 		potential = {
-			culture = hungarian
 			has_landed_title = k_magyar
+			culture = hungarian
 			NOT = { has_dlc = "Horse Lords" }
 
 			k_hungary = {
 				has_holder = no
 			}
+
 			k_magyar = {
 				is_vice_royalty = no
 			}
@@ -1268,6 +1266,7 @@ decisions = {
 				}
 			}
 		}
+
 		allow = {
 			completely_controls = c_jerusalem
 
@@ -1503,7 +1502,6 @@ decisions = {
 		only_independent = yes
 
 		potential = {
-			independent = yes
 			has_dlc = "Sons of Abraham"
 
 			trigger_if = {
@@ -1523,9 +1521,7 @@ decisions = {
 			NOR = {
 				religion = manichean
 				has_character_modifier = expelled_jewish
-				secret_religion = jewish
-				secret_religion = samaritan
-				secret_religion = karaite
+				secret_religion_group = jewish_group
 				has_character_flag = currently_considering_expelling_jews
 				government = order_government
 			}
@@ -1899,7 +1895,6 @@ decisions = {
 		allow = {
 			has_landed_title = k_germany
 
-
 			trigger_if = {
 				limit = { start_date >= 936.8.7 }
 				has_landed_title = k_italy
@@ -1977,12 +1972,12 @@ decisions = {
 			}
 
 			any_demesne_title = {
+				show_scope_change = no
+
 				limit = {
 					higher_real_tier_than = DUKE
 					NOT = { title = e_hre }
 				}
-
-				show_scope_change = no
 
 				destroy_landed_title = THIS
 			}
@@ -2355,8 +2350,8 @@ decisions = {
 					show_scope_change = no
 
 					opinion = {
+						name = opinion_unhappy
 						who = ROOT
-						modifier = opinion_unhappy
 						years = 100
 					}
 
@@ -2367,8 +2362,8 @@ decisions = {
 							show_scope_change = no
 
 							reverse_opinion = {
+								name = opinion_unhappy
 								who = PREVPREV
-								modifier = opinion_unhappy
 								years = 100
 							}
 						}
@@ -2378,28 +2373,15 @@ decisions = {
 
 			if = {
 				limit = {
-					OR = {
-						NOT = {	has_character_flag = is_charlemagne }
-						has_character_flag = charlemagne_coronation
-					}
-				}
-
-				add_artifact = crown_hre
-
-				hidden_effect = {
-					narrative_event = { id = CM.510 } # Spread the news
-				}
-			}
-
-			if = {
-				limit = {
 					has_character_flag = is_charlemagne
 					NOT = { has_character_flag = charlemagne_coronation }
 				}
 
-				hidden_effect = {
-					narrative_event = { id = CM.1500 } # Charlemagne coronation
-				}
+				narrative_event = { id = CM.1500 } # Charlemagne coronation
+			}
+			else = {
+				add_artifact = crown_hre
+				narrative_event = { id = CM.510 } # Spread the news
 			}
 
 			if = {
@@ -2428,7 +2410,7 @@ decisions = {
 		only_independent = yes
 
 		potential = {
-			tier = DUKE
+			real_tier = DUKE
 
 			trigger_if = {
 				limit = { is_alternate_start = yes }
@@ -2440,40 +2422,6 @@ decisions = {
 			}
 			trigger_else = {
 				has_dlc = "Charlemagne"
-			}
-
-			trigger_if = {
-				limit = { ai = yes }
-
-				trigger_if = {
-					limit = { is_alternate_start = yes }
-
-					has_alternate_start_parameter = {
-						key = dejure_kingdoms
-						value = none
-					}
-				}
-
-				trigger_else_if = {
-					limit = {
-						OR = {
-							trait = proud
-							trait = ambitious
-						}
-
-						prestige >= 5000
-					}
-				}
-				trigger_else = {
-					OR = {
-						prestige >= 15000
-
-						AND = {
-							realm_size >= 70
-							num_of_duke_titles >= 4
-						}
-					}
-				}
 			}
 
 			holy_order = no
@@ -2670,6 +2618,38 @@ decisions = {
 
 		ai_will_do = {
 			factor = 1
+
+			trigger = {
+				trigger_if = {
+					limit = { is_alternate_start = yes }
+
+					has_alternate_start_parameter = {
+						key = dejure_kingdoms
+						value = none
+					}
+				}
+
+				trigger_else_if = {
+					limit = {
+						OR = {
+							trait = proud
+							trait = ambitious
+						}
+
+						prestige >= 5000
+					}
+				}
+				trigger_else = {
+					OR = {
+						prestige >= 15000
+
+						AND = {
+							realm_size >= 70
+							num_of_duke_titles >= 4
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -2680,7 +2660,7 @@ decisions = {
 		only_independent = yes
 
 		potential = {
-			tier = KING
+			real_tier = KING
 
 			trigger_if = {
 				limit = { is_alternate_start = yes }
@@ -2690,6 +2670,7 @@ decisions = {
 						key = dejure_kingdoms
 						value = none
 					}
+
 					has_alternate_start_parameter = {
 						key = dejure_empires
 						value = none
@@ -2698,37 +2679,6 @@ decisions = {
 			}
 			trigger_else = {
 				has_dlc = "Charlemagne"
-			}
-
-			trigger_if = {
-				limit = { ai = yes }
-
-				trigger_if = {
-					limit = { is_alternate_start = yes }
-
-					OR = {
-						has_alternate_start_parameter = {
-							key = dejure_kingdoms
-							value = none
-						}
-						has_alternate_start_parameter = {
-							key = dejure_empires
-							value = none
-						}
-					}
-				}
-				trigger_else_if = {
-					limit = {
-						OR = {
-							trait = proud
-							trait = ambitious
-						}
-					}
-					prestige >= 40000
-				}
-				trigger_else = {
-					prestige >= 120000
-				}
 			}
 
 			holy_order = no
@@ -2869,6 +2819,35 @@ decisions = {
 
 		ai_will_do = {
 			factor = 1
+
+			trigger = {
+				trigger_if = {
+					limit = { is_alternate_start = yes }
+
+					OR = {
+						has_alternate_start_parameter = {
+							key = dejure_kingdoms
+							value = none
+						}
+						has_alternate_start_parameter = {
+							key = dejure_empires
+							value = none
+						}
+					}
+				}
+				trigger_else_if = {
+					limit = {
+						OR = {
+							trait = proud
+							trait = ambitious
+						}
+					}
+					prestige >= 40000
+				}
+				trigger_else = {
+					prestige >= 120000
+				}
+			}
 		}
 	}
 
@@ -2888,6 +2867,8 @@ decisions = {
 		}
 
 		allow = {
+			wealth >= 20
+			prestige >= 100
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
@@ -2896,14 +2877,6 @@ decisions = {
 			any_demesne_title = {
 				NOT = { higher_tier_than = count }
 				is_occupied = no
-			}
-			wealth >= 20
-			prestige >= 100
-
-			custom_tooltip = {
-				text = is_not_busy_trigger_tooltip
-
-				NOT = { has_character_flag = do_not_disturb }
 			}
 		}
 
@@ -2915,11 +2888,9 @@ decisions = {
 				duration = -1
 			}
 
-			hidden_effect = {
-				set_character_flag = recent_minor_decision
-				set_character_flag = do_not_disturb
-				character_event = { id = HL.7000 }
-			}
+			set_character_flag = recent_minor_decision
+			set_character_flag = do_not_disturb
+			character_event = { id = HL.7000 }
 		}
 
 		ai_will_do = {
@@ -3000,7 +2971,6 @@ decisions = {
 
 				set_character_flag = achievement_not_a_tribe
 			}
-
 
 			if = {
 				limit = { is_government_potential = muslim_government}
@@ -3375,6 +3345,7 @@ decisions = {
 
 			mult_modifier = {
 				factor = 0.01
+
 				liege = {
 					trigger_if = {
 						limit = { religion_group = ROOT }
@@ -3387,13 +3358,12 @@ decisions = {
 
 			mult_modifier = {
 				factor = 0.1
-				liege = {
-					NOT = { culture_group = ROOT }
-				}
+				NOT = { culture_group = liege }
 			}
 
 			mult_modifier = {
 				factor = 0.1
+
 				liege = {
 					religion_group = ROOT
 
@@ -3418,22 +3388,11 @@ decisions = {
 		}
 
 		allow = {
-			war = no
+			higher_real_tier_than = COUNT
+			is_not_unreformed_pagan_trigger = yes
+			has_law = tribal_organization_4
 			is_female = no
-			higher_tier_than = COUNT
-
-			custom_tooltip = {
-				text = TT_NOT_UNREFORMED_PAGAN
-
-				trigger_if = {
-					limit = { religion_group = pagan_group }
-					is_reformed_religion = yes
-				}
-			}
-
-			primary_title = {
-				has_law = tribal_organization_4
-			}
+			war = no
 
 			capital_scope = {
 				is_coastal = yes
@@ -3486,64 +3445,63 @@ decisions = {
 						if = {
 							limit = { is_tribal = yes }
 
-							hidden_effect = {
-								any_demesne_title = {
+
+							any_demesne_title = {
+								limit = {
+									tier = BARON
+									holding_type = tribal
+								}
+
+								convert_to = city
+								refill_holding_levy = yes
+
+								location = { # Clear Tribal Great Pillars
+									clr_province_flag = flag_great_pillar_norse
+									clr_province_flag = flag_great_pillar_tengri
+									clr_province_flag = flag_great_pillar_slavic
+									clr_province_flag = flag_great_pillar_baltic
+									clr_province_flag = flag_great_pillar_finnish
+									clr_province_flag = flag_great_pillar_west_african
+									clr_province_flag = flag_great_pillar_aztec
+									clr_province_flag = flag_great_pillar_bon
+									clr_province_flag = flag_great_pillar_zun
+									clr_province_flag = flag_great_pillar_hellenic
+								}
+
+								if = {
 									limit = {
-										tier = BARON
-										holding_type = tribal
-									}
+										dejure_liege_title = {
+											holder = PREVPREV
 
-									convert_to = city
-									refill_holding_levy = yes
-
-									location = { # Clear Tribal Great Pillars
-										clr_province_flag = flag_great_pillar_norse
-										clr_province_flag = flag_great_pillar_tengri
-										clr_province_flag = flag_great_pillar_slavic
-										clr_province_flag = flag_great_pillar_baltic
-										clr_province_flag = flag_great_pillar_finnish
-										clr_province_flag = flag_great_pillar_west_african
-										clr_province_flag = flag_great_pillar_aztec
-										clr_province_flag = flag_great_pillar_bon
-										clr_province_flag = flag_great_pillar_zun
-										clr_province_flag = flag_great_pillar_hellenic
-									}
-
-									if = {
-										limit = {
-											dejure_liege_title = {
-												holder = PREVPREV
-
-												location = {
-													has_castle = no
-													num_of_empty_holdings >= 2
-												}
-											}
-										}
-
-										location = {
-											build_holding = {
-												type = castle
+											location = {
+												has_castle = no
+												num_of_empty_holdings >= 2
 											}
 										}
 									}
 
-									if = {
-										limit = {
-											dejure_liege_title = {
-												holder = PREVPREV
+									location = {
+										build_holding = {
+											type = castle
+										}
+									}
+								}
 
-												location = {
-													has_temple = no
-													num_of_empty_holdings >= 2
-												}
+								if = {
+									limit = {
+										dejure_liege_title = {
+											holder = PREVPREV
+
+											location = {
+												has_temple = no
+												num_of_empty_holdings >= 2
 											}
 										}
+									}
 
-										location = {
-											build_holding = {
-												type = temple
-											}
+									location = {
+										build_holding = {
+											type = temple
 										}
 									}
 								}

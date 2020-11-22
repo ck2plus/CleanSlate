@@ -1689,9 +1689,6 @@ character_event = {
 	min_age = 16
 	only_capable = no
 
-	trigger = {
-	}
-
 	weight_multiplier = {
 		days = 1
 
@@ -2458,17 +2455,17 @@ character_event = {
 		intrigue >= 10
 
 		liege = {
-			any_courtier_or_vassal = { # Regency might not exist still
-				has_minor_title = title_regent
+			# Regency might not be in effect yet
+			OR = {
+				has_assigned_minor_title = title_regent
+				has_assigned_minor_title = title_appointed_regent
 			}
 
 			trigger_if = {
 				limit = { is_incapable = no }
 
-				OR = {
-					practical_age >= 1
-					practical_age < 14
-				}
+				age >= 1
+				age < 14
 			}
 		}
 
@@ -2490,14 +2487,24 @@ character_event = {
 		}
 
 		host = { character = liege }
-		NOT = { has_minor_title = title_regent }
 		is_ill = no
+
+		NOR = {
+			has_minor_title = title_regent
+			has_minor_title = title_appointed_regent
+		}
 	}
 
 	immediate = {
 		liege = {
 			random_courtier_or_vassal = {
-				limit = { has_minor_title = title_regent }
+				limit = {
+					OR = {
+						has_minor_title = title_regent
+						has_minor_title = title_appointed_regent
+					}
+				}
+
 				save_event_target_as = scoped_regent
 			}
 		}

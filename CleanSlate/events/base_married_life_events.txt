@@ -531,22 +531,18 @@ character_event = {
 	option = {
 		name = EVTOPTA30005 # Imprison!
 
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		spouse = {
 			show_scope_change = no
 
 			character_event = {
 				id = 30009
 				tooltip = EVTTOOLTIP30009
-			}
-		}
-
-		spouse = {
-			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_poisonous_woman
-				who = ROOT
-				years = 5
 			}
 		}
 	}
@@ -567,14 +563,14 @@ character_event = {
 	option = {
 		name = EVTOPTC30005 # Pardon
 
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		spouse = {
 			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
 
 			character_event = { # I was pardoned!
 				id = 30010
@@ -710,18 +706,18 @@ character_event = {
 	option = {
 		name = EVTOPTA30007 # Imprison!
 
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		spouse = {
 			show_scope_change = no
 
 			character_event = {
 				id = 30009
 				tooltip = EVTTOOLTIP30009
-			}
-
-			reverse_opinion = {
-				name = opinion_poisonous_woman
-				who = ROOT
-				years = 5
 			}
 		}
 	}
@@ -742,14 +738,14 @@ character_event = {
 	option = {
 		name = EVTOPTC30007 # Pardon
 
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		spouse = {
 			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
 
 			character_event = { # I was pardoned!
 				id = 30010
@@ -941,6 +937,12 @@ character_event = {
 
 		ai_chance = { factor = 50 }
 
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		FROM = {
 			show_scope_change = no
 
@@ -948,12 +950,6 @@ character_event = {
 				id = 30009
 				tooltip = EVTTOOLTIP30009
 			}
-		}
-
-		opinion = {
-			name = opinion_poisonous_woman
-			who = spouse
-			years = 5
 		}
 	}
 
@@ -1042,8 +1038,8 @@ character_event = {
 	is_triggered_only = yes
 
 	only_rulers = yes
-	is_married = yes
 	only_men = yes
+	is_married = yes
 	min_age = 20
 	only_capable = yes
 	prisoner = no
@@ -1258,6 +1254,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_women = yes
+	is_married = yes
 	min_age = 20
 	only_capable = yes
 	prisoner = no
@@ -1728,44 +1725,47 @@ character_event = {
 	option = {
 		name = EVTOPTA30033
 
-		add_trait_depressed_effect = yes
+		add_trait_silently_depressed_effect = yes
 
-		event_target:prisoner_host = {
-			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_dishonorable_scum
-				who = ROOT
-			}
+		opinion = {
+			name = opinion_dishonorable_scum
+			who = event_target:prisoner_host
 		}
 	}
 
 	option = {
 		name = EVTOPTB30033
 
-		add_trait_wroth_effect = yes
-
-		event_target:prisoner_host = {
-			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_dishonorable_scum
-				who = ROOT
+		if = {
+			limit = {
+				NOT = { trait = wroth }
 			}
+
+			remove_trait_patient_effect = yes
+			add_trait = wroth
+		}
+
+		opinion = {
+			name = opinion_dishonorable_scum
+			who = event_target:prisoner_host
 		}
 	}
+
 	option = {
 		name = EVTOPTC30033
 
-		add_trait_envious_effect = yes
-
-		event_target:prisoner_host = {
-			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_dishonorable_scum
-				who = ROOT
+		if = {
+			limit = {
+				NOT = { trait = envious }
 			}
+
+			remove_trait_kind_effect = yes
+			add_trait = envious
+		}
+
+		opinion = {
+			name = opinion_dishonorable_scum
+			who = event_target:prisoner_host
 		}
 	}
 }
@@ -1781,14 +1781,10 @@ character_event = {
 	option = {
 		name = EVTOPTA30034
 
-		event_target:prisoner_host = {
-			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_grateful
-				who = ROOT
-				years = 1
-			}
+		opinion = {
+			name = opinion_grateful
+			who = event_target:prisoner_host
+			years = 5
 		}
 	}
 }
@@ -1823,7 +1819,17 @@ letter_event = {
 
 		prestige = -10
 
-		add_trait_craven_effect = yes
+		if = {
+			limit = {
+				NOR = {
+					trait = craven
+					trait = berserker
+				}
+			}
+
+			remove_trait_silently_brave_effect = yes
+			add_trait = craven
+		}
 	}
 
 	option = {
@@ -2512,7 +2518,6 @@ character_event = {
 		}
 
 		wealth = -15
-
 		add_lover = spouse
 	}
 
@@ -2642,9 +2647,11 @@ character_event = {
 
 		wealth = -20
 
-		if = { #if they already like you, you'll likely become lovers...
-			limit = {
-				event_target:my_spouse = {
+		event_target:my_spouse = {
+			show_scope_change = no
+
+			if = { #if they already like you, you'll likely become lovers...
+				limit = {
 					OR = {
 						has_opinion_modifier = {
 							who = ROOT
@@ -2660,16 +2667,15 @@ character_event = {
 						has_character_flag = carrying_torch_for@ROOT
 					}
 				}
+
+				add_lover = ROOT
 			}
-
-			add_lover = event_target:my_spouse
-		}
-
-		else = {
-			reverse_opinion = {
-				name = opinion_infatuated
-				who = event_target:my_spouse
-				years = 10
+			else = {
+				opinion = {
+					name = opinion_infatuated
+					who = ROOT
+					years = 10
+				}
 			}
 		}
 	}
@@ -2786,6 +2792,7 @@ character_event = {
 				is_alive = yes
 				is_abroad = no
 			}
+
 			save_event_target_as = my_spouse
 		}
 	}
@@ -2857,6 +2864,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_men = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -2951,6 +2959,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_men = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -3015,7 +3024,22 @@ character_event = {
 
 		random_list = {
 			20 = { change_martial = 1 }
-			80 = { add_trait_content_effect = yes }
+
+			80 = {
+				trigger = {
+					NOT = { trait = content }
+				}
+
+				tooltip = {
+					remove_trait_silently_ambitious_effect = yes
+					add_trait = content
+				}
+
+				hidden_effect = {
+					remove_trait_silently_ambitious_effect = yes
+					add_trait_content_effect = yes
+				}
+			}
 		}
 	}
 
@@ -3045,6 +3069,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_men = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -3109,7 +3134,22 @@ character_event = {
 
 		random_list = {
 			20 = { change_stewardship = 1 }
-			80 = { add_trait_content_effect = yes }
+
+			80 = {
+				trigger = {
+					NOT = { trait = content }
+				}
+
+				tooltip = {
+					remove_trait_silently_ambitious_effect = yes
+					add_trait = content
+				}
+
+				hidden_effect = {
+					remove_trait_silently_ambitious_effect = yes
+					add_trait_content_effect = yes
+				}
+			}
 		}
 	}
 
@@ -3139,6 +3179,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_men = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -3237,6 +3278,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_men = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -3330,19 +3372,19 @@ character_event = {
 	is_triggered_only = yes
 
 	only_women = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
 
 	trigger = {
-		is_ruler = no
-
 		OR = {
 			trait = ambitious
 			trait = diligent
 			trait = charitable
 		}
 
+		is_ruler = no
 		NOT = { has_job_title = job_chancellor }
 
 		spouse = {
@@ -3527,6 +3569,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_women = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -3724,6 +3767,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_women = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -3921,6 +3965,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_women = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -4118,6 +4163,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_women = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes
@@ -4781,6 +4827,7 @@ character_event = {
 	hide_from = yes
 
 	only_men = yes
+	is_married = yes
 	min_age = 40
 	only_capable = yes
 	prisoner = no
@@ -5593,10 +5640,24 @@ character_event = {
 		clr_character_flag = wild_ride
 		prestige = 20
 
-		random = {
-			chance = 40
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
 
-			add_trait_lustful_effect = yes
+			random = {
+				chance = 40
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5632,10 +5693,24 @@ character_event = {
 		clr_character_flag = wild_ride
 		prestige = 20
 
-		random = {
-			chance = 40
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
 
-			add_trait_lustful_effect = yes
+			random = {
+				chance = 40
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5671,10 +5746,24 @@ character_event = {
 		clr_character_flag = boss_in_bedchamber
 		prestige = 20
 
-		random = {
-			chance = 40
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
 
-			add_trait_lustful_effect = yes
+			random = {
+				chance = 40
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5710,10 +5799,24 @@ character_event = {
 		clr_character_flag = boss_in_bedchamber
 		prestige = 20
 
-		random = {
-			chance = 40
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
 
-			add_trait_lustful_effect = yes
+			random = {
+				chance = 40
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5739,7 +5842,7 @@ character_event = {
 	}
 }
 
-#Active ***live: Gentle and Sweet Love
+# Active ***live: Gentle and Sweet Love
 character_event = {
 	id = 30102
 	desc = EVTDESC30102
@@ -5757,9 +5860,24 @@ character_event = {
 
 		clr_character_flag = gentle_loving
 
-		random = {
-			chance = 60
-			add_trait_lustful_effect = yes
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
+
+			random = {
+				chance = 60
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5793,9 +5911,24 @@ character_event = {
 
 		clr_character_flag = gentle_loving
 
-		random = {
-			chance = 40
-			add_trait_lustful_effect = yes
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
+
+			random = {
+				chance = 40
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5830,9 +5963,24 @@ character_event = {
 
 		clr_character_flag = sweet_love
 
-		random = {
-			chance = 30
-			add_trait_lustful_effect = yes
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
+
+			random = {
+				chance = 30
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5867,9 +6015,24 @@ character_event = {
 
 		clr_character_flag = sweet_love
 
-		random = {
-			chance = 20
-			add_trait_lustful_effect = yes
+		if = {
+			limit = {
+				NOT = { trait = lustful }
+			}
+
+			random = {
+				chance = 20
+
+				tooltip = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait = lustful
+				}
+
+				hidden_effect = {
+					remove_trait_silently_chaste_effect = yes
+					add_trait_lustful_effect = yes
+				}
+			}
 		}
 
 		if = {
@@ -5969,7 +6132,6 @@ character_event = {
 			is_female = no
 			practical_age >= 20
 			practical_age < 35
-
 			fertility >= 0.5
 			has_lover = no
 
@@ -6070,6 +6232,7 @@ character_event = {
 
 	religion_group = muslim
 	only_men = yes
+	is_married = yes
 	min_age = 20
 	prisoner = no
 	only_capable = yes

@@ -25,35 +25,127 @@ character_event = {
 			character_event = { id = 88516 days = 31 } # Gift for wives
 			character_event = { id = 88522 days = 35 } # Ramadan ends
 
-			random_list = {
-				10 = { character_event = { id = 88501 days = 3 } } # Release prisoners
-				10 = { character_event = { id = 88502 days = 3 } } # Charity for the people
-				10 = { character_event = { id = 88503 days = 3 } } # Prayers
-				10 = { character_event = { id = 88504 days = 3 } } # Ill due to fast
-				20 = { character_event = { id = 88505 days = 3 } } # Infirm due to fast
-				4  = { character_event = { id = 88506 days = 3 } } # Gain temperate
-				4  = { character_event = { id = 88507 days = 3 } } # Gain charitable
+			set_variable = {
+				which = local_random_ramadan_events
+				value = 0
 			}
 
-			random_list = {
-				10 = { character_event = { id = 88501 days = 10 } } # Release prisoners
-				10 = { character_event = { id = 88502 days = 10 } } # Charity for the people
-				10 = { character_event = { id = 88503 days = 10 } } # Prayers
-				10 = { character_event = { id = 88504 days = 10 } } # Ill due to fast
-				20 = { character_event = { id = 88505 days = 10 } } # Infirm due to fast
-				4  = { character_event = { id = 88506 days = 10 } } # Gain temperate
-				4  = { character_event = { id = 88507 days = 10 } } # Gain charitable
+			character_event = {
+				id = 88600
+				days = 3
+			}
+		}
+	}
+}
+
+character_event = {
+	id = 88600
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		check_variable = {
+			which = local_random_ramadan_events
+			value < 3
+		}
+	}
+
+	immediate = {
+		random_list = {
+			10 = {
+				trigger = {
+					num_of_prisoners >= 1
+					NOT = { has_character_flag = ramadan_prisoners }
+
+					any_courtier = {
+						prisoner = yes
+
+						NAND = {
+							trait = decadent
+							dynasty = ROOT
+						}
+					}
+				}
+
+				character_event = { id = 88501 } # Release prisoners
 			}
 
-			random_list = {
-				10 = { character_event = { id = 88501 days = 17	} } # Release prisoners
-				10 = { character_event = { id = 88502 days = 17 } } # Charity for the people
-				10 = { character_event = { id = 88503 days = 17 } } # Prayers
-				10 = { character_event = { id = 88504 days = 17 } } # Ill due to fast
-				20 = { character_event = { id = 88505 days = 17 } } # Infirm due to fast
-				4  = { character_event = { id = 88506 days = 17 } } # Gain temperate
-				4  = { character_event = { id = 88507 days = 17 } } # Gain charitable
+			10 = {
+				trigger = {
+					scaled_wealth = 0.20
+					NOT = { has_character_flag = ramadan_charity }
+				}
+
+				character_event = { id = 88502 } # Charity for the people
 			}
+
+			10 = {
+				trigger = {
+					NOT = { has_character_flag = ramadan_prayers }
+				}
+
+				character_event = {
+					id = 88503 # Prayers
+				}
+			}
+
+			10 = {
+				trigger = {
+					OR = {
+						practical_age >= 50
+						is_weak_trigger = yes
+					}
+
+					NOT = { has_character_flag = ramadan_ill }
+				}
+
+				character_event = { id = 88504 } # Ill due to fast
+			}
+
+			20 = {
+				trigger = {
+					is_ill = yes
+					has_character_flag = ramadan_ill
+					NOT = { has_character_flag = ramadan_infirm }
+				}
+
+				character_event = { id = 88505 } # Infirm due to fast
+			}
+
+			4 = {
+				trigger = {
+					NOR = {
+						trait = gluttonous
+						trait = temperate
+						has_character_flag = ramadan_temperate
+					}
+				}
+
+				character_event = { id = 88506 } # Gain temperate
+			}
+
+			4 = {
+				trigger = {
+					NOR = {
+						trait = greedy
+						trait = charitable
+						has_character_flag = ramadan_charitable
+					}
+				}
+
+				character_event = { id = 88507 } # Gain charitable
+			}
+		}
+
+		change_variable = {
+			which = local_random_ramadan_events
+			value = 1
+		}
+
+		repeat_event = {
+			id = 88600
+			days = 7
 		}
 	}
 }
@@ -67,20 +159,6 @@ character_event = {
 	border = GFX_event_normal_frame_religion
 
 	is_triggered_only = yes
-
-	trigger = {
-		num_of_prisoners >= 1
-		NOT = { has_character_flag = ramadan_prisoners }
-
-		any_courtier = {
-			prisoner = yes
-
-			NAND = {
-				trait = decadent
-				dynasty = ROOT
-			}
-		}
-	}
 
 	immediate = {
 		set_character_flag = ramadan_prisoners
@@ -126,11 +204,6 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		scaled_wealth = 0.20
-		NOT = { has_character_flag = ramadan_charity }
-	}
-
 	immediate = {
 		set_character_flag = ramadan_charity
 	}
@@ -161,10 +234,6 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		NOT = { has_character_flag = ramadan_prayers }
-	}
-
 	immediate = {
 		set_character_flag = ramadan_prayers
 	}
@@ -193,15 +262,6 @@ character_event = {
 	border = GFX_event_normal_frame_religion
 
 	is_triggered_only = yes
-
-	trigger = {
-		OR = {
-			practical_age >= 50
-			is_weak_trigger = yes
-		}
-
-		NOT = { has_character_flag = ramadan_ill }
-	}
 
 	immediate = {
 		set_character_flag = ramadan_ill
@@ -251,9 +311,8 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		is_ill = yes
-		has_character_flag = ramadan_ill
+	immediate = {
+		set_character_flag = ramadan_infirm
 	}
 
 	option = {
@@ -279,17 +338,14 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		NOR = {
-			trait = gluttonous
-			trait = temperate
-		}
+	immediate = {
+		set_character_flag = ramadan_temperate
 	}
 
 	option = {
 		name = EVTOPTA88506
 
-		add_trait_silently_temperate_effect = yes
+		add_trait = temperate
 		decadence = -1
 		piety = 15
 	}
@@ -305,11 +361,8 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		NOR = {
-			trait = greedy
-			trait = charitable
-		}
+	immediate = {
+		set_character_flag = ramadan_charitable
 	}
 
 	option = {
@@ -888,15 +941,6 @@ character_event = {
 	option = {
 		name = EVTOPTA88522
 
-		clr_character_flag = ramadan
-		clr_character_flag = ramadan_ill
-		clr_character_flag = ramadan_cynical
-		clr_character_flag = ramadan_greedy
-		clr_character_flag = ramadan_gluttonous
-		clr_character_flag = ramadan_drunkard
-		clr_character_flag = ramadan_lustful_hedonist
-		clr_character_flag = ramadan_prayers
-		clr_character_flag = ramadan_charity
-		clr_character_flag = ramadan_prisoners
+		clear_flags_with_prefix = ramadan
 	}
 }

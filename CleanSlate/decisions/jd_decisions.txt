@@ -40,7 +40,7 @@ decisions = {
 		}
 
 		allow = {
-			tier = EMPEROR
+			real_tier = EMPEROR
 			is_tributary = no
 			is_adult = yes
 			prisoner = no
@@ -296,22 +296,11 @@ decisions = {
 				any_courtier = {
 					dynasty = ROOT
 					is_landed = no
-					liege = { character = ROOT } # No prisoners from other courts, etc.
+					vassal_of = ROOT # No prisoners from other courts, etc.
 
 					OR = {
 						any_spouse = { has_character_flag = chinese_honor_guard }
 						any_consort = { has_character_flag = chinese_honor_guard }
-					}
-				}
-			}
-
-			trigger_if = {
-				limit = { ai = yes }
-
-				any_war = {
-					OR = {
-						is_primary_war_defender = yes
-						is_primary_war_attacker = yes
 					}
 				}
 			}
@@ -321,38 +310,34 @@ decisions = {
 			custom_tooltip = {
 				text = primary_defender_or_attacker_tt
 
-				any_war = {
-					OR = {
-						is_primary_war_defender = yes
-						is_primary_war_attacker = yes
-					}
+				OR = {
+					is_primary_war_defender = yes
+					is_primary_war_attacker = yes
 				}
 			}
 
 			custom_tooltip = {
 				text = earmarked_regiments_tt
 
-				NOT = {
-					has_earmarked_regiments = honor_guard
-				}
+				NOT = { has_earmarked_regiments = honor_guard }
 			}
 
 			custom_tooltip = {
 				text = raise_chinese_honor_guard_TT
+
 				NOT = { has_character_modifier = jd_chinese_honor_guard_timer }
 			}
 		}
+
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					name = jd_chinese_honor_guard_timer
-					years = 1 # Can't use it too often
-					hidden = yes
-				}
+			add_character_modifier = {
+				name = jd_chinese_honor_guard_timer
+				years = 1 # Can't use it too often
+				hidden = yes
 			}
 
 			if = {
-				limit = { tier = EMPEROR }
+				limit = { real_tier = EMPEROR }
 
 				spawn_unit = {
 					owner = ROOT
@@ -371,7 +356,7 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = { tier = KING }
+				limit = { real_tier = KING }
 
 				spawn_unit = {
 					owner = ROOT
@@ -391,7 +376,7 @@ decisions = {
 				}
 			}
 			else_if = {
-				limit = { tier = DUKE }
+				limit = { real_tier = DUKE }
 
 				spawn_unit = {
 					owner = ROOT
@@ -448,15 +433,7 @@ decisions = {
 		}
 
 		allow = {
-			war = yes
-
-			custom_tooltip = {
-				text = primary_defender_TT
-
-				any_war = {
-					is_primary_war_defender = yes
-				}
-			}
+			is_primary_war_defender = yes
 
 			custom_tooltip = {
 				text = war_with_other_tributary_tt
@@ -495,12 +472,10 @@ decisions = {
 		}
 
 		effect = {
-			hidden_effect = {
-				add_character_modifier = {
-					name = jd_chinese_regiment_timer
-					years = 1 # Can't use it too often
-					hidden = yes
-				}
+			add_character_modifier = {
+				name = jd_chinese_regiment_timer
+				years = 1 # Can't use it too often
+				hidden = yes
 			}
 
 			if = {
@@ -510,7 +485,7 @@ decisions = {
 						num_of_count_titles_in_realm > 16
 					}
 					trigger_else = {
-						tier = EMPEROR
+						real_tier = EMPEROR
 					}
 				}
 
@@ -539,7 +514,7 @@ decisions = {
 						num_of_count_titles_in_realm > 12
 					}
 					trigger_else = {
-						tier = KING
+						real_tier = KING
 					}
 				}
 
@@ -568,7 +543,7 @@ decisions = {
 						num_of_count_titles_in_realm > 8
 					}
 					trigger_else = {
-						tier = DUKE
+						real_tier = DUKE
 					}
 				}
 
@@ -905,7 +880,9 @@ decisions = {
 			### Match mult calculation against war enemies and sending notification events to enemy war leaders
 			any_war = {
 				if = {
-					limit = { is_primary_war_defender = yes }
+					limit = {
+						defender = { character = ROOT }
+					}
 
 					attacker = {
 						save_event_target_as = enemy
@@ -941,7 +918,9 @@ decisions = {
 				}
 
 				else_if = {
-					limit = { is_primary_war_attacker = yes }
+					limit = {
+						attacker = { character = ROOT }
+					}
 
 					defender = {
 						save_event_target_as = enemy
@@ -1296,7 +1275,7 @@ targeted_decisions = {
 			FROM = {
 				show_scope_change = no
 
-				higher_tier_than = DUKE
+				higher_real_tier_than = DUKE
 			}
 
 			custom_tooltip = {
@@ -1358,14 +1337,12 @@ targeted_decisions = {
 					set_character_flag = negotiating_with_adventurer
 					set_character_flag = peaceful_negotiation
 
-					hidden_effect = {
-						character_event = { id = adv.001 } # Start negatiation
+					character_event = { id = adv.001 } # Start negatiation
 
-						add_character_modifier = {
-							name = adventurer_negotiate_cd
-							years = 1
-							hidden = yes
-						}
+					add_character_modifier = {
+						name = adventurer_negotiate_cd
+						years = 1
+						hidden = yes
 					}
 				}
 			}
