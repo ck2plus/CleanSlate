@@ -64,8 +64,7 @@ targeted_decisions = {
 		}
 
 		potential = {
-			is_marriage_adult = yes
-			is_incapable = no
+			is_valid_romance_target = FROM
 			prisoner = no
 
 			NOR = {
@@ -74,32 +73,6 @@ targeted_decisions = {
 				is_former_lover = FROM
 				is_lover = FROM
 				is_married = FROM
-			}
-
-			trigger_if = {
-				limit = { is_close_relative = FROM }
-
-				trigger_if = {
-					limit = { religion_group = zoroastrian_group }
-					FROM = { religion_group = zoroastrian_group }
-				}
-				trigger_else = {
-					religion = messalian
-					FROM = { religion = messalian }
-				}
-			}
-
-			trigger_if = {
-				limit = { same_sex = FROM }
-
-				FROM = { trait = homosexual }
-				trait = homosexual
-			}
-			trigger_else = {
-				NOR = {
-					FROM = { trait = homosexual }
-					trait = homosexual
-				}
 			}
 		}
 
@@ -113,8 +86,8 @@ targeted_decisions = {
 
 			NOR = {
 				has_opinion_modifier = {
+					name = opinion_seduced_refused
 					who = FROM
-					modifier = opinion_seduced_refused
 				}
 
 				has_character_modifier = dismissed_proposal
@@ -127,8 +100,8 @@ targeted_decisions = {
 			hidden_effect = {
 				FROM = {
 					opinion = {
+						name = opinion_seducing
 						who = ROOT
-						modifier = opinion_seducing
 						years = 1000
 					}
 
@@ -197,9 +170,16 @@ targeted_decisions = {
 		}
 
 		ai_will_do = {
-			factor = 0.25 # 1 = 100% chance every month (for each allowed target!)
+			factor = 0.25
 
 			trigger = {
+				NOT = {
+					has_game_rule = {
+						name = ai_seduction
+						value = off
+					}
+				}
+
 				# Decision Taker
 				FROM = {
 					is_ill = no
@@ -255,13 +235,13 @@ targeted_decisions = {
 					trigger_if = {
 						limit = { is_female = yes }
 
-						age < 40
+						practical_age < 40
 						is_pregnant = no
 						NOT = { has_character_modifier = lustful_affair_timer }
 					}
 
 					trigger_if = {
-						limit = { num_of_lovers >= 1 }
+						limit = { has_lover = yes }
 
 						OR = {
 							trait = lustful
@@ -277,6 +257,7 @@ targeted_decisions = {
 			# Number of Children modifiers
 			mult_modifier = {
 				factor = 0.1
+
 				FROM = {
 					is_female = no
 					num_of_children >= 6
@@ -285,6 +266,7 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 0.5
+
 				FROM = {
 					is_female = no
 					num_of_children >= 3
@@ -293,6 +275,7 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 0.5
+
 				FROM = {
 					is_female = no
 					num_of_children >= 8
@@ -302,6 +285,7 @@ targeted_decisions = {
 			# Close relatives are gross
 			mult_modifier = {
 				factor = 0.25
+
 				is_close_relative = FROM
 
 				FROM = {
@@ -317,6 +301,7 @@ targeted_decisions = {
 			# Target isn't a ruler and their spouse is a player
 			mult_modifier = {
 				factor = 0.1
+
 				is_ruler = no
 
 				OR = {
@@ -352,6 +337,7 @@ targeted_decisions = {
 			# A more interesting quarry
 			mult_modifier = {
 				factor = 5
+
 				OR = {
 					is_playable = yes
 					is_married = yes
@@ -368,6 +354,12 @@ targeted_decisions = {
 			mult_modifier = {
 				factor = 3
 				trait = groomed
+			}
+
+			# Target players less often
+			mult_modifier = {
+				factor = 0.25
+				ai = no
 			}
 		}
 	}
@@ -389,8 +381,8 @@ targeted_decisions = {
 				limit = {
 					ROOT = {
 						has_opinion_modifier = {
+							name = opinion_seducing
 							who = PREV
-							modifier = opinion_seducing
 						}
 					}
 				}
@@ -398,6 +390,8 @@ targeted_decisions = {
 				save_event_target_as = target_seduced
 
 				ROOT = {
+					show_scope_change = no
+
 					character_event = {
 						id = WoL.118
 						tooltip = stop_seduce_decision_tt
@@ -424,19 +418,17 @@ targeted_decisions = {
 		potential = {
 			FROM = {
 				has_opinion_modifier = {
+					name = opinion_seducing
 					who = ROOT
-					modifier = opinion_seducing
 				}
 			}
 		}
 
 		effect = {
-			hidden_effect = {
-				save_event_target_as = target_seduced
+			save_event_target_as = target_seduced
 
-				FROM = {
-					character_event = { id = WoL.118 }
-				}
+			FROM = {
+				character_event = { id = WoL.118 }
 			}
 		}
 
@@ -480,20 +472,20 @@ targeted_decisions = {
 					any_opinion_modifier_target = {
 						limit = {
 							reverse_has_opinion_modifier = {
+								name = opinion_spying_on
 								who = PREV
-								modifier = opinion_spying_on
 							}
 						}
 
 						reverse_remove_opinion = {
+							name = opinion_spying_on
 							who = PREV
-							modifier = opinion_spying_on
 						}
 					}
 
 					opinion = {
+						name = opinion_spying_on
 						who = ROOT
-						modifier = opinion_spying_on
 						years = 1000
 					}
 
@@ -541,12 +533,14 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 10.0
+
 				in_faction = yes
-				liege = { character = FROM }
+				vassal_of = FROM
 			}
 
 			mult_modifier = {
 				factor = 10.0
+
 				FROM = { leads_faction = yes }
 				in_faction = no
 				same_liege = FROM
@@ -560,7 +554,6 @@ targeted_decisions = {
 		ai = no
 
 		potential = {
-			has_focus = focus_intrigue
 			has_any_opinion_modifier = opinion_spying_on
 		}
 
@@ -569,8 +562,8 @@ targeted_decisions = {
 				limit = {
 					ROOT = {
 						has_opinion_modifier = {
+							name = opinion_spying_on
 							who = PREV
-							modifier = opinion_spying_on
 						}
 					}
 				}
@@ -595,26 +588,23 @@ targeted_decisions = {
 		ai = no
 
 		from_potential = {
-			has_focus = focus_intrigue
 			has_any_opinion_modifier = opinion_spying_on
 		}
 
 		potential = {
 			FROM = {
 				has_opinion_modifier = {
+					name = opinion_spying_on
 					who = ROOT
-					modifier = opinion_spying_on
 				}
 			}
 		}
 
 		effect = {
-			hidden_effect = {
-				save_event_target_as = target_spy_on
+			save_event_target_as = target_spy_on
 
-				FROM = {
-					character_event = { id = WoL.2069 }
-				}
+			FROM = {
+				character_event = { id = WoL.2069 }
 			}
 		}
 
@@ -625,8 +615,8 @@ targeted_decisions = {
 
 	decision_break_free = {
 		is_high_prio = yes
-		ai_check_interval = 6
 		ai_target_filter = dynasty
+		ai_check_interval = 6
 
 		only_playable = yes
 
@@ -656,8 +646,8 @@ targeted_decisions = {
 				is_consort = yes
 
 				has_opinion_modifier = {
+					name = opinion_forced_consort
 					who = consort # senior party
-					modifier = opinion_forced_consort
 				}
 
 				NOT = { is_consort = FROM }
@@ -675,8 +665,8 @@ targeted_decisions = {
 			hidden_effect = {
 				FROM = {
 					opinion = {
+						name = opinion_breaking_out
 						who = ROOT
-						modifier = opinion_breaking_out
 						years = 1000
 					}
 
@@ -740,7 +730,6 @@ targeted_decisions = {
 		potential = {
 			is_adult = yes
 			prisoner = no
-			is_inaccessible_trigger = no
 			is_incapable = no
 			is_within_diplo_range = FROM
 
@@ -755,21 +744,16 @@ targeted_decisions = {
 
 			same_realm = FROM
 			war = no
+			is_inaccessible_trigger = no
 
 			NOR = {
 				has_character_modifier = organizing_party
 				has_character_modifier = party_carousing
 
 				reverse_has_opinion_modifier = {
-					modifier = opinion_declined_party
+					name = opinion_declined_party
 					who = FROM
 				}
-			}
-
-			custom_tooltip = {
-				text = tooltip_not_busy
-
-				NOT = { has_character_flag = do_not_disturb }
 			}
 
 			FROM = {
@@ -796,28 +780,24 @@ targeted_decisions = {
 					limit = { NOT = { has_character_modifier = organizing_party } }
 
 					add_character_modifier = {
-						modifier = organizing_party
-						duration = 120
+						name = organizing_party
+						months = 4
 					}
 
-					hidden_effect = {
-						set_character_flag = inviting_guests_to_party_timer
+					set_character_flag = inviting_guests_to_party_timer
 
-						character_event = {
-							id = WoL.4010 # Party to be held in four months
-							days = 120
-						}
+					character_event = {
+						id = WoL.4010 # Party to be held in four months
+						months = 4
 					}
 				}
 			}
 
-			hidden_effect = {
-				set_character_flag = carousing_invite
+			set_character_flag = carousing_invite
 
-				letter_event = {
-					id = WoL.4000 # Invitee receives event - any number of invitees possible
-					days = 7
-				}
+			letter_event = {
+				id = WoL.4000 # Invitee receives event - any number of invitees possible
+				days = 7
 			}
 		}
 
@@ -843,38 +823,19 @@ targeted_decisions = {
 
 #	DEPRECATED: the new version of this can be found in hf_warrior_lodge_decisions.txt
 #	duel_decision = {
-#		only_playable = yes
 #		is_high_prio = yes
 #
-#		#filter = rivals
 #		ai_target_filter = rivals
 #
+#		only_playable = yes
+#
 #		from_potential = {
-#			is_playable = yes
+#			has_focus = focus_war
 #			is_adult = yes
 #			prisoner = no
 #			has_dlc = "Way of Life"
-#			has_focus = focus_war
 #			has_regent = no
 #			is_inaccessible_trigger = no
-#
-#			OR = {
-#				ai = no
-#
-#				is_female = no
-#
-#				AND = {
-#					is_female = yes
-#					OR = {
-#						trait = brave
-#						religion_group = pagan_group
-#						is_nomadic = yes
-#						religion = buddhist
-#						religion = bogomilist
-#						gender_equality_trigger = yes
-#					}
-#				}
-#			}
 #		}
 #
 #		potential = {
@@ -883,34 +844,148 @@ targeted_decisions = {
 #			NOT = { character = FROM }
 #			is_inaccessible_trigger = no
 #
-#			OR = {
-#				AND = {
-#					OR = {
-#						is_rival = FROM
-#						is_foe = FROM
-#						AND = {
-#							FROM = { trait = zealous }
-#							OR = {
-#								AND = {
-#									religion = FROM
-#									trait = excommunicated
-#								}
-#								AND = {
-#									FROM = { religion_group = muslim }
-#									trait = decadent
-#								}
+#			trigger_if = {
+#				limit = {
+#					NOT = {
+#						has_game_rule = {
+#							name = dueling
+#							value = unrestricted
+#						}
+#					}
+#				}
+#
+#				OR = {
+#					is_rival = FROM
+#					is_foe = FROM
+#
+#					AND = {
+#						FROM = { trait = zealous }
+#
+#						OR = {
+#							excommunicated_for = FROM
+#
+#							AND = {
+#								FROM = { religion_group = muslim }
+#								trait = decadent
 #							}
 #						}
+#					}
+#				}
+#
+#				trigger_if = {
+#					limit = { is_female = yes }
+#
+#					# Both FROM and ROOT have gender equality
+#					OR = {
+#						trait = brave
+#						gender_equality_trigger = yes
+#						religion_group = pagan_group
+#						is_nomadic = yes
+#						religion = buddhist
+#						religion = bogomilist
+#					}
+#
+#					FROM = {
+#						OR = {
+#							gender_equality_trigger = yes
+#							religion_group = pagan_group
+#							is_nomadic = yes
+#							religion = buddhist
+#							religion = bogomilist
+#						}
+#					}
+#				}
+#			}
+#		}
+#
+#		allow = {
+#			OR = {
+#				AND = {
+#					# Valid reasons for duel
+#					OR = {
+#						custom_tooltip = {
+#							text = duel_tooltip_rivals
+#							is_rival = FROM
+#						}
+#
+#						custom_tooltip = {
+#							text = duel_tooltip_foes
+#							is_foe = FROM
+#						}
+#
+#						custom_tooltip = {
+#							text = duel_tooltip_excommunicated
+#
+#							excommunicated_for = FROM
+#							FROM = { trait = zealous }
+#						}
+#
+#						custom_tooltip = {
+#							text = duel_tooltip_decadent
+#
+#							trait = decadent
+#
+#							FROM = {
+#								religion_group = muslim
+#								trait = zealous
+#							}
+#						}
+#
 #						has_game_rule = {
 #							name = dueling
 #							value = restricted
 #						}
 #					}
-#					OR = {
-#						is_female = no
 #
-#						#Both FROM and ROOT have gender equality
-#						AND = {
+#					# Both are healthy
+#					custom_tooltip = {
+#						text = duel_tooltip_sickness
+#
+#						FROM = {
+#							is_incapable = no
+#
+#							NOR = {
+#								trait = infirm
+#								trait = has_aztec_disease
+#								trait = has_small_pox
+#								trait = has_measles
+#								trait = has_bubonic_plague
+#								trait = has_typhus
+#								trait = has_typhoid_fever
+#								trait = has_tuberculosis
+#								trait = leper
+#								trait = pneumonic
+#							}
+#						}
+#
+#						ROOT = {
+#							is_incapable = no
+#							practical_age < 70
+#
+#							NOR = {
+#								trait = infirm
+#								trait = has_aztec_disease
+#								trait = has_small_pox
+#								trait = has_measles
+#								trait = has_bubonic_plague
+#								trait = has_typhus
+#								trait = has_typhoid_fever
+#								trait = has_tuberculosis
+#								trait = leper
+#								trait = pneumonic
+#							}
+#						}
+#					}
+#
+#					# Checks gender and some religious stuff
+#					custom_tooltip = {
+#						text = duel_tooltip_valid_target
+#
+#						### Not female or challenger religion accepts female warriors
+#						trigger_if = {
+#							limit = { is_female = yes }
+#
+#							# Both FROM and ROOT have gender equality
 #							OR = {
 #								trait = brave
 #								gender_equality_trigger = yes
@@ -919,6 +994,7 @@ targeted_decisions = {
 #								religion = buddhist
 #								religion = bogomilist
 #							}
+#
 #							FROM = {
 #								OR = {
 #									gender_equality_trigger = yes
@@ -929,154 +1005,65 @@ targeted_decisions = {
 #								}
 #							}
 #						}
+#
+#						### Not priest or challenger religion is pagan
+#						OR = {
+#							is_priest = no
+#							FROM = { religion_group = pagan_group }
+#						}
 #					}
 #				}
+#
 #				has_game_rule = {
 #					name = dueling
 #					value = unrestricted
 #				}
 #			}
-#		}
 #
-#		allow = {
-#			OR = {
-#				AND = {
-#					#Valid reasons for duel
-#					OR = {
-#						custom_tooltip = {
-#							text = duel_tooltip_rivals
-#							is_rival = FROM
-#						}
-#						custom_tooltip = {
-#							text = duel_tooltip_foes
-#							is_foe = FROM
-#						}
-#						custom_tooltip = {
-#							text = duel_tooltip_excommunicated
-#							religion = FROM
-#							FROM = { trait = zealous }
-#							trait = excommunicated
-#						}
-#						custom_tooltip = {
-#							text = duel_tooltip_decadent
-#							FROM = { religion_group = muslim }
-#							FROM = { trait = zealous }
-#							trait = decadent
-#						}
-#						has_game_rule = {
-#							name = dueling
-#							value = restricted
-#						}
-#					}
-#
-#					#Both are healthy
-#					custom_tooltip = {
-#						text = duel_tooltip_sickness
-#						FROM = {
-#							NOR = {
-#								is_incapable = yes
-#								trait = infirm
-#								trait = has_aztec_disease
-#								trait = has_small_pox
-#								trait = has_measles
-#								trait = has_bubonic_plague
-#								trait = has_typhus
-#								trait = has_typhoid_fever
-#								trait = has_tuberculosis
-#								trait = leper
-#								trait = pneumonic
-#							}
-#						}
-#						ROOT = {
-#							NOR = {
-#								is_incapable = yes
-#								trait = infirm
-#								trait = has_aztec_disease
-#								trait = has_small_pox
-#								trait = has_measles
-#								trait = has_bubonic_plague
-#								trait = has_typhus
-#								trait = has_typhoid_fever
-#								trait = has_tuberculosis
-#								trait = leper
-#								trait = pneumonic
-#								age = 70
-#							}
-#						}
-#					}
-#
-#					#Checks gender and some religious stuff
-#					custom_tooltip = {
-#						text = duel_tooltip_valid_target
-#						hidden_tooltip = { ### Not female or challenger religion accepts female warriors
-#							 OR = {
-#								is_female = no
-#
-#								#Both FROM and ROOT have gender equality
-#								AND = {
-#									OR = {
-#										trait = brave
-#										gender_equality_trigger = yes
-#										religion_group = pagan_group
-#										is_nomadic = yes
-#										religion = buddhist
-#										religion = bogomilist
-#									}
-#									FROM = {
-#										OR = {
-#											gender_equality_trigger = yes
-#											religion_group = pagan_group
-#											is_nomadic = yes
-#											religion = buddhist
-#											religion = bogomilist
-#										}
-#									}
-#								}
-#							}
-#							### Not priest or challenger religion is pagan
-#							OR = {
-#								is_priest = no
-#								FROM = { religion_group = pagan_group }
-#							}
-#
-#						}
-#					}
-#				}
-#				has_game_rule = {
-#					name = dueling
-#					value = unrestricted
-#				}
-#			}
 #			custom_tooltip = {
 #				text = duel_tooltip_challenged_before
-#				hidden_tooltip = {
-#					NOT = {
-#						has_opinion_modifier = { who = FROM modifier = opinion_fought_duel }
+#
+#				NOT = {
+#					has_opinion_modifier = {
+#						name = opinion_fought_duel
+#						who = FROM
 #					}
-#					FROM = {
-#						NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_fought_duel } }
-#						NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_fled_duel } }
+#				}
+#
+#				FROM = {
+#					NOR = {
+#						has_opinion_modifier = {
+#							name = opinion_fought_duel
+#							who = ROOT
+#						}
+#
+#						has_opinion_modifier = {
+#							name = opinion_fled_duel
+#							who = ROOT
+#						}
 #					}
 #				}
 #			}
+#
 #			custom_tooltip = {
 #				text = duel_tooltip_recent_duel
-#				hidden_tooltip = {
-#					FROM = { NOT = { has_character_modifier = recent_duel_timer } }
-#					NOT = { has_character_modifier = recent_duel_timer }
-#				}
+#
+#				FROM = { NOT = { has_character_modifier = recent_duel_timer } }
+#				NOT = { has_character_modifier = recent_duel_timer }
 #			}
+#
 #			custom_tooltip = {
 #				text = duel_tooltip_busy
-#				hidden_tooltip = {
-#					FROM = {
-#						NOT = { has_character_flag = do_not_disturb }
-#						NOT = { war = yes }
-#					}
+#
+#				FROM = {
 #					NOT = { has_character_flag = do_not_disturb }
-#					NOT = { war = yes }
+#					war = no
 #				}
+#
+#				NOT = { has_character_flag = do_not_disturb }
+#				war = no
 #			}
+#
 #			is_within_diplo_range = ROOT # CPU HEAVY!
 #		}
 #
@@ -1084,58 +1071,69 @@ targeted_decisions = {
 #			if = {
 #				limit = {
 #					OR = {
-#						age = 50
+#						practical_age >= 50
 #						trait = wounded
 #						is_maimed_trigger = yes
 #					}
 #				}
+#
 #				custom_tooltip = {
 #					text = dishonorable_duel_tooltip
-#					hidden_tooltip = {
-#						FROM = {
-#							any_realm_character = {
-#								limit = {
-#									NOT = { character = FROM }
-#									OR = {
-#										trait = honest
-#										trait = kind
-#										trait = just
-#									}
+#
+#
+#					FROM = {
+#						any_realm_character = {
+#							limit = {
+#								NOT = { character = FROM }
+#
+#								OR = {
+#									trait = honest
+#									trait = kind
+#									trait = just
 #								}
-#								opinion = {
-#									modifier = opinion_dishonorable_duel
-#									who = PREV
-#									months = 36
-#								}
+#							}
+#
+#							opinion = {
+#								name = opinion_dishonorable_duel
+#								who = PREV
+#								years = 3
 #							}
 #						}
 #					}
 #				}
 #			}
+#
 #			FROM = {
 #				pacifists_lose_piety_effect = yes
+#
 #				add_character_modifier = {
-#					modifier = recent_duel_timer
-#					duration = 365
+#					name = recent_duel_timer
+#					years = 1
 #					hidden = yes
 #				}
 #			}
-#			hidden_tooltip = {
-#				character_event = { id = WoL.11000 }
-#			}
+#
+#			character_event = { id = WoL.11000 }
 #		}
 #
-#		revoke_allowed = {
-#			always = no
-#		}
 #		ai_will_do = {
-#			factor = 1
-#			modifier = {
-#				factor = 0
-#				has_character_modifier = declined_prestige_duel_timer
-#			}
-#			modifier = {
-#				factor = 0.01
+#			factor = 0.01
+#
+#			trigger = {
+#				NOT = { has_character_modifier = declined_prestige_duel_timer }
+#
+#				trigger_if = {
+#					limit = { is_female = yes }
+#
+#					OR = {
+#						trait = brave
+#						religion_group = pagan_group
+#						is_nomadic = yes
+#						religion = buddhist
+#						religion = bogomilist
+#						gender_equality_trigger = yes
+#					}
+#				}
 #			}
 #		}
 #	}
@@ -1184,11 +1182,8 @@ decisions = {
 
 		effect = {
 			wealth = -25
-
-			hidden_effect = {
-				set_character_flag = building_observatory
-				character_event = { id = WoL.6000 }
-			}
+			set_character_flag = building_observatory
+			character_event = { id = WoL.6000 }
 		}
 
 		ai_will_do = {
@@ -1210,7 +1205,7 @@ decisions = {
 
 			mult_modifier = {
 				factor = 0.1
-				age < 30
+				practical_age < 30
 			}
 		}
 	}

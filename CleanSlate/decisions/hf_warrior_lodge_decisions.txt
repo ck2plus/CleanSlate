@@ -10,21 +10,19 @@ targeted_decisions = {
 		only_playable = yes
 
 		from_potential = {
-			OR = {
-				AND = {
-					has_focus = focus_war
-					has_dlc = "Way of Life"
-				}
+			trigger_if = {
+				limit = { has_focus = focus_war }
+				has_dlc = "Way of Life"
+			}
+			trigger_else = {
+				has_dlc = "Holy Fury"
 
-				AND = {
-					has_dlc = "Holy Fury"
+				OR = {
+					is_member_of_any_warrior_lodge_trigger = yes
 
-					OR = {
-						is_member_of_any_warrior_lodge_trigger = yes
-
-						any_bloodline = {
-							has_bloodline_flag = duelist_bloodline
-						}
+					any_bloodline = {
+						has_bloodline_flag = duelist_bloodline
+						bloodline_is_active_for = PREV
 					}
 				}
 			}
@@ -96,8 +94,9 @@ targeted_decisions = {
 
 						custom_tooltip = {
 							text = duel_tooltip_excommunicated
-							FROM = { trait = zealous }
+
 							trait = excommunicated
+							FROM = { trait = zealous }
 						}
 					}
 
@@ -106,8 +105,9 @@ targeted_decisions = {
 
 						custom_tooltip = {
 							text = duel_tooltip_decadent
-							FROM = { trait = zealous }
+
 							trait = decadent
+							FROM = { trait = zealous }
 						}
 					}
 
@@ -123,9 +123,7 @@ targeted_decisions = {
 							}
 						}
 
-						custom_tooltip = {
-							text = quest_target_tt
-						}
+						custom_tooltip = { text = quest_target_tt }
 					}
 				}
 			}
@@ -133,6 +131,7 @@ targeted_decisions = {
 			# Both are healthy
 			custom_tooltip = {
 				text = duel_tooltip_sickness
+
 				FROM = {
 					NOR = { # Not in sickly in bed, but sick if well treated is okay
 						has_character_modifier = bedridden_illness
@@ -140,6 +139,7 @@ targeted_decisions = {
 						is_incapable = yes
 					}
 				}
+
 				ROOT = {
 					NOR = { # Not in sickly in bed, but sick if well treated is okay
 						has_character_modifier = bedridden_illness
@@ -151,6 +151,7 @@ targeted_decisions = {
 
 			custom_tooltip = {
 				text = duel_tooltip_pregnant
+
 				FROM = { is_pregnant = no }
 				ROOT = { is_pregnant = no }
 			}
@@ -159,14 +160,17 @@ targeted_decisions = {
 			custom_tooltip = {
 				text = duel_tooltip_recent_duel
 
-				FROM = { NOT = { has_character_modifier = recent_duel_timer } }
-				NOT = { has_character_modifier = recent_duel_timer }
+				NOR = {
+					has_character_modifier = recent_duel_timer
+					FROM = { has_character_modifier = recent_duel_timer }
+				}
 			}
 
 			#############################################################################
 
 			custom_tooltip = {
 				text = duel_tooltip_no_war
+
 				FROM = { war = no }
 				war = no
 			}
@@ -177,6 +181,7 @@ targeted_decisions = {
 					NOT = {
 						any_quester_targeting_this = { # FROM must have this as a quest target
 							character = FROM
+
 							OR = {
 								has_quest = quest_warrior_lodge_duel_honor
 								has_quest = quest_warrior_lodge_duel_deadly
@@ -184,6 +189,7 @@ targeted_decisions = {
 						}
 					}
 				}
+
 				is_within_diplo_range = FROM # CPU HEAVY!
 			}
 
@@ -192,7 +198,7 @@ targeted_decisions = {
 
 				custom_tooltip = {
 					text = opinion_duel_decline_cooldown_tt
-					NOT = { has_character_modifier = has_recently_declined_duel_cooldown }
+					always = no
 				}
 			}
 		}
@@ -209,15 +215,13 @@ targeted_decisions = {
 				pacifists_lose_piety_effect = yes
 
 				add_character_modifier = {
-					modifier = recent_duel_timer
-					days = 90
+					name = recent_duel_timer
+					months = 3
 					hidden = yes
 				}
 			}
 
-			hidden_effect = {
-				character_event = { id = HFP.10095 } # Duel evaluation (hidden) + result event as follow-up
-			}
+			character_event = { id = HFP.10095 } # Duel evaluation (hidden) + result event as follow-up
 		}
 
 		ai_will_do = {
@@ -308,6 +312,7 @@ targeted_decisions = {
 			### For CLAIM duels ###
 			custom_tooltip = {
 				text = both_tribal_tt
+
 				is_tribal = yes
 				FROM = { is_tribal = yes }
 			}
@@ -315,6 +320,7 @@ targeted_decisions = {
 			# Both are healthy
 			custom_tooltip = {
 				text = duel_tooltip_sickness
+
 				FROM = {
 					NOR = { # Not in sickly in bed, but sick if well treated is okay
 						has_character_modifier = bedridden_illness
@@ -322,6 +328,7 @@ targeted_decisions = {
 						is_incapable = yes
 					}
 				}
+
 				ROOT = {
 					NOR = { # Not in sickly in bed, but sick if well treated is okay
 						has_character_modifier = bedridden_illness
@@ -334,14 +341,18 @@ targeted_decisions = {
 			custom_tooltip = {
 				text = duel_tooltip_recent_duel
 
-				FROM = { NOT = { has_character_modifier = recent_duel_timer } }
-				NOT = { has_character_modifier = recent_duel_timer }
+				NOR = {
+					has_character_modifier = recent_duel_timer
+					FROM = { has_character_modifier = recent_duel_timer }
+				}
 			}
 
 			custom_tooltip = {
 				text = duel_tooltip_recent_challenge_tt
 
-				FROM = { NOT = { has_character_modifier = recently_challenged_rule_timer } }
+				FROM = {
+					NOT = { has_character_modifier = recently_challenged_rule_timer }
+				}
 			}
 
 			custom_tooltip = {
@@ -358,7 +369,7 @@ targeted_decisions = {
 
 				custom_tooltip = {
 					text = opinion_duel_decline_cooldown_tt
-					NOT = { has_character_modifier = has_recently_declined_duel_cooldown }
+					always = no
 				}
 			}
 		}
@@ -372,8 +383,8 @@ targeted_decisions = {
 		   		increase_troublemaker_status_effect = yes
 
 				add_character_modifier = {
-					modifier = recent_duel_timer
-					days = 90
+					name = recent_duel_timer
+					months = 3
 					hidden = yes
 				}
 			}
@@ -396,11 +407,12 @@ targeted_decisions = {
 
 					random_demesne_title = {
 						limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
-						preferred_limit = { tier = EMPEROR }
-						preferred_limit = { tier = KING }
-						preferred_limit = { tier = DUKE }
-						preferred_limit = { tier = COUNT }
-						preferred_limit = { tier = BARON }
+						preferred_limit = { real_tier = EMPEROR }
+						preferred_limit = { real_tier = KING }
+						preferred_limit = { real_tier = DUKE }
+						preferred_limit = { real_tier = COUNT }
+						preferred_limit = { real_tier = BARON }
+
 						save_event_target_as = target_title
 					}
 
@@ -420,7 +432,7 @@ targeted_decisions = {
 				}
 				FROM = {
 					add_character_modifier = {
-						modifier = recently_challenged_rule_timer
+						name = recently_challenged_rule_timer
 						duration = 90
 						hidden = yes
 					}
@@ -476,7 +488,6 @@ targeted_decisions = {
 
 		potential = {
 			is_child_of = FROM
-			NOT = { character = FROM }
 			prisoner = no
 
 			trigger_if = {
@@ -484,7 +495,10 @@ targeted_decisions = {
 				is_primary_heir = FROM
 			}
 
-			NOT = { has_character_flag = flag_child_abandoned_lodge }
+			NOR = {
+				character = FROM
+				has_character_flag = flag_child_abandoned_lodge
+			}
 		}
 
 		allow = {
@@ -511,12 +525,10 @@ targeted_decisions = {
 						has_character_flag = refused_trial
 					}
 				}
+
 				custom_tooltip = {
 					text = already_attempted_recruitment_tt
-					NOR = {
-						has_character_flag = refused_trial
-						has_character_flag = is_being_recruited_to_warrior_lodge_by_parent
-					}
+					always = no
 				}
 			}
 
@@ -526,11 +538,13 @@ targeted_decisions = {
 						FROM = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_legendary_warrior
+								bloodline_is_active_for = PREV
 							}
 						}
 
 						any_owned_bloodline = {
 							has_bloodline_flag = bloodline_legendary_warrior
+							bloodline_is_active_for = PREV
 						}
 
 						custom_tooltip = {
@@ -552,20 +566,24 @@ targeted_decisions = {
 
 					custom_tooltip = {
 						text = legendary_warrior_bloodline_trigger_tt
+
 						OR = { # Or you or the recruit have a bloodline that matters...
 							FROM = {
 								any_owned_bloodline = {
 									has_bloodline_flag = bloodline_legendary_warrior
+									bloodline_is_active_for = PREV
 								}
 							}
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_legendary_warrior
+								bloodline_is_active_for = PREV
 							}
 						}
 					}
 
 					custom_tooltip = { # Or you have a mission to recruit ROOT...
 						text = has_mission_to_recruit_tt
+
 						FROM = {
 							has_quest = quest_warrior_lodge_recruit
 							quest_target = { character = ROOT }
@@ -589,6 +607,7 @@ targeted_decisions = {
 					NOT = { has_character_flag = do_not_disturb }
 					war = no
 				}
+
 				NOT = { has_character_flag = do_not_disturb }
 				war = no
 			}
@@ -643,11 +662,13 @@ targeted_decisions = {
 						FROM = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_legendary_warrior
+								bloodline_is_active_for = PREV
 							}
 						}
 
 						any_owned_bloodline = {
 							has_bloodline_flag = bloodline_legendary_warrior
+							bloodline_is_active_for = PREV
 						}
 
 						custom_tooltip = {
@@ -785,13 +806,9 @@ targeted_decisions = {
 
 		effect = {
 			detract_society_currency_medium_effect = yes
-
-			hidden_effect = {
-				set_character_flag = choosing_warrior_training
-				character_event = { id = HF.10040 } # Gain trait...
-			}
+			set_character_flag = choosing_warrior_training
+			character_event = { id = HF.10040 } # Gain trait...
 		}
-
 
 		ai_will_do = {
 			factor = 1
@@ -830,7 +847,6 @@ targeted_decisions = {
 
 			custom_tooltip = {
 				text = not_already_using_toughness_tt
-				NOT = { has_character_flag = using_toughness }
 			}
 
 			OR = {
@@ -844,11 +860,8 @@ targeted_decisions = {
 
 		effect = {
 			detract_society_currency_minor_effect = yes
-
-			hidden_effect = {
-				set_character_flag = using_toughness
-				character_event = { id = HF.10055 } # Remove physical injury...
-			}
+			set_character_flag = using_toughness
+			character_event = { id = HF.10055 } # Remove physical injury...
 		}
 
 		ai_will_do = {
@@ -886,10 +899,7 @@ targeted_decisions = {
 			has_society_currency_minor_trigger = yes
 			has_religion_matching_joined_warrior_lodge_trigger = yes
 
-			custom_tooltip = {
-				text = not_already_going_berserk_tt
-				NOT = { has_character_flag = going_berserk }
-			}
+			custom_tooltip = { text = not_already_going_berserk_tt }
 
 			OR = {
 				NOT = { trait = berserker }
@@ -908,6 +918,8 @@ targeted_decisions = {
 			}
 
 			set_character_flag = special_berserker # Will last for at least 10 years
+			set_character_flag = going_berserk
+			detract_society_currency_minor_effect = yes
 
 			hidden_effect = {
 				if = {
@@ -940,8 +952,6 @@ targeted_decisions = {
 					character_event = { id = HF.10070 } # Go berserk in prison!
 				}
 			}
-			set_character_flag = going_berserk
-			detract_society_currency_minor_effect = yes
 		}
 
 		ai_will_do = {
@@ -969,7 +979,7 @@ targeted_decisions = {
 		}
 	}
 
-	#Power, rank 4: Call to Glory
+	# Power, rank 4: Call to Glory
 	warrior_lodge_call_to_glory = {
 		is_high_prio = yes
 		is_mercenary = yes
@@ -991,11 +1001,9 @@ targeted_decisions = {
 			trigger_if = {
 				limit = { ai = yes }
 
-				any_war = {
-					OR = {
-						is_primary_war_defender = yes
-						is_primary_war_attacker = yes
-					}
+				OR = {
+					is_primary_war_defender = yes
+					is_primary_war_attacker = yes
 				}
 			}
 		}
@@ -1022,7 +1030,7 @@ targeted_decisions = {
 
 				# Removed by recurring event and on_action when at peace or if leaving society
 				add_character_modifier = {
-					modifier = call_to_glory
+					name = call_to_glory
 					duration = -1
 				}
 			}
@@ -1084,8 +1092,8 @@ society_decisions = {
 
 			custom_tooltip = {
 				text = legendary_gathering_tt
-				sound_effect = pagan_warhorn
 
+				sound_effect = pagan_warhorn
 
 				society = {
 					if = {
@@ -1095,6 +1103,7 @@ society_decisions = {
 								years >= 100
 							}
 						}
+
 						clr_flag = used_legendary_gathering
 					}
 
@@ -1112,6 +1121,7 @@ society_decisions = {
 								years >= 100
 							}
 						}
+
 						set_society_progress = 0
 					}
 
@@ -1125,6 +1135,7 @@ society_decisions = {
 
 			mult_modifier = {
 				factor = 1.5 # more likely if ambitious
+
 				OR = {
 					trait = ambitious
 					ai_ambition >= 50
@@ -1284,43 +1295,28 @@ society_decisions = {
 								}
 							}
 						}
+
 						set_character_flag = special_marshal # Ensures character can be marshal
 					}
 
 					random_list = { # Flavor Randomization
-						35 = {
-							# Nothing
-						}
-						15 = {
-							change_martial = 2
-						}
-						10 = {
-							add_trait = robust
-						}
-						10 = {
-							add_trait = duelist
-						}
-						10 = {
-							add_trait = hunter
-						}
-						5 = {
-							add_trait = strategist
-						}
-						5 = {
-							change_martial = 4
-						}
+						35 = { } # Nothing
+						15 = { change_martial = 2 }
+						10 = { add_trait = robust }
+						10 = { add_trait = duelist }
+						10 = { add_trait = hunter }
+						5 = { add_trait = strategist }
+						5 = { change_martial = 4 }
+
 						5 = {
 							if = {
 								limit = { has_dlc = "Reapers" }
 								add_trait = one_eyed
 							}
 						}
-						5 = {
-							add_trait = shrewd
-						}
-						3 = {
-							add_trait = giant
-						}
+
+						5 = { add_trait = shrewd }
+						3 = { add_trait = giant }
 					}
 
 					join_prev_warrior_lodge_society_effect = yes
@@ -1332,7 +1328,7 @@ society_decisions = {
 
 							give_this_warrior_lodge_religion_effect = yes
 
-							#In which case don't allow liege to immediately demand conversion.
+							# In which case don't allow liege to immediately demand conversion.
 							set_character_flag = ai_flag_refuse_conversion
 						}
 
@@ -1348,8 +1344,7 @@ society_decisions = {
 						else_if = {
 							limit = {
 								OR = {
-									religion = hellenic_pagan
-									religion = hellenic_pagan_reformed
+									religion_openly_hellenic_or_reformed_trigger = yes
 									has_religion_feature = religion_astrology
 								}
 							}
@@ -1378,6 +1373,7 @@ society_decisions = {
 					save_event_target_as = invited_lodge_soldier
 				}
 			}
+
 			character_event = { id = HF.25000 } # Notify, give commander title, etc.
 		}
 
@@ -1386,60 +1382,7 @@ society_decisions = {
 
 			trigger = {
 				# Only use if empty commander spots
-				trigger_if = {
-					limit = { is_nomadic = yes }
-
-					trigger_if = {
-						limit = { tier = KING }
-
-						has_assigned_minor_title = {
-							title = title_commander
-							count < 2
-						}
-					}
-					trigger_else_if = {
-						limit = { tier = EMPEROR }
-
-						has_assigned_minor_title = {
-							title = title_commander
-							count < 4
-						}
-					}
-				}
-				trigger_else = {
-					trigger_if = {
-						limit = { tier = COUNT }
-
-						has_assigned_minor_title = {
-							title = title_commander
-							count < 2
-						}
-					}
-					trigger_else_if = {
-						limit = { tier = DUKE }
-
-						has_assigned_minor_title = {
-							title = title_commander
-							count < 4
-						}
-					}
-					trigger_else_if = {
-						limit = { tier = KING }
-
-						has_assigned_minor_title = {
-							title = title_commander
-							count < 6
-						}
-					}
-					trigger_else_if = {
-						limit = { tier = EMPEROR }
-
-						has_assigned_minor_title = {
-							title = title_commander
-							count < 8
-						}
-					}
-				}
+				can_grant_title = title_commander
 			}
 
 			mult_modifier = {
@@ -1449,19 +1392,20 @@ society_decisions = {
 
 			mult_modifier = {
 				factor = 0.1
+
 				# Less likely to invite if there is already someone else at court
 				any_courtier = { is_member_of_any_warrior_lodge_trigger = yes }
 			}
 
 			mult_modifier = {
 				factor = 0.1
-				job_marshal = {
-					martial >= 16
-				}
+				job_marshal = { martial >= 16 }
 			}
 
 			mult_modifier = {
-				factor = 0.25 # Fearful to be challenged for leadership
+				factor = 0.25
+
+				# Fearful to be challenged for leadership
 				is_tribal = yes
 				trait = paranoid
 			}
@@ -1477,24 +1421,21 @@ society_decisions = {
 
 		potential = {
 			has_dlc = "Holy Fury"
-			society_member_of = warrior_lodge_finnish
-			society_rank = 3
 
-			OR = {
-				religion = finnish_pagan
-				religion = finnish_pagan_reformed
+			society_rank = {
+				society = warrior_lodge_finnish
+				rank >= 3
 			}
 
+			religion_openly_finnish_or_reformed_trigger = yes
 			is_adult = yes
 
 			trigger_if = {
 				limit = { ai = yes }
 
-				any_war = {
-					OR = {
-						is_primary_war_defender = yes
-						is_primary_war_attacker = yes
-					}
+				OR = {
+					is_primary_war_defender = yes
+					is_primary_war_attacker = yes
 				}
 			}
 		}
@@ -1520,7 +1461,7 @@ society_decisions = {
 
 				# Removed on_action when player is back at peace.
 				add_character_modifier = {
-					modifier = lodge_summon_warriors_cooldown
+					name = lodge_summon_warriors_cooldown
 					duration = -1
 					hidden = yes
 				}
@@ -1541,23 +1482,21 @@ society_decisions = {
 
 		potential = {
 			has_dlc = "Holy Fury"
-			society_member_of = warrior_lodge_slavic
-			society_rank = 2
 
-			OR = {
-				religion = slavic_pagan
-				religion = slavic_pagan_reformed
+			society_rank = {
+				society = warrior_lodge_slavic
+				rank >= 2
 			}
 
+			religion_openly_slavic_or_reformed_trigger = yes
 			is_adult = yes
 
 			trigger_if = {
 				limit = { ai = yes }
-				any_war = {
-					OR = {
-						is_primary_war_defender = yes
-						is_primary_war_attacker = yes
-					}
+
+				OR = {
+					is_primary_war_defender = yes
+					is_primary_war_attacker = yes
 				}
 			}
 		}
@@ -1605,7 +1544,7 @@ society_decisions = {
 				character_event = { id = HF.25007 } # Find society member
 
 				add_character_modifier = {
-					modifier = lodge_slavic_stand_together_cooldown
+					name = lodge_slavic_stand_together_cooldown
 					duration = -1 #Removed on_action when player is back at peace.
 					hidden = yes
 				}
@@ -1625,14 +1564,14 @@ society_decisions = {
 
 		potential = {
 			has_dlc = "Holy Fury"
-			society_member_of = warrior_lodge_tengri
-			society_rank = 2
-			is_adult = yes
 
-			OR = {
-				religion = tengri_pagan
-				religion = tengri_pagan_reformed
+			society_rank = {
+				society = warrior_lodge_tengri
+				rank >= 2
 			}
+
+			religion_openly_tengri_or_reformed_trigger = yes
+			is_adult = yes
 		}
 
 		allow = {
@@ -1681,12 +1620,12 @@ society_decisions = {
 			trigger = {
 				trigger_if = {
 					limit = { is_nomadic = yes }
-					war = no # No need for levy reinforcement for non-nomads when at peace
+					war = yes # No need for levy reinforcement for non-nomads when at peace
 				}
 
 				# I could use some help winning this war
 				any_war = {
-					is_primary_war_defender = yes
+					defender = { character = ROOT }
 					war_score < 50
 				}
 			}
@@ -1698,8 +1637,9 @@ society_decisions = {
 
 			mult_modifier = { # I am losing the war, help!
 				factor = 10
+
 				any_war = {
-					is_primary_war_defender = yes
+					defender = { character = ROOT }
 					war_score < -50
 				}
 			}
@@ -1736,11 +1676,9 @@ society_decisions = {
 			trigger_if = {
 				limit = { ai = yes }
 
-				any_war = {
-					OR = {
-						is_primary_war_defender = yes
-						is_primary_war_attacker = yes
-					}
+				OR = {
+					is_primary_war_defender = yes
+					is_primary_war_attacker = yes
 				}
 			}
 		}
@@ -1806,16 +1744,18 @@ society_decisions = {
 
 			mult_modifier = { # I am losing the war, help!
 				factor = 10
+
 				any_war = {
-					is_primary_war_defender = yes
+					defender = { character = ROOT }
 					war_score < -50
 				}
 			}
 
 			mult_modifier = { # I am winning the war, no need!
 				factor = 0.25
+
 				any_war = {
-					is_primary_war_defender = yes
+					defender = { character = ROOT }
 					war_score > 50
 				}
 			}
@@ -1850,14 +1790,14 @@ society_decisions = {
 
 		potential = {
 			has_dlc = "Holy Fury"
-			society_member_of = warrior_lodge_zun
-			society_rank >= 2
-			is_adult = yes
 
-			OR = {
-				religion = zun_pagan
-				religion = zun_pagan_reformed
+			society_rank = {
+				society = warrior_lodge_zun
+				rank >= 2
 			}
+
+			religion_openly_zun_or_reformed_trigger = yes
+			is_adult = yes
 		}
 
 		allow = {
@@ -1898,7 +1838,7 @@ society_decisions = {
 
 				# I could use some help winning this war
 				any_war = {
-					is_primary_war_defender = yes
+					defender = { character = ROOT }
 					war_score < 50
 				}
 			}
@@ -1910,8 +1850,9 @@ society_decisions = {
 
 			mult_modifier = { # I am losing the war, help!
 				factor = 10
+
 				any_war = {
-					is_primary_war_defender = yes
+					defender = { character = ROOT }
 					war_score < -50
 				}
 			}
@@ -1936,14 +1877,14 @@ society_decisions = {
 
 		potential = {
 			has_dlc = "Holy Fury"
-			society_member_of = warrior_lodge_west_african
-			society_rank = 4
-			is_adult = yes
 
-			OR = {
-				religion = west_african_pagan
-				religion = west_african_pagan_reformed
+			society_rank = {
+				society = warrior_lodge_west_african
+				rank == 4
 			}
+
+			religion_openly_west_african_or_reformed_trigger = yes
+			is_adult = yes
 
 			trigger_if = {
 				limit = {
@@ -2015,7 +1956,6 @@ society_decisions = {
 
 				else = {
 					set_character_flag = flag_ordered_fetish_creation
-
 					character_event = { id = HF.25040 }
 				}
 			}
@@ -2068,10 +2008,7 @@ decisions = {
 				}
 			}
 
-			OR = {
-				religion = hellenic_pagan
-				religion = hellenic_pagan_reformed
-			}
+			religion_openly_hellenic_or_reformed_trigger = yes
 
 			warrior_lodge_hellenic = {
 				society_has_members = no
@@ -2081,7 +2018,7 @@ decisions = {
 		}
 
 		allow = {
-			higher_tier_than = DUKE
+			higher_real_tier_than = DUKE
 			has_education_martial_trigger = yes
 			martial >= 15
 			scaled_wealth = 0.75
@@ -2137,12 +2074,12 @@ decisions = {
 				any_player = {
 					limit = {
 						OR = {
-							religion = hellenic_pagan_reformed
-							religion = hellenic_pagan
+							religion_openly_hellenic_or_reformed_trigger = yes
 							culture = roman
 							is_within_diplo_range = ROOT
 						}
 					}
+
 					narrative_event = { id = HF.25026 } # Chance to join
 				}
 			}
@@ -2168,7 +2105,7 @@ settlement_decisions = {
 			has_dlc = "Holy Fury"
 			is_member_of_any_warrior_lodge_trigger = yes
 			society_rank >= 3
-			higher_tier_than = BARON
+			higher_real_tier_than = BARON
 			NOT = { has_character_flag = inspiring_warriors }
 		}
 
@@ -2208,7 +2145,7 @@ settlement_decisions = {
 
 					# I could use some help winning this war
 					any_war = {
-						is_primary_war_defender = yes
+						defender = { character = ROOT }
 						war_score < 50
 					}
 				}
@@ -2216,8 +2153,9 @@ settlement_decisions = {
 
 			modifier = { # I am losing the war, help!
 				factor = 1.5
+
 				any_war = {
-					is_primary_war_defender = yes
+					defender = { character = ROOT }
 					war_score < -50
 				}
 			}
@@ -2236,16 +2174,16 @@ settlement_decisions = {
 
 		from_potential = {
 			has_dlc = "Holy Fury"
-			society_member_of = warrior_lodge_baltic
-			society_rank >= 3
+
+			society_rank = {
+				society = warrior_lodge_baltic
+				rank >= 3
+			}
+
+			religion_openly_baltic_or_reformed_trigger = yes
+			higher_real_tier_than = BARON
 			is_nomadic = no
 			is_adult = yes
-			higher_tier_than = BARON
-
-			OR = {
-				religion = baltic_pagan
-				religion = baltic_pagan_reformed
-			}
 		}
 
 		potential = {
@@ -2259,6 +2197,7 @@ settlement_decisions = {
 						has_building = tb_hillfort_4
 						is_building = tb_hillfort_4
 					}
+
 					OR = {
 						has_building = tb_defensive_fortifications_4
 						is_building = tb_defensive_fortifications_4
@@ -2276,6 +2215,7 @@ settlement_decisions = {
 						has_building = ca_con_wall_6
 						is_building = ca_con_wall_6
 					}
+
 					OR = {
 						has_building = ca_wall_q_5
 						is_building = ca_wall_q_5
@@ -2574,10 +2514,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_5
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25068 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25068 } # Notify
 						}
 					}
 					else_if = {
@@ -2589,10 +2527,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_4
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25068 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25068 } # Notify
 						}
 					}
 					else_if = {
@@ -2604,10 +2540,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_3
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25068 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25068 } # Notify
 						}
 					}
 					else_if = {
@@ -2619,10 +2553,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_2
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25068 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25068 } # Notify
 						}
 					}
 					else_if = {
@@ -2636,10 +2568,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_1
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25068 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25068 } # Notify
 						}
 					}
 				}
@@ -2659,10 +2589,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_q_5
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25069 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25069 } # Notify
 						}
 					}
 					else_if = {
@@ -2674,10 +2602,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_q_4
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25069 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25069 } # Notify
 						}
 					}
 					else_if = {
@@ -2689,10 +2615,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_q_3
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25069 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25069 } # Notify
 						}
 					}
 					else_if = {
@@ -2704,10 +2628,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_q_2
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25069 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25069 } # Notify
 						}
 					}
 					else_if = {
@@ -2721,10 +2643,8 @@ settlement_decisions = {
 
 						add_building = ca_wall_q_1
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25069 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25069 } # Notify
 						}
 					}
 				}
@@ -2748,10 +2668,8 @@ settlement_decisions = {
 
 						add_building = tb_hillfort_4
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25067 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25067 } # Notify
 						}
 					}
 					else_if = {
@@ -2763,10 +2681,8 @@ settlement_decisions = {
 
 						add_building = tb_hillfort_3
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25066 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25066 } # Notify
 						}
 					}
 					else_if = {
@@ -2778,10 +2694,8 @@ settlement_decisions = {
 
 						add_building = tb_hillfort_2
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25065 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25065 } # Notify
 						}
 					}
 					else_if = {
@@ -2795,10 +2709,8 @@ settlement_decisions = {
 
 						add_building = tb_hillfort_1
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25064 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25064 } # Notify
 						}
 					}
 				}
@@ -2814,15 +2726,14 @@ settlement_decisions = {
 					if = {
 						limit = {
 							has_building = tb_defensive_fortifications_3
-							NOT = { is_building = tb_defensive_fortifications_4 }							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
+							NOT = { is_building = tb_defensive_fortifications_4 }
+							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
 						}
 
 						add_building = tb_defensive_fortifications_4
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25063 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25063 } # Notify
 						}
 					}
 					else_if = {
@@ -2834,10 +2745,8 @@ settlement_decisions = {
 
 						add_building = tb_defensive_fortifications_3
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25062 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25062 } # Notify
 						}
 					}
 					else_if = {
@@ -2849,10 +2758,8 @@ settlement_decisions = {
 
 						add_building = tb_defensive_fortifications_2
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25061 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25061 } # Notify
 						}
 					}
 					else_if = {
@@ -2866,10 +2773,8 @@ settlement_decisions = {
 
 						add_building = tb_defensive_fortifications_1
 
-						hidden_effect = {
-							FROM = {
-								character_event = { id = HF.25060 } # Notify
-							}
+						FROM = {
+							character_event = { id = HF.25060 } # Notify
 						}
 					}
 				}

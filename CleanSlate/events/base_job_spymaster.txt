@@ -1,0 +1,3339 @@
+namespace = spymaster
+
+##############################
+# SPYMASTER
+#
+# Job: action_uncover_plots
+# 	929: Plot Uncovered
+# 	930: Reveal new succession law
+# 	931: The Spymaster is attacked by a Noble's thugs (Gets away, Is wounded, Is maimed, Is killed)
+#
+# Job: action_study_technology
+# 	932: The Spymaster studies foreign technology
+# 	933: The Spymaster is discovered by the local count - chance of imprisonment
+#
+# Job: action_organize_spies
+# 	935: Vicious Rumors Spread
+# 	936: Corruption Uncovered
+#
+##############################
+
+
+##############################
+# SPYMASTER
+# JOB: action_uncover_plots
+##############################
+
+# 929: Plot Uncovered
+character_event = {
+	id = spymaster.001
+	title = evt_spymaster_001_title
+	desc = evt_spymaster_001_desc_a
+	picture = GFX_evt_council
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		has_job_action = action_uncover_plots
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		location = {
+			any_province_character = {
+				OR = {
+					has_plot = plot_gain_title
+					has_plot = plot_kill_character
+					has_plot = plot_kill_spouse
+					has_plot = plot_weaken_fellow_vassal
+					has_plot = plot_gain_liege_title
+					has_plot = plot_gain_fellow_vassal_title
+				}
+
+				NOR = {
+					is_liege_of = ROOT
+					character = ROOT
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 120
+
+		job_event_mtth_modifier_intrigue_score = yes
+	}
+
+	option = {
+		name = evt_spymaster_001_option_a
+
+		hidden_effect = {
+			location = {
+				random_province_character = {
+					limit = {
+						OR = {
+							has_plot = plot_gain_title
+							has_plot = plot_kill_character
+							has_plot = plot_kill_spouse
+							has_plot = plot_weaken_fellow_vassal
+							has_plot = plot_gain_liege_title
+							has_plot = plot_gain_fellow_vassal_title
+						}
+
+						NOR = {
+							is_liege_of = ROOT
+							character = ROOT
+						}
+					}
+
+					character_event = {
+						id = spymaster.002
+						days = 7
+					}
+				}
+			}
+		}
+	}
+}
+
+# 20290 - The plotter is informed
+character_event = {
+	id = spymaster.002
+	desc = evt_spymaster_002_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_002_option_a
+
+		trigger = { ai = no }
+	}
+
+	option = {
+		name = evt_spymaster_002_option_b
+
+		trigger = { ai = yes }
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 2.0
+
+				opinion = {
+					who = FROM
+					value < 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 2.0
+
+				opinion = {
+					who = FROM
+					value < -25
+				}
+			}
+
+			mult_modifier = {
+				factor = 2.0
+
+				opinion = {
+					who = FROM
+					value < -50
+				}
+			}
+		}
+
+		# Spymaster
+		FROM = {
+			show_scope_change = no
+
+			random_list = {
+				50 = {
+					set_character_flag = was_murdered_by_plot
+
+					death = {
+						death_reason = death_murder
+						killer = ROOT
+					}
+
+					liege = {
+						show_scope_change = no
+
+						opinion = {
+							name = opinion_dishonorable
+							who = ROOT
+							years = 5
+						}
+					}
+				}
+
+				50 = {
+					character_event = {
+						id = spymaster.003
+						days = 1
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = evt_spymaster_002_option_c
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 2.0
+
+				opinion = {
+					who = FROM
+					value >= 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 2.0
+
+				opinion = {
+					who = FROM
+					value >= 25
+				}
+			}
+
+			mult_modifier = {
+				factor = 2.0
+
+				opinion = {
+					who = FROM
+					value >= 50
+				}
+			}
+		}
+	}
+}
+
+# 20291 - Assassination attempt on the spymaster fails
+character_event = {
+	id = spymaster.003
+	desc = evt_spymaster_003_desc_a
+	picture = GFX_evt_shadow
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_003_option_a
+
+		opinion = {
+			name = attempted_murder
+			who = FROM
+			years = 10
+		}
+
+		hidden_effect = {
+			liege = {
+				letter_event = { id = spymaster.004 }
+			}
+		}
+	}
+}
+
+# 20292 - Spymaster informs liege about assassination attempt and plot
+letter_event = {
+	id = spymaster.004
+	desc = evt_spymaster_004_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_004_option_a
+
+		FROMFROM = {
+			reveal_plot = yes
+
+			hidden_effect = {
+				character_event = {
+					id = spymaster.005
+				}
+			}
+		}
+
+		ai_chance = {
+			factor = 100
+		}
+	}
+
+	option = {
+		name = evt_spymaster_004_option_b
+
+		ai_chance = {
+			factor = 0
+		}
+	}
+}
+
+# 20293 - Liege writes to plotter
+character_event = {
+	id = spymaster.005
+	desc = evt_spymaster_005_desc_a
+	picture = GFX_evt_recieve_letter
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_005_option_a
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = scheming_bastard
+				who = ROOT
+				years = 10
+			}
+		}
+	}
+}
+
+# 931: The Spymaster is attacked by a Noble's thugs (Gets away, Is wounded, Is maimed, Is killed)
+character_event = {
+	id = spymaster.101
+	title = evt_spymaster_101_title
+	desc = evt_spymaster_101_desc_a
+	picture = GFX_evt_peasants
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		OR = {
+			has_job_action = action_uncover_plots
+			has_job_action = action_organize_spies_mystics
+		}
+
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		location = {
+			any_province_lord = {
+				OR = {
+					has_plot = plot_gain_title
+					has_plot = plot_kill_character
+					has_plot = plot_kill_spouse
+					has_plot = plot_weaken_fellow_vassal
+					has_plot = plot_gain_liege_title
+					has_plot = plot_gain_fellow_vassal_title
+				}
+
+				NOR = {
+					is_liege_of = ROOT
+					character = ROOT
+				}
+			}
+		}
+	}
+
+	immediate = {
+		location = {
+			random_province_lord = {
+				limit = {
+					OR = {
+						has_plot = plot_gain_title
+						has_plot = plot_kill_character
+						has_plot = plot_kill_spouse
+						has_plot = plot_weaken_fellow_vassal
+						has_plot = plot_gain_liege_title
+						has_plot = plot_gain_fellow_vassal_title
+					}
+
+					NOR = {
+						is_liege_of = ROOT
+						character = ROOT
+					}
+				}
+
+				save_event_target_as = killer_target
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 120
+
+		job_event_mtth_modifier_inverted_intrigue_score = yes
+	}
+
+	option = {
+		name = evt_spymaster_101_option
+
+		trigger = {
+			combat_rating < 5
+		}
+
+		random_list = {
+			25 = {
+				character_event = {
+					id = spymaster.102 # Gets away
+					tooltip = evt_spymaster_101_option_tooltip_1
+				}
+			}
+
+			50 = {
+				character_event = {
+					id = spymaster.103 # Gets wounded
+					tooltip = evt_spymaster_101_option_tooltip_2
+				}
+			}
+
+			25 = {
+				death = {
+					death_reason = death_murder_unknown
+					killer = event_target:killer_target
+				}
+
+				hidden_effect = {
+					liege = { # Inform liege about death
+						character_event = { id = spymaster.105 }
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_101_option
+		tooltip_info = combat_rating
+
+		trigger = {
+			combat_rating >= 5
+			combat_rating < 10
+		}
+
+		random_list = {
+			35 = {
+				character_event = {
+					id = spymaster.102 # Gets away
+					tooltip = evt_spymaster_101_option_tooltip_1
+				}
+			}
+
+			50 = {
+				character_event = {
+					id = spymaster.103 # Gets wounded
+					tooltip = evt_spymaster_101_option_tooltip_2
+				}
+			}
+
+			15 = {
+				death = {
+					death_reason = death_murder_unknown
+					killer = event_target:killer_target
+				}
+
+				hidden_effect = {
+					liege = { # Inform liege about death
+						character_event = { id = spymaster.105 }
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_101_option
+		tooltip_info = combat_rating
+
+		trigger = {
+			combat_rating >= 10
+		}
+
+		random_list = {
+			50 = {
+				character_event = {
+					id = spymaster.102 # Gets away
+					tooltip = evt_spymaster_101_option_tooltip_1
+				}
+			}
+
+			40 = {
+				character_event = {
+					id = spymaster.103 # Gets wounded
+					tooltip = evt_spymaster_101_option_tooltip_2
+				}
+			}
+
+			10 = {
+				death = {
+					death_reason = death_murder_unknown
+					killer = event_target:killer_target
+				}
+
+				hidden_effect = {
+					liege = { # Inform liege about death
+						character_event = { id = spymaster.105 }
+					}
+				}
+			}
+		}
+	}
+}
+
+# 20310: Spymaster gets away
+character_event = {
+	id = spymaster.102
+	desc = evt_spymaster_102_option_a
+	picture = GFX_evt_courier
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_102_option_a
+
+		prestige = -10
+	}
+}
+
+# 20311: Spymaster gets wounded
+character_event = {
+	id = spymaster.103
+	desc = evt_spymaster_103_desc_a
+	picture = GFX_evt_illness
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_103_option_a
+
+		add_trait = wounded
+
+		liege = {
+			show_scope_change = no
+
+			letter_event = {
+				id = spymaster.104
+				tooltip = evt_spymaster_103_option_a_tooltip
+			}
+		}
+	}
+}
+
+# 20312: Inform the Liege about wounding
+letter_event = {
+	id = spymaster.104
+	desc = evt_spymaster_104_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_104_option_a
+
+		prestige = -10
+	}
+}
+
+# 20313: Inform the Liege about death
+character_event = {
+	id = spymaster.105
+	desc = evt_spymaster_105_desc_a
+	picture = GFX_evt_death
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_105_option_a
+
+		prestige = -15
+	}
+}
+
+## 9000: Faction Prevention - Spymaster finds Faction Member
+character_event = {
+	id = spymaster.201
+	title = evt_spymaster_201_title
+	desc = evt_spymaster_201_desc_a
+	picture = GFX_evt_council
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		OR = {
+			has_job_action = action_uncover_plots
+			has_job_action = action_organize_spies_mystics
+		}
+
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		location = {
+			owner = {
+				OR = {
+					AND = {
+						higher_real_tier_than = BARON
+						independent = no
+						same_liege = ROOT
+						is_incapable = no
+						is_adult = yes
+						prisoner = no
+
+						NOR = {
+							has_opinion_modifier = {
+								name = opinion_coerced_into_leaving_faction
+								who = liege
+							}
+
+							has_character_flag = faction_member
+							is_liege_of = ROOT
+							character = ROOT
+						}
+					}
+
+					AND = {
+						independent = no
+
+						liege = {
+							higher_real_tier_than = BARON
+							is_adult = yes
+							prisoner = no
+							same_liege = ROOT
+							independent = no
+							is_incapable = no
+
+							NOR = {
+								has_opinion_modifier = {
+									name = opinion_coerced_into_leaving_faction
+									who = liege
+								}
+
+								has_character_flag = faction_member
+								is_liege_of = ROOT
+								character = ROOT
+							}
+						}
+					}
+
+					NOR = {
+						is_liege_of = ROOT
+						character = ROOT
+					}
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 110
+
+		job_event_mtth_modifier_intrigue_score = yes
+	}
+
+	immediate = {
+		location = {
+			owner = {
+				if = {
+					limit = { same_liege = ROOT	}
+					set_character_flag = faction_member
+				}
+			}
+
+			liege = {
+				if = {
+					limit = { same_liege = ROOT }
+					set_character_flag = faction_member
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_201_option_a
+
+		liege = {
+			show_scope_change = no
+
+			letter_event = {
+				id = spymaster.202
+				tooltip = evt_spymaster_201_option_a_tooltip
+			}
+		}
+	}
+}
+
+# 9001: Liege is informed
+letter_event = {
+	id = spymaster.202
+	desc = evt_spymaster_202_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Blackmail
+		name = evt_spymaster_202_option_a
+
+		trigger = {
+			any_vassal = {
+				has_character_flag = faction_member
+
+				OR = {
+					trait = homosexual
+					trait = impaler
+					trait = lustful
+					trait = drunkard
+					trait = hedonist
+					trait = syphilitic
+				}
+			}
+		}
+
+		ai_chance = {
+			factor = 10000
+		}
+
+		random_vassal = {
+			limit = { has_character_flag = faction_member }
+
+			letter_event = {
+				id = spymaster.203
+				tooltip = evt_spymaster_202_option_a_tooltip
+			}
+		}
+	}
+
+	option = { # Legalism
+		name = evt_spymaster_202_option_b
+
+		trigger = {
+			any_vassal = {
+				has_character_flag = faction_member
+
+				OR = {
+					trait = just
+					trait = honest
+					trait = trusting
+					trait = content
+					trait = kind
+				}
+			}
+		}
+
+		ai_chance = {
+			factor = 10000
+		}
+
+		random_vassal = {
+			limit = { has_character_flag = faction_member }
+
+			letter_event = {
+				id = spymaster.205
+				tooltip = evt_spymaster_202_option_b_tooltip
+			}
+		}
+	}
+	option = { # Threaten
+		name = evt_spymaster_202_option_c
+
+		trigger = {
+			any_vassal = {
+				has_character_flag = faction_member
+
+				OR = {
+					trait = craven
+					trait = paranoid
+					trait = cynical
+					trait = humble
+					trait = slothful
+				}
+			}
+		}
+
+		ai_chance = {
+			factor = 10000
+		}
+
+		random_vassal = {
+			limit = { has_character_flag = faction_member }
+
+			letter_event = {
+				id = spymaster.207
+				tooltip = evt_spymaster_202_option_c_tooltip
+			}
+		}
+	}
+
+	option = { # Ask Nicely
+		name = evt_spymaster_202_option_d
+
+		trigger = {
+			any_vassal = {
+				has_character_flag = faction_member
+
+				NOR = {
+					trait = craven
+					trait = paranoid
+					trait = cynical
+					trait = humble
+					trait = slothful
+					trait = just
+					trait = honest
+					trait = trusting
+					trait = content
+					trait = kind
+					trait = homosexual
+					trait = impaler
+					trait = lustful
+					trait = drunkard
+					trait = hedonist
+					trait = syphilitic
+				}
+			}
+		}
+
+		ai_chance = {
+			factor = 100
+		}
+
+		random_vassal = {
+			limit = { has_character_flag = faction_member }
+
+			letter_event = {
+				id = spymaster.209
+				tooltip = evt_spymaster_202_option_d_tooltip
+			}
+		}
+	}
+
+	option = { # Do Nothing
+		name = evt_spymaster_202_option_e
+
+		ai_chance = {
+			factor = 1
+		}
+
+		random_vassal = {
+			limit = { has_character_flag = faction_member }
+			clr_character_flag = faction_member
+		}
+	}
+}
+
+# 9002: Faction Member Confronted: Blackmail
+letter_event = {
+	id = spymaster.203
+	desc = evt_spymaster_203_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Agree (Homosexual)
+		name = evt_spymaster_203_option_a
+		tooltip_info = homosexual
+
+		trigger = { trait = homosexual }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.204
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Impaler)
+		name = evt_spymaster_203_option_b
+		tooltip_info = impaler
+
+		trigger = { trait = impaler }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.204
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Lustful)
+		name = evt_spymaster_203_option_c
+		tooltip_info = lustful
+
+		trigger = { trait = lustful }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.204
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Drunkard)
+		name = evt_spymaster_203_option_d
+		tooltip_info = drunkard
+
+		trigger = { trait = drunkard }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.204
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Hedonist)
+		name = evt_spymaster_203_option_e
+		tooltip_info = hedonist
+
+		trigger = { trait = hedonist }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.204
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Syphilis)
+		name = evt_spymaster_203_option_f
+		tooltip_info = syphilitic
+
+		trigger = { trait = syphilitic }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.204
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+}
+
+# 9004: Liege Informed: Successful Blackmail
+letter_event = {
+	id = spymaster.204
+	desc = evt_spymaster_204_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_coerced_into_leaving_faction
+				who = ROOT
+			}
+
+			custom_tooltip = {
+				text = leaving_faction
+
+				clr_character_flag = faction_member
+			}
+		}
+	}
+}
+
+# 9005: Faction Member Confronted: Legalism
+letter_event = {
+	id = spymaster.205
+	desc = evt_spymaster_205_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Agree (Just)
+		name = evt_spymaster_205_option_a
+		tooltip_info = just
+
+		trigger = { trait = just }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.206
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Honest)
+		name = evt_spymaster_205_option_b
+		tooltip_info = honest
+
+		trigger = { trait = honest }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.206
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Trusting)
+		name = evt_spymaster_205_option_c
+		tooltip_info = trusting
+
+		trigger = { trait = trusting }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.206
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Content)
+		name = evt_spymaster_205_option_d
+		tooltip_info = content
+
+		trigger = { trait = content }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.206
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Kind)
+		name = evt_spymaster_205_option_e
+		tooltip_info = kind
+
+		trigger = { trait = kind }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.206
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+}
+
+# 9007: Liege Informed: Successful Legalism
+letter_event = {
+	id = spymaster.206
+	desc = evt_spymaster_206_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_206_option_a
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_coerced_into_leaving_faction
+				who = ROOT
+			}
+
+			custom_tooltip = {
+				text = leaving_faction
+
+				clr_character_flag = faction_member
+			}
+		}
+	}
+}
+
+# 9008: Faction Member Confronted: Threaten
+letter_event = {
+	id = spymaster.207
+	desc = evt_spymaster_207_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Agree (Craven)
+		name = evt_spymaster_207_option_a
+		tooltip_info = craven
+
+		trigger = { trait = craven }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.208
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Paranoid)
+		name = evt_spymaster_207_option_b
+		tooltip_info = paranoid
+
+		trigger = { trait = paranoid }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.208
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Cynical)
+		name = evt_spymaster_207_option_c
+		tooltip_info = cynical
+
+		trigger = { trait = cynical }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.208
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Humble)
+		name = evt_spymaster_207_option_d
+		tooltip_info = humble
+
+		trigger = { trait = humble }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.208
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Slothful)
+		name = evt_spymaster_207_option_e
+		tooltip_info = slothful
+
+		trigger = { trait = slothful }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.208
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+}
+
+# 9010: Liege Informed: Successful Threat
+letter_event = {
+	id = spymaster.208
+	desc = evt_spymaster_208_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_208_option_a
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_coerced_into_leaving_faction
+				who = ROOT
+			}
+
+			custom_tooltip = {
+				text = leaving_faction
+
+				clr_character_flag = faction_member
+			}
+		}
+	}
+}
+
+# 9003: Faction Member Confronted: Ask Nicely
+letter_event = {
+	id = spymaster.209
+	desc = evt_spymaster_209_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Agree
+		name = evt_spymaster_209_option_a
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.206
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Never!
+		name = evt_spymaster_209_option_b
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_angry
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.210
+				days = 7
+				tooltip = evt_spymaster_209_option_b_tooltip
+			}
+		}
+	}
+}
+
+# 9006: Liege Informed: Failed Request
+letter_event = {
+	id = spymaster.210
+	desc = evt_spymaster_210_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_210_option_a
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_angry
+				who = ROOT
+				years = 2
+			}
+
+			clr_character_flag = faction_member
+		}
+	}
+}
+
+
+### 9020: Faction Recruitment - Spymaster finds Faction Member
+character_event = {
+	id = spymaster.301
+	title = evt_spymaster_301_title
+	desc = evt_spymaster_301_desc_a
+	picture = GFX_evt_council
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		OR = {
+			has_job_action = action_uncover_plots
+			has_job_action = action_organize_spies_mystics
+		}
+
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		liege = { in_faction = yes }
+
+		location = {
+			owner = {
+				ROOT = {
+					liege = {
+						same_liege = PREVPREV
+
+						NOT = {
+							reverse_has_opinion_modifier = {
+								name = opinion_coerced_into_joining_faction
+								who = PREVPREV # province owner
+							}
+						}
+					}
+				}
+
+				higher_real_tier_than = BARON
+				independent = no
+				is_incapable = no
+				in_faction = no
+				is_adult = yes
+				prisoner = no
+				ai = yes
+
+				NOR = {
+					has_character_flag = faction_recruit
+
+					has_opinion_modifier = {
+						name = opinion_coerced_into_leaving_faction
+						who = liege
+					}
+
+					is_liege_of = ROOT
+					character = ROOT
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 110
+
+		job_event_mtth_modifier_intrigue_score = yes
+	}
+
+	immediate = {
+		location = {
+			owner = {
+				set_character_flag = faction_recruit
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_301_option_a
+
+		liege = {
+			show_scope_change = no
+
+			letter_event = {
+				id = spymaster.302
+				tooltip = evt_spymaster_201_option_a_tooltip
+			}
+		}
+	}
+}
+
+# 9021: Liege is informed
+letter_event = {
+	id = spymaster.302
+	desc = evt_spymaster_302_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Blackmail
+		name = evt_spymaster_302_option_a
+
+		trigger = {
+			liege = {
+				any_vassal = {
+					has_character_flag = faction_recruit
+
+					OR = {
+						trait = homosexual
+						trait = impaler
+						trait = lustful
+						trait = drunkard
+						trait = hedonist
+						trait = syphilitic
+					}
+				}
+			}
+		}
+
+		liege = {
+			any_vassal = {
+				limit = { has_character_flag = faction_recruit }
+
+				letter_event = {
+					id = spymaster.303
+					tooltip = evt_spymaster_302_option_a_tooltip
+				}
+			}
+		}
+	}
+
+	option = { # Threaten
+		name = evt_spymaster_302_option_b
+
+		trigger = {
+			liege = {
+				any_vassal = {
+					has_character_flag = faction_recruit
+
+					OR = {
+						trait = craven
+						trait = paranoid
+						trait = cynical
+						trait = humble
+						trait = slothful
+					}
+				}
+			}
+		}
+
+		liege = {
+			any_vassal = {
+				limit = { has_character_flag = faction_recruit }
+
+				letter_event = {
+					id = spymaster.305
+					tooltip = evt_spymaster_302_option_b_tooltip
+				}
+			}
+		}
+	}
+
+	option = { # Ask nicely
+		name = evt_spymaster_302_option_c
+
+		trigger = {
+			liege = {
+				any_vassal = {
+					has_character_flag = faction_recruit
+
+					NOR = {
+						trait = craven
+						trait = paranoid
+						trait = cynical
+						trait = humble
+						trait = slothful
+						trait = homosexual
+						trait = impaler
+						trait = lustful
+						trait = drunkard
+						trait = hedonist
+						trait = syphilitic
+					}
+				}
+			}
+		}
+
+		liege = {
+			any_vassal = {
+				limit = { has_character_flag = faction_recruit }
+
+				letter_event = {
+					id = spymaster.307
+					tooltip = evt_spymaster_302_option_c_tooltip
+				}
+			}
+		}
+	}
+
+	option = { # Do Nothing
+		name = evt_spymaster_302_option_d
+
+		liege = {
+			any_vassal = {
+				limit = { has_character_flag = faction_recruit }
+
+				clr_character_flag = faction_recruit
+			}
+		}
+	}
+}
+
+# 9022: Faction Member Confronted: Blackmail
+letter_event = {
+	id = spymaster.303
+	desc = evt_spymaster_203_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Agree (Homosexual)
+		name = evt_spymaster_203_option_a
+		tooltip_info = homosexual
+
+		trigger = { trait = homosexual }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.304
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Impaler)
+		name = evt_spymaster_203_option_b
+		tooltip_info = impaler
+
+		trigger = { trait = impaler }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.304
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Lustful)
+		name = evt_spymaster_203_option_c
+		tooltip_info = lustful
+
+		trigger = { trait = lustful }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.304
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Drunkard)
+		name = evt_spymaster_203_option_d
+		tooltip_info = drunkard
+
+		trigger = { trait = drunkard }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.304
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Hedonist)
+		name = evt_spymaster_203_option_e
+		tooltip_info = hedonist
+
+		trigger = { trait = hedonist }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.304
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Syphilis)
+		name = evt_spymaster_203_option_f
+		tooltip_info = syphilitic
+
+		trigger = { trait = syphilitic }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.304
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+}
+
+# 9024: Liege Informed: Successful Blackmail
+letter_event = {
+	id = spymaster.304
+	desc = evt_spymaster_304_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_coerced_into_joining_faction
+				who = ROOT
+			}
+
+			custom_tooltip = {
+				text = joining_faction
+
+				clr_character_flag = faction_recruit
+			}
+		}
+	}
+}
+
+# 9028: Faction Member Confronted: Threaten
+letter_event = {
+	id = spymaster.305
+	desc = evt_spymaster_207_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Agree (Paranoid)
+		name = evt_spymaster_207_option_b
+		tooltip_info = paranoid
+
+		trigger = { trait = paranoid }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.306
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Cynical)
+		name = evt_spymaster_207_option_c
+		tooltip_info = cynical
+
+		trigger = { trait = cynical }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.306
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Humble)
+		name = evt_spymaster_207_option_d
+		tooltip_info = humble
+
+		trigger = { trait = humble }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.306
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+
+	option = { # Agree (Slothful)
+		name = evt_spymaster_207_option_e
+		tooltip_info = slothful
+
+		trigger = { trait = slothful }
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			letter_event = {
+				id = spymaster.306
+				days = 7
+				tooltip = evt_spymaster_203_option_tooltip
+			}
+		}
+	}
+}
+
+# 9030: Liege Informed: Successful Threat
+letter_event = {
+	id = spymaster.306
+	desc = evt_spymaster_306_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_306_option_a
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_coerced_into_joining_faction
+				who = ROOT
+			}
+
+			custom_tooltip = {
+				text = joining_faction
+
+				clr_character_flag = faction_recruit
+			}
+		}
+	}
+}
+
+# 9023: Faction Member Confronted: Ask Nicely (AI Only)
+letter_event = {
+	id = spymaster.307
+	desc = evt_spymaster_209_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = { # Agree
+		name = EXCELLENT
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_pleased
+				who = ROOT
+				years = 2
+			}
+
+			hidden_effect = {
+				letter_event = {
+					id = spymaster.308
+					days = 7
+				}
+			}
+		}
+	}
+
+	option = { # Never!
+		name = EXCELLENT
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_angry
+				who = ROOT
+				years = 2
+			}
+
+			hidden_effect = {
+				letter_event = {
+					id = spymaster.309
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+# 9027: Liege Informed: Successful Request
+letter_event = {
+	id = spymaster.308
+	desc = evt_spymaster_308_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_coerced_into_joining_faction
+				who = ROOT
+			}
+
+			custom_tooltip = {
+				text = joining_faction
+
+				clr_character_flag = faction_recruit
+			}
+		}
+	}
+}
+
+# 9026: Liege Informed: Failed Request
+letter_event = {
+	id = spymaster.309
+	desc = evt_spymaster_309_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_210_option_a
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_angry
+				who = ROOT
+				years = 2
+			}
+
+			clr_character_flag = faction_recruit
+		}
+	}
+}
+
+##############################
+# SPYMASTER
+# JOB: action_study_technology
+##############################
+
+# 932: The Spymaster studies foreign technology
+character_event = {
+	id = spymaster.401
+	title = evt_spymaster_401_title
+	desc = evt_spymaster_401_desc_a
+	picture = GFX_evt_library
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		has_job_action = action_study_technology
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		location = {
+			has_higher_tech_than = ROOT
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 180
+
+		job_event_mtth_modifier_intrigue_score = yes
+
+		mult_modifier = {
+			factor = 0.5
+
+			OR = {
+				has_focus = focus_scholarship
+
+				liege = {
+					has_focus = focus_scholarship
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+			has_religion_feature = religion_dogmatic
+		}
+	}
+
+	option = {
+		name = evt_spymaster_401_option_a
+
+		liege = {
+			show_scope_change = no
+
+			letter_event = {
+				id = spymaster.402
+				tooltip = evt_spymaster_401_option_a_tooltip
+			}
+		}
+	}
+}
+
+# 20320: The Spymaster informs his liege of the success
+letter_event = {
+	id = spymaster.402
+	desc = evt_spymaster_402_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_402_option_a
+
+		random_list = {
+			33 = { military_techpoints = 50 }
+			33 = { economy_techpoints = 50 }
+			33 = { culture_techpoints = 50 }
+		}
+
+		if = {
+			limit = { has_dlc = "Reapers" }
+
+			custom_tooltip = {
+				text = capital_prospers_custom_tooltip
+
+				capital_scope = {
+					change_variable = {
+						which = prosperity_value
+						value = 6
+					}
+				}
+			}
+		}
+	}
+}
+
+# 933: The Spymaster is discovered by the local count - chance of imprisonment
+character_event = {
+	id = spymaster.501
+	title = evt_spymaster_501_title
+	desc = evt_spymaster_501_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		trigger_if = {
+			limit = { has_job_action = action_study_technology }
+
+			location = {
+				has_higher_tech_than = ROOT
+			}
+		}
+		trigger_else = {
+			has_job_action = action_sabotage_province
+		}
+
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		location = {
+			any_province_lord = {
+				OR = {
+					intrigue >= 10
+
+					job_spymaster = {
+						intrigue >= 10
+					}
+				}
+
+				NOR = {
+					is_liege_of = ROOT
+					character = ROOT
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 360
+
+		job_event_mtth_modifier_inverted_intrigue_score = yes
+	}
+
+	option = {
+		name = evt_spymaster_501_option_a
+
+		location = {
+			random_province_lord = {
+				limit = {
+					job_spymaster = {
+						intrigue >= 10
+					}
+
+					NOR = {
+						is_liege_of = ROOT
+						character = ROOT
+					}
+				}
+
+				character_event = {
+					id = spymaster.502
+					days = 2
+					tooltip = evt_spymaster_501_option_a_tooltip
+				}
+			}
+		}
+	}
+}
+
+# 20330: Local noble reacts
+character_event = {
+	id = spymaster.502
+	desc = evt_spymaster_502_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_502_option_a
+
+		ai_chance = { factor = 75 }
+
+		FROM = {
+			show_scope_change = no
+
+			imprison = ROOT
+
+			liege = {
+				show_scope_change = no
+
+				letter_event = {
+					id = spymaster.503
+					tooltip = evt_spymaster_502_option_a_tooltip
+				}
+
+				tooltip = {
+					opinion = {
+						name = opinion_furious
+						who = ROOT
+						years = 2
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_502_option_b
+
+		ai_chance = {
+			factor = 25
+
+			trigger = {
+				FROM = {
+					NOT = { has_character_flag = spymaster_found_spying }
+				}
+			}
+		}
+
+		prestige = 15
+
+		FROM = {
+			show_scope_change = no
+
+			set_character_flag = spymaster_found_spying
+
+			letter_event = {
+				id = spymaster.504
+				days = 7
+				tooltip = evt_spymaster_502_option_b_tooltip
+			}
+		}
+	}
+}
+
+# 20331: Liege get the news - Spymaster Imprisoned
+letter_event = {
+	id = spymaster.503
+	desc = evt_spymaster_503_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_503_option_a
+
+		opinion = {
+			name = opinion_furious
+			who = FROM
+			years = 2
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_dishonorable_scum
+				who = ROOT
+				years = 2
+			}
+		}
+	}
+}
+
+# 20332: Spymaster get the news: is free to go
+letter_event = {
+	id = spymaster.504
+	desc = evt_spymaster_504_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_504_option_a
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = FROM
+			years = 5
+		}
+	}
+}
+
+##############################
+# SPYMASTER
+# JOB: action_organize_spies
+##############################
+
+# 935: Vicious Rumors Spread
+character_event = {
+	id = spymaster.601
+	title = evt_spymaster_601_title
+	desc = evt_spymaster_601_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		has_job_action = action_organize_spies
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		location = {
+			any_province_lord = {
+				ROOT = {
+					liege = {
+						opinion = {
+							who = PREVPREV
+							value < 0
+						}
+					}
+				}
+
+				trait = homosexual
+				is_female = no
+				num_of_vassals >= 1
+
+				NOR = {
+					is_liege_of = ROOT
+					character = ROOT
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 240
+
+		job_event_mtth_modifier_intrigue_score = yes
+	}
+
+	option = {
+		name = evt_spymaster_601_option_a
+
+		hidden_effect = {
+			location = {
+				random_province_lord = {
+					limit = {
+						ROOT = {
+							liege = {
+								opinion = {
+									who = PREVPREV
+									value < 0
+								}
+							}
+						}
+
+						trait = homosexual
+						is_female = no
+						num_of_vassals >= 1
+
+						NOR = {
+							is_liege_of = ROOT
+							character = ROOT
+						}
+					}
+
+					save_event_target_as = vicious_rumor_target
+					set_character_flag = vicious_rumor
+				}
+			}
+
+			liege = {
+				letter_event = { id = spymaster.602 }
+			}
+		}
+	}
+}
+
+# 20350 - Liege is informed
+letter_event = {
+	id = spymaster.602
+	desc = evt_spymaster_602_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_602_option_a
+
+		ai_chance = { factor = 30 }
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.603
+					days = 7
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_602_option_b
+
+		ai_chance = { factor = 70 }
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.611
+					days = 7
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_602_option_c
+
+		ai_chance = { factor = 0 }
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.615
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+# 20351 - Blackmail him
+character_event = {
+	id = spymaster.603
+	desc = evt_spymaster_603_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	trigger = {
+		event_target:vicious_rumor_target = {
+			is_alive = yes
+		}
+	}
+
+	option = {
+		name = evt_spymaster_603_option_a
+
+		hidden_effect = {
+			event_target:vicious_rumor_target = {
+				set_character_flag = vicious_rumor_blackmail
+
+				character_event = {
+					id = spymaster.604
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+# 20354 - The noble responds to blackmail
+character_event = {
+	id = spymaster.604
+	desc = evt_spymaster_604_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_604_option_a
+
+		ai_chance = { factor = 40 }
+
+		scaled_wealth = -0.25
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.605
+					days = 1
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_604_option_b
+
+		ai_chance = {
+			factor = 30
+
+			mult_modifier = {
+				factor = 3.0
+
+				OR = {
+					trait = wroth
+					trait = paranoid
+				}
+			}
+		}
+
+		random_list = {
+			50 = {
+				FROM = {
+					show_scope_change = no
+
+					set_character_flag = spymaster_attacked
+
+					character_event = {
+						id = spymaster.607
+						days = 1
+						tooltip = EVTTOOLTIPSPYMASTERATTACK
+					}
+				}
+
+				hidden_effect = {
+					character_event = {
+						id = spymaster.613
+						days = 1
+					}
+				}
+			}
+
+			50 = {
+				FROM = {
+					show_scope_change = no
+
+					set_character_flag = spymaster_killed
+
+					character_event = {
+						id = spymaster.607
+						days = 1
+						tooltip = EVTTOOLTIPSPYMASTERKILLED
+					}
+				}
+
+				hidden_effect = {
+					character_event = {
+						id = spymaster.614
+						days = 1
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_604_option_c
+
+		ai_chance = {
+			factor = 30
+
+			mult_modifier = {
+				factor = 3.0
+
+				OR = {
+					trait = proud
+					trait = honest
+					trait = brave
+				}
+			}
+		}
+
+		prestige = 25
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.616
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# 20359 - Blackmail succeeds
+character_event = {
+	id = spymaster.605
+	desc = evt_spymaster_605_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_605_option_a
+
+		hidden_effect = {
+			liege = {
+				letter_event = { id = spymaster.606 }
+			}
+		}
+	}
+}
+
+# 20360 - Liege is informed that blackmail succeeded
+letter_event = {
+	id = spymaster.606
+	desc = evt_spymaster_606_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+
+		wealth = 100
+
+		hidden_effect = {
+			FROMFROM = {
+				clr_character_flag = vicious_rumor
+				clr_character_flag = vicious_rumor_blackmail
+			}
+		}
+	}
+}
+
+# 20356 - Spymaster is attacked
+character_event = {
+	id = spymaster.607
+	desc = evt_spymaster_607_desc_a
+	picture = GFX_evt_peasants
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_607_option_a
+
+		trigger = { has_character_flag = spymaster_attacked }
+
+		hidden_effect = {
+			clr_character_flag = spymaster_attacked
+
+			liege = {
+				letter_event = { id = spymaster.608 }
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_607_option_b
+
+		trigger = { has_character_flag = spymaster_killed }
+
+		death = {
+			death_reason = death_murder_unknown
+			killer = FROM
+		}
+
+		hidden_effect = {
+			clr_character_flag = spymaster_killed
+
+			liege = {
+				character_event = { id = spymaster.610 }
+			}
+		}
+	}
+}
+
+# 20357 - Inform the Liege about attack
+letter_event = {
+	id = spymaster.608
+	desc = evt_spymaster_608_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_608_option_a
+
+		hidden_effect = {
+			FROMFROM = {
+				character_event = { id = spymaster.609 }
+			}
+		}
+	}
+}
+
+# 20363 - The noble is informed that the rumor has been spread
+character_event = {
+	id = spymaster.609
+	desc = evt_spymaster_609_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	immediate = {
+		any_courtier_or_vassal = {
+			limit = {
+				opinion = {
+					who = ROOT
+					value < 0
+				}
+
+				NOT = { trait = homosexual }
+			}
+
+			set_character_flag = opinion_liege_homosexual
+		}
+	}
+
+	option = {
+		name = evt_spymaster_609_option_a
+
+		any_courtier_or_vassal = {
+			show_scope_change = no
+
+			limit = { has_character_flag = opinion_liege_homosexual }
+
+			opinion = {
+				name = opinion_homosexual
+				who = ROOT
+				years = 2
+			}
+
+			clr_character_flag = opinion_liege_homosexual
+		}
+	}
+}
+
+# 20358 - Inform the Liege about death
+character_event = {
+	id = spymaster.610
+	desc = evt_spymaster_610_desc_a
+	picture = GFX_evt_death
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_610_option_a
+
+		prestige = -15
+
+		hidden_effect = {
+			FROMFROM = {
+				clr_character_flag = vicious_rumor
+			}
+		}
+	}
+}
+
+# 20352 - Spread rumors
+character_event = {
+	id = spymaster.611
+	desc = evt_spymaster_611_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	trigger = {
+		event_target:vicious_rumor_target = {
+			is_alive = yes
+		}
+	}
+
+	option = {
+		name = evt_spymaster_611_option_a
+
+		hidden_effect = {
+			event_target:vicious_rumor_target = {
+				set_character_flag = vicious_rumor_spread
+
+				character_event = {
+					id = spymaster.612
+					days = 7
+				}
+			}
+		}
+	}
+}
+
+# 20355 - The noble responds to rumor
+character_event = {
+	id = spymaster.612
+	desc = evt_spymaster_612_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_612_option_a
+
+		random_list = {
+			50 = {
+				FROM = {
+					show_scope_change = no
+
+					set_character_flag = spymaster_attacked
+
+					character_event = {
+						id = spymaster.607
+						days = 1
+						tooltip = EVTTOOLTIPSPYMASTERATTACK
+					}
+				}
+
+				hidden_effect = {
+					character_event = {
+						id = spymaster.613
+						days = 1
+					}
+				}
+			}
+
+			50 = {
+				FROM = {
+					show_scope_change = no
+
+					set_character_flag = spymaster_killed
+
+					character_event = {
+						id = spymaster.607
+						days = 1
+						tooltip = EVTTOOLTIPSPYMASTERKILLED
+					}
+				}
+
+				hidden_effect = {
+					character_event = {
+						id = spymaster.614
+						days = 1
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_612_option_b
+
+		prestige = 25
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.616
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# 20364 - Spymaster gets away
+character_event = {
+	id = spymaster.613
+	desc = evt_spymaster_613_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_613_option_a
+
+		prestige = -10
+	}
+}
+
+# 20365 - Spymaster is killed
+character_event = {
+	id = spymaster.614
+	desc = evt_spymaster_614_desc_a
+	picture = GFX_evt_death
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EXCELLENT
+	}
+}
+
+# 20353 - Do nothing
+character_event = {
+	id = spymaster.615
+	desc = evt_spymaster_615_desc_a
+	picture = GFX_evt_throne_room
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	trigger = {
+		event_target:vicious_rumor_target = {
+			is_alive = yes
+		}
+	}
+
+	option = {
+		name = evt_spymaster_615_option_a
+
+		hidden_effect = {
+			event_target:vicious_rumor_target = {
+				clr_character_flag = vicious_rumor
+			}
+		}
+	}
+}
+
+# 20361 - The noble does not care about the rumor
+character_event = {
+	id = spymaster.616
+	desc = evt_spymaster_616_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_616_option_a
+
+		hidden_effect = {
+			liege = {
+				letter_event = { id = spymaster.617 }
+			}
+		}
+	}
+}
+
+# 20362 - Inform the liege that the noble does not care about the rumor
+letter_event = {
+	id = spymaster.617
+	desc = evt_spymaster_617_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_617_option_a
+
+		hidden_effect = {
+			FROMFROM = {
+				character_event = {
+					id = spymaster.609 # Inform noble rumor has been spread
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# 936: Corruption Uncovered
+character_event = {
+	id = spymaster.701
+	title = evt_spymaster_701_title
+	desc = evt_spymaster_701_desc_a
+	picture = GFX_evt_whispers
+	border = GFX_event_normal_frame_intrigue
+
+	has_job_title = yes
+
+	trigger = {
+		has_job_action = action_organize_spies
+		in_seclusion = no
+		NOT = {	has_character_modifier = bedridden_illness }
+
+		location = {
+			any_province_lord = {
+				ROOT = {
+					liege = {
+						opinion = {
+							who = PREVPREV
+							value < 0
+						}
+
+						same_realm = PREVPREV
+					}
+				}
+
+				NOR = {
+					is_liege_of = ROOT
+					character = ROOT
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 240
+
+		job_event_mtth_modifier_intrigue_score = yes
+	}
+
+	option = {
+		name = evt_spymaster_701_option_a
+
+		hidden_effect = {
+			location = {
+				random_province_lord = {
+					limit = {
+						ROOT = {
+							liege = {
+								opinion = {
+									who = PREVPREV
+									value < 0
+								}
+
+								same_realm = PREVPREV
+							}
+						}
+
+						NOR = {
+							is_liege_of = ROOT
+							character = ROOT
+						}
+					}
+
+					save_event_target_as = corrupt_noble
+				}
+			}
+
+			liege = {
+				letter_event = { id = spymaster.702 }
+			}
+		}
+	}
+}
+
+# 20370 - Liege is informed
+letter_event = {
+	id = spymaster.702
+	desc = evt_spymaster_702_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_702_option_a
+
+		ai_chance = { factor = 100 }
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.703
+					days = 1
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_702_option_b
+
+		ai_chance = { factor = 0 }
+
+		hidden_effect = {
+			FROM = {
+				character_event = {
+					id = spymaster.712
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# 20371 - Accuse him
+character_event = {
+	id = spymaster.703
+	desc = evt_spymaster_703_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_703_option_a
+
+		hidden_effect = {
+			location = {
+				event_target:corrupt_noble = {
+					character_event = {
+						id = spymaster.704
+						days = 1
+					}
+				}
+			}
+		}
+	}
+}
+
+# 20373 - The noble responds to accusation
+character_event = {
+	id = spymaster.704
+	desc = evt_spymaster_704_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_704_option_a
+
+		random_list = {
+			50 = {
+				FROM = {
+					show_scope_change = no
+
+					set_character_flag = spymaster_attacked
+
+					character_event = {
+						id = spymaster.705
+						days = 1
+						tooltip = EVTTOOLTIPSPYMASTERATTACK
+					}
+				}
+
+				hidden_effect = {
+					character_event = {
+						id = spymaster.708
+						days = 1
+					}
+				}
+			}
+
+			50 = {
+				FROM = {
+					show_scope_change = no
+
+					set_character_flag = spymaster_killed
+
+					character_event = {
+						id = spymaster.705
+						days = 1
+						tooltip = EVTTOOLTIPSPYMASTERKILLED
+					}
+				}
+
+				hidden_effect = {
+					character_event = {
+						id = spymaster.709
+						days = 1
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_704_option_b
+
+		prestige = -25
+		scaled_wealth = -0.25
+
+		hidden_effect = {
+			FROM = {
+				letter_event = { id = spymaster.710 }
+			}
+		}
+	}
+}
+
+# 20376 - Spymaster is attacked
+character_event = {
+	id = spymaster.705
+	desc = evt_spymaster_705_desc_a
+	picture = GFX_evt_melee
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_705_option_a
+
+		trigger = { has_character_flag = spymaster_attacked }
+
+		hidden_effect = {
+			clr_character_flag = spymaster_attacked
+
+			liege = {
+				letter_event = { id = spymaster.706 }
+			}
+		}
+	}
+
+	option = {
+		name = evt_spymaster_705_option_b
+
+		trigger = { has_character_flag = spymaster_killed }
+
+		death = {
+			death_reason = death_murder
+			killer = FROM
+		}
+
+		hidden_effect = {
+			clr_character_flag = spymaster_killed
+
+			liege = {
+				character_event = {
+					id = spymaster.707
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# 20377 - Inform the Liege about attack
+letter_event = {
+	id = spymaster.706
+	desc = evt_spymaster_706_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_706_option_a
+
+		hidden_effect = {
+			FROMFROM = {
+				character_event = {
+					id = spymaster.609 # Inform noble rumor has been spread
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+# 20378 - Inform the Liege about death
+character_event = {
+	id = spymaster.707
+	desc = evt_spymaster_707_desc_a
+	picture = GFX_evt_death
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = evt_spymaster_707_option_a
+
+		prestige = -15
+
+		hidden_effect = {
+			FROMFROM = {
+				clr_character_flag = corrupt_nobel
+			}
+		}
+	}
+}
+
+# 20374 - Spymaster gets away
+character_event = {
+	id = spymaster.708
+	desc = evt_spymaster_708_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_708_option_a
+
+		prestige = -10
+	}
+}
+
+# 20375 - Spymaster is killed
+character_event = {
+	id = spymaster.709
+	desc = evt_spymaster_709_desc_a
+	picture = GFX_evt_death
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EXCELLENT
+	}
+}
+
+# 20379 - Noble confesses to spymaster
+letter_event = {
+	id = spymaster.710
+	desc = evt_spymaster_710_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_710_option_a
+
+		hidden_effect = {
+			liege = {
+				letter_event = { id = spymaster.711 }
+			}
+		}
+	}
+}
+
+# 20369 - Spymaster reports to liege about confession
+letter_event = {
+	id = spymaster.711
+	desc = evt_spymaster_711_desc_a
+	border = GFX_event_letter_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+
+		wealth = 50
+	}
+}
+
+# 20372 - Do nothing
+character_event = {
+	id = spymaster.712
+	desc = evt_spymaster_712_desc_a
+	picture = GFX_evt_spymaster
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = evt_spymaster_712_option_a
+
+		clear_event_target = corrupt_noble
+	}
+}
