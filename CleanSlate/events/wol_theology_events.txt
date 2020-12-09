@@ -7,7 +7,7 @@
 ###########################################
 
 # Written by Tobias Bodlund
-# Tweaks and additional events by Henrik Fåhraeus
+# Tweaks and additional events by Henrik FÃ¥hraeus
 
 namespace = WoL
 
@@ -20,8 +20,8 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 	prisoner = no
 
@@ -29,7 +29,7 @@ character_event = {
 		is_priest = no
 		holy_order = no
 		has_focus = focus_theology
-		NOT = { is_inaccessible_trigger = yes }
+		is_inaccessible_trigger = no
 		NOT = { has_character_flag = studied_religious_myths }
 	}
 
@@ -63,7 +63,7 @@ character_event = {
 			}
 		}
 		piety = 20
-		hidden_tooltip = { character_event = { id = WoL.7001 days = 90 } }
+		character_event = { id = WoL.7001 days = 90 }
 	}
 	option = {
 		name = EVTOPTB_WoL_7000 # Yes, listen to stories
@@ -72,7 +72,7 @@ character_event = {
 			is_reformed_religion = no
 		}
 		piety = 20
-		hidden_tooltip = { character_event = { id = WoL.7001 days = 90 } }
+		character_event = { id = WoL.7001 days = 90 }
 	}
 	option = {
 		name = EVTOPTC_WoL_7000  # I have no time
@@ -96,17 +96,13 @@ character_event = {
 
 	desc = {
 		trigger = {
-			OR = {
-				NOT = { religion_group = pagan_group } # Scriptures
-				is_reformed_religion = yes
-			}
+			is_unreformed_pagan_trigger = no # Scriptures
 		}
 		text = EVTDESC_WoL_7001_non_unref_pagan
 	}
 	desc = {
 		trigger = {
-			religion_group = pagan_group # Stories
-			is_reformed_religion = no
+			is_unreformed_pagan_trigger = yes # Stories
 		}
 		text = EVTDESC_WoL_7001_unref_pagan
 	}
@@ -114,10 +110,7 @@ character_event = {
 	option = {
 		name = EVTOPTA_WoL_7001 # Scriptures
 		trigger = {
-			OR = {
-				NOT = { religion_group = pagan_group }
-				is_reformed_religion = yes
-			}
+			is_unreformed_pagan_trigger = no
 		}
 		piety = 20
 		add_character_modifier = {
@@ -126,9 +119,11 @@ character_event = {
 		}
 		if = {
 			limit = {
-				NOT = { has_character_modifier = religious_studies }
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
+				NOR = {
+					has_character_modifier = religious_studies
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			add_character_modifier = {
 				name = religious_studies
@@ -139,9 +134,11 @@ character_event = {
 		if = {
 			limit = {
 				has_character_modifier = religious_studies
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
 				had_character_flag = { flag = religious_studies_timer days = 1800 }
+				NOR = {
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			clr_character_flag = religious_studies_timer
 			remove_character_modifier = religious_studies
@@ -154,8 +151,7 @@ character_event = {
 	option = {
 		name = EVTOPTB_WoL_7001 # Stories
 		trigger = {
-			religion_group = pagan_group # Stories
-			is_reformed_religion = no
+			is_unreformed_pagan_trigger = yes
 		}
 		piety = 20
 		add_character_modifier = {
@@ -164,9 +160,11 @@ character_event = {
 		}
 		if = {
 			limit = {
-				NOT = { has_character_modifier = religious_studies }
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
+				NOR = {
+					has_character_modifier = religious_studies
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			add_character_modifier = {
 				name = religious_studies
@@ -177,9 +175,11 @@ character_event = {
 		if = {
 			limit = {
 				has_character_modifier = religious_studies
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
 				had_character_flag = { flag = religious_studies_timer days = 1800 }
+				NOR = {
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			clr_character_flag = religious_studies_timer
 			remove_character_modifier = religious_studies
@@ -199,8 +199,8 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 	prisoner = no
 
@@ -210,14 +210,10 @@ character_event = {
 		any_realm_character = {
 			religion = ROOT
 			is_priest = yes
-			NOR = {
-				is_incapable = yes
-				is_inaccessible_trigger = yes
-				any_friend = {
-					character = ROOT
-				}
-			}
+			is_inaccessible_trigger = no
+			is_incapable = no
 			prisoner = no
+			NOT = { is_friend = ROOT }
 		}
 	}
 
@@ -226,14 +222,10 @@ character_event = {
 			limit = {
 				religion = ROOT
 				is_priest = yes
-				NOR = {
-					is_incapable = yes
-					is_inaccessible_trigger = yes
-					any_friend = {
-						character = ROOT
-					}
-				}
+				is_inaccessible_trigger = no
+				is_incapable = no
 				prisoner = no
+				NOT = { is_friend = ROOT }
 			}
 			character_event = { id = WoL.7011 }
 		}
@@ -275,22 +267,24 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 	prisoner = no
 	war = no
+	in_command = no
 
 	trigger = {
 		has_focus = focus_theology
-		in_command = no
-		NOT = { religion_group = christian }
-		NOT = { religion_group = muslim }
-		NOT = { religion_group = jewish_group }
-		NOT = { religion_group = indian_group }
-		NOT = { is_inaccessible_trigger = yes }
-		NOT = { has_character_flag = do_not_disturb }
-		NOT = { has_character_flag = wol_theology_visited_holy_site }
+		is_inaccessible_trigger = no
+		NOR = {
+			religion_group = christian
+			religion_group = muslim
+			religion_group = jewish_group
+			religion_group = indian_group
+			has_character_flag = do_not_disturb
+			has_character_flag = wol_theology_visited_holy_site
+		}
 		any_realm_title = {
 			is_holy_site = ROOT
 			holder_scope = { ai = yes }
@@ -312,7 +306,7 @@ character_event = {
 		name = EVTOPTA_WoL_7020  # Go
 		piety = 20
 		scaled_wealth = -0.2
-		hidden_tooltip = { character_event = { id = WoL.7021 days = 20 } }
+		character_event = { id = WoL.7021 days = 20 }
 		set_character_flag = do_not_disturb
 	}
 	option = {
@@ -335,17 +329,6 @@ character_event = {
 		piety = 50
 		if = {
 			limit = {
-				NOT = { trait = cynical }
-				NOT = { trait = zealous }
-			}
-			random = {
-				chance = 20
-				add_trait = zealous
-				character_event = { id = 38269 } # Notify
-			}
-		}
-		if = {
-			limit = {
 				trait = cynical
 			}
 			random = {
@@ -354,13 +337,25 @@ character_event = {
 				character_event = { id = 38316 } # Notify
 			}
 		}
+		else_if = {
+			limit = {
+				NOT = { trait = zealous }
+			}
+			random = {
+				chance = 20
+				add_trait = zealous
+				character_event = { id = 38269 } # Notify
+			}
+		}
 		clr_character_flag = do_not_disturb
 		clear_event_target = holy_site_visiting
 		if = {
 			limit = {
-				NOT = { has_character_modifier = religious_studies }
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
+				NOR = {
+					has_character_modifier = religious_studies
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			add_character_modifier = {
 				name = religious_studies
@@ -371,9 +366,11 @@ character_event = {
 		if = {
 			limit = {
 				has_character_modifier = religious_studies
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
 				had_character_flag = { flag = religious_studies_timer days = 1800 }
+				NOR = {
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			clr_character_flag = religious_studies_timer
 			remove_character_modifier = religious_studies
@@ -394,22 +391,24 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 
 	trigger = {
 		is_priest = no
 		has_focus = focus_theology
-		NOT = { has_character_flag = wol_theology_reflect_on_self_and_gods }
-		NOT = { trait = possessed }
-		NOT = { trait = theologian }
-		NOT = { has_character_modifier = religious_philosopher }
+		NOR = {
+			has_character_flag = wol_theology_reflect_on_self_and_gods
+			has_character_modifier = religious_philosopher
+			trait = possessed
+			trait = theologian
+		}
 		any_realm_character = {
 			religion = ROOT
 			is_priest = yes
 			is_incapable = no
-			NOT = { is_inaccessible_trigger = yes }
+			is_inaccessible_trigger = no
 		}
 	}
 
@@ -432,9 +431,11 @@ character_event = {
 		piety = 30
 		if = {
 			limit = {
-				NOT = { has_character_modifier = religious_studies }
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
+				NOR = {
+					has_character_modifier = religious_studies
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			add_character_modifier = {
 				name = religious_studies
@@ -445,9 +446,11 @@ character_event = {
 		if = {
 			limit = {
 				has_character_modifier = religious_studies
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
 				had_character_flag = { flag = religious_studies_timer days = 1800 }
+				NOR = {
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			clr_character_flag = religious_studies_timer
 			remove_character_modifier = religious_studies
@@ -482,21 +485,18 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 
 	trigger = {
 		has_focus = focus_theology
 		is_priest = no
-		NOT = { trait = zealous }
-		NOT = { trait = sympathy_christendom }
-		NOT = { trait = sympathy_islam }
-		NOT = { trait = sympathy_pagans }
-		NOT = { trait = sympathy_zoroastrianism }
-		NOT = { trait = sympathy_judaism }
-		NOT = { trait = sympathy_indian }
-		NOT = { has_character_flag = wol_theology_view_other_religions }
+		has_any_sympathy_trait_trigger = no
+		NOR = {
+			trait = zealous
+			has_character_flag = wol_theology_view_other_religions
+		}
 		any_realm_character = {
 			NOT = { religion_group = ROOT }
 		}
@@ -541,22 +541,14 @@ character_event = {
 		name = EVTOPTA_WoL_7042  # Accept
 		ai_chance = {
 			factor = 100
-			modifier = {
+			mult_modifier = {
 				factor = 5.0
 				trait = cynical
 			}
 		}
 		FROM = {
 			show_scope_change = no
-			trigger_switch = {
-				on_trigger = religion_group
-				christian = { ROOT = { add_trait = sympathy_christendom } }
-				muslim = { ROOT = { add_trait = sympathy_islam } }
-				pagan_group = { ROOT = { add_trait = sympathy_pagans } }
-				zoroastrian_group = { ROOT = { add_trait = sympathy_zoroastrianism } }
-				jewish_group = { ROOT = { add_trait = sympathy_judaism } }
-				indian_group = { ROOT = { add_trait = sympathy_indian } }
-			}
+			add_sympathy_for_prevs_open_religion_effect = yes
 		}
 	}
 	option = {
@@ -577,8 +569,8 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 
 	desc = {
@@ -628,15 +620,15 @@ character_event = {
 		}
 		if = {
 			limit = {
-				NOT = { trait = zealous }
-			}
-			add_trait = cynical
-		}
-		if = {
-			limit = {
 				trait = zealous
 			}
 			remove_trait = zealous
+		}
+		else_if = {
+			limit = {
+				NOT = { trait = cynical }
+			}
+			add_trait = cynical
 		}
 	}
 	option = {
@@ -661,15 +653,15 @@ character_event = {
 		}
 		if = {
 			limit = {
-				NOT = { trait = cynical }
-			}
-			add_trait = zealous
-		}
-		if = {
-			limit = {
 				trait = cynical
 			}
 			remove_trait = cynical
+		}
+		else_if = {
+			limit = {
+				NOT = { trait = zealous }
+			}
+			add_trait = zealous
 		}
 	}
 }
@@ -683,8 +675,8 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 
 	trigger = {
@@ -734,9 +726,11 @@ character_event = {
 
 		if = {
 			limit = {
-				NOT = { has_character_modifier = religious_studies }
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
+				NOR = {
+					has_character_modifier = religious_studies
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			add_character_modifier = {
 				name = religious_studies
@@ -747,9 +741,11 @@ character_event = {
 		if = {
 			limit = {
 				has_character_modifier = religious_studies
-				NOT = { has_character_modifier = religious_philosopher }
-				NOT = { trait = theologian }
 				had_character_flag = { flag = religious_studies_timer days = 1800 }
+				NOR = {
+					has_character_modifier = religious_philosopher
+					trait = theologian
+				}
 			}
 			clr_character_flag = religious_studies_timer
 			remove_character_modifier = religious_studies
@@ -770,15 +766,15 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
 	min_age = 16
+	only_playable = yes
 	only_capable = yes
 
 	trigger = {
 		has_focus = focus_theology
-		NOT = { lifestyle_traits = 1 }
 		has_character_modifier = religious_philosopher
-		NOT = { has_character_flag = wol_theology_lifestyle_question }
+		lifestyle_traits < 1
+		NOT = {  has_character_flag = wol_theology_lifestyle_question }
 	}
 
 	immediate = {
@@ -809,23 +805,20 @@ character_event = {
 					give_nickname = nick_the_holy
 				}
 				10 = {
-					modifier = {
-						factor = 0
-						NOT = { religion_group = christian }
+					trigger = {
+						religion_group = christian
 					}
 					give_nickname = nick_the_apostle
 				}
 				10 = {
-					modifier = {
-						factor = 0
-						NOT = { religion_group = christian }
+					trigger = {
+						religion_group = christian
 					}
 					give_nickname = nick_the_confessor
 				}
 				10 = {
-					modifier = {
-						factor = 0
-						NOT = { religion_group = christian }
+					trigger = {
+						religion_group = christian
 					}
 					give_nickname = nick_the_blessed
 				}
@@ -911,9 +904,10 @@ character_event = {
 		trigger = { has_dharmic_religion_trigger = yes }
 	}
 
+	min_age = 16
+
 	trigger = {
 		has_focus = focus_theology
-		is_adult = yes
 		OR = {
 			trait = stressed
 			trait = depressed
@@ -922,11 +916,11 @@ character_event = {
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 0.25
 			trait = cynical
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2.0
 			trait = zealous
 		}
@@ -955,6 +949,7 @@ character_event = {
 
 	is_triggered_only = yes
 
+	min_age = 16
 	only_playable = yes
 	only_capable = yes
 	prisoner = no
@@ -963,17 +958,16 @@ character_event = {
 
 	trigger = {
 		has_focus = focus_theology
-		is_adult = yes
-		NOT = { is_inaccessible_trigger = yes }
+		is_inaccessible_trigger = no
 	}
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 0.25
 			trait = cynical
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2.0
 			trait = zealous
 		}
@@ -1055,8 +1049,10 @@ character_event = {
 	}
 
 	trigger = {
-		NOT = { trait = on_pilgrimage }
-		NOT = { trait = on_hajj }
+		NOR = {
+			trait = on_pilgrimage
+			trait = on_hajj
+		}
 	}
 
 	option = {
@@ -1071,21 +1067,25 @@ character_event = {
 
 		if = {
 			limit = {
-				NOT = { trait = temperate }
-				NOT = { trait = gluttonous }
+				NOR = {
+					trait = temperate
+					trait = gluttonous
+				}
 			}
 			random = {
 				chance = 20
 				add_trait = temperate
-			lose_weight_small_effect = yes
-			weight_trait_check_effect = yes
+				lose_weight_small_effect = yes
+				weight_trait_check_effect = yes
 				character_event = { id = 38276 } # Notify Temperate
 			}
 		}
 		if = {
 			limit = {
-				NOT = { trait = diligent }
-				NOT = { trait = slothful }
+				NOR = {
+					trait = diligent
+					trait = slothful
+				}
 			}
 			random = {
 				chance = 10
@@ -1103,20 +1103,19 @@ character_event = {
 			trait = gluttonous
 		}
 		remove_trait = gluttonous
-		if = {
-			limit = { NOT = { trait = temperate } }
-			random = {
-				chance = 20
-				add_trait = temperate
+		random = {
+			chance = 20
+			add_trait = temperate
 			lose_weight_small_effect = yes
 			weight_trait_check_effect = yes
-				character_event = { id = 38276 } # Notify Temperate
-			}
+			character_event = { id = 38276 } # Notify Temperate
 		}
 		if = {
 			limit = {
-				NOT = { trait = diligent }
-				NOT = { trait = slothful }
+				NOR = {
+					trait = diligent
+					trait = slothful
+				}
 			}
 			random = {
 				chance = 10
@@ -1134,25 +1133,24 @@ character_event = {
 			trait = slothful
 		}
 		remove_trait = slothful
+		random = {
+			chance = 10
+			add_trait = diligent
+			character_event = { id = 38256 } # Notify Diligent
+		}
 		if = {
 			limit = {
-				NOT = { trait = temperate }
-				NOT = { trait = gluttonous }
+				NOR = {
+					trait = temperate
+					trait = gluttonous
+				}
 			}
 			random = {
 				chance = 20
 				add_trait = temperate
-			lose_weight_small_effect = yes
-			weight_trait_check_effect = yes
+				lose_weight_small_effect = yes
+				weight_trait_check_effect = yes
 				character_event = { id = 38276 } # Notify Temperate
-			}
-		}
-		if = {
-			limit = { NOT = { trait = diligent } }
-			random = {
-				chance = 10
-				add_trait = diligent
-				character_event = { id = 38256 } # Notify Diligent
 			}
 		}
 	}
@@ -1160,9 +1158,8 @@ character_event = {
 		name = EVTOPT_WoL_7091_LUSTFUL
 		ai_chance = {
 			factor = 10
-			modifier = {
-				factor = 0
-				trait = hedonist
+			trigger = {
+				NOT = { trait = hedonist }
 			}
 		}
 		trigger = {
@@ -1178,21 +1175,25 @@ character_event = {
 		}
 		if = {
 			limit = {
-				NOT = { trait = temperate }
-				NOT = { trait = gluttonous }
+				NOR = {
+					trait = temperate
+					trait = gluttonous
+				}
 			}
 			random = {
 				chance = 20
 				add_trait = temperate
-			lose_weight_small_effect = yes
-			weight_trait_check_effect = yes
+				lose_weight_small_effect = yes
+				weight_trait_check_effect = yes
 				character_event = { id = 38276 } # Notify Temperate
 			}
 		}
 		if = {
 			limit = {
-				NOT = { trait = diligent }
-				NOT = { trait = slothful }
+				NOR = {
+					trait = diligent
+					trait = slothful
+				}
 			}
 			random = {
 				chance = 10
@@ -1302,21 +1303,25 @@ character_event = {
 		piety = 100
 		if = {
 			limit = {
-				NOT = { trait = temperate }
-				NOT = { trait = gluttonous }
+				NOR = {
+					trait = temperate
+					trait = gluttonous
+				}
 			}
 			random = {
 				chance = 20
 				add_trait = temperate
-			lose_weight_small_effect = yes
-			weight_trait_check_effect = yes
+				lose_weight_small_effect = yes
+				weight_trait_check_effect = yes
 				character_event = { id = 38276 } # Notify Temperate
 			}
 		}
 		if = {
 			limit = {
-				NOT = { trait = diligent }
-				NOT = { trait = slothful }
+				NOR = {
+					trait = diligent
+					trait = slothful
+				}
 			}
 			random = {
 				chance = 10
