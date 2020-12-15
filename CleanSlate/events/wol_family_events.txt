@@ -2,7 +2,7 @@
 #
 # Way of Life - Family Events
 #
-# Written by Henrik FÃ¥hraeus
+# Written by Henrik Fåhraeus
 #
 # ID Range: WoL.3000 to WoL.3999
 #
@@ -129,21 +129,21 @@ character_event = {
 			naive_appeaser = {
 				random = {
 					chance = 10
-					set_character_flag = int_ed_boost
+					set_flag = int_ed_boost
 					character_event = { id = WoL.3002 }
 				}
 			}
 			underhanded_rogue = {
 				random = {
 					chance = 5
-					set_character_flag = int_ed_boost
+					set_flag = int_ed_boost
 					character_event = { id = WoL.3002 }
 				}
 			}
 			charismatic_negotiator = {
 				random = {
 					chance = 1
-					set_character_flag = int_ed_boost
+					set_flag = int_ed_boost
 					character_event = { id = WoL.3002 }
 				}
 			}
@@ -166,9 +166,9 @@ character_event = {
 
 		if = {
 			limit = {
-				has_character_flag = int_ed_boost
+				has_flag = int_ed_boost
 			}
-			clr_character_flag = int_ed_boost
+			clr_flag = int_ed_boost
 
 			trigger_switch = {
 				on_trigger = trait
@@ -201,7 +201,7 @@ character_event = {
 
 	trigger = {
 		lifestyle_traits < 1
-		NOT = { has_character_flag = wol_no_to_diplomacy_trait }
+		NOT = { has_flag = wol_no_to_diplomacy_trait }
 	}
 
 	option = {
@@ -256,7 +256,7 @@ character_event = {
 		ai_chance = {
 			factor = 0
 		}
-		set_character_flag = wol_no_to_diplomacy_trait
+		set_flag = wol_no_to_diplomacy_trait
 	}
 }
 
@@ -302,11 +302,11 @@ character_event = {
 			has_character_modifier = wol_seducer_1
 		}
 		mult_modifier = {
-			factor = 2.0
+			factor = 2
 			has_character_modifier = wol_seducer_2
 		}
 		mult_modifier = {
-			factor = 4.0
+			factor = 4
 			OR = {
 				trait = seducer
 				trait = seductress
@@ -680,7 +680,7 @@ character_event = {
 	}
 }
 
-# The shown event - female
+# The shown event
 character_event = {
 	id = WoL.3032
 
@@ -1249,7 +1249,7 @@ character_event = {
 		opinion = {
 			who = FROM
 			name = opinion_disappointed
-			months = 36
+			years = 3
 		}
 	}
 }
@@ -1270,7 +1270,7 @@ character_event = {
 		opinion = {
 			who = FROM
 			name = opinion_disappointed
-			months = 36
+			years = 3
 		}
 	}
 }
@@ -1291,7 +1291,7 @@ character_event = {
 		opinion = {
 			who = FROM
 			name = opinion_disappointed
-			months = 36
+			years = 3
 		}
 	}
 }
@@ -1414,6 +1414,7 @@ character_event = {
 					trait = imbecile
 				}
 				host = { character = ROOT }
+				
 				OR = {
 					trigger_if = {
 						limit = {
@@ -1434,68 +1435,71 @@ character_event = {
 							}
 						}
 					}
+					
 					is_primary_heir = ROOT
 					ROOT = { has_law = true_cognatic_succession }
 				}
 			}
-
-			save_event_target_as = target_second
-
-			ROOT = {
-				set_character_flag = found_second
-
-				random_child = {
-					limit = {
-						age >= 5
-						is_adult = no
-						is_alive = yes
-						is_incapable = no
-						prisoner = no
-						NOR = {
-							character = PREVPREV
-							is_friend = PREVPREV
-							trait = inbred
-							trait = imbecile
+			save_event_target_as = target_first
+		}
+		
+		random_child = {
+			limit = {
+				age >= 5
+				is_adult = no
+				is_alive = yes
+				is_incapable = no
+				prisoner = no
+				NOR = {
+					character = event_target:target_first
+					is_friend = event_target:target_first
+					trait = inbred
+					trait = imbecile
+				}
+				host = { character = ROOT }
+				
+				OR = {
+					trigger_if = {
+						limit = {
+							is_female = no
 						}
-						host = { character = ROOT }
-						OR = {
-							trigger_if = {
-								limit = {
-									is_female = no
-								}
-								ROOT = {
-									OR = {
-										has_law = agnatic_succession
-										has_law = cognatic_succession
-									}
-								}
+						ROOT = {
+							OR = {
+								has_law = agnatic_succession
+								has_law = cognatic_succession
 							}
-							trigger_else = {
-								ROOT = {
-									OR = {
-										has_law = enatic_succession
-										has_law = enatic_cognatic_succession
-									}
-								}
-							}
-							ROOT = { has_law = true_cognatic_succession }
-							is_primary_heir = ROOT
-						}
-						personal_opinion = {
-							who = PREVPREV
-							value < 50
 						}
 					}
-					ROOT = { set_character_flag = found_first }
-					save_event_target_as = target_first
+					trigger_else = {
+						ROOT = {
+							OR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
+							}
+						}
+					}
+					
+					ROOT = { has_law = true_cognatic_succession }
+					is_primary_heir = ROOT
+				}
+				OR = {
+					personal_opinion = {
+						who = event_target:target_first
+						value < 50
+					}
+					reverse_personal_opinion = {
+						who = event_target:target_first
+						value < 50
+					}
 				}
 			}
+			save_event_target_as = target_second
 		}
 
 		if = {
 			limit = {
-				has_character_flag = found_second
-				has_character_flag = found_first
+				event_target:target_first = { always = yes }
+				event_target:target_second = { always = yes }
 			}
 			random = {
 				chance = 33
@@ -1503,8 +1507,6 @@ character_event = {
 			}
 			character_event = { id = WoL.3060 }
 		}
-		clr_character_flag = found_second
-		clr_character_flag = found_first
 	}
 }
 
@@ -1536,7 +1538,7 @@ character_event = {
 				opinion = {
 					who = event_target:target_first
 					name = opinion_family_love
-					months = 360
+					years = 30
 				}
 			}
 		}
@@ -1553,7 +1555,7 @@ character_event = {
 				opinion = {
 					who = event_target:target_second
 					name = opinion_family_love
-					months = 360
+					years = 30
 				}
 			}
 			if = {
