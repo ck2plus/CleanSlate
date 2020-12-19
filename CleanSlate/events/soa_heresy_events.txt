@@ -21,12 +21,18 @@ province_event = {
 	picture = GFX_evt_heretic
 	border = GFX_event_normal_frame_religion
 
-	trigger = {
-		has_dlc = "Sons of Abraham"
+	has_dlc = "Sons of Abraham"
 
-		is_heretic = no
+	trigger = {
+		OR = {
+			has_castle = yes
+			has_temple = yes
+			has_city = yes
+			has_tribal = yes
+		}
 
 		has_heresies = yes
+		is_heretic = no
 
 		# Heretic top lieges must spread the faith themselves
 		owner = {
@@ -35,92 +41,97 @@ province_event = {
 			}
 		}
 
-		num_of_settlements = 1
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-
 		NOT = { religion_authority = 0.9 }
 	}
 
 	mean_time_to_happen = {
-		months = 9600 # 800 years
-		modifier = {
+		years = 800
+
+		mult_modifier = {
 			factor = 1.5
 			religion_authority = 0.6
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			religion_authority = 0.7
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			religion_authority = 0.8
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			religion_authority = 0.9
 		}
-		modifier = {
+
+		mult_modifier = {
+			factor = 0.5
+			NOT = { religion_authority = 0.2 }
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			NOT = { religion_authority = 0.3 }
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			NOT = { religion_authority = 0.4 }
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			NOT = { religion_authority = 0.5 }
+		}
+
+		mult_modifier = {
 			factor = 3.0
+
 			OR = {
 				province_id = 333 # Rome
 				province_id = 497 # Thrace
 				province_id = 719 # Mecca
 			}
 		}
-		modifier = {
-			factor = 0.5
-			NOT = { religion_authority = 0.2 }
-		}
-		modifier = {
-			factor = 0.75
-			NOT = { religion_authority = 0.3 }
-		}
-		modifier = {
-			factor = 0.75
-			NOT = { religion_authority = 0.4 }
-		}
-		modifier = {
-			factor = 0.75
-			NOT = { religion_authority = 0.5 }
-		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
+
 			any_neighbor_province = {
 				is_land = yes
 				is_heresy_of = ROOT
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.25
+
 			any_neighbor_province = {
 				is_land = yes
-				is_heresy_of = ROOT
 				has_province_modifier = heretic_stronghold
+				is_heresy_of = ROOT
 			}
 		}
 	}
 
 	immediate = {
-
 		# Prefer a neighboring heresy
 		random_neighbor_province = {
 			limit = {
 				is_land = yes
 				is_heresy_of = ROOT
 			}
-			ROOT = {
-				religion = PREV
-			}
+
+			reverse_religion = ROOT
 		}
 
-		# Prefer an existing heresy in the realm
+		# If that fails, prefer an existing heresy in the realm
 		if = {
-			limit = {
-				is_heretic = no
-			}
+			limit = { is_heretic = no }
+
 			owner = {
 				top_liege = {
 					random_realm_province = {
@@ -128,9 +139,8 @@ province_event = {
 							is_land = yes
 							is_heresy_of = ROOT
 						}
-						ROOT = {
-							religion = PREV
-						}
+
+						reverse_religion = ROOT
 					}
 				}
 			}
@@ -138,16 +148,14 @@ province_event = {
 
 		# ...otherwise, just pick a heresy
 		if = {
-			limit = {
-				is_heretic = no
-			}
+			limit = { is_heretic = no }
 			become_heretic = yes
 		}
 
 		# Two years of much higher revolt risk
 		add_province_modifier = {
 			name = religious_unrest
-			duration = 730
+			years = 2
 		}
 
 		# One heretic province in the realm is the epicentre of the heresy
@@ -157,52 +165,56 @@ province_event = {
 					top_liege = {
 						NOT = {
 							any_realm_province = {
-								religion = ROOT
 								has_province_modifier = heretic_stronghold
+								religion = ROOT
 							}
 						}
 					}
 				}
 			}
+
 			add_province_modifier = {
 				name = heretic_stronghold # Ten years of even higher revolt risk
-				duration = 3650
+				years = 10
 			}
 		}
 
-		# Notify the lieges
-		owner = {
-			any_liege = {
-				character_event = { id = 39400 }
-			}
-		}
 		owner = {
 			if = {
 				limit = { ai = no }
+
 				chronicle = {
 					entry = CHRONICLE_HERESY_SPREAD
 					picture = GFX_evt_heretic
 				}
 			}
-		}
-		owner = {
+
 			any_liege = {
+				character_event = { id = 39400 } # Notify the lieges
+
 				if = {
 					limit = { ai = no }
+
 					chronicle = {
 						entry = CHRONICLE_HERESY_SPREAD
 						picture = GFX_evt_heretic
 					}
 				}
 			}
+
 		}
 	}
 
 	option = {
 		name = EVTOPTA39000 # The owner is of the parent religion
-		trigger = { owner = { is_parent_religion = ROOT } }
 
-		owner = { piety = -10 }
+		trigger = { is_heresy_of = owner }
+
+		owner = {
+			show_scope_change = no
+
+			piety = -10
+		}
 
 		ai_chance = {
 			factor = 95
@@ -211,7 +223,9 @@ province_event = {
 
 	option = {
 		name = EVTOPTB39000 # The owner is of the same heresy
-		trigger = { owner = { religion = ROOT } }
+
+		trigger = { religion = owner }
+
 		ai_chance = {
 			factor = 95
 		}
@@ -219,12 +233,14 @@ province_event = {
 
 	option = {
 		name = EVTOPTC_SOA_4000 # The owner is of some other religion
+
 		trigger = {
-			owner = {
-				NOT = { religion = ROOT }
-				NOT = { is_parent_religion = ROOT }
+			NOR = {
+				religion = owner
+				is_heresy_of = owner
 			}
 		}
+
 		ai_chance = {
 			factor = 95
 		}
@@ -232,44 +248,60 @@ province_event = {
 
 	option = {
 		name = EVTOPTD_SOA_4000 #  The owner is of the parent religion and interested in the heresy
-		trigger = {
-			owner = {
-				is_parent_religion = ROOT
-			}
-		}
+
+		trigger = { is_heresy_of = owner }
 
 		owner = {
+			show_scope_change = no
+
 			piety = -250
-			set_secret_religion = { target_type = public target = ROOT }
-			any_spouse = {
-				limit = {
-					ai = yes
-					has_secret_religion = no
-				}
-				set_secret_religion = { target_type = public target = ROOT }
+
+			set_secret_religion = {
+				target_type = public
+				target = ROOT
 			}
-			any_child = {
+
+			any_spouse = {
+				show_scope_change = no
+
 				limit = {
 					ai = yes
 					has_secret_religion = no
 				}
-				set_secret_religion = { target_type = public target = ROOT }
+
+				set_secret_religion = {
+					target_type = public
+					target = ROOT
+				}
+			}
+
+			any_child = {
+				show_scope_change = no
+
+				limit = {
+					ai = yes
+					has_secret_religion = no
+				}
+
+				set_secret_religion = {
+					target_type = public
+					target = ROOT
+				}
 			}
 		}
 
 		ai_chance = {
 			factor = 5
-			modifier = {
-				factor = 0
+
+			trigger = {
 				owner = {
-					trait = zealous
+					NOT = { trait = zealous }
 				}
 			}
+
 			modifier = {
 				factor = 2
-				owner = {
-					trait = cynical
-				}
+				owner = { trait = cynical }
 			}
 		}
 	}
@@ -289,56 +321,93 @@ character_event = {
 	picture = GFX_evt_heretic
 	border = GFX_event_normal_frame_religion
 
+	is_triggered_only = yes # on_decade_pulse
+
 	min_age = 16
 	max_age = 50
 	only_capable = yes
 	prisoner = no
-
-	is_triggered_only = yes
+	has_dlc = "Sons of Abraham"
 
 	trigger = {
-		has_dlc = "Sons of Abraham"
-
-		NOT = { religion_group = pagan_group }
-
-		is_heretic = no # Heretics, already people of strong conviction, never change religion spontaneously
-
-		is_theocracy = no
-
+		religion_group = location
+		NOT = { religion = location }
 		can_change_religion = yes
 
-		NOT = { religion_authority = 0.9 }
-
-
-		NOR = {
-			is_inaccessible_trigger = yes
-			trait = zealous
-		}
-
-
 		location = {
-			NOT = { religion_group = pagan_group }
-			religion_group = ROOT
-			NOT = { religion = ROOT }
 			OR = {
 				is_heretic = yes
 				religion_authority = ROOT # The local religion has at least the same authority as my religion
 			}
-		}
-	}
 
-	immediate = {
-		location = {
-			save_event_target_as = location_religion
+			NOT = { religion_group = pagan_group }
+		}
+
+		is_heretic = no # Heretics, already people of strong conviction, never change religion spontaneously
+		is_theocracy = no
+		is_inaccessible_trigger = no
+
+		NOR = {
+			religion_group = pagan_group
+			religion_authority = 0.9
+			trait = zealous
 		}
 	}
 
 	weight_multiplier = {
 		days = 1
-		modifier = {
+
+		mult_modifier = {
+			factor = 0.75
+			religion_authority = 0.6
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			religion_authority = 0.7
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			religion_authority = 0.8
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			religion_authority = 0.9
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			NOT = { religion_authority = 0.2 }
+		}
+
+		mult_modifier = {
 			factor = 1.75
+			NOT = { religion_authority = 0.3 }
+		}
+
+		mult_modifier = {
+			factor = 1.75
+			NOT = { religion_authority = 0.4 }
+		}
+
+		mult_modifier = {
+			factor = 1.75
+			NOT = { religion_authority = 0.5 }
+		}
+
+		mult_modifier = {
+			factor = 0.25
+			NOT = { is_heresy_of = ROOT }
+		}
+
+		mult_modifier = {
+			factor = 1.75
+
 			trait = cynical
 			independent = no
+
 			location = {
 				ROOT = {
 					top_liege = {
@@ -347,59 +416,31 @@ character_event = {
 				}
 			}
 		}
-		modifier = {
-			factor = 0.75
-			religion_authority = 0.6
-		}
-		modifier = {
-			factor = 0.75
-			religion_authority = 0.7
-		}
-		modifier = {
-			factor = 0.75
-			religion_authority = 0.8
-		}
-		modifier = {
-			factor = 0.5
-			religion_authority = 0.9
-		}
-		modifier = {
-			factor = 0.25
-			NOT = { is_heresy_of = ROOT }
-		}
-		modifier = {
-			factor = 1.5
-			NOT = { religion_authority = 0.2 }
-		}
-		modifier = {
-			factor = 1.75
-			NOT = { religion_authority = 0.3 }
-		}
-		modifier = {
-			factor = 1.75
-			NOT = { religion_authority = 0.4 }
-		}
-		modifier = {
-			factor = 1.75
-			NOT = { religion_authority = 0.5 }
+	}
+
+	immediate = {
+		save_event_target_as = converting_courtier
+
+		location = {
+			save_event_target_as = location_religion
 		}
 	}
 
 	option = {
 		name = EVTOPTA_SOA_4020
+
 		ai_chance = { factor = 100 }
 
-		hidden_tooltip = {
-			if = {
-				limit = {
-					independent = no
-					liege = {
-						religion = ROOT
-					}
-				}
+		if = {
+			limit = {
+				independent = no
+				religion = liege
+			}
 
-				liege = {
-					character_event = { id = SoA.4021 days = 3 } # Liege responds and may demand reconversion
+			liege = {
+				character_event = {
+					id = SoA.4021 # Liege responds and may demand reconversion
+					days = 3
 				}
 			}
 		}
@@ -413,16 +454,19 @@ character_event = {
 
 		convert_religion_failsafe_effect = yes
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = { has_dharmic_religion_trigger = yes }
+
 				set_character_flag = india_converted
 				character_event = { id = RoI.30120 } # Set religious branch randomly
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTB_SOA_4020
+
 		ai_chance = { factor = 0 }
 	}
 }
@@ -438,46 +482,56 @@ character_event = {
 
 	option = { # Demand reconversion
 		name = EVTOPTA_SOA_4021
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 10.0
 				trait = zealous
 			}
 		}
-		FROM = {
-			# Below event offers a change to secretly keep practising
-			save_persistent_event_target = {
-				name = old_religion
-				scope = religion_scope
+
+		event_target:converting_courtier = {
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4022
+				days = 7
+				tooltip = EVTTOOLTIP_SOA_4022
 			}
-			letter_event = { id = SoA.4022 days = 7 tooltip = EVTTOOLTIP_SOA_4022 }
 		}
 	}
+
 	option = { # Let it slide
 		name = EVTOPTB_SOA_4021
+
 		ai_chance = { factor = 100 }
 	}
+
 	option = { # Debate for reconversion
 		name = EVTOPTC_SOA_4021
 		tooltip_info = learning
-		trigger = {
-			learning = 7
-		}
+
+		trigger = { learning >= 7 }
+
 		ai_chance = {
 			factor = 1000
-			modifier = {
+
+			mult_modifier = {
 				factor = 5.0
 				trait = zealous
 			}
 		}
-		FROM = {
-			# Below event offers a change to secretly keep practising
-			save_persistent_event_target = {
-				name = old_religion
-				scope = religion_scope
+
+		event_target:converting_courtier = {
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4025
+				days = 7
+				tooltip = EVTTOOLTIP_SOA_4025
 			}
-			letter_event = { id = SoA.4025 days = 7 tooltip = EVTTOOLTIP_SOA_4025 }
 		}
 	}
 }
@@ -492,38 +546,41 @@ letter_event = {
 
 	immediate = {
 		opinion = {
+			name = opinion_demanded_conversion
 			who = FROM
-			modifier = opinion_demanded_conversion
 		}
 	}
 
 	option = { # Accept
 		name = ACCEPT
+
 		ai_chance = {
 			factor = 50
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
-				NOT = {
-					opinion = {
-						who = FROM
-						value = -50
-					}
-				}
-			}
-			modifier = {
-				factor = 0.5
-				NOT = {
-					opinion = {
-						who = FROM
-						value = 0
-					}
-				}
-			}
-			modifier = {
-				factor = 4.0
+
 				opinion = {
 					who = FROM
-					value = 50
+					value < -50
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.5
+
+				opinion = {
+					who = FROM
+					value < 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 4.0
+
+				opinion = {
+					who = FROM
+					value >= 50
 				}
 			}
 		}
@@ -538,7 +595,7 @@ letter_event = {
 		convert_religion_failsafe_effect = yes
 		clear_secret_religion = yes
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = { has_dharmic_religion_trigger = yes }
 				set_character_flag = india_converted
@@ -546,46 +603,55 @@ letter_event = {
 			}
 		}
 
-
-
 		FROM = {
-			letter_event = { id = SoA.4023 tooltip = EVTTOOLTIP_SOA_4023 }
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4023
+				tooltip = EVTTOOLTIP_SOA_4023
+			}
 		}
 	}
+
 	option = { # Accept
 		name = ACCEPT_SECRETLY_WORSHIP_OLD_RELIGION
+
 		ai_chance = {
 			factor = 50
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
-				NOT = {
-					opinion = {
-						who = FROM
-						value = -50
-					}
-				}
-			}
-			modifier = {
-				factor = 0.5
-				NOT = {
-					opinion = {
-						who = FROM
-						value = 0
-					}
-				}
-			}
-			modifier = {
-				factor = 4.0
+
 				opinion = {
 					who = FROM
-					value = 50
+					value < -50
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.5
+
+				opinion = {
+					who = FROM
+					value < 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 4.0
+
+				opinion = {
+					who = FROM
+					value >= 50
 				}
 			}
 		}
 
-		log = "persistent_event_target:old_religion: [old_religion.GetName] - [This.GetTitledNameWithNick] ([This.GetID])"
-		set_secret_religion = persistent_event_target:old_religion
-		clear_persistent_event_target = old_religion
+		# Below event offers a change to secretly keep practising
+		save_persistent_event_target = {
+			name = old_religion
+			scope = religion_scope
+		}
 
 		# Workaround for automatic usurption of theocratic characters
 		FROM = {
@@ -596,28 +662,45 @@ letter_event = {
 
 		convert_religion_failsafe_effect = yes
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = { has_dharmic_religion_trigger = yes }
+
 				set_character_flag = india_converted
 				character_event = { id = RoI.30121 } # Set religious branch to liege's branch
 			}
 		}
 
-
+		set_secret_religion = persistent_event_target:old_religion
+		clear_persistent_event_target = old_religion
+		log = "Soa.4022: new religion: [This.Religion.GetName]"
+		log = "SoA.4022: persistent_event_target:old_religion: [old_religion.GetName] - [This.GetTitledNameWithNick] ([This.GetID])"
+		log = "Soa.4022: secret_religion: [This.SecretReligion.GetName]"
 
 		FROM = {
-			letter_event = { id = SoA.4023 tooltip = EVTTOOLTIP_SOA_4023 }
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4023
+				tooltip = EVTTOOLTIP_SOA_4023
+			}
 		}
 	}
+
 	option = { # Refuse
 		name = DECLINE
+
 		ai_chance = {
 			factor = 50
 		}
 
 		FROM = {
-			letter_event = { id = SoA.4024 tooltip = EVTTOOLTIP_SOA_4024 }
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4024
+				tooltip = EVTTOOLTIP_SOA_4024
+			}
 		}
 	}
 }
@@ -629,6 +712,8 @@ letter_event = {
 	border = GFX_event_letter_frame_religion
 
 	is_triggered_only = yes
+
+	ai = no
 
 	option = {
 		name = EXCELLENT
@@ -642,6 +727,8 @@ letter_event = {
 	border = GFX_event_letter_frame_religion
 
 	is_triggered_only = yes
+
+	ai = no
 
 	option = {
 		name = EVTOPTC_SOA_4024
@@ -658,6 +745,7 @@ letter_event = {
 
 	option = { # Accept
 		name = ACCEPT
+
 		ai_chance = {
 			factor = 80
 		}
@@ -672,22 +760,32 @@ letter_event = {
 		convert_religion_failsafe_effect = yes
 
 		FROM = {
-			letter_event = { id = SoA.4026 tooltip = EVTTOOLTIP_SOA_4023 }
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4026
+				tooltip = EVTTOOLTIP_SOA_4023
+			}
 		}
 	}
+
 	option = { # Accept, but keep old religion secretly
 		name = ACCEPT_SECRETLY_WORSHIP_OLD_RELIGION
+
 		ai_chance = {
-			modifier = {
+			factor = 20
+
+			mult_modifier = {
 				factor = 2.0
 				trait = zealous
 			}
-			factor = 20
 		}
 
-		log = "persistent_event_target:old_religion: [old_religion.GetName] - [This.GetTitledNameWithNick] ([This.GetID])"
-		set_secret_religion = persistent_event_target:old_religion
-		clear_persistent_event_target = old_religion
+		# Below event offers a change to secretly keep practising
+		save_persistent_event_target = {
+			name = old_religion
+			scope = religion_scope
+		}
 
 		# Workaround for automatic usurption of theocratic characters
 		FROM = {
@@ -698,18 +796,36 @@ letter_event = {
 
 		convert_religion_failsafe_effect = yes
 
+		set_secret_religion = persistent_event_target:old_religion
+		clear_persistent_event_target = old_religion
+		log = "Soa.4025: new religion: [This.Religion.GetName]"
+		log = "SoA.4025: persistent_event_target:old_religion: [old_religion.GetName] - [This.GetTitledNameWithNick] ([This.GetID])"
+		log = "Soa.4025: secret_religion: [This.SecretReligion.GetName]"
+
 		FROM = {
-			letter_event = { id = SoA.4026 tooltip = EVTTOOLTIP_SOA_4023 }
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4026
+				tooltip = EVTTOOLTIP_SOA_4023
+			}
 		}
 	}
+
 	option = { # Refuse
 		name = DECLINE
+
 		ai_chance = {
 			factor = 0
 		}
 
 		FROM = {
-			letter_event = { id = SoA.4024 tooltip = EVTTOOLTIP_SOA_4024 }
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4024
+				tooltip = EVTTOOLTIP_SOA_4024
+			}
 		}
 	}
 }
@@ -721,6 +837,8 @@ letter_event = {
 	border = GFX_event_letter_frame_religion
 
 	is_triggered_only = yes
+
+	ai = no
 
 	option = {
 		name = EXCELLENT
@@ -734,126 +852,141 @@ letter_event = {
 # SoA.4030 - Courtier with minority religion attempts to convert another character at court
 character_event = {
 	id = SoA.4030
-	desc = OK
-	picture = GFX_evt_heretic
-	border = GFX_event_normal_frame_religion
+
+	hide_window = yes
 
 	min_age = 16
 	only_capable = yes
 	prisoner = no
+	has_dlc = "Sons of Abraham"
 
 	trigger = {
 		is_ruler = no
+		religion_group = liege
+		NOT = { religion = liege }
+		is_inaccessible_trigger = no
 
 		liege = {
-			NOT = { religion = ROOT }
-			religion_group = ROOT
 			NOT = { religion_authority = 0.9 }
 		}
 
 		any_courtier = {
+			trigger_if = {
+				limit = { same_liege = ROOT }
+				religion = liege
+			}
+			trigger_else = {
+				is_liege_of = ROOT
+			}
+
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
-			OR = {
-				same_liege = ROOT
-				is_liege_of = ROOT
-			}
-			ROOT = {
-				liege = {
-					religion = PREVPREV
-				}
-			}
 			mercenary = no
 			holy_order = no
+			is_inaccessible_trigger = no
 		}
-
-		has_dlc = "Sons of Abraham"
 	}
 
 	mean_time_to_happen = {
-		months = 120
-		modifier = {
+		years = 10
+
+		mult_modifier = {
 			factor = 10.0
 			trait = cynical
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.25
 			trait = zealous
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = diligent
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
 			trait = slothful
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			NOT = { religion_authority = 0.2 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			NOT = { religion_authority = 0.4 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			religion_authority = 0.6
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			religion_authority = 0.8
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			liege = {
 				NOT = { religion_authority = 0.2 }
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			liege = {
 				NOT = { religion_authority = 0.4 }
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			liege = {
 				religion_authority = 0.6
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			liege = {
 				religion_authority = 0.8
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 6.0
 			is_heretic = no
 		}
 	}
 
-	option = {
-		name = OK
+	immediate = {
+		save_event_target_as = converting_courtier
+
 		random_courtier = {
 			limit = {
+				trigger_if = {
+					limit = { same_liege = ROOT }
+					religion = liege
+				}
+				trigger_else = {
+					is_liege_of = ROOT
+				}
+
 				is_adult = yes
 				prisoner = no
 				is_incapable = no
 				mercenary = no
 				holy_order = no
-				OR = {
-					same_liege = ROOT
-					is_liege_of = ROOT
-				}
-				ROOT = {
-					liege = {
-						religion = PREVPREV
-					}
-				}
+				is_inaccessible_trigger = no
 			}
+
+			save_event_target_as = targeted_courtier
 			character_event = { id = SoA.4031 }
 		}
 	}
@@ -865,51 +998,60 @@ character_event = {
 	desc = EVTDESC_SOA_4031
 	picture = GFX_evt_heretic
 	border = GFX_event_normal_frame_religion
+	portrait = event_target:converting_courtier
 
 	is_triggered_only = yes
 
 	option = { # Accept
 		name = EVTOPTA_SOA_4031
+
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 0.1
-				NOT = {
-					opinion = {
-						who = FROM
-						value = 0
-					}
-				}
-			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.1
 				trait = zealous
 			}
-			modifier = {
-				factor = 2.0
+
+			mult_modifier = {
+				factor = 0.1
+
 				opinion = {
-					who = FROM
-					value = 25
+					who = event_target:converting_courtier
+					value < 0
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2.0
+
 				opinion = {
-					who = FROM
-					value = 50
+					who = event_target:converting_courtier
+					value >= 25
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2.0
+
 				opinion = {
-					who = FROM
-					value = 75
+					who = event_target:converting_courtier
+					value >= 50
+				}
+			}
+
+			mult_modifier = {
+				factor = 2.0
+
+				opinion = {
+					who = event_target:converting_courtier
+					value >= 75
 				}
 			}
 		}
 
 		# Workaround for automatic usurption of theocratic characters
-		FROM = {
+		event_target:converting_courtier = {
 			religion_scope = {
 				save_event_target_as = target_religion
 			}
@@ -917,9 +1059,10 @@ character_event = {
 
 		convert_religion_failsafe_effect = yes
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = { has_dharmic_religion_trigger = yes }
+
 				set_character_flag = india_converted
 				character_event = { id = RoI.30122 }
 			}
@@ -928,12 +1071,14 @@ character_event = {
 
 	option = { # Refuse
 		name = EVTOPTB_SOA_4031
+
 		trigger = {
-			OR = {
-				NOT = { learning = 7 }
-				NOT = { is_liege_of = FROM }
+			NAND = {
+				learning >= 7
+				is_liege_of = event_target:converting_courtier
 			}
 		}
+
 		ai_chance = {
 			factor = 100
 		}
@@ -942,81 +1087,93 @@ character_event = {
 	option = { # Debate for reconversion
 		name = EVTOPTC_SOA_4031
 		tooltip_info = learning
+
 		trigger = {
-			learning = 7
-			is_liege_of = FROM
+			is_liege_of = event_target:converting_courtier
+			learning >= 7
 		}
+
 		ai_chance = {
 			factor = 100
 		}
-		FROM = {
-			# Below event offers a change to secretly keep practising
-			save_persistent_event_target = {
-				name = old_religion
-				scope = religion_scope
+
+		event_target:converting_courtier = {
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4025
+				days = 7
+				tooltip = EVTTOOLTIP_SOA_4025
 			}
-			letter_event = { id = SoA.4025 days = 7 tooltip = EVTTOOLTIP_SOA_4025 }
 		}
 	}
 
 	option = { # Imprison (if liege)
 		name = EVTOPTD_SOA_4031
+
 		trigger = {
-			is_liege_of = FROM
+			is_liege_of = event_target:converting_courtier
 		}
+
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 0
+
+			trigger = {
 				opinion = {
-					who = FROM
-					value = 0
+					who = event_target:converting_courtier
+					value < 0
 				}
 			}
+
 			modifier = {
 				factor = 3.0
-				NOT = {
-					opinion = {
-						who = FROM
-						value = -25
-					}
+
+				opinion = {
+					who = event_target:converting_courtier
+					value < -25
 				}
 			}
 		}
 
-		reverse_imprison = FROM
+		reverse_imprison = event_target:converting_courtier
 	}
 
 	option = { # Refuse and blab to liege (if not liege)
 		name = EVTOPTE_SOA_4031
+
 		trigger = {
-			NOT = { is_liege_of = FROM }
-			intrigue = 7
+			NOT = { is_liege_of = event_target:converting_courtier }
+			intrigue >= 7
 		}
 
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 0
+
+			trigger = {
 				opinion = {
-					who = FROM
-					value = 0
+					who = event_target:converting_courtier
+					value < 0
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 3.0
-				NOT = {
-					opinion = {
-						who = FROM
-						value = -25
-					}
+
+				opinion = {
+					who = event_target:converting_courtier
+					value < -25
 				}
 			}
 		}
 
-		FROM = {
+		event_target:converting_courtier = {
 			liege = {
-				letter_event = { id = SoA.4032 days = 7 }
+				show_portrait = yes
+
+				letter_event = {
+					id = SoA.4032
+					days = 7
+				}
 			}
 		}
 	}
@@ -1032,49 +1189,64 @@ letter_event = {
 
 	option = { # Demand reconversion
 		name = EVTOPTA_SOA_4021
-		show_portrait = FROMFROM
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 10.0
 				trait = zealous
 			}
 		}
-		FROMFROM = {
+
+		event_target:converting_courtier = {
+			show_scope_change = no
+
 			# Below event offers a change to secretly keep practising
 			save_persistent_event_target = {
 				name = old_religion
 				scope = religion_scope
 			}
-			letter_event = { id = SoA.4022 days = 7 tooltip = EVTTOOLTIP_SOA_4022 }
+
+			letter_event = {
+				id = SoA.4022
+				days = 7
+				tooltip = EVTTOOLTIP_SOA_4022
+			}
 		}
 	}
 
 	option = { # Let it slide
 		name = EVTOPTB_SOA_4021
+
 		ai_chance = { factor = 100 }
 	}
 
 	option = { # Debate for reconversion
 		name = EVTOPTC_SOA_4032
 		tooltip_info = learning
+
 		trigger = {
-			learning = 7
+			learning >= 7
 		}
+
 		ai_chance = {
 			factor = 1000
-			modifier = {
+
+			mult_modifier = {
 				factor = 5.0
 				trait = zealous
 			}
 		}
-		FROMFROM = {
-			# Below event offers a change to secretly keep practising
-			save_persistent_event_target = {
-				name = old_religion
-				scope = religion_scope
+
+		event_target:converting_courtier = {
+			show_scope_change = no
+
+			letter_event = {
+				id = SoA.4025
+				days = 7
+				tooltip = EVTTOOLTIP_SOA_4025
 			}
-			letter_event = { id = SoA.4025 days = 7 tooltip = EVTTOOLTIP_SOA_4025 }
 		}
 	}
 }
@@ -1088,33 +1260,39 @@ letter_event = {
 
 province_event = {
 	id = SoA.4100
+
 	hide_window = yes
 
-	trigger = {
-		has_dlc = "Sons of Abraham"
+	has_dlc = "Sons of Abraham"
 
+	trigger = {
 		is_heretic = yes
+
+		parent_religion_head = {
+			character = yes # There is a head of the parent religion
+			wealth >= 100
+		}
 
 		owner = {
 			is_nomadic = no
+
 			top_liege = {
 				is_parent_religion = ROOT
 			}
 		}
 
-		parent_religion_head = {
-			character = yes # There is a head of the parent religion
-			wealth = 100
+		NOR = {
+			has_province_modifier = theological_dialogue
+			has_province_modifier = active_inquisition
 		}
-
-		NOT = { has_province_modifier = theological_dialogue }
-		NOT = { has_province_modifier = active_inquisition }
 	}
 
 	mean_time_to_happen = {
-		months = 1200
-		modifier = {
+		years = 100
+
+		mult_modifier = {
 			factor = 3.0 # Do not spam human players with this
+
 			parent_religion_head = {
 				ai = no
 			}
@@ -1122,7 +1300,18 @@ province_event = {
 	}
 
 	immediate = {
+		save_event_target_as = heretic_province
+
+		owner = {
+			save_event_target_as = heretic_province_owner
+
+			top_liege = {
+				save_event_target_as = heretic_province_top_liege
+			}
+		}
+
 		parent_religion_head = {
+			save_event_target_as = heretic_province_parent_religion_head
 			character_event = { id = SoA.4101 }
 		}
 	}
@@ -1144,13 +1333,16 @@ character_event = {
 
 	option = { # Send in the Inquisition!
 		name = EVTOPTA_SOA_4101
+
 		ai_chance = {
 			factor = 200
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				trait = cruel
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 3
 				trait = zealous
 			}
@@ -1158,31 +1350,34 @@ character_event = {
 
 		wealth = -100
 
-		FROM = {
-			province_event = { id = SoA.4110 tooltip = EVTTOOLTIP_SOA_4110 }
+		event_target:heretic_province = {
+			show_scope_change = no
+
+			province_event = {
+				id = SoA.4110
+				tooltip = EVTTOOLTIP_SOA_4110
+			}
 		}
 	}
 
 	option = { # Dispatch Legate to Ruler
 		name = EVTOPTB_SOA_4101
+
 		trigger = {
-			NOT = {
-				FROM = {
-					owner = {
-						top_liege = { character = ROOT }
-					}
-				}
-			}
+			NOT = { character = event_target:heretic_province_top_liege }
 		}
+
 		ai_chance = {
 			factor = 100
 		}
 
-		FROM = {
-			owner = {
-				top_liege = {
-					character_event = { id = SoA.4120 days = 2 tooltip = EVTTOOLTIP_SOA_4120 }
-				}
+		event_target:heretic_province_top_liege = {
+			show_scope_change = no
+
+			character_event = {
+				id = SoA.4120
+				days = 2
+				tooltip = EVTTOOLTIP_SOA_4120
 			}
 		}
 	}
@@ -1190,9 +1385,8 @@ character_event = {
 	option = { # Open Dialogue
 		name = EVTOPTC_SOA_4101
 		tooltip_info = learning
-		trigger = {
-			learning = 7
-		}
+
+		trigger = { learning >= 7 }
 
 		ai_chance = {
 			factor = 1000
@@ -1200,13 +1394,19 @@ character_event = {
 
 		wealth = -50
 
-		FROM = {
-			province_event = { id = SoA.4130 tooltip = EVTTOOLTIP_SOA_4130 }
+		event_target:heretic_province = {
+			show_scope_change = no
+
+			province_event = {
+				id = SoA.4130
+				tooltip = EVTTOOLTIP_SOA_4130
+			}
 		}
 	}
 
 	option = { # Do nothing
 		name = EVTOPTD_SOA_4101
+
 		ai_chance = {
 			factor = 1
 		}
@@ -1225,17 +1425,21 @@ province_event = {
 	immediate = {
 		add_province_modifier = {
 			name = active_inquisition
-			days = 730
+			years = 2
 		}
+
 		random_list = {
 			50 = {
 				province_event = {
-					id = SoA.4111 days = 730
+					id = SoA.4111
+					years = 2
 				}
 			}
+
 			50 = {
 				province_event = {
-					id = SoA.4113 days = 730
+					id = SoA.4113
+					years = 2
 				}
 			}
 		}
@@ -1261,14 +1465,14 @@ province_event = {
 
 	immediate = {
 		remove_province_modifier = active_inquisition
-		FROMFROM = {
-			character_event = {
-				id = SoA.4112
-			}
+
+		event_target:heretic_province_parent_religion_head = {
+			character_event = { id = SoA.4112 }
 		}
+
 		add_province_modifier = {
 			name = religious_unrest
-			days = 365
+			years = 1
 		}
 	}
 
@@ -1288,8 +1492,9 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_SOA_4112
+
 		religion_authority = {
-			modifier = failed_inquisition
+			name = failed_inquisition
 		}
 	}
 }
@@ -1308,15 +1513,13 @@ province_event = {
 	}
 
 	immediate = {
-		religion = FROMFROM
+		religion = event_target:heretic_province_parent_religion_head
 		remove_province_modifier = active_inquisition
 		remove_province_modifier = religious_unrest
 		remove_province_modifier = heretic_stronghold
 
-		FROMFROM = {
-			character_event = {
-				id = SoA.4114
-			}
+		event_target:heretic_province_parent_religion_head = {
+			character_event = { id = SoA.4114 }
 		}
 	}
 
@@ -1336,8 +1539,9 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_SOA_4114
+
 		religion_authority = {
-			modifier = successful_inquisition
+			name = successful_inquisition
 		}
 	}
 }
@@ -1354,14 +1558,15 @@ character_event = {
 	immediate = {
 		add_character_modifier = {
 			name = promised_to_clear_out_heresy
-#			hidden = yes
-			duration = 3650
+			years = 10
+		#	hidden = yes
 		}
-		FROMFROM = {
+
+		event_target:heretic_province = {
 			add_province_modifier = {
 				name = promised_to_clear_out_heresy
-#				hidden = yes
-				duration = 3650
+				years = 10
+			#	hidden = yes
 			}
 		}
 	}
@@ -1374,27 +1579,38 @@ character_event = {
 # SoA.4121 - The heresy is eradicated in the county. On-action.
 province_event = {
 	id = SoA.4121
-	hide_window = yes
 
+	hide_window = yes
 	is_triggered_only = yes
 
+	has_dlc = "Sons of Abraham"
+
 	trigger = {
-		has_dlc = "Sons of Abraham"
 		has_province_modifier = promised_to_clear_out_heresy
+
 		owner = {
 			top_liege = {
-				religion = ROOT
 				has_character_modifier = promised_to_clear_out_heresy
+				religion = ROOT
 			}
 		}
 	}
 
 	immediate = {
 		remove_province_modifier = promised_to_clear_out_heresy
-		religion_head = {
-			character_event = {
-				id = SoA.4122
+		save_event_target_as = heretic_province
+
+		owner = {
+			save_event_target_as = heretic_province_owner
+
+			top_liege = {
+				save_event_target_as = heretic_province_top_liege
 			}
+		}
+
+		religion_head = {
+			save_event_target_as = heretic_province_parent_religion_head
+			character_event = { id = SoA.4122 }
 		}
 	}
 }
@@ -1409,72 +1625,64 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		FROM = {
-			owner = {
-				top_liege = {
-					reverse_opinion = {
-						who = ROOT
-						modifier = opinion_grateful
-						months = 120
-					}
-				}
-			}
+		opinion = {
+			name = opinion_grateful
+			who = event_target:heretic_province_top_liege
+			years = 10
 		}
 	}
 
 	option = { # Reward the ruler with money
 		name = EVTOPTA_SOA_4122
-		trigger = {
-			wealth = 100
-		}
+
+		trigger = { wealth >= 100 }
+
 		ai_chance = { factor = 10 }
 
 		wealth = -100
 
-		FROM = {
-			owner = {
-				top_liege = {
-					character_event = {
-						id = SoA.4123 tooltip = EVTTOOLTIP_SOA_4123
-					}
-				}
+		event_target:heretic_province_top_liege = {
+			show_scope_change = no
+
+			character_event = {
+				id = SoA.4123
+				tooltip = EVTTOOLTIP_SOA_4123
 			}
 		}
 	}
 
 	option = { # Reward the ruler with piety
 		name = EVTOPTB_SOA_4122
+
 		ai_chance = { factor = 10 }
-		FROM = {
-			owner = {
-				top_liege = {
-					character_event = {
-						id = SoA.4124 tooltip = EVTTOOLTIP_SOA_4124
-					}
-				}
+
+		event_target:heretic_province_top_liege = {
+			show_scope_change = no
+
+			character_event = {
+				id = SoA.4124
+				tooltip = EVTTOOLTIP_SOA_4124
 			}
 		}
 	}
 
 	option = { # Lift the excommunication
 		name = EVTOPTC_SOA_4122
+
 		trigger = {
-			FROM = {
-				owner = {
-					top_liege = {
-						excommunicated_for = ROOT
-					}
-				}
+			event_target:heretic_province_top_liege = {
+				excommunicated_for = ROOT
 			}
 		}
+
 		ai_chance = { factor = 1000 }
-		FROM = {
-			owner = {
-				top_liege = {
-					character_event = {
-						id = SoA.4125 tooltip = EVTTOOLTIP_SOA_4125
-					}
-				}
+
+		event_target:heretic_province_top_liege = {
+			show_scope_change = no
+
+			character_event = {
+				id = SoA.4125
+				tooltip = EVTTOOLTIP_SOA_4125
 			}
 		}
 	}
@@ -1491,11 +1699,13 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_SOA_4123
+
 		wealth = 100
+
 		opinion = {
-			who = FROM
-			modifier = opinion_grateful
-			months = 120
+			name = opinion_grateful
+			who = event_target:heretic_province_parent_religion_head
+			years = 10
 		}
 	}
 }
@@ -1511,11 +1721,13 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_SOA_4123
+
 		piety = 200
+
 		opinion = {
-			who = FROM
-			modifier = opinion_grateful
-			months = 120
+			name = opinion_grateful
+			who = event_target:heretic_province_parent_religion_head
+			years = 10
 		}
 	}
 }
@@ -1535,9 +1747,9 @@ character_event = {
 		excommunicate = no
 
 		opinion = {
-			who = FROM
-			modifier = opinion_grateful
-			months = 120
+			name = opinion_grateful
+			who = event_target:heretic_province_parent_religion_head
+			years = 10
 		}
 	}
 }
@@ -1554,17 +1766,21 @@ province_event = {
 	immediate = {
 		add_province_modifier = {
 			name = theological_dialogue
-			days = 730
+			years = 2
 		}
+
 		random_list = {
 			50 = {
 				province_event = {
-					id = SoA.4131 days = 730
+					id = SoA.4131
+					years = 2
 				}
 			}
+
 			50 = {
 				province_event = {
-					id = SoA.4133 days = 730
+					id = SoA.4133
+					years = 2
 				}
 			}
 		}
@@ -1590,10 +1806,9 @@ province_event = {
 
 	immediate = {
 		remove_province_modifier = theological_dialogue
-		FROMFROM = {
-			character_event = {
-				id = SoA.4132
-			}
+
+		event_target:heretic_province_parent_religion_head = {
+			character_event = { id = SoA.4132 }
 		}
 	}
 
@@ -1613,8 +1828,9 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_SOA_4132
+
 		religion_authority = {
-			modifier = failed_heretic_dialogue
+			name = failed_heretic_dialogue
 		}
 	}
 }
@@ -1633,15 +1849,13 @@ province_event = {
 	}
 
 	immediate = {
-		religion = FROMFROM
+		religion = event_target:heretic_province_parent_religion_head
 		remove_province_modifier = theological_dialogue
 		remove_province_modifier = religious_unrest
 		remove_province_modifier = heretic_stronghold
 
-		FROMFROM = {
-			character_event = {
-				id = SoA.4134
-			}
+		event_target:heretic_province_parent_religion_head = {
+			character_event = { id = SoA.4134 }
 		}
 	}
 
@@ -1661,29 +1875,31 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_SOA_4134
+
 		religion_authority = {
-			modifier = successful_heretic_dialogue
+			name = successful_heretic_dialogue
 		}
 	}
 }
 
-# SoA.4200 - A heresy has become the new orthodoxy. On-action. There are temporary characters in FROM and FROMFROM with the correct religions set.
+# SoA.4200 - A heresy has become the new orthodoxy
+# FROM is new parent religion scope
+# FROMFROM is new heresy religion scope
 narrative_event = {
 	id = SoA.4200
 	title = EVTTITLE_SOA_4200
 	desc = EVTDESC_SOA_4200
 	picture = GFX_evt_bishop
 	border = GFX_event_narrative_frame_religion
+
+	is_triggered_only = yes # on_heresy_takeover
+	major = yes
 	hide_from = yes
 
-	major = yes
-
-	is_triggered_only = yes
-
 	trigger = {
-		OR = {
-			is_alternate_start = no
-			total_years_played = 1
+		trigger_if = {
+			limit = { is_alternate_start = yes }
+			total_years_played >= 1
 		}
 	}
 
@@ -1692,6 +1908,7 @@ narrative_event = {
 
 		# Update holy order persistent event target religion scopes
 		# Holy Order titles and their leaders should already have been switched to the new orthodoxy
+		# Looks clumsy, but done this way because 'FROM = { is_parent_religion = cathar }' doesn't work
 
 		if = {
 			limit = {
@@ -1701,21 +1918,25 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					cathar = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					fraticelli = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					lollard = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					waldensian = {
 						parent_religion = {
 							religion = FROM
@@ -1796,21 +2017,25 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					bogomilist = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					iconoclast = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					monothelite = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					paulician = {
 						parent_religion = {
 							religion = FROM
@@ -1837,6 +2062,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					monophysite = {
 						parent_religion = {
 							religion = FROM
@@ -1863,6 +2089,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					messalian = {
 						parent_religion = {
 							religion = FROM
@@ -1889,16 +2116,19 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					druze = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					hurufi = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					qarmatian = {
 						parent_religion = {
 							religion = FROM
@@ -1925,11 +2155,13 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					zikri = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					yazidi = {
 						parent_religion = {
 							religion = FROM
@@ -1956,6 +2188,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					kharijite = {
 						parent_religion = {
 							religion = FROM
@@ -1982,11 +2215,13 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					karaite = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					samaritan = {
 						parent_religion = {
 							religion = FROM
@@ -2013,16 +2248,19 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					mazdaki = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					manichean = {
 						parent_religion = {
 							religion = FROM
 						}
 					}
+
 					khurmazta = {
 						parent_religion = {
 							religion = FROM
@@ -2058,6 +2296,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					norse_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2084,6 +2323,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					tengri_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2110,6 +2350,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					west_african_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2136,6 +2377,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					slavic_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2162,6 +2404,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					baltic_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2188,6 +2431,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					finnish_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2214,6 +2458,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					aztec_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2240,6 +2485,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					bon_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2266,6 +2512,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					zun_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2292,6 +2539,7 @@ narrative_event = {
 							religion = FROM
 						}
 					}
+
 					hellenic_pagan_reformed = {
 						parent_religion = {
 							religion = FROM
@@ -2372,35 +2620,42 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTA_SOA_4200
-		trigger = {
-			religion = FROM
-		}
+
+		trigger = { religion = FROM }
+
 		if = {
 			limit = { ai = no }
+
 			chronicle = {
 				entry = CHRONICLE_HERESY_TAKEOVER_PLAYER_IS_NEW
 				portrait = [Root.GetID]
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTB_SOA_4200
-		trigger = {
-			religion = FROMFROM
-		}
+
+		trigger = { religion = FROMFROM }
+
 		if = {
 			limit = { ai = no }
+
 			chronicle = {
 				entry = CHRONICLE_HERESY_TAKEOVER_PLAYER_IS_OLD
 				portrait = [Root.GetID]
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTC_SOA_4200
+
 		trigger = {
-			NOT = { religion = FROM }
-			NOT = { religion = FROMFROM }
+			NOR = {
+				religion = FROM
+				religion = FROMFROM
+			}
 		}
 	}
 }
