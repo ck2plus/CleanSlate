@@ -31,21 +31,24 @@ character_event = {
 		# Chance of trait adjustments
 		if = {
 			limit = {
-				NOT = { trait = honest }
-				NOT = { trait = deceitful }
-				random = 85 # 15% chance
+				trait = honest
 			}
-			add_trait = deceitful
-			character_event = { id = 38255 } # Deceitful notification
+			random = {
+				chance = 50
+				remove_trait = honest
+				character_event = { id = 38311 } # Honest loss notification
+			}
 		}
 
-		if = {
+		else_if = {
 			limit = {
-				trait = honest
-				random = 50
+				NOT = { trait = deceitful }
 			}
-			remove_trait = honest
-			character_event = { id = 38311 } # Honest loss notification
+			random = {
+				chance = 15
+				add_trait = deceitful
+				character_event = { id = 38255 } # Deceitful notification
+			}
 		}
 
 		# Chance of various Intrigue boosters
@@ -60,9 +63,8 @@ character_event = {
 				chance = 10
 				character_event = { id = WoL.2003 days = 4 } # Gain the Schemer or Impaler trait
 			}
-			break = yes
 		}
-		if = {
+		else_if = {
 			limit = {
 				has_character_modifier = wol_schemer_1
 			}
@@ -70,14 +72,12 @@ character_event = {
 				chance = 20
 				remove_character_modifier = wol_schemer_1
 				add_character_modifier = {
-					modifier = wol_schemer_2
+					name = wol_schemer_2
 					duration = -1
 				}
 			}
-			break = yes
 		}
-
-		if = {
+		else_if = {
 			limit = {
 				NOR = {
 					trait = schemer
@@ -87,7 +87,7 @@ character_event = {
 			random = {
 				chance = 50
 				add_character_modifier = {
-					modifier = wol_schemer_1
+					name = wol_schemer_1
 					duration = -1
 				}
 			}
@@ -104,38 +104,29 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		if = {
-			limit = {
-				trait = amateurish_plotter
+		trigger_switch = {
+			on_trigger = trait
+			amateurish_plotter = {
+				random = {
+					chance = 10
+					set_flag = int_ed_boost
+					character_event = { id = WoL.2002 }
+				}
 			}
-			random = {
-				chance = 10
-				set_character_flag = int_ed_boost
-				character_event = { id = WoL.2002 }
+			flamboyant_schemer = {
+				random = {
+					chance = 5
+					set_flag = int_ed_boost
+					character_event = { id = WoL.2002 }
+				}
 			}
-			break = yes
-		}
-		if = {
-			limit = {
-				trait = flamboyant_schemer
+			intricate_webweaver = {
+				random = {
+					chance = 1
+					set_flag = int_ed_boost
+					character_event = { id = WoL.2002 }
+				}
 			}
-			random = {
-				chance = 5
-				set_character_flag = int_ed_boost
-				character_event = { id = WoL.2002 }
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				trait = intricate_webweaver
-			}
-			random = {
-				chance = 1
-				set_character_flag = int_ed_boost
-				character_event = { id = WoL.2002 }
-			}
-			break = yes
 		}
 	}
 }
@@ -155,33 +146,25 @@ character_event = {
 
 		if = {
 			limit = {
-				has_character_flag = int_ed_boost
-				trait = amateurish_plotter
+				has_flag = int_ed_boost
 			}
-			hidden_tooltip = { remove_trait = amateurish_plotter }
-			add_trait = flamboyant_schemer
-			clr_character_flag = int_ed_boost
-			break = yes
-		}
-		if = {
-			limit = {
-				has_character_flag = int_ed_boost
-				trait = flamboyant_schemer
+			clr_flag = int_ed_boost
+			
+			trigger_switch = {
+				on_trigger = trait
+				amateurish_plotter = {
+					hidden_effect = { remove_trait = amateurish_plotter }
+					add_trait = flamboyant_schemer
+				}
+				flamboyant_schemer = {
+					hidden_effect = { remove_trait = flamboyant_schemer }
+					add_trait = intricate_webweaver
+				}
+				intricate_webweaver = {
+					hidden_effect = { remove_trait = intricate_webweaver }
+					add_trait = elusive_shadow
+				}
 			}
-			hidden_tooltip = { remove_trait = flamboyant_schemer }
-			add_trait = intricate_webweaver
-			clr_character_flag = int_ed_boost
-			break = yes
-		}
-		if = {
-			limit = {
-				has_character_flag = int_ed_boost
-				trait = intricate_webweaver
-			}
-			hidden_tooltip = { remove_trait = intricate_webweaver }
-			add_trait = elusive_shadow
-			clr_character_flag = int_ed_boost
-			break = yes
 		}
 	}
 }
@@ -197,8 +180,8 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		NOT = { lifestyle_traits = 1 }
-		NOT = { has_character_flag = wol_no_to_intrigue_trait }
+		lifestyle_traits < 1
+		NOT = { has_flag = wol_no_to_intrigue_trait }
 	}
 
 	option = {
@@ -209,7 +192,7 @@ character_event = {
 		remove_character_modifier = wol_schemer_2
 		add_trait = schemer
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = {
 					has_nickname = no
@@ -229,24 +212,24 @@ character_event = {
 
 		ai_chance = {
 			factor = 20
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = kind
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.25
 				trait = charitable
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = envious
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = wroth
 			}
-			modifier = {
-				factor = 100.0
+			mult_modifier = {
+				factor = 100
 				trait = cruel
 			}
 		}
@@ -254,7 +237,7 @@ character_event = {
 		remove_character_modifier = wol_schemer_2
 		add_trait = impaler
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = {
 					has_nickname = no
@@ -276,7 +259,7 @@ character_event = {
 		ai_chance = {
 			factor = 0
 		}
-		set_character_flag = wol_no_to_intrigue_trait
+		set_flag = wol_no_to_intrigue_trait
 	}
 }
 
@@ -371,7 +354,7 @@ character_event = {
 				NOT = {
 					has_opinion_modifier = {
 						who = FROMFROM
-						modifier = opinion_spying_on
+						name = opinion_spying_on
 					}
 				}
 			}
@@ -383,11 +366,7 @@ character_event = {
 		if = {
 			limit = {
 				FROMFROM = {
-					OR = {
-						trait = on_hajj
-						is_inaccessible_trigger = yes
-						trait = on_pilgrimage
-					}
+					is_inaccessible_trigger = yes
 				}
 			}
 			break = yes
@@ -395,82 +374,76 @@ character_event = {
 
 		random_list = {
 			20000 = { # Nothing happens
-				modifier = {
+				mult_modifier = {
 					factor = 0.75
 					attribute_diff = {
 						attribute = intrigue
 						character = FROMFROM
-						value = 3
+						value >= 3
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.75
 					attribute_diff = {
 						attribute = intrigue
 						character = FROMFROM
-						value = 5
+						value >= 5
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					attribute_diff = {
 						attribute = intrigue
 						character = FROMFROM
-						value = 10
+						value >= 10
 					}
 				}
-				modifier = {
-					factor = 2.0
-					NOT = {
-						attribute_diff = {
-							attribute = intrigue
-							character = FROMFROM
-							value = -2
-						}
+				mult_modifier = {
+					factor = 2
+					attribute_diff = {
+						attribute = intrigue
+						character = FROMFROM
+						value < -2
 					}
 				}
-				modifier = {
-					factor = 3.0
-					NOT = {
-						attribute_diff = {
-							attribute = intrigue
-							character = FROMFROM
-							value = -4
-						}
+				mult_modifier = {
+					factor = 3
+					attribute_diff = {
+						attribute = intrigue
+						character = FROMFROM
+						value < -4
 					}
 				}
-				modifier = {
-					factor = 4.0
-					NOT = {
-						attribute_diff = {
-							attribute = intrigue
-							character = FROMFROM
-							value = -9
-						}
+				mult_modifier = {
+					factor = 4
+					attribute_diff = {
+						attribute = intrigue
+						character = FROMFROM
+						value < -9
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.75
 					has_character_modifier = wol_schemer_1
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					has_character_modifier = wol_schemer_2
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.2
 					trait = schemer
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 1.5
 					FROMFROM = { has_character_modifier = wol_schemer_1 }
 				}
-				modifier = {
-					factor = 3.0
+				mult_modifier = {
+					factor = 3
 					FROMFROM = { has_character_modifier = wol_schemer_2 }
 				}
-				modifier = {
-					factor = 5.0
+				mult_modifier = {
+					factor = 5
 					FROMFROM = { trait = schemer }
 				}
 
@@ -480,10 +453,9 @@ character_event = {
 				}
 			}
 			10000 = { # Plot uncovered
-				modifier = {
-					factor = 0
+				trigger = {
 					FROMFROM = {
-						NOR = {
+						OR = {
 							AND = {
 								has_plot = yes
 								NOT = { plot_is_known_by = ROOT }
@@ -498,35 +470,32 @@ character_event = {
 
 				character_event = { id = WoL.2000 days = 1 } # Chance of levelling up Intrigue skills
 
-				if = {
-					limit = {
-						FROMFROM = {
-							has_plot = yes
-							NOT = { plot_is_known_by = ROOT }
-						}
-					}
-					FROMFROM = { character_event = { id = WoL.2070 } } # Plot uncovered
-					break = yes
-				}
-
 				FROMFROM = {
-					random_backed_character = {
+					if = {
 						limit = {
 							has_plot = yes
 							NOT = { plot_is_known_by = ROOT }
 						}
-						character_event = { id = WoL.2070 }
+						character_event = { id = WoL.2070 } # Plot uncovered
+					}
+					else = {
+						random_backed_character = {
+							limit = {
+								has_plot = yes
+								NOT = { plot_is_known_by = ROOT }
+							}
+							character_event = { id = WoL.2070 }
+						}
 					}
 				}
 			}
 
 			3000 = { # Adultery of spouse or consort uncovered
-				modifier = {
-					factor = 0
+				trigger = {
 					FROMFROM = {
-						NOT = { is_married = ROOT }
-						NOT = { is_consort = ROOT }
-						NOT = {
+						OR = {
+							is_married = ROOT
+							is_consort = ROOT
 							any_lover = {
 								OR = {
 									is_married = ROOT
@@ -534,23 +503,20 @@ character_event = {
 								}
 							}
 						}
-					}
-				}
-				modifier = {
-					factor = 0
-					FROMFROM = {
-						OR = {
-							is_married = ROOT
-							is_consort = ROOT
-						}
-						NOT = {
+						trigger_if = {
+							limit = {
+								OR = {
+									is_married = ROOT
+									is_consort = ROOT
+								}
+							}
 							any_lover = {
 								NOT = { character = ROOT }
 							}
 						}
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.05
 					FROMFROM = {
 						OR = {
@@ -559,7 +525,7 @@ character_event = {
 						}
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.05
 					FROMFROM = {
 						any_lover = {
@@ -567,13 +533,13 @@ character_event = {
 							OR = {
 								has_character_modifier = wol_court_tomcat
 								has_character_modifier = wol_court_vixen
-								trait = schemer
 								has_character_modifier = wol_schemer_2
+								trait = schemer
 							}
 						}
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.1
 					FROMFROM = {
 						any_lover = {
@@ -582,15 +548,15 @@ character_event = {
 						}
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 2
 					FROMFROM = {
 						OR = {
 							AND = {
-								num_of_lovers = 2
+								num_of_lovers >= 2
 								NOT = { is_lover = ROOT }
 							}
-							num_of_lovers = 3
+							num_of_lovers >= 3
 						}
 					}
 				}
@@ -644,15 +610,20 @@ character_event = {
 			}
 
 			1000 = { # Treason charges & blackmail. Allows imprisonment or faction prevention/joining.
-				modifier = {
-					factor = 0
+				trigger = {
 					OR = {
-						FROMFROM = { independent = yes }
-						has_opinion_modifier = { who = FROMFROM modifier = opinion_spy_blackmailed } # Already done this once
+						FROMFROM = { independent = no }
+						# Already done this once
+						NOT = {
+							has_opinion_modifier = {
+								who = FROMFROM
+								name = opinion_spy_blackmailed
+							}
+						}
 					}
 				}
-				modifier = {
-					factor = 3.0
+				mult_modifier = {
+					factor = 3
 					FROMFROM = {
 						society_is_criminal = yes
 						NOT = { same_society_as = ROOT }
@@ -665,11 +636,10 @@ character_event = {
 			}
 
 			3000 = { # Chance to slander
-				modifier = {
-					factor = 0
-					FROMFROM = { has_character_modifier = vicious_rumors }
+				trigger = {
+					NOT = { FROMFROM = { has_character_modifier = vicious_rumors } }
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					OR = {
 						trait = temperate
@@ -678,8 +648,8 @@ character_event = {
 						trait = kind
 					}
 				}
-				modifier = {
-					factor = 2.0
+				mult_modifier = {
+					factor = 2
 					FROMFROM = {
 						OR = {
 							has_character_modifier = incestuous_adulterer
@@ -692,8 +662,8 @@ character_event = {
 						}
 					}
 				}
-				modifier = {
-					factor = 2.0
+				mult_modifier = {
+					factor = 2
 					FROMFROM = {
 						OR = {
 							trait = hedonist
@@ -715,32 +685,25 @@ character_event = {
 				character_event = { id = WoL.2100 }
 			}
 			400 = { # Chance to murder the target
-				modifier = {
-					factor = 0
-					NOT = {
-						attribute_diff = {
-							attribute = intrigue
-							character = FROMFROM
-							value = 0
-						}
+				trigger = {
+					attribute_diff = {
+						attribute = intrigue
+						character = FROMFROM
+						value >= 0
 					}
-				}
-
-				modifier = {
-					factor = 0
-					NOR = {
+					OR = {
 						trait = schemer
 						has_character_modifier = wol_schemer_1
 						has_character_modifier = wol_schemer_2
 					}
 				}
 
-				modifier = {
+				mult_modifier = {
 					factor = 0.25
 					has_character_modifier = wol_schemer_1
 				}
 
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					has_character_modifier = wol_schemer_2
 				}
@@ -750,32 +713,25 @@ character_event = {
 				character_event = { id = WoL.2110 }
 			}
 			400 = { # Chance to abduct the target
-				modifier = {
-					factor = 0
-					NOT = {
-						attribute_diff = {
-							attribute = intrigue
-							character = FROMFROM
-							value = 0
-						}
+				trigger = {
+					attribute_diff = {
+						attribute = intrigue
+						character = FROMFROM
+						value >= 0
 					}
-				}
-
-				modifier = {
-					factor = 0
-					NOR = {
+					OR = {
 						trait = schemer
 						has_character_modifier = wol_schemer_1
 						has_character_modifier = wol_schemer_2
 					}
 				}
 
-				modifier = {
+				mult_modifier = {
 					factor = 0.25
 					has_character_modifier = wol_schemer_1
 				}
 
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					has_character_modifier = wol_schemer_2
 				}
@@ -890,9 +846,7 @@ character_event = {
 		ai_chance = {
 			factor = 10
 		}
-		hidden_tooltip = {
-			character_event = { id = WoL.2069 }
-		}
+		character_event = { id = WoL.2069 }
 	}
 
 	option = {
@@ -914,17 +868,17 @@ character_event = {
 	immediate = {
 		remove_opinion = {
 			who = event_target:target_spy_on
-			modifier = opinion_spying_on
+			name = opinion_spying_on
 		}
 
 		clear_delayed_event = { id = WoL.2060 }
 
-		clr_character_flag = charge_illegitimate
-		clr_character_flag = charge_heretic
-		clr_character_flag = charge_infidel
-		clr_character_flag = charge_deviant
-		clr_character_flag = charge_traitor
-		clr_character_flag = charge_slanderer
+		clr_flag = charge_illegitimate
+		clr_flag = charge_heretic
+		clr_flag = charge_infidel
+		clr_flag = charge_deviant
+		clr_flag = charge_traitor
+		clr_flag = charge_slanderer
 	}
 }
 
@@ -989,7 +943,7 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = {
 					FROMFROMFROM = {
@@ -998,7 +952,7 @@ character_event = {
 						NOT = { same_society_as = ROOT }
 					}
 				}
-				set_character_flag = charge_secret_society
+				set_flag = charge_secret_society
 				break = yes
 			}
 			if = {
@@ -1009,7 +963,7 @@ character_event = {
 						NOT = { same_society_as = ROOT }
 					}
 				}
-				set_character_flag = charge_witch
+				set_flag = charge_witch
 				break = yes
 			}
 
@@ -1017,11 +971,13 @@ character_event = {
 				limit = {
 					FROMFROMFROM = {
 						is_father_real_father = no
-						NOT = { trait = bastard }
-						NOT = { trait = legit_bastard }
+						NOR = {
+							trait = bastard
+							trait = legit_bastard
+						}
 					}
 				}
-				set_character_flag = charge_illegitimate
+				set_flag = charge_illegitimate
 				break = yes
 			}
 
@@ -1040,14 +996,16 @@ character_event = {
 							}
 							AND = {
 								liege = { religion_group = PREV }
-								NOT = { liege = { religion = PREV } }
-								NOT = { religion_group = pagan_group }
-								NOT = { religion_group = indian_group }
+								NOR = {
+									liege = { religion = PREV }
+									religion_group = pagan_group
+									religion_group = indian_group
+								}
 							}
 						}
 					}
 				}
-				set_character_flag = charge_heretic
+				set_flag = charge_heretic
 				break = yes
 			}
 			if = {
@@ -1062,7 +1020,7 @@ character_event = {
 						}
 					}
 				}
-				set_character_flag = charge_infidel
+				set_flag = charge_infidel
 				break = yes
 			}
 			if = {
@@ -1089,13 +1047,13 @@ character_event = {
 						}
 					}
 				}
-				set_character_flag = charge_deviant
+				set_flag = charge_deviant
 				break = yes
 			}
 
 			random_list = {
-				10 = { set_character_flag = charge_traitor }
-				90 = { set_character_flag = charge_slanderer }
+				10 = { set_flag = charge_traitor }
+				90 = { set_flag = charge_slanderer }
 			}
 		}
 	}
@@ -1103,49 +1061,49 @@ character_event = {
 	desc = {
 		text = EVTDESC_WOL_2080
 		trigger = {
-			has_character_flag = charge_slanderer
+			has_flag = charge_slanderer
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2080_BASTARD
 		trigger = {
-			has_character_flag = charge_illegitimate
+			has_flag = charge_illegitimate
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2080_HERETIC
 		trigger = {
-			has_character_flag = charge_heretic
+			has_flag = charge_heretic
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2080_INFIDEL
 		trigger = {
-			has_character_flag = charge_infidel
+			has_flag = charge_infidel
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2080_DEVIANT
 		trigger = {
-			has_character_flag = charge_deviant
+			has_flag = charge_deviant
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2080_TRAITOR
 		trigger = {
-			has_character_flag = charge_traitor
+			has_flag = charge_traitor
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2080_CULTIST
 		trigger = {
-			has_character_flag = charge_secret_society
+			has_flag = charge_secret_society
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2080_DW
 		trigger = {
-			has_character_flag = charge_witch
+			has_flag = charge_witch
 		}
 	}
 
@@ -1153,11 +1111,15 @@ character_event = {
 		name = EVTOPTA_WOL_2080
 		trigger = {
 			NOT = { is_liege_of = FROMFROMFROM }
-			FROMFROMFROM = { independent = no }
-			FROMFROMFROM = { liege = { NOT = { war_with = ROOT } } }
-			FROMFROMFROM = { liege = { is_incapable = no } }
-			FROMFROMFROM = { liege = { NOT = { is_inaccessible_trigger = yes } } }
-			FROMFROMFROM = { liege = { is_adult = yes } }
+			FROMFROMFROM = {
+				independent = no
+				liege = {
+					NOT = { war_with = ROOT }
+					is_adult = yes
+					is_incapable = no
+					is_inaccessible_trigger = no
+				}
+			}
 		}
 		ai_chance = {
 			factor = 100
@@ -1165,16 +1127,16 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTC_WOL_2080_TOOLTIP }
 
-		hidden_tooltip = {
+		hidden_effect = {
 			FROMFROMFROM = { liege = { character_event = { id = WoL.2082 } } }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_spy_blackmailed
+				name = opinion_spy_blackmailed
 			}
 		}
 
 		# Mudslinger achievement check event
-		hidden_tooltip = { character_event = { id = steam.020 } }
+		character_event = { id = steam.020 }
 	}
 
 	option = { # Expose and denounce!
@@ -1182,9 +1144,9 @@ character_event = {
 			text = EVTOPTB_WOL_2080
 			trigger = {
 				NOR = {
-					has_character_flag = charge_illegitimate
-					has_character_flag = charge_traitor
-					has_character_flag = charge_witch
+					has_flag = charge_illegitimate
+					has_flag = charge_traitor
+					has_flag = charge_witch
 				}
 			}
 		}
@@ -1192,9 +1154,9 @@ character_event = {
 			text = EVTOPTB_WOL_2080_HARSH
 			trigger = {
 				OR = {
-					has_character_flag = charge_illegitimate
-					has_character_flag = charge_traitor
-					has_character_flag = charge_witch
+					has_flag = charge_illegitimate
+					has_flag = charge_traitor
+					has_flag = charge_witch
 				}
 			}
 		}
@@ -1208,97 +1170,91 @@ character_event = {
 
 		opinion = {
 			who = FROMFROMFROM
-			modifier = opinion_spy_blackmailed
+			name = opinion_spy_blackmailed
 		}
 
 		custom_tooltip = { text = EVTOPTB_WOL_2080_TOOLTIP }
 
 		if = {
-			limit = {
-				has_character_flag = charge_secret_society
-			}
+			limit = { has_flag = charge_secret_society }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_cultist
-				months = 24
+				name = opinion_charge_cultist
+				years = 2
 			}
 		}
-		if = {
-			limit = {
-				has_character_flag = charge_witch
-			}
+		else_if = {
+			limit = { has_flag = charge_witch }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_dw
-				months = 24
+				name = opinion_charge_dw
+				years = 2
 			}
 		}
-		if = {
-			limit = { has_character_flag = charge_illegitimate }
+		else_if = {
+			limit = { has_flag = charge_illegitimate }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_illegitimate
-				months = 24
+				name = opinion_charge_illegitimate
+				years = 2
 			}
 		}
-		if = {
-			limit = { has_character_flag = charge_heretic }
+		else_if = {
+			limit = { has_flag = charge_heretic }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_heresiarch
-				months = 24
+				name = opinion_charge_heresiarch
+				years = 2
 			}
 		}
-		if = {
-			limit = { has_character_flag = charge_infidel }
+		else_if = {
+			limit = { has_flag = charge_infidel }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_infidel
-				months = 24
+				name = opinion_charge_infidel
+				years = 2
 			}
 		}
-		if = {
-			limit = { has_character_flag = charge_deviant }
+		else_if = {
+			limit = { has_flag = charge_deviant }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_deviant
-				months = 24
+				name = opinion_charge_deviant
+				years = 2
 			}
 		}
-		if = {
-			limit = { has_character_flag = charge_traitor }
+		else_if = {
+			limit = { has_flag = charge_traitor }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_traitor
-				months = 24
+				name = opinion_charge_traitor
+				years = 2
 			}
 		}
-		if = {
-			limit = { has_character_flag = charge_slanderer }
+		else_if = {
+			limit = { has_flag = charge_slanderer }
 			opinion = {
 				who = FROMFROMFROM
-				modifier = opinion_charge_slanderer
-				months = 24
+				name = opinion_charge_slanderer
+				years = 2
 			}
 		}
 
-		hidden_tooltip = {
-			FROMFROMFROM = { character_event = { id = WoL.2081 } }
-		}
+		FROMFROMFROM = { character_event = { id = WoL.2081 } }
 
 #		log = "WoL.2080: [Root.GetTitledName] slanders [target_spy_on.GetTitledName]!"
 
-		clr_character_flag = charge_illegitimate
-		clr_character_flag = charge_heretic
-		clr_character_flag = charge_infidel
-		clr_character_flag = charge_deviant
-		clr_character_flag = charge_traitor
-		clr_character_flag = charge_slanderer
-		clr_character_flag = charge_secret_society
-		clr_character_flag = charge_witch
+		clr_flag = charge_illegitimate
+		clr_flag = charge_heretic
+		clr_flag = charge_infidel
+		clr_flag = charge_deviant
+		clr_flag = charge_traitor
+		clr_flag = charge_slanderer
+		clr_flag = charge_secret_society
+		clr_flag = charge_witch
 
 		# Mudslinger achievement check event
-		hidden_tooltip = { character_event = { id = steam.020 } }
+		character_event = { id = steam.020 }
 	}
 
 	option = {
@@ -1307,13 +1263,18 @@ character_event = {
 			is_liege_of = FROMFROMFROM
 			FROMFROMFROM = {
 				is_playable = yes
-				NOT = { has_opinion_modifier = { who = liege modifier = opinion_coerced_into_leaving_faction } }
+				NOT = {
+					has_opinion_modifier = {
+						who = liege
+						name = opinion_coerced_into_leaving_faction
+					}
+				}
 			}
 		}
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 10.0
+			mult_modifier = {
+				factor = 10
 				FROMFROMFROM = {
 					in_faction = yes
 				}
@@ -1324,12 +1285,10 @@ character_event = {
 
 		opinion = {
 			who = FROMFROMFROM
-			modifier = opinion_spy_blackmailed
+			name = opinion_spy_blackmailed
 		}
 
-		hidden_tooltip = {
-			FROMFROMFROM = { character_event = { id = WoL.2086 } }
-		}
+		FROMFROMFROM = { character_event = { id = WoL.2086 } }
 	}
 
 	option = {
@@ -1339,8 +1298,13 @@ character_event = {
 			FROMFROMFROM = {
 				ai = yes
 				is_playable = yes
-				NOT = { liege = { character = ROOT } }
-				NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_coerced_into_joining_faction } }
+				NOR = {
+					liege = { character = ROOT }
+					has_opinion_modifier = {
+						who = ROOT
+						name = opinion_coerced_into_joining_faction
+					}
+				}
 			}
 		}
 		ai_chance = {
@@ -1351,12 +1315,10 @@ character_event = {
 
 		opinion = {
 			who = FROMFROMFROM
-			modifier = opinion_spy_blackmailed
+			name = opinion_spy_blackmailed
 		}
 
-		hidden_tooltip = {
-			FROMFROMFROM = { character_event = { id = WoL.2089 } }
-		}
+		FROMFROMFROM = { character_event = { id = WoL.2089 } }
 	}
 
 	option = {
@@ -1367,14 +1329,14 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTE_WOL_2080_TOOLTIP }
 
-		clr_character_flag = charge_illegitimate
-		clr_character_flag = charge_heretic
-		clr_character_flag = charge_infidel
-		clr_character_flag = charge_deviant
-		clr_character_flag = charge_traitor
-		clr_character_flag = charge_slanderer
-		clr_character_flag = charge_secret_society
-		clr_character_flag = charge_witch
+		clr_flag = charge_illegitimate
+		clr_flag = charge_heretic
+		clr_flag = charge_infidel
+		clr_flag = charge_deviant
+		clr_flag = charge_traitor
+		clr_flag = charge_slanderer
+		clr_flag = charge_secret_society
+		clr_flag = charge_witch
 	}
 	option = {
 		name = EVTOPTF_WOL_2080 # Keep to myself and end spying
@@ -1384,18 +1346,16 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTF_WOL_2080_TOOLTIP }
 
-		hidden_tooltip = {
-			character_event = { id = WoL.2069 } # Clear out flags and end spying
-		}
+		character_event = { id = WoL.2069 } # Clear out flags and end spying
 
-		clr_character_flag = charge_illegitimate
-		clr_character_flag = charge_heretic
-		clr_character_flag = charge_infidel
-		clr_character_flag = charge_deviant
-		clr_character_flag = charge_traitor
-		clr_character_flag = charge_slanderer
-		clr_character_flag = charge_secret_society
-		clr_character_flag = charge_witch
+		clr_flag = charge_illegitimate
+		clr_flag = charge_heretic
+		clr_flag = charge_infidel
+		clr_flag = charge_deviant
+		clr_flag = charge_traitor
+		clr_flag = charge_slanderer
+		clr_flag = charge_secret_society
+		clr_flag = charge_witch
 	}
 
 }
@@ -1411,53 +1371,49 @@ character_event = {
 	desc = {
 		text = EVTDESC_WOL_2081
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_dishonorable }
+			event_target:target_snooper = { has_flag = charge_dishonorable }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2081_BASTARD
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_illegitimate }
+			event_target:target_snooper = { has_flag = charge_illegitimate }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2081_TRAITOR
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_traitor }
+			event_target:target_snooper = { has_flag = charge_traitor }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2081_HERETIC
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_heretic }
+			event_target:target_snooper = { has_flag = charge_heretic }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2081_INFIDEL
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_infidel }
+			event_target:target_snooper = { has_flag = charge_infidel }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2081_DEVIANT
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_deviant }
+			event_target:target_snooper = { has_flag = charge_deviant }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2081_DW
 		trigger = {
-			event_target:target_snooper = {
-				has_character_flag = charge_witch
-			}
+			event_target:target_snooper = { has_flag = charge_witch }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2081_CULTIST
 		trigger = {
-			event_target:target_snooper = {
-				has_character_flag = charge_secret_society
-			}
+			event_target:target_snooper = { has_flag = charge_secret_society }
 		}
 	}
 
@@ -1465,8 +1421,8 @@ character_event = {
 		name = EVTOPTA_WOL_2081 # Lies and slander!
 		opinion = {
 			who = FROM
-			modifier = opinion_slandered
-			months = 24
+			name = opinion_slandered
+			years = 2
 		}
 	}
 }
@@ -1486,53 +1442,49 @@ character_event = {
 	desc = {
 		text = EVTDESC_WOL_2082
 		trigger = {
-			FROM = { has_character_flag = charge_slanderer }
+			FROM = { has_flag = charge_slanderer }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2082_BASTARD
 		trigger = {
-			FROM = { has_character_flag = charge_illegitimate }
+			FROM = { has_flag = charge_illegitimate }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2082_HERETIC
 		trigger = {
-			FROM = { has_character_flag = charge_heretic }
+			FROM = { has_flag = charge_heretic }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2082_INFIDEL
 		trigger = {
-			FROM = { has_character_flag = charge_infidel }
+			FROM = { has_flag = charge_infidel }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2082_DEVIANT
 		trigger = {
-			FROM = { has_character_flag = charge_deviant }
+			FROM = { has_flag = charge_deviant }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2082_TRAITOR
 		trigger = {
-			FROM = { has_character_flag = charge_traitor }
+			FROM = { has_flag = charge_traitor }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2082_DW
 		trigger = {
-			FROM = {
-				has_character_flag = charge_witch
-			}
+			FROM = { has_flag = charge_witch }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2082_CULTIST
 		trigger = {
-			FROM = {
-				has_character_flag = charge_secret_society
-			}
+			FROM = { has_flag = charge_secret_society }
 		}
 	}
 
@@ -1542,9 +1494,9 @@ character_event = {
 			trigger = {
 				FROM = {
 					NOR = {
-						has_character_flag = charge_illegitimate
-						has_character_flag = charge_traitor
-						has_character_flag = charge_witch
+						has_flag = charge_illegitimate
+						has_flag = charge_traitor
+						has_flag = charge_witch
 					}
 				}
 			}
@@ -1554,9 +1506,9 @@ character_event = {
 			trigger = {
 				FROM = {
 					OR = {
-						has_character_flag = charge_illegitimate
-						has_character_flag = charge_traitor
-						has_character_flag = charge_witch
+						has_flag = charge_illegitimate
+						has_flag = charge_traitor
+						has_flag = charge_witch
 					}
 				}
 			}
@@ -1569,87 +1521,83 @@ character_event = {
 #		log = "WoL.2082: [Root.GetTitledName] slanders [target_spy_on.GetTitledName]!"
 
 		if = {
-			limit = { FROM = { has_character_flag = charge_witch } }
+			limit = { FROM = { has_flag = charge_witch } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_dw
-				months = 24
+				name = opinion_charge_dw
+				years = 2
 			}
 		}
-		if = {
-			limit = { FROM = { has_character_flag = charge_secret_society } }
+		else_if = {
+			limit = { FROM = { has_flag = charge_secret_society } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_cultist
-				months = 24
+				name = opinion_charge_cultist
+				years = 2
 			}
 		}
 
-		if = {
-			limit = { FROM = { has_character_flag = charge_illegitimate } }
+		else_if = {
+			limit = { FROM = { has_flag = charge_illegitimate } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_illegitimate
-				months = 24
+				name = opinion_charge_illegitimate
+				years = 2
 			}
 		}
-		if = {
-			limit = { FROM = { has_character_flag = charge_heretic } }
+		else_if = {
+			limit = { FROM = { has_flag = charge_heretic } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_heresiarch
-				months = 24
+				name = opinion_charge_heresiarch
+				years = 2
 			}
 		}
-		if = {
-			limit = { FROM = { has_character_flag = charge_infidel } }
+		else_if = {
+			limit = { FROM = { has_flag = charge_infidel } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_infidel
-				months = 24
+				name = opinion_charge_infidel
+				years = 2
 			}
 		}
-		if = {
-			limit = { FROM = { has_character_flag = charge_deviant } }
+		else_if = {
+			limit = { FROM = { has_flag = charge_deviant } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_deviant
-				months = 24
+				name = opinion_charge_deviant
+				years = 2
 			}
 		}
-		if = {
-			limit = { FROM = { has_character_flag = charge_traitor } }
+		else_if = {
+			limit = { FROM = { has_flag = charge_traitor } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_traitor
-				months = 24
+				name = opinion_charge_traitor
+				years = 2
 			}
 		}
-		if = {
-			limit = { FROM = { has_character_flag = charge_slanderer } }
+		else_if = {
+			limit = { FROM = { has_flag = charge_slanderer } }
 			opinion = {
 				who = FROMFROMFROMFROM
-				modifier = opinion_charge_slanderer
-				months = 24
+				name = opinion_charge_slanderer
+				years = 2
 			}
 		}
 
-		hidden_tooltip = {
-			FROMFROMFROMFROM = { character_event = { id = WoL.2081 } }
-		}
+		FROMFROMFROMFROM = { character_event = { id = WoL.2081 } }
 
-		hidden_tooltip = {
-			FROM = {
-				character_event = { id = WoL.2083 days = 3 } # Notify spy
-				clr_character_flag = charge_illegitimate
-				clr_character_flag = charge_heretic
-				clr_character_flag = charge_infidel
-				clr_character_flag = charge_deviant
-				clr_character_flag = charge_traitor
-				clr_character_flag = charge_slanderer
-				clr_character_flag = charge_witch
-				clr_character_flag = charge_secret_society
-			}
+		FROM = {
+			character_event = { id = WoL.2083 days = 3 } # Notify spy
+			clr_flag = charge_illegitimate
+			clr_flag = charge_heretic
+			clr_flag = charge_infidel
+			clr_flag = charge_deviant
+			clr_flag = charge_traitor
+			clr_flag = charge_slanderer
+			clr_flag = charge_witch
+			clr_flag = charge_secret_society
 		}
 	}
 
@@ -1658,13 +1606,18 @@ character_event = {
 		trigger = {
 			FROMFROMFROMFROM = {
 				is_playable = yes
-				NOT = { has_opinion_modifier = { who = liege modifier = opinion_coerced_into_leaving_faction } }
+				NOT = {
+					has_opinion_modifier = {
+						who = liege
+						name = opinion_coerced_into_leaving_faction
+					}
+				}
 			}
 		}
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 10.0
+			mult_modifier = {
+				factor = 10
 				FROMFROMFROMFROM = {
 					in_faction = yes
 				}
@@ -1673,11 +1626,8 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTC_WOL_2080_TOOLTIP }
 
-		hidden_tooltip = {
-			FROMFROMFROMFROM = { character_event = { id = WoL.2086 } }
-
-			FROM = { character_event = { id = WoL.2084 days = 3 } } # Notify spy of blackmail
-		}
+		FROMFROMFROMFROM = { character_event = { id = WoL.2086 } }
+		FROM = { character_event = { id = WoL.2084 days = 3 } } # Notify spy of blackmail
 	}
 
 	option = {
@@ -1688,18 +1638,16 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTE_WOL_2082_TOOLTIP }
 
-		hidden_tooltip = {
-			FROM = {
-				clr_character_flag = charge_illegitimate
-				clr_character_flag = charge_heretic
-				clr_character_flag = charge_infidel
-				clr_character_flag = charge_deviant
-				clr_character_flag = charge_traitor
-				clr_character_flag = charge_slanderer
-				clr_character_flag = charge_witch
-				clr_character_flag = charge_secret_society
-				character_event = { id = WoL.2085 days = 3 } # Notify spy that no action was taken
-			}
+		FROM = {
+			clr_flag = charge_illegitimate
+			clr_flag = charge_heretic
+			clr_flag = charge_infidel
+			clr_flag = charge_deviant
+			clr_flag = charge_traitor
+			clr_flag = charge_slanderer
+			clr_flag = charge_witch
+			clr_flag = charge_secret_society
+			character_event = { id = WoL.2085 days = 3 } # Notify spy that no action was taken
 		}
 	}
 }
@@ -1758,49 +1706,49 @@ character_event = {
 	desc = {
 		text = EVTDESC_WOL_2086
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_dishonorable }
+			event_target:target_snooper = { has_flag = charge_dishonorable }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2086_BASTARD
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_illegitimate }
+			event_target:target_snooper = { has_flag = charge_illegitimate }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2086_TRAITOR
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_traitor }
+			event_target:target_snooper = { has_flag = charge_traitor }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2086_HERETIC
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_heretic }
+			event_target:target_snooper = { has_flag = charge_heretic }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2086_INFIDEL
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_infidel }
+			event_target:target_snooper = { has_flag = charge_infidel }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2086_DEVIANT
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_deviant }
+			event_target:target_snooper = { has_flag = charge_deviant }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2086_DW
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_witch }
+			event_target:target_snooper = { has_flag = charge_witch }
 		}
 	}
 	desc = {
 		text = EVTDESC_WOL_2086_CULTIST
 		trigger = {
-			event_target:target_snooper = { has_character_flag = charge_secret_society }
+			event_target:target_snooper = { has_flag = charge_secret_society }
 		}
 	}
 
@@ -1808,143 +1756,139 @@ character_event = {
 		name = EVTOPTA_WOL_2086 # Agree
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 5.0
+			mult_modifier = {
+				factor = 5
 				trait = craven
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = proud
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = content
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = trusting
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = patient
 			}
 		}
 
 		event_target:target_snooper = {
-			clr_character_flag = charge_illegitimate
-			clr_character_flag = charge_heretic
-			clr_character_flag = charge_infidel
-			clr_character_flag = charge_deviant
-			clr_character_flag = charge_traitor
-			clr_character_flag = charge_slanderer
-			clr_character_flag = charge_witch
-			clr_character_flag = charge_secret_society
+			clr_flag = charge_illegitimate
+			clr_flag = charge_heretic
+			clr_flag = charge_infidel
+			clr_flag = charge_deviant
+			clr_flag = charge_traitor
+			clr_flag = charge_slanderer
+			clr_flag = charge_witch
+			clr_flag = charge_secret_society
 		}
 
 		opinion = {
 			who = liege
-			modifier = opinion_coerced_into_leaving_faction
-			months = 1200
+			name = opinion_coerced_into_leaving_faction
+			years = 100
 		}
 
 #		log = "WoL.2086: [Root.GetTitledName] blackmailed to stay out of factions by [target_snooper.GetTitledName]!"
 
-		hidden_tooltip = {
-			FROM = { character_event = { id = WoL.2087 days = 3 } }
-		}
+		FROM = { character_event = { id = WoL.2087 days = 3 } }
 	}
 
 	option = {
 		name = EVTOPTB_WOL_2086 # Never!
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = brave
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = wroth
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = ambitious
 			}
 		}
 
 		opinion = {
 			who = FROM
-			modifier = opinion_slandered
-			months = 24
+			name = opinion_slandered
+			years = 2
 		}
 
-		hidden_tooltip = {
-			FROM = { character_event = { id = WoL.2088 days = 3 } }
-		}
+		FROM = { character_event = { id = WoL.2088 days = 3 } }
 
 		tooltip = {
 			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_witch } }
+				limit = { event_target:target_snooper = { has_flag = charge_witch } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_dw
-					months = 24
+					name = opinion_charge_dw
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_secret_society } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_secret_society } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_cultist
-					months = 24
+					name = opinion_charge_cultist
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_illegitimate } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_illegitimate } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_illegitimate
-					months = 24
+					name = opinion_charge_illegitimate
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_heretic } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_heretic } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_heresiarch
-					months = 24
+					name = opinion_charge_heresiarch
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_infidel } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_infidel } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_infidel
-					months = 24
+					name = opinion_charge_infidel
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_deviant } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_deviant } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_deviant
-					months = 24
+					name = opinion_charge_deviant
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_traitor } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_traitor } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_traitor
-					months = 24
+					name = opinion_charge_traitor
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_slanderer } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_slanderer } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_slanderer
-					months = 24
+					name = opinion_charge_slanderer
+					years = 2
 				}
 			}
 		}
@@ -1982,79 +1926,79 @@ character_event = {
 #		log = "WoL.2088: [Root.GetTitledName] slanders [From.GetTitledName] after failed blackmail!"
 
 		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_witch } }
+			limit = { event_target:target_snooper = { has_flag = charge_witch } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_dw
-				months = 24
+				name = opinion_charge_dw
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_secret_society } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_secret_society } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_cultist
-				months = 24
+				name = opinion_charge_cultist
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_illegitimate } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_illegitimate } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_illegitimate
-				months = 24
+				name = opinion_charge_illegitimate
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_heretic } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_heretic } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_heresiarch
-				months = 24
+				name = opinion_charge_heresiarch
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_infidel } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_infidel } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_infidel
-				months = 24
+				name = opinion_charge_infidel
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_deviant } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_deviant } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_deviant
-				months = 24
+				name = opinion_charge_deviant
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_traitor } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_traitor } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_traitor
-				months = 24
+				name = opinion_charge_traitor
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_slanderer } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_slanderer } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_slanderer
-				months = 24
+				name = opinion_charge_slanderer
+				years = 2
 			}
 		}
 
 		event_target:target_snooper = {
-			clr_character_flag = charge_illegitimate
-			clr_character_flag = charge_heretic
-			clr_character_flag = charge_infidel
-			clr_character_flag = charge_deviant
-			clr_character_flag = charge_traitor
-			clr_character_flag = charge_slanderer
-			clr_character_flag = charge_witch
-			clr_character_flag = charge_secret_society
+			clr_flag = charge_illegitimate
+			clr_flag = charge_heretic
+			clr_flag = charge_infidel
+			clr_flag = charge_deviant
+			clr_flag = charge_traitor
+			clr_flag = charge_slanderer
+			clr_flag = charge_witch
+			clr_flag = charge_secret_society
 		}
 	}
 }
@@ -2073,141 +2017,137 @@ character_event = {
 		name = OK # Agree
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 5.0
+			mult_modifier = {
+				factor = 5
 				trait = craven
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = proud
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = content
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = trusting
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = patient
 			}
 		}
 
 		event_target:target_snooper = {
-			clr_character_flag = charge_illegitimate
-			clr_character_flag = charge_heretic
-			clr_character_flag = charge_infidel
-			clr_character_flag = charge_deviant
-			clr_character_flag = charge_traitor
-			clr_character_flag = charge_slanderer
-			clr_character_flag = charge_witch
-			clr_character_flag = charge_secret_society
+			clr_flag = charge_illegitimate
+			clr_flag = charge_heretic
+			clr_flag = charge_infidel
+			clr_flag = charge_deviant
+			clr_flag = charge_traitor
+			clr_flag = charge_slanderer
+			clr_flag = charge_witch
+			clr_flag = charge_secret_society
 		}
 
 		opinion = {
 			who = FROM
-			modifier = opinion_coerced_into_joining_faction
-			months = 1200
+			name = opinion_coerced_into_joining_faction
+			years = 100
 		}
 
-		hidden_tooltip = {
-			FROM = { character_event = { id = WoL.2090 days = 3 } }
-		}
+		FROM = { character_event = { id = WoL.2090 days = 3 } }
 	}
 
 	option = {
 		name = OK # Never!
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = brave
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = wroth
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = ambitious
 			}
 		}
 
 		opinion = {
 			who = FROM
-			modifier = opinion_slandered
-			months = 24
+			name = opinion_slandered
+			years = 2
 		}
 
-		hidden_tooltip = {
-			FROM = { character_event = { id = WoL.2091 days = 3 } }
-		}
+		FROM = { character_event = { id = WoL.2091 days = 3 } }
 
 		tooltip = {
 			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_witch } }
+				limit = { event_target:target_snooper = { has_flag = charge_witch } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_dw
-					months = 24
+					name = opinion_charge_dw
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_secret_society } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_secret_society } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_cultist
-					months = 24
+					name = opinion_charge_cultist
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_illegitimate } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_illegitimate } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_illegitimate
-					months = 24
+					name = opinion_charge_illegitimate
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_heretic } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_heretic } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_heresiarch
-					months = 24
+					name = opinion_charge_heresiarch
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_infidel } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_infidel } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_infidel
-					months = 24
+					name = opinion_charge_infidel
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_deviant } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_deviant } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_deviant
-					months = 24
+					name = opinion_charge_deviant
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_traitor } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_traitor } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_traitor
-					months = 24
+					name = opinion_charge_traitor
+					years = 2
 				}
 			}
-			if = {
-				limit = { event_target:target_snooper = { has_character_flag = charge_slanderer } }
+			else_if = {
+				limit = { event_target:target_snooper = { has_flag = charge_slanderer } }
 				reverse_opinion = {
 					who = FROM
-					modifier = opinion_charge_slanderer
-					months = 24
+					name = opinion_charge_slanderer
+					years = 2
 				}
 			}
 		}
@@ -2243,79 +2183,79 @@ character_event = {
 		name = EVTOPTA_WOL_2088
 
 		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_witch } }
+			limit = { event_target:target_snooper = { has_flag = charge_witch } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_dw
-				months = 24
+				name = opinion_charge_dw
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_secret_society } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_secret_society } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_cultist
-				months = 24
+				name = opinion_charge_cultist
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_illegitimate } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_illegitimate } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_illegitimate
-				months = 24
+				name = opinion_charge_illegitimate
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_heretic } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_heretic } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_heresiarch
-				months = 24
+				name = opinion_charge_heresiarch
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_infidel } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_infidel } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_infidel
-				months = 24
+				name = opinion_charge_infidel
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_deviant } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_deviant } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_deviant
-				months = 24
+				name = opinion_charge_deviant
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_traitor } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_traitor } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_traitor
-				months = 24
+				name = opinion_charge_traitor
+				years = 2
 			}
 		}
-		if = {
-			limit = { event_target:target_snooper = { has_character_flag = charge_slanderer } }
+		else_if = {
+			limit = { event_target:target_snooper = { has_flag = charge_slanderer } }
 			opinion = {
 				who = FROM
-				modifier = opinion_charge_slanderer
-				months = 24
+				name = opinion_charge_slanderer
+				years = 2
 			}
 		}
 
 		event_target:target_snooper = {
-			clr_character_flag = charge_illegitimate
-			clr_character_flag = charge_heretic
-			clr_character_flag = charge_infidel
-			clr_character_flag = charge_deviant
-			clr_character_flag = charge_traitor
-			clr_character_flag = charge_slanderer
-			clr_character_flag = charge_witch
-			clr_character_flag = charge_secret_society
+			clr_flag = charge_illegitimate
+			clr_flag = charge_heretic
+			clr_flag = charge_infidel
+			clr_flag = charge_deviant
+			clr_flag = charge_traitor
+			clr_flag = charge_slanderer
+			clr_flag = charge_witch
+			clr_flag = charge_secret_society
 		}
 	}
 }
@@ -2332,154 +2272,149 @@ character_event = {
 
 	immediate = {
 		random_list = {
-			10 = { set_character_flag = rumor_1 }
-			10 = { set_character_flag = rumor_2 }
-			10 = { set_character_flag = rumor_3 }
-			10 = { set_character_flag = rumor_4 }
-			10 = { set_character_flag = rumor_5 }
-			10 = { set_character_flag = rumor_6 }
-			10 = { set_character_flag = rumor_7 }
-			10 = { set_character_flag = rumor_8 }
+			10 = { set_flag = rumor_1 }
+			10 = { set_flag = rumor_2 }
+			10 = { set_flag = rumor_3 }
+			10 = { set_flag = rumor_4 }
+			10 = { set_flag = rumor_5 }
+			10 = { set_flag = rumor_6 }
+			10 = { set_flag = rumor_7 }
+			10 = { set_flag = rumor_8 }
 		}
 	}
 
 	option = {
 		name = {
 			text = EVTOPTA_WOL_2100_1
-			trigger = { has_character_flag = rumor_1 }
+			trigger = { has_flag = rumor_1 }
 		}
 		name = {
 			text = EVTOPTA_WOL_2100_2
-			trigger = { has_character_flag = rumor_2 }
+			trigger = { has_flag = rumor_2 }
 		}
 		name = {
 			text = EVTOPTA_WOL_2100_3
-			trigger = { has_character_flag = rumor_3 }
+			trigger = { has_flag = rumor_3 }
 		}
 		name = {
 			text = EVTOPTA_WOL_2100_4
-			trigger = { has_character_flag = rumor_4 }
+			trigger = { has_flag = rumor_4 }
 		}
 		name = {
 			text = EVTOPTA_WOL_2100_5
-			trigger = { has_character_flag = rumor_5 }
+			trigger = { has_flag = rumor_5 }
 		}
 		name = {
 			text = EVTOPTA_WOL_2100_6
-			trigger = { has_character_flag = rumor_6 }
+			trigger = { has_flag = rumor_6 }
 		}
 		name = {
 			text = EVTOPTA_WOL_2100_7
-			trigger = { has_character_flag = rumor_7 }
+			trigger = { has_flag = rumor_7 }
 		}
 		name = {
 			text = EVTOPTA_WOL_2100_8
-			trigger = { has_character_flag = rumor_8 }
+			trigger = { has_flag = rumor_8 }
 		}
 
 		ai_chance = {
 			factor = 100
 		}
 
-		clr_character_flag = rumor_1
-		clr_character_flag = rumor_2
-		clr_character_flag = rumor_3
-		clr_character_flag = rumor_4
-		clr_character_flag = rumor_5
-		clr_character_flag = rumor_6
-		clr_character_flag = rumor_7
-		clr_character_flag = rumor_8
+		clr_flag = rumor_1
+		clr_flag = rumor_2
+		clr_flag = rumor_3
+		clr_flag = rumor_4
+		clr_flag = rumor_5
+		clr_flag = rumor_6
+		clr_flag = rumor_7
+		clr_flag = rumor_8
 
 		FROMFROMFROM = {
+			show_scope_change = no
 			add_character_modifier = {
-				modifier = vicious_rumors
+				name = vicious_rumors
 				years = 5
 			}
 		}
 
 		# Mudslinger achievement check event
-		hidden_tooltip = { character_event = { id = steam.020 } }
+		character_event = { id = steam.020 }
 
 #		log = "WoL.2100: [Root.GetTitledName] spreads vicious rumors about [target_spy_on.GetTitledName]!"
 
 		random = {
 			chance = 25
-			modifier = {
+			mult_modifier = {
 				factor = 0.75
 				attribute_diff = {
 					attribute = intrigue
 					character = FROMFROMFROM
-					value = 3
+					value >= 3
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.75
 				attribute_diff = {
 					attribute = intrigue
 					character = FROMFROMFROM
-					value = 5
+					value >= 5
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.5
 				attribute_diff = {
 					attribute = intrigue
 					character = FROMFROMFROM
-					value = 10
+					value >= 10
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
-				NOT = {
-					attribute_diff = {
-						attribute = intrigue
-						character = FROMFROMFROM
-						value = -2
-					}
+				attribute_diff = {
+					attribute = intrigue
+					character = FROMFROMFROM
+					value < -2
 				}
 			}
-			modifier = {
-				factor = 2.0
-				NOT = {
-					attribute_diff = {
-						attribute = intrigue
-						character = FROMFROMFROM
-						value = -4
-					}
+			mult_modifier = {
+				factor = 2
+				attribute_diff = {
+					attribute = intrigue
+					character = FROMFROMFROM
+					value < -4
 				}
 			}
-			modifier = {
-				factor = 2.0
-				NOT = {
-					attribute_diff = {
-						attribute = intrigue
-						character = FROMFROMFROM
-						value = -9
-					}
+			mult_modifier = {
+				factor = 2
+				attribute_diff = {
+					attribute = intrigue
+					character = FROMFROMFROM
+					value < -9
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.75
 				has_character_modifier = wol_schemer_1
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.5
 				has_character_modifier = wol_schemer_2
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.2
 				trait = schemer
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				FROMFROMFROM = { has_character_modifier = wol_schemer_1 }
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				FROMFROMFROM = { has_character_modifier = wol_schemer_2 }
 			}
-			modifier = {
-				factor = 5.0
+			mult_modifier = {
+				factor = 5
 				FROMFROMFROM = { trait = schemer }
 			}
 
@@ -2493,14 +2428,14 @@ character_event = {
 			factor = 1
 		}
 
-		clr_character_flag = rumor_1
-		clr_character_flag = rumor_2
-		clr_character_flag = rumor_3
-		clr_character_flag = rumor_4
-		clr_character_flag = rumor_5
-		clr_character_flag = rumor_6
-		clr_character_flag = rumor_7
-		clr_character_flag = rumor_8
+		clr_flag = rumor_1
+		clr_flag = rumor_2
+		clr_flag = rumor_3
+		clr_flag = rumor_4
+		clr_flag = rumor_5
+		clr_flag = rumor_6
+		clr_flag = rumor_7
+		clr_flag = rumor_8
 	}
 
 	option = {
@@ -2509,18 +2444,16 @@ character_event = {
 			factor = 50
 		}
 
-		hidden_tooltip = {
-			character_event = { id = WoL.2069 }
-		}
+		character_event = { id = WoL.2069 }
 
-		clr_character_flag = rumor_1
-		clr_character_flag = rumor_2
-		clr_character_flag = rumor_3
-		clr_character_flag = rumor_4
-		clr_character_flag = rumor_5
-		clr_character_flag = rumor_6
-		clr_character_flag = rumor_7
-		clr_character_flag = rumor_8
+		clr_flag = rumor_1
+		clr_flag = rumor_2
+		clr_flag = rumor_3
+		clr_flag = rumor_4
+		clr_flag = rumor_5
+		clr_flag = rumor_6
+		clr_flag = rumor_7
+		clr_flag = rumor_8
 	}
 }
 
@@ -2539,8 +2472,8 @@ character_event = {
 
 		opinion = {
 			who = FROM
-			modifier = opinion_slandered
-			months = 60
+			name = opinion_slandered
+			years = 5
 		}
 	}
 }
@@ -2560,34 +2493,35 @@ character_event = {
 
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 0
+			trigger = {
 				FROMFROMFROM = {
-					same_liege = ROOT # No use for vassals to kill other vassals
-					NOT = { is_foe = ROOT }
+					OR = {
+						NOT = { same_liege = ROOT } # No use for vassals to kill other vassals
+						is_foe = ROOT
+					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
-				NOT = { wealth = 5 }
+				wealth < 5
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = arbitrary
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = cruel
 			}
-			modifier = {
-				factor = 10.0
+			mult_modifier = {
+				factor = 10
 				is_foe = FROMFROMFROM
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = just
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.25
 				FROMFROMFROM = {
 					liege = {
@@ -2611,16 +2545,16 @@ character_event = {
 
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = just
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = kind
 			}
-			modifier = {
-				factor = 5.0
+			mult_modifier = {
+				factor = 5
 				is_friend = FROMFROMFROM
 			}
 		}
@@ -2639,7 +2573,7 @@ character_event = {
 	immediate = {
 		random_list = {
 			1000 = { # Dies, murderer unknown
-				modifier = {
+				mult_modifier = {
 					factor = 0.01
 					OR = {
 						trait = paranoid
@@ -2648,10 +2582,10 @@ character_event = {
 						has_character_modifier = seduced_loyal_spy_maid
 					}
 				}
-				set_character_flag = spy_death
+				set_flag = spy_death
 			}
 			1000 = { # Dies, murderer known
-				modifier = {
+				mult_modifier = {
 					factor = 0.01
 					OR = {
 						trait = paranoid
@@ -2660,19 +2594,19 @@ character_event = {
 						has_character_modifier = seduced_loyal_spy_maid
 					}
 				}
-				set_character_flag = spy_death_known
+				set_flag = spy_death_known
 			}
 			500 = { # Wounded, assailant unknown
-				set_character_flag = spy_wounded
+				set_flag = spy_wounded
 			}
 			500 = { # Wounded, assailant known
-				set_character_flag = spy_wounded_known
+				set_flag = spy_wounded_known
 			}
 			500 = { # Lives, assailant unknown
-				set_character_flag = spy_lives
+				set_flag = spy_lives
 			}
 			500 = { # Lives, assailant known
-				set_character_flag = spy_lives_known
+				set_flag = spy_lives_known
 			}
 		}
 	}
@@ -2681,8 +2615,8 @@ character_event = {
 		text = EVTDESC_WOL_2111_DEATH
 		trigger = {
 			OR = {
-				has_character_flag = spy_death
-				has_character_flag = spy_death_known
+				has_flag = spy_death
+				has_flag = spy_death_known
 			}
 		}
 	}
@@ -2690,8 +2624,8 @@ character_event = {
 		text = EVTDESC_WOL_2111_WOUNDED
 		trigger = {
 			OR = {
-				has_character_flag = spy_wounded
-				has_character_flag = spy_wounded_known
+				has_flag = spy_wounded
+				has_flag = spy_wounded_known
 			}
 		}
 	}
@@ -2699,21 +2633,19 @@ character_event = {
 		text = EVTDESC_WOL_2111_LIVES
 		trigger = {
 			OR = {
-				has_character_flag = spy_lives
-				has_character_flag = spy_lives_known
+				has_flag = spy_lives
+				has_flag = spy_lives_known
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPT_WOL_2111_DEATH
-		trigger = { has_character_flag = spy_death }
+		trigger = { has_flag = spy_death }
 
-		hidden_tooltip = {
-			FROM = {
-				character_event = { id = WoL.2069 } # Clear out flags and end spying
-				character_event = { id = WoL.2112 } # Notify killer
-			}
+		FROM = {
+			character_event = { id = WoL.2069 } # Clear out flags and end spying
+			character_event = { id = WoL.2112 } # Notify killer
 		}
 		death = {
 			death_reason = death_murder_unknown
@@ -2723,15 +2655,13 @@ character_event = {
 
 	option = {
 		name = EVTOPT_WOL_2111_DEATH_KNOWN
-		trigger = { has_character_flag = spy_death_known }
+		trigger = { has_flag = spy_death_known }
 
-		hidden_tooltip = {
-			save_event_target_as = target_victim
-			FROM = {
-				character_event = { id = WoL.2069 } # Clear out flags and end spying
-				character_event = { id = 10 } # Discovered murder -> consequences
-				character_event = { id = WoL.2113 } # Notify killer
-			}
+		save_event_target_as = target_victim
+		FROM = {
+			character_event = { id = WoL.2069 } # Clear out flags and end spying
+			character_event = { id = 10 } # Discovered murder -> consequences
+			character_event = { id = WoL.2113 } # Notify killer
 		}
 		death = {
 			death_reason = death_murder
@@ -2741,60 +2671,52 @@ character_event = {
 
 	option = {
 		name = EVTOPT_WOL_2111_UNKNOWN
-		trigger = { has_character_flag = spy_wounded }
+		trigger = { has_flag = spy_wounded }
 
 		add_trait = wounded
 
-		hidden_tooltip = {
-			FROM = {
-				character_event = { id = WoL.2114 } # Notify attacker
-			}
-			clr_character_flag = spy_wounded
+		FROM = {
+			character_event = { id = WoL.2114 } # Notify attacker
 		}
+		clr_flag = spy_wounded
 	}
 
 	option = {
 		name = EVTOPT_WOL_2111_KNOWN
-		trigger = { has_character_flag = spy_wounded_known }
+		trigger = { has_flag = spy_wounded_known }
 
 		add_trait = wounded
 
-		hidden_tooltip = {
-			save_event_target_as = target_victim
-			FROM = {
-				character_event = { id = 11 } # Consequences of discovery
-				character_event = { id = WoL.2115 } # Notify attacker
-			}
-			clear_event_target = target_victim
-			clr_character_flag = spy_wounded_known
+		save_event_target_as = target_victim
+		FROM = {
+			character_event = { id = 11 } # Consequences of discovery
+			character_event = { id = WoL.2115 } # Notify attacker
 		}
+		clear_event_target = target_victim
+		clr_flag = spy_wounded_known
 	}
 
 	option = {
 		name = EVTOPT_WOL_2111_UNKNOWN
-		trigger = { has_character_flag = spy_lives }
+		trigger = { has_flag = spy_lives }
 
-		hidden_tooltip = {
-			FROM = {
-				character_event = { id = WoL.2116 } # Notify attacker
-			}
-			clr_character_flag = spy_lives
+		FROM = {
+			character_event = { id = WoL.2116 } # Notify attacker
 		}
+		clr_flag = spy_lives
 	}
 
 	option = {
 		name = EVTOPT_WOL_2111_KNOWN
-		trigger = { has_character_flag = spy_lives_known }
+		trigger = { has_flag = spy_lives_known }
 
-		hidden_tooltip = {
-			save_event_target_as = target_victim
-			FROM = {
-				character_event = { id = 11 } # Consequences of discovery
-				character_event = { id = WoL.2117 } # Notify attacker
-			}
-			clear_event_target = target_victim
-			clr_character_flag = spy_lives_known
+		save_event_target_as = target_victim
+		FROM = {
+			character_event = { id = 11 } # Consequences of discovery
+			character_event = { id = WoL.2117 } # Notify attacker
 		}
+		clear_event_target = target_victim
+		clr_flag = spy_lives_known
 	}
 }
 
@@ -2903,30 +2825,28 @@ character_event = {
 		name = EVTOPTA_WOL_2120
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 0
-				NOT = { wealth = 5 }
-			}
-			modifier = {
-				factor = 0
+			trigger = {
+				wealth >= 5
 				FROMFROMFROM = {
-					same_liege = ROOT # No use for vassals to imprison other vassals
-					NOT = { is_foe = ROOT }
+					OR = {
+						NOT = { same_liege = ROOT } # No use for vassals to imprison other vassals
+						is_foe = ROOT
+					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = just
 			}
-			modifier = {
-				factor = 2.0
+			mult_modifier = {
+				factor = 2
 				trait = arbitrary
 			}
-			modifier = {
-				factor = 3.0
+			mult_modifier = {
+				factor = 3
 				trait = cruel
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.25
 				FROMFROMFROM = {
 					liege = {
@@ -2938,9 +2858,9 @@ character_event = {
 					NOT = { is_foe = ROOT }
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
-				NOT = { wealth = 10 }
+				wealth < 10
 			}
 		}
 
@@ -2950,10 +2870,8 @@ character_event = {
 			text = EVTTOOLTIP_WOL_2121
 		}
 
-		hidden_tooltip = {
-			FROMFROMFROM = {
-				character_event = { id = WoL.2121 days = 3 }
-			}
+		FROMFROMFROM = {
+			character_event = { id = WoL.2121 days = 3 }
 		}
 	}
 	option = {
@@ -2977,7 +2895,7 @@ character_event = {
 	immediate = {
 		random = {
 			chance = 50
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				OR = {
 					trait = paranoid
@@ -2986,18 +2904,18 @@ character_event = {
 					has_character_modifier = seduced_loyal_spy_maid
 				}
 			}
-			set_character_flag = spy_success
+			set_flag = spy_success
 		}
 	}
 
 	option = {
 		name = EVTOPT_WOL_2121_CAUGHT
 
-		trigger = { has_character_flag = spy_success }
+		trigger = { has_flag = spy_success }
 
 		imprison = FROM
 
-		hidden_tooltip = {
+		hidden_effect = {
 			FROM = {
 				character_event = { id = WoL.2122 }
 			}
@@ -3010,22 +2928,20 @@ character_event = {
 				opinion = {
 					who = FROM
 					years = 10
-					modifier = opinion_regicide_traitor
+					name = opinion_regicide_traitor
 				}
 			}
 		}
-		clr_character_flag = spy_success
+		clr_flag = spy_success
 	}
 
 	option = {
 		name = EVTOPT_WOL_2121
 
-		trigger = { NOT = { has_character_flag = spy_success } }
+		trigger = { NOT = { has_flag = spy_success } }
 
-		hidden_tooltip = {
-			FROM = {
-				character_event = { id = WoL.2123 }
-			}
+		FROM = {
+			character_event = { id = WoL.2123 }
 		}
 	}
 }
@@ -3083,7 +2999,7 @@ character_event = {
 
 	immediate = {
 		FROMFROM = {
-			set_character_flag = spy_spouse_affair
+			set_flag = spy_spouse_affair
 			character_event = { id = WoL.1003 }
 		}
 	}
@@ -3110,12 +3026,17 @@ character_event = {
 			save_event_target_as = target_captive
 		}
 	#	save_event_target_as = target_rescuer
-		set_character_flag = freeing_prisoner
+		set_flag = freeing_prisoner
 	}
 
 	option = {
 		name = EVTOPTA_WOL_2200
-		character_event = { id = WoL.2210 days = 20 random = 20 tooltip = EVTTOOLTIP_WoL_110 }
+		character_event = {
+			id = WoL.2210
+			days = 20
+			random = 20
+			tooltip = EVTTOOLTIP_WoL_110
+		}
 #		log = "WoL.2200: [Root.GetTitledName] starts planning to liberate [From.GetTitledName] from prison"
 	}
 }
@@ -3137,12 +3058,17 @@ character_event = {
 			save_event_target_as = target_captive
 		}
 	#	save_event_target_as = target_rescuer
-		set_character_flag = freeing_concubine
+		set_flag = freeing_concubine
 	}
 
 	option = {
 		name = EVTOPTA_WOL_2200
-		character_event = { id = WoL.2210 days = 20 random = 20 tooltip = EVTTOOLTIP_WoL_110 }
+		character_event = {
+			id = WoL.2210
+			days = 20
+			random = 20
+			tooltip = EVTTOOLTIP_WoL_110
+		}
 #		log = "WoL.2201: [Root.GetTitledName] starts planning to liberate [From.GetTitledName] from concubinage"
 	}
 }
@@ -3169,7 +3095,12 @@ character_event = {
 
 		if = {
 			limit = {
-				NOT = { has_opinion_modifier = { who = event_target:target_captive modifier = opinion_breaking_out } }
+				NOT = {
+					has_opinion_modifier = {
+						who = event_target:target_captive
+						name = opinion_breaking_out
+					}
+				}
 			}
 			break = yes
 		}
@@ -3195,7 +3126,7 @@ character_event = {
 		}
 		if = {
 			limit = {
-				has_character_flag = freeing_prisoner
+				has_flag = freeing_prisoner
 				event_target:target_captive = {
 					prisoner = no
 				}
@@ -3206,7 +3137,7 @@ character_event = {
 
 		if = {
 			limit = {
-				has_character_flag = has_liberation_agent
+				has_flag = has_liberation_agent
 				event_target:target_agent = {
 					OR = {
 						is_alive = no
@@ -3217,7 +3148,7 @@ character_event = {
 			}
 			character_event = { id = WoL.2230 }
 			clear_event_target = target_agent
-			clr_character_flag = has_liberation_agent
+			clr_flag = has_liberation_agent
 		}
 
 		random_list = {
@@ -3225,45 +3156,43 @@ character_event = {
 				repeat_event = { id = WoL.2210 days = 30 random = 60 } # Fire again with no scope changes
 			}
 			100 = { # Courtier contacted
-				modifier = {
-					factor = 0
-					has_character_flag = has_liberation_agent
+				trigger = {
+					NOT = { has_flag = has_liberation_agent }
 				}
 
 				event_target:target_captive = {
-					host = {
-						random_courtier = {
-							limit = {
-								is_ruler = no
-								prisoner = no
-								is_ill = no
-								is_adult = yes
-								is_incapable = no
-								NOT = { character = PREVPREV }
-								OR = {
-									trait = arbitrary
-									trait = greedy
-									personal_opinion_diff = {
-										first = ROOT
-										second = liege
-										value = 5
-									}
-									personal_opinion_diff = {
-										first = PREVPREV
-										second = liege
-										value = 5
-									}
+					random_host_courtier = {
+						limit = {
+							is_ruler = no
+							is_adult = yes
+							is_ill = no
+							is_incapable = no
+							prisoner = no
+							in_command = no
+							NOT = { character = PREVPREV }
+							OR = {
+								trait = arbitrary
+								trait = greedy
+								personal_opinion_diff = {
+									first = ROOT
+									second = liege
+									value >= 5
 								}
-								NOT = {
-									reverse_has_opinion_modifier = {
-										who = ROOT
-										modifier = opinion_disappointed
-									}
+								personal_opinion_diff = {
+									first = PREVPREV
+									second = liege
+									value >= 5
 								}
 							}
-							character_event = { id = WoL.2220 }
-							break = yes
+							NOT = {
+								reverse_has_opinion_modifier = {
+									who = ROOT
+									name = opinion_disappointed
+								}
+							}
 						}
+						character_event = { id = WoL.2220 }
+						break = yes
 					}
 				}
 
@@ -3271,9 +3200,8 @@ character_event = {
 			}
 
 			100 = { # Liberation attempt
-				modifier = {
-					factor = 0
-					NOT = { has_character_flag = has_liberation_agent }
+				trigger = {
+					has_flag = has_liberation_agent
 				}
 
 				event_target:target_agent = {
@@ -3281,20 +3209,16 @@ character_event = {
 				}
 			}
 			100 = { # Agent wants more money
-				modifier = {
-					factor = 0
-					NOT = { has_character_flag = has_liberation_agent }
-				}
-				modifier = {
-					factor = 0
+				trigger = {
+					has_flag = has_liberation_agent
 					event_target:target_agent = {
-						NOR = {
+						OR = {
 							trait = greedy
 							trait = arbitrary
 							trait = deceitful
 							trait = cruel
 						}
-						OR = {
+						NOR = {
 							is_lover = ROOT
 							is_friend = ROOT
 						}
@@ -3380,12 +3304,12 @@ character_event = {
 	immediate = {
 		remove_opinion = {
 			who = event_target:target_captive
-			modifier = opinion_breaking_out
+			name = opinion_breaking_out
 		}
 
-		clr_character_flag = freeing_prisoner
-		clr_character_flag = freeing_concubine
-		clr_character_flag = has_liberation_agent
+		clr_flag = freeing_prisoner
+		clr_flag = freeing_concubine
+		clr_flag = has_liberation_agent
 	}
 }
 
@@ -3419,12 +3343,12 @@ character_event = {
 				personal_opinion_diff = {
 					first = ROOT
 					second = liege
-					value = 20
+					value >= 20
 				}
 				personal_opinion_diff = {
 					first = event_target:target_captive
 					second = liege
-					value = 20
+					value >= 20
 				}
 			}
 		}
@@ -3433,11 +3357,9 @@ character_event = {
 			factor = 1000
 		}
 
-		hidden_tooltip = {
-			set_character_flag = has_liberation_agent
-			FROM = { save_event_target_as = target_agent }
-			character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
-		}
+		set_flag = has_liberation_agent
+		FROM = { save_event_target_as = target_agent }
+		character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
 	}
 
 	option = {
@@ -3446,19 +3368,15 @@ character_event = {
 			FROM = {
 				OR = {
 					trait = greedy
-					NOT = {
-						personal_opinion_diff = {
-							first = ROOT
-							second = liege
-							value = 20
-						}
+					personal_opinion_diff = {
+						first = ROOT
+						second = liege
+						value < 20
 					}
-					NOT = {
-						personal_opinion_diff = {
-							first = event_target:target_captive
-							second = liege
-							value = 20
-						}
+					personal_opinion_diff = {
+						first = event_target:target_captive
+						second = liege
+						value < 20
 					}
 				}
 			}
@@ -3469,13 +3387,13 @@ character_event = {
 		}
 
 		wealth = -10
-		FROM = { wealth = 10 }
-
-		hidden_tooltip = {
-			set_character_flag = has_liberation_agent
-			FROM = { save_event_target_as = target_agent }
-			character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
+		FROM = {
+			wealth = 10
+			save_event_target_as = target_agent
 		}
+
+		set_flag = has_liberation_agent
+		character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
 	}
 
 	option = {
@@ -3500,11 +3418,9 @@ character_event = {
 
 		tooltip_info = seducer
 
-		hidden_tooltip = {
-			set_character_flag = has_liberation_agent
-			FROM = { save_event_target_as = target_agent }
-			character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
-		}
+		set_flag = has_liberation_agent
+		FROM = { save_event_target_as = target_agent }
+		character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
 	}
 
 	option = {
@@ -3529,11 +3445,9 @@ character_event = {
 
 		tooltip_info = seductress
 
-		hidden_tooltip = {
-			set_character_flag = has_liberation_agent
-			FROM = { save_event_target_as = target_agent }
-			character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
-		}
+		set_flag = has_liberation_agent
+		FROM = { save_event_target_as = target_agent }
+		character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
 	}
 
 	option = {
@@ -3542,9 +3456,7 @@ character_event = {
 			factor = 0
 		}
 
-		hidden_tooltip = {
-			character_event = { id = WoL.2219 }
-		}
+		character_event = { id = WoL.2219 }
 	}
 }
 
@@ -3560,39 +3472,33 @@ character_event = {
 
 		random_list = {
 			100 = { # Success!
-				modifier = {
+				mult_modifier = {
 					factor = 1.5
 					liege = {
-						NOT = {
-							attribute_diff = {
-								attribute = intrigue
-								character = FROM
-								value = -2
-							}
+						attribute_diff = {
+							attribute = intrigue
+							character = FROM
+							value < -2
 						}
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 1.5
 					liege = {
-						NOT = {
-							attribute_diff = {
-								attribute = intrigue
-								character = FROM
-								value = -5
-							}
+						attribute_diff = {
+							attribute = intrigue
+							character = FROM
+							value < -5
 						}
 					}
 				}
-				modifier = {
-					factor = 2.0
+				mult_modifier = {
+					factor = 2
 					liege = {
-						NOT = {
-							attribute_diff = {
-								attribute = intrigue
-								character = FROM
-								value = -9
-							}
+						attribute_diff = {
+							attribute = intrigue
+							character = FROM
+							value < -9
 						}
 					}
 				}
@@ -3603,33 +3509,33 @@ character_event = {
 			}
 
 			100 = { # Failure
-				modifier = {
+				mult_modifier = {
 					factor = 1.5
 					liege = {
 						attribute_diff = {
 							attribute = intrigue
 							character = FROM
-							value = 3
+							value >= 3
 						}
 					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 1.5
 					liege = {
 						attribute_diff = {
 							attribute = intrigue
 							character = FROM
-							value = 6
+							value >= 6
 						}
 					}
 				}
-				modifier = {
-					factor = 2.0
+				mult_modifier = {
+					factor = 2
 					liege = {
 						attribute_diff = {
 							attribute = intrigue
 							character = FROM
-							value = 10
+							value >= 10
 						}
 					}
 				}
@@ -3659,18 +3565,16 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_2223 # Freedom!
 
-		hidden_tooltip = {
-			host = {
-				character_event = { id = WoL.2224 } # Notify jailor
-			}
+		host = {
+			character_event = { id = WoL.2224 } # Notify jailor
 		}
 
 		if = {
 			limit = {
 				prisoner = no
 				is_consort = yes
-				NOT = { is_senior_consort_party = yes }
-				FROMFROM = { has_character_flag = freeing_concubine }
+				is_senior_consort_party = no
+				FROMFROM = { has_flag = freeing_concubine }
 			}
 			consort = {
 				remove_consort = ROOT
@@ -3678,11 +3582,9 @@ character_event = {
 			move_character = FROMFROM
 		}
 
-		hidden_tooltip = {
-			FROMFROM = {
-				character_event = { id = WoL.2219 } # Clean up
-				character_event = { id = WoL.2225 } # Notify liberator
-			}
+		FROMFROM = {
+			character_event = { id = WoL.2219 } # Clean up
+			character_event = { id = WoL.2225 } # Notify liberator
 		}
 
 		if = {
@@ -3692,13 +3594,13 @@ character_event = {
 
 		opinion = {
 			who = FROM
-			modifier = opinion_grateful
-			months = 120
+			name = opinion_grateful
+			years = 10
 		}
 		opinion = {
 			who = FROMFROM
-			modifier = opinion_grateful
-			months = 120
+			name = opinion_grateful
+			years = 10
 		}
 	}
 }
@@ -3745,8 +3647,8 @@ character_event = {
 
 		opinion = {
 			who = FROMFROM
-			modifier = opinion_grateful
-			months = 120
+			name = opinion_grateful
+			years = 10
 		}
 	}
 }
@@ -3764,9 +3666,9 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_2226
 
-		hidden_tooltip = {
+		hidden_effect = {
 			add_character_modifier = {
-				modifier = failed_escape
+				name = failed_escape
 				years = 5
 			}
 
@@ -3810,30 +3712,33 @@ character_event = {
 
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 5.0
+			mult_modifier = {
+				factor = 5
 				trait = cruel
 			}
-			modifier = {
-				factor = 5.0
+			mult_modifier = {
+				factor = 5
 				trait = impaler
 			}
 		}
 
 		opinion = {
 			who = FROMFROM
-			modifier = opinion_traitor
+			name = opinion_traitor
 		}
 
 		FROM = {
+			show_scope_change = no
 			add_character_modifier = {
-				modifier = the_oubliette
+				name = the_oubliette
 				duration = -1
 			}
-
-			hidden_tooltip = {
-				character_event = { id = WoL.2228 days = 3 } # Notify prisoner
+			hidden_effect = {
+				remove_character_modifier = house_arrest
+				remove_character_modifier = the_dungeon
 			}
+
+			character_event = { id = WoL.2228 days = 3 } # Notify prisoner
 		}
 	}
 
@@ -3841,15 +3746,15 @@ character_event = {
 		name = EVTOPTB_WOL_2227 # Tighten security
 		ai_chance = {
 			factor = 100
-			modifier = {
-				factor = 5.0
+			mult_modifier = {
+				factor = 5
 				trait = kind
 			}
 		}
 
 		opinion = {
 			who = FROMFROM
-			modifier = opinion_traitor
+			name = opinion_traitor
 		}
 	}
 }
@@ -3884,8 +3789,8 @@ character_event = {
 
 		opinion = {
 			who = FROMFROM
-			modifier = opinion_grateful
-			months = 120
+			name = opinion_grateful
+			years = 10
 		}
 	}
 }
@@ -3920,7 +3825,7 @@ letter_event = {
 		name = EVTOPTA_WOL_2231 # Pay
 		ai_chance = {
 			factor = 10
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = greedy
 			}
@@ -3929,9 +3834,7 @@ letter_event = {
 		event_target:target_agent = {
 			wealth = 10
 		}
-		hidden_tooltip = {
-			character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
-		}
+		character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
 	}
 
 	option = {
@@ -3939,15 +3842,15 @@ letter_event = {
 		ai_chance = {
 			factor = 100
 		}
-		hidden_tooltip = {
+		hidden_effect = {
 			opinion = {
 				who = event_target:target_agent
-				modifier = opinion_disappointed
-				months = 36
+				name = opinion_disappointed
+				years = 3
 			}
 
 			clear_event_target = target_agent
-			clr_character_flag = has_liberation_agent
+			clr_flag = has_liberation_agent
 
 			character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
 		}
@@ -3959,9 +3862,7 @@ letter_event = {
 			factor = 1
 		}
 
-		hidden_tooltip = {
-			character_event = { id = WoL.2219 } # Clear out any flags, etc
-		}
+		character_event = { id = WoL.2219 } # Clear out any flags, etc
 	}
 }
 
@@ -3982,18 +3883,14 @@ character_event = {
 		ai_chance = {
 			factor = 10
 		}
-		hidden_tooltip = {
-			character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
-		}
+		character_event = { id = WoL.2210 days = 30 random = 60 } # Back to the tombola
 	}
 	option = {
 		name = EVTOPTB_WOL_2232 # Give up
 		ai_chance = {
 			factor = 100
 		}
-		hidden_tooltip = {
-			character_event = { id = WoL.2219 } # Clear out any flags, etc
-		}
+		character_event = { id = WoL.2219 } # Clear out any flags, etc
 	}
 }
 
@@ -4011,13 +3908,13 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	only_playable = yes
-	prisoner = no
 	only_capable = yes
+	prisoner = no
+	in_command = no
 
 	trigger = {
 		has_focus = focus_intrigue
 		has_regent = no
-		in_command = no
 		job_spymaster = {
 			OR = {
 				AND = {
@@ -4030,79 +3927,75 @@ character_event = {
 				}
 				ROOT = { trait = paranoid }
 			}
-			NOT = { has_character_flag = spymaster_noticed_liege }
+			NOT = { has_flag = spymaster_noticed_liege }
 		}
 	}
 
 	mean_time_to_happen = {
-		months = 60
-		modifier = {
+		years = 5
+		mult_modifier = {
 			factor = 0.25
 			trait = schemer
 			NOT = { trait = paranoid }
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			NOT = { trait = paranoid }
 			has_character_modifier = wol_schemer_2
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.75
 			NOT = { trait = paranoid }
 			has_character_modifier = wol_schemer_1
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			NOT = { trait = paranoid }
 			has_character_modifier = seduced_loyal_spy_maid
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
-			job_spymaster = {
-				NOT = {
-					attribute_diff = {
-						attribute = intrigue
-						character = ROOT
-						value = -4
-					}
-				}
-			}
-		}
-		modifier = {
-			factor = 0.5
-			job_spymaster = {
-				NOT = {
-					attribute_diff = {
-						attribute = intrigue
-						character = ROOT
-						value = -9
-					}
-				}
-			}
-		}
-		modifier = {
-			factor = 2.0
 			job_spymaster = {
 				attribute_diff = {
 					attribute = intrigue
 					character = ROOT
-					value = 5
+					value < -4
 				}
 			}
 		}
-		modifier = {
-			factor = 2.0
+		mult_modifier = {
+			factor = 0.5
 			job_spymaster = {
 				attribute_diff = {
 					attribute = intrigue
 					character = ROOT
-					value = 10
+					value < -9
 				}
 			}
 		}
-		modifier = {
-			factor = 4.0
+		mult_modifier = {
+			factor = 2
+			job_spymaster = {
+				attribute_diff = {
+					attribute = intrigue
+					character = ROOT
+					value >= 5
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 2
+			job_spymaster = {
+				attribute_diff = {
+					attribute = intrigue
+					character = ROOT
+					value >= 10
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 4
 			trait = paranoid
 			job_spymaster = {
 				NOR = {
@@ -4131,36 +4024,32 @@ character_event = {
 			factor = 100
 		}
 
-		hidden_tooltip = {
-			random_list = {
-				200 = { # Plot uncovered, spymaster arrested
-					modifier = {
-						factor = 0
-						job_spymaster = {
-							NOR = {
-								AND = {
-									has_plot = yes
-									NOT = { plot_is_known_by = ROOT }
-								}
-								any_backed_character = {
-									has_plot = yes
-									NOT = { plot_is_known_by = ROOT }
-								}
+		random_list = {
+			200 = { # Plot uncovered, spymaster arrested
+				trigger = {
+					job_spymaster = {
+						OR = {
+							AND = {
+								has_plot = yes
+								NOT = { plot_is_known_by = ROOT }
 							}
-						}
-					}
-
-					if = {
-						limit = {
-							job_spymaster = {
+							any_backed_character = {
 								has_plot = yes
 								NOT = { plot_is_known_by = ROOT }
 							}
 						}
-						job_spymaster = { character_event = { id = WoL.2301 days = 3 random = 7 } }
-						break = yes
 					}
-					job_spymaster = {
+				}
+
+				job_spymaster = {
+					if = {
+						limit = {
+								has_plot = yes
+								NOT = { plot_is_known_by = ROOT }
+						}
+						character_event = { id = WoL.2301 days = 3 random = 7 }
+					}
+					else = {
 						random_backed_character = {
 							limit = {
 								has_plot = yes
@@ -4170,12 +4059,12 @@ character_event = {
 						}
 					}
 				}
-				50 = { # Nothing discovered
-					character_event = { id = WoL.2304 days = 7 random = 7 }
-				}
-				50 = { # Spymaster notices
-					job_spymaster = { character_event = { id = WoL.2305 days = 3 random = 7 } }
-				}
+			}
+			50 = { # Nothing discovered
+				character_event = { id = WoL.2304 days = 7 random = 7 }
+			}
+			50 = { # Spymaster notices
+				job_spymaster = { character_event = { id = WoL.2305 days = 3 random = 7 } }
 			}
 		}
 	}
@@ -4184,7 +4073,7 @@ character_event = {
 		name = EVTOPTB_WOL_2300 # I trust him/her
 		ai_chance = {
 			factor = 1
-			modifier = {
+			mult_modifier = {
 				factor = 300
 				trait = trusting
 			}
@@ -4255,7 +4144,7 @@ character_event = {
 			}
 			opinion = {
 				who = event_target:intrigue_spymaster
-				modifier = opinion_traitor
+				name = opinion_traitor
 			}
 		}
 	}
@@ -4284,7 +4173,7 @@ character_event = {
 			}
 			opinion = {
 				who = event_target:intrigue_spymaster
-				modifier = opinion_traitor
+				name = opinion_traitor
 			}
 		}
 	}
@@ -4328,7 +4217,7 @@ character_event = {
 		name = EVTOPTB_WOL_2304 # Replace
 		ai_chance = {
 			factor = 10
-			modifier = {
+			mult_modifier = {
 				factor = 50
 				trait = paranoid
 			}
@@ -4354,9 +4243,7 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_2305
 
-		hidden_tooltip = {
-			set_character_flag = spymaster_noticed_liege
-			character_event = { id = WoL.2304 }
-		}
+		set_flag = spymaster_noticed_liege
+		character_event = { id = WoL.2304 }
 	}
 }

@@ -8,20 +8,27 @@ character_event = {
 	id = HF.40000
 	hide_window = yes
 	is_triggered_only = yes
+	
+	has_dlc = "Holy Fury"
+	
+	religion_group = christian
 	min_age = 16
 	only_playable = yes
-	religion_group = christian
-	has_dlc = "Holy Fury"
 
 	trigger = {
+		
 		death_in_china_trigger = no
 		death_no_trace_trigger = no
+		has_vice_trigger = no
+		has_virtue_trigger = yes
+		is_benevolent_trigger = yes
+		is_pious_trigger = yes
+		
 		NOR = {
 			trait = excommunicated
 			trait = drunkard
 			trait = hedonist
 			trait = cannibal_trait
-			#controls_religion = yes
 			religion = waldensian
 			is_any_kinslayer_trigger = yes
 			has_character_modifier = voice_of_satan
@@ -34,44 +41,37 @@ character_event = {
 			has_character_modifier = corrupting_magic_minor
 			has_character_modifier = corrupting_magic_major
 
-			any_claim = { title = k_papal_state } # Antipopes
-			any_claim = { title = d_fraticelli } # Antipopes
+			# Antipopes
+			has_claim = k_papal_state
+			has_claim = d_fraticelli
 		}
 		OR = {
-			AND = {
-				tier = emperor
+			trigger_if = {
+				limit = { real_tier = emperor }
 				piety >= 1250
 			}
-
-			AND = {
-				tier = king
+			trigger_else_if = {
+				limit = { real_tier = king }
 				piety >= 1000
 			}
-			AND = {
-				tier = duke
+			trigger_else_if = {
+				limit = { real_tier = duke }
 				piety >= 750
 			}
-			AND = {
-				tier = count
+			trigger_else_if = {
+				limit = { real_tier = count }
 				piety >= 500
 			}
 			has_character_modifier = true_christian_knight
 			has_any_opinion_modifier = opinion_baptism_sponsor_target
 		}
-		has_vice_trigger = no
-		is_benevolent_trigger = yes
-		is_pious_trigger = yes
-		has_virtue_trigger = yes
-		is_adult = yes
 	}
 
 	immediate = {
 		#Beatification
 		save_event_target_as = saint_person
-		event_target:saint_person = {
-			capital_scope = {
-				save_event_target_as = saint_capital
-			}
+		capital_scope = {
+			save_event_target_as = saint_capital
 		}
 		random_demesne_province = {
 			limit = {
@@ -91,57 +91,46 @@ character_event = {
 			}
 			save_event_target_as = random_saint_realm_province
 		}
-		if = {
+		random_realm_character = {
 			limit = {
-				religion_group = christian
+				is_landed = yes
+				is_theocracy = yes
+				religion = ROOT
+				NOT = { trait = bad_priest_christian }
 			}
-			random_realm_character = {
-				limit = {
-					is_theocracy = yes
-					religion = event_target:saint_person
-					NOT = {
-						trait = bad_priest_christian
+			random = {
+				chance = 100
+				
+				mult_modifier = {
+					factor = 0.25
+					ROOT = {
+						any_owned_bloodline = {
+							has_bloodline_flag = saintly_bloodline
+						}
 					}
-					is_landed = yes
 				}
-				random = {
-					chance = 100
-					modifier = {
-						factor = 0.25
-						event_target:saint_person = {
-							any_owned_bloodline = {
-								has_bloodline_flag = saintly_bloodline
-							}
-						}
-					}
-					modifier = {
-						factor = 0.8
-						event_target:saint_person = {
-							trait = cynical
-						}
-					}
-					random_realm_province = {
-						province_event = { id = HF.40001 }
-					}
-					event_target:saint_person = {
-						set_character_flag = beatified
-					}
+				
+				mult_modifier = {
+					factor = 0.8
+					ROOT = { trait = cynical }
+				}
+				
+				random_realm_province = {
+					province_event = { id = HF.40001 }
+				}
+				ROOT = {
+					set_character_flag = beatified
+					
+					#Potential for sainthood
+					deciding_upon_saint_effect = yes
 				}
 			}
 		}
 
 		if = {
-			limit = {
-				event_target:saint_person = {
-					ai = no
-				}
-			}
-			event_target:saint_person = {
-				add_trait = i_used_to_be_a_player
-			}
+			limit = { ai = no }
+			add_trait = i_used_to_be_a_player
 		}
-		#Potential for sainthood
-		deciding_upon_saint_effect = yes
 	}
 }
 
@@ -188,12 +177,10 @@ province_event = {
 			else = {
 				random_realm_character = {
 					limit = {
+						is_landed = yes
 						is_theocracy = yes
 						religion = event_target:saint_person
-						NOT = {
-							trait = bad_priest_christian
-						}
-						is_landed = yes
+						NOT = { trait = bad_priest_christian }
 					}
 					character_event = { id = HF.40003 }
 				}
@@ -394,7 +381,7 @@ narrative_event = {
 			piety = 250
 			religion_head = {
 				opinion = {
-					modifier = opinion_family_saint
+					name = opinion_family_saint
 					who = ROOT
 					years = 10
 				}
@@ -405,7 +392,7 @@ narrative_event = {
 					religion_head = { NOT = { character = PREV } }
 				}
 				opinion = {
-					modifier = opinion_family_saint
+					name = opinion_family_saint
 					who = ROOT
 					years = 10
 				}
@@ -938,12 +925,7 @@ character_event = {
 					event_target:saint_person = {
 						if = {
 							limit = {
-								OR = {
-									religion = orthodox
-									religion = iconoclast
-									religion = paulician
-									religion = monothelite
-								}
+								is_orthodox_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_orthodox_01
@@ -953,7 +935,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								religion = nestorian
+								is_nestorian_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_nestorian_01
@@ -963,10 +945,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								OR = {
-									religion = miaphysite
-									religion = monophysite
-								}
+								is_miaphysite_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_coptic_01
@@ -1241,12 +1220,7 @@ character_event = {
 					event_target:saint_person = {
 						 if = {
 							limit = {
-								OR = {
-									religion = orthodox
-									religion = iconoclast
-									religion = paulician
-									religion = monothelite
-								}
+								is_orthodox_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_orthodox_02
@@ -1256,7 +1230,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								religion = nestorian
+								is_nestorian_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_nestorian_02
@@ -1266,10 +1240,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								OR = {
-									religion = miaphysite
-									religion = monophysite
-								}
+								is_miaphysite_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_coptic_02
@@ -1312,12 +1283,7 @@ character_event = {
 					event_target:saint_person = {
 						if = {
 							limit = {
-								OR = {
-									religion = orthodox
-									religion = iconoclast
-									religion = paulician
-									religion = monothelite
-								}
+								is_orthodox_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_orthodox_03
@@ -1327,7 +1293,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								religion = nestorian
+								is_nestorian_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_nestorian_03
@@ -1337,10 +1303,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								OR = {
-									religion = miaphysite
-									religion = monophysite
-								}
+								is_miaphysite_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_coptic_03
@@ -1590,7 +1553,7 @@ character_event = {
 					}
 				}
 				5 = {
-					modifier = {
+					mult_modifier = {
 						factor = 4
 						OR = {
 							event_target:saint_person = {
@@ -1604,12 +1567,7 @@ character_event = {
 					event_target:saint_person = {
 						if = {
 							limit = {
-								OR = {
-									religion = orthodox
-									religion = iconoclast
-									religion = paulician
-									religion = monothelite
-								}
+								is_orthodox_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_orthodox_04
@@ -1619,7 +1577,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								religion = nestorian
+								is_nestorian_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_nestorian_04
@@ -1629,10 +1587,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								OR = {
-									religion = miaphysite
-									religion = monophysite
-								}
+								is_miaphysite_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_coptic_04
@@ -1890,12 +1845,7 @@ character_event = {
 					event_target:saint_person = {
 						if = {
 							limit = {
-								OR = {
-									religion = orthodox
-									religion = iconoclast
-									religion = paulician
-									religion = monothelite
-								}
+								is_orthodox_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_orthodox_05
@@ -1905,7 +1855,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								religion = nestorian
+								is_nestorian_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_nestorian_05
@@ -1915,10 +1865,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								OR = {
-									religion = miaphysite
-									religion = monophysite
-								}
+								is_miaphysite_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_coptic_05
@@ -2171,12 +2118,7 @@ character_event = {
 					event_target:saint_person = {
 						if = {
 							limit = {
-								OR = {
-									religion = orthodox
-									religion = iconoclast
-									religion = paulician
-									religion = monothelite
-								}
+								is_orthodox_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_orthodox_06
@@ -2186,7 +2128,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								religion = nestorian
+								is_nestorian_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_nestorian_06
@@ -2196,10 +2138,7 @@ character_event = {
 						}
 						else_if = {
 							limit = {
-								OR = {
-									religion = miaphysite
-									religion = monophysite
-								}
+								is_miaphysite_branch = yes
 							}
 							create_bloodline = {
 								type = saintly_bloodline_coptic_06
@@ -2589,57 +2528,45 @@ character_event = {
 	weight_multiplier = {
 		days = 1
 		#After the year 950
-		modifier = {
+		mult_modifier = {
 			factor = 2
-			year = 950
-			NOT = {
-				year = 1000
-			}
+			year >= 950
+			year < 1000
 		}
 		#After the year 1000
-		modifier = {
+		mult_modifier = {
 			factor = 3
-			year = 1000
-			NOT = {
-				year = 1050
-			}
+			year >= 1000
+			year < 1050
 		}
 		#After the year 1050
-		modifier = {
+		mult_modifier = {
 			factor = 4
-			year = 1050
-			NOT = {
-				year = 1110
-			}
+			year >= 1050
+			year < 1110
 		}
 		#After the year 1110
-		modifier = {
+		mult_modifier = {
 			factor = 5
-			year = 1100
-			NOT = {
-				year = 1150
-			}
+			year >= 1100
+			year < 1150
 		}
 		#After the year 1150
-		modifier = {
+		mult_modifier = {
 			factor = 6
-			year = 1150
-			NOT = {
-				year = 1200
-			}
+			year >= 1150
+			year < 1200
 		}
 		#After the year 1200
-		modifier = {
+		mult_modifier = {
 			factor = 7
-			year = 1200
-			NOT = {
-				year = 1250
-			}
+			year >= 1200
+			year < 1250
 		}
 		#After the year 1250
-		modifier = {
+		mult_modifier = {
 			factor = 8
-			year = 1250
+			year >= 1250
 		}
 	}
 
@@ -2789,25 +2716,10 @@ narrative_event = {
 	#Disapprove of sinful Blessed
 	desc = {
 		trigger = {
-			OR = {
-				#Stranger, and dislike sinful beatified
-				NOR = {
-					trait = drunkard
-					trait = hedonist
-					event_target:saint_person = {
-					   family = ROOT
-					}
-				}
-				#Family member, and disapprove of sinful beatified
-				AND = {
-					NOR = {
-							trait = drunkard
-							trait = hedonist
-					}
-					event_target:saint_person = {
-						family = ROOT
-					}
-				}
+			# Dislike sinful beatified
+			NOR = {
+				trait = drunkard
+				trait = hedonist
 			}
 		}
 		text = EVTDESCA_HF_40055
@@ -2816,29 +2728,10 @@ narrative_event = {
 	#Approve of sinful beatified
 	desc = {
 		trigger = {
+			# Similar
 			OR = {
-				#Not family member, but similar
-				AND = {
-					OR = {
-						trait = drunkard
-						trait = hedonist
-					}
-					NOT = {
-						event_target:saint_person = {
-							family = ROOT
-						}
-					}
-				}
-				#Family Member and similar
-				AND = {
-					OR = {
-						trait = drunkard
-						trait = hedonist
-					}
-					event_target:saint_person = {
-						family = ROOT
-					}
-				}
+				trait = drunkard
+				trait = hedonist
 			}
 		}
 		text = EVTDESCB_HF_40055
@@ -2855,11 +2748,9 @@ narrative_event = {
 	option = {
 		name = EVTOPTA_HF_40055
 		trigger = {
-			NOT = {
-				OR = {
-					trait = drunkard
-					trait = hedonist
-				}
+			NOR = {
+				trait = drunkard
+				trait = hedonist
 				event_target:saint_person = {
 					family = ROOT
 				}
@@ -2889,15 +2780,12 @@ narrative_event = {
 	option = {
 		name = EVTOPTC_HF_40055
 		trigger = {
+			NOR = {
+				trait = drunkard
+				trait = hedonist
+			}
 			event_target:saint_person = {
 				family = ROOT
-			}
-			NOT = {
-				OR = {
-					trait = drunkard
-					trait = hedonist
-				}
-
 			}
 		}
 		show_portrait = event_target:bishopric_holder
@@ -2986,25 +2874,10 @@ narrative_event = {
 	#Approve of Papal decision
 	desc = {
 		trigger = {
-			OR = {
-				#Stranger, and dislike sinful beatified
-				NOR = {
-					trait = drunkard
-					trait = hedonist
-					event_target:saint_person = {
-						family = ROOT
-					}
-				}
-				#Family member, and dislike sinful beatified
-				AND = {
-					NOR = {
-						trait = drunkard
-						trait = hedonist
-					}
-					event_target:saint_person = {
-						family = ROOT
-					}
-				}
+			# Dislike sinful beatified
+			NOR = {
+				trait = drunkard
+				trait = hedonist
 			}
 		}
 		text = EVTDESCA_HF_40060
@@ -3013,29 +2886,10 @@ narrative_event = {
 	#Disapprove of Papal decision
 	desc = {
 		trigger = {
+			# Similar
 			OR = {
-				#Not family member of Saint, but similar
-				AND = {
-					OR = {
-						trait = drunkard
-						trait = hedonist
-					}
-					NOT = {
-						event_target:saint_person = {
-							family = ROOT
-						}
-					}
-				}
-				#Family Member of Saint and similar
-				AND = {
-					OR = {
-						trait = drunkard
-						trait = hedonist
-					}
-					event_target:saint_person = {
-						family = ROOT
-					}
-				}
+				trait = drunkard
+				trait = hedonist
 			}
 		}
 		text = EVTDESCB_HF_40060
@@ -3078,15 +2932,12 @@ narrative_event = {
 			}
 		}
 		opinion = {
-			modifier = insulted
+			name = insulted
 			who = FROM
 		}
-		FROM = {
-			show_scope_change = no
-			opinion = {
-				modifier = insulted
-				who = ROOT
-			}
+		reverse_opinion = {
+			name = insulted
+			who = FROM
 		}
 		custom_tooltip = { text = impious_beatification_tooltip }
 		show_portrait = event_target:saint_person
@@ -3096,12 +2947,12 @@ narrative_event = {
 	option = {
 		name = EVTOPTC_HF_40060
 		trigger = {
-			event_target:saint_person = {
-				family = ROOT
-			}
 			NOR = {
 				trait = drunkard
 				trait = hedonist
+			}
+			event_target:saint_person = {
+				family = ROOT
 			}
 		}
 		custom_tooltip = { text = impious_beatification_tooltip }
@@ -3121,15 +2972,12 @@ narrative_event = {
 			}
 		}
 		opinion = {
-			modifier = insulted
+			name = insulted
 			who = FROM
 		}
-		FROM = {
-			show_scope_change = no
-			opinion = {
-				modifier = insulted
-				who = ROOT
-			}
+		reverse_opinion = {
+			name = insulted
+			who = FROM
 		}
 		custom_tooltip = { text = impious_beatification_tooltip }
 		show_portrait = event_target:saint_person
@@ -3139,11 +2987,14 @@ narrative_event = {
 #Bad Papal saint
 character_event = {
 	id = HF.40090
+	
 	hide_window = yes
 	is_triggered_only = yes
+	
+	has_dlc = "Holy Fury"
+	
 	religion = catholic
 	min_age = 16
-	has_dlc = "Holy Fury"
 
 	trigger = {
 		death_in_china_trigger = no
@@ -3154,14 +3005,11 @@ character_event = {
 				independent = yes
 				opinion = {
 					who = ROOT
-					value = 50
+					value >= 50
 				}
 			}
 		}
-		religion = catholic
-		NOT = {
-			trait = excommunicated
-		}
+		NOT = { trait = excommunicated }
 		OR = {
 			AND = {
 				trait = impaler
@@ -3389,11 +3237,10 @@ character_event = {
 		if = {
 			limit = {
 				independent = yes
-				any_playable_ruler = {
-					independent = yes
+				any_independent_ruler = {
 					OR = {
-						tier = KING
-						tier = EMPEROR
+						real_tier = KING
+						real_tier = EMPEROR
 					}
 					NOT = { trait = cynical }
 					war = no
@@ -3402,12 +3249,11 @@ character_event = {
 					is_within_diplo_range = ROOT
 				}
 			}
-			random_playable_ruler = {
+			random_independent_ruler = {
 				limit = {
-					independent = yes
 					OR = {
-						tier = KING
-						tier = EMPEROR
+						real_tier = KING
+						real_tier = EMPEROR
 					}
 					NOT = { trait = cynical }
 					war = no
@@ -3416,7 +3262,7 @@ character_event = {
 					is_within_diplo_range = ROOT
 				}
 				preferred_limit = {
-					tier = EMPEROR
+					real_tier = EMPEROR
 				}
 				save_event_target_as = papal_attacker
 				add_trait = zealous
@@ -3428,11 +3274,7 @@ character_event = {
 			any_playable_ruler = {
 				limit = {
 					religion = ROOT
-					event_target:papal_attacker = {
-						NOT = {
-							character = PREV
-						}
-					}
+					NOT = { character = event_target:papal_attacker }
 				}
 				narrative_event = { id = HF.40093 days = 15 }
 			}
@@ -3542,14 +3384,14 @@ narrative_event = {
 		ai_chance = {
 			factor = 80
 
-			modifier = {
+			mult_modifier = {
 				factor = 0
 				independent = yes
 				ai = yes
 				trait = zealous
 			}
 
-			modifier = {
+			mult_modifier = {
 				factor = 0.25
 				OR = {
 					trait = cannibal_trait
@@ -3594,7 +3436,7 @@ narrative_event = {
 
 		ai_chance = {
 			factor = 20
-			modifier = {
+			mult_modifier = {
 				factor = 4
 				OR = {
 					trait = cannibal_trait
@@ -3671,7 +3513,7 @@ narrative_event = {
 
 		ai_chance = {
 			factor = 10
-			modifier = {
+			mult_modifier = {
 				factor = 5
 				OR = {
 					trait = zealous
@@ -3711,7 +3553,7 @@ narrative_event = {
 
 		ai_chance = {
 			factor = 10
-			modifier = {
+			mult_modifier = {
 				factor = 5
 				has_character_flag = supported_impious_pope
 			}
@@ -3732,7 +3574,7 @@ narrative_event = {
 
 		ai_chance = {
 			factor = 10
-			modifier = {
+			mult_modifier = {
 				factor = 3
 				NOR = {
 					has_character_flag = supported_impious_pope

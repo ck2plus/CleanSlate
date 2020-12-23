@@ -24,30 +24,31 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		has_dlc = "Way of Life"
-	}
+	has_dlc = "Way of Life"
 
 	immediate = {
 
 		# Chance of trait adjustments
 		if = {
 			limit = {
-				NOT = { trait = proud }
-				NOT = { trait = humble }
-				random = 85 # 15% chance
+				trait = humble
 			}
-			add_trait = proud
-			character_event = { id = 38261 } # Proud notification
+			random = {
+				chance = 50
+				remove_trait = humble
+				character_event = { id = 38312 } # Humble loss notification
+			}
 		}
 
-		if = {
+		else_if = {
 			limit = {
-				trait = humble
-				random = 50
+				NOT = { trait = proud }
 			}
-			remove_trait = humble
-			character_event = { id = 38312 } # Humble loss notification
+			random = {
+				chance = 15
+				add_trait = proud
+				character_event = { id = 38261 } # Proud notification
+			}
 		}
 
 		# Chance of Diplo boosters
@@ -65,9 +66,8 @@ character_event = {
 				chance = 5
 				character_event = { id = WoL.3003 days = 4 } # Gain the Gamer or Socializer trait?
 			}
-			break = yes
 		}
-		if = {
+		else_if = {
 			limit = {
 				has_character_modifier = wol_patriarch_1
 			}
@@ -75,13 +75,12 @@ character_event = {
 				chance = 20
 				remove_character_modifier = wol_patriarch_1
 				add_character_modifier = {
-					modifier = wol_patriarch_2
+					name = wol_patriarch_2
 					duration = -1
 				}
 			}
-			break = yes
 		}
-		if = {
+		else_if = {
 			limit = {
 				has_character_modifier = wol_matriarch_1
 			}
@@ -89,27 +88,27 @@ character_event = {
 				chance = 20
 				remove_character_modifier = wol_matriarch_1
 				add_character_modifier = {
-					modifier = wol_matriarch_2
+					name = wol_matriarch_2
 					duration = -1
 				}
 			}
-			break = yes
 		}
 
-		random = {
-			chance = 50
-			if = {
-				limit = { is_female = yes }
-				add_character_modifier = {
-					modifier = wol_matriarch_1
-					duration = -1
+		else = {
+			random = {
+				chance = 50
+				if = {
+					limit = { is_female = yes }
+					add_character_modifier = {
+						name = wol_matriarch_1
+						duration = -1
+					}
 				}
-			}
-			if = {
-				limit = { is_female = no }
-				add_character_modifier = {
-					modifier = wol_patriarch_1
-					duration = -1
+				else = {
+					add_character_modifier = {
+						name = wol_patriarch_1
+						duration = -1
+					}
 				}
 			}
 		}
@@ -125,36 +124,28 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		if = {
-			limit = {
-				trait = naive_appeaser
+		trigger_switch = {
+			on_trigger = trait
+			naive_appeaser = {
+				random = {
+					chance = 10
+					set_flag = int_ed_boost
+					character_event = { id = WoL.3002 }
+				}
 			}
-			random = {
-				chance = 10
-				set_character_flag = int_ed_boost
-				character_event = { id = WoL.3002 }
+			underhanded_rogue = {
+				random = {
+					chance = 5
+					set_flag = int_ed_boost
+					character_event = { id = WoL.3002 }
+				}
 			}
-			break = yes
-		}
-		if = {
-			limit = {
-				trait = underhanded_rogue
-			}
-			random = {
-				chance = 5
-				set_character_flag = int_ed_boost
-				character_event = { id = WoL.3002 }
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				trait = charismatic_negotiator
-			}
-			random = {
-				chance = 1
-				set_character_flag = int_ed_boost
-				character_event = { id = WoL.3002 }
+			charismatic_negotiator = {
+				random = {
+					chance = 1
+					set_flag = int_ed_boost
+					character_event = { id = WoL.3002 }
+				}
 			}
 		}
 	}
@@ -175,33 +166,25 @@ character_event = {
 
 		if = {
 			limit = {
-				has_character_flag = int_ed_boost
-				trait = naive_appeaser
+				has_flag = int_ed_boost
 			}
-			hidden_tooltip = { remove_trait = naive_appeaser }
-			add_trait = underhanded_rogue
-			clr_character_flag = int_ed_boost
-			break = yes
-		}
-		if = {
-			limit = {
-				has_character_flag = int_ed_boost
-				trait = underhanded_rogue
+			clr_flag = int_ed_boost
+
+			trigger_switch = {
+				on_trigger = trait
+				naive_appeaser = {
+					hidden_effect = { remove_trait = naive_appeaser }
+					add_trait = underhanded_rogue
+				}
+				underhanded_rogue = {
+					hidden_effect = { remove_trait = underhanded_rogue }
+					add_trait = charismatic_negotiator
+				}
+				charismatic_negotiator = {
+					hidden_effect = { remove_trait = charismatic_negotiator }
+					add_trait = grey_eminence
+				}
 			}
-			hidden_tooltip = { remove_trait = underhanded_rogue }
-			add_trait = charismatic_negotiator
-			clr_character_flag = int_ed_boost
-			break = yes
-		}
-		if = {
-			limit = {
-				has_character_flag = int_ed_boost
-				trait = charismatic_negotiator
-			}
-			hidden_tooltip = { remove_trait = charismatic_negotiator }
-			add_trait = grey_eminence
-			clr_character_flag = int_ed_boost
-			break = yes
 		}
 	}
 }
@@ -217,8 +200,8 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		NOT = { lifestyle_traits = 1 }
-		NOT = { has_character_flag = wol_no_to_diplomacy_trait }
+		lifestyle_traits < 1
+		NOT = { has_flag = wol_no_to_diplomacy_trait }
 	}
 
 	option = {
@@ -228,7 +211,7 @@ character_event = {
 		}
 		add_trait = socializer
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = {
 					has_nickname = no
@@ -251,7 +234,7 @@ character_event = {
 			factor = 100
 		}
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = {
 					has_nickname = no
@@ -273,7 +256,7 @@ character_event = {
 		ai_chance = {
 			factor = 0
 		}
-		set_character_flag = wol_no_to_diplomacy_trait
+		set_flag = wol_no_to_diplomacy_trait
 	}
 }
 
@@ -291,52 +274,53 @@ character_event = {
 
 	is_triggered_only = yes
 
-	prisoner = no
-	only_capable = yes
-	in_command = no
 	is_married = yes
+	only_capable = yes
+	prisoner = no
+	in_command = no
 
 
 	trigger = {
 		has_focus = focus_family
 		has_regent = no
-		in_command = no
 		is_ill = no
 		any_spouse = {
 			is_alive = yes
-			NOT = { is_lover = ROOT }
-			NOT = { is_rival = ROOT }
 			is_incapable = no
 			prisoner = no
+			NOR = {
+				is_lover = ROOT
+				is_rival = ROOT
+			}
 		}
 	}
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			has_character_modifier = wol_seducer_1
 		}
-		modifier = {
-			factor = 2.0
+		mult_modifier = {
+			factor = 2
 			has_character_modifier = wol_seducer_2
 		}
-		modifier = {
-			factor = 4.0
+		mult_modifier = {
+			factor = 4
 			OR = {
 				trait = seducer
 				trait = seductress
 			}
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.66
 			trait = cruel
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			trait = kind
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			has_fair_trait_trigger = yes
 		}
@@ -346,10 +330,12 @@ character_event = {
 		random_spouse = {
 			limit = {
 				is_alive = yes
-				NOT = { is_lover = ROOT }
-				NOT = { is_rival = ROOT }
 				is_incapable = no
 				prisoner = no
+				NOR = {
+					is_lover = ROOT
+					is_rival = ROOT
+				}
 			}
 			save_event_target_as = target_spouse
 		}
@@ -364,35 +350,14 @@ character_event = {
 
 		if = {
 			limit = {
-				NOT = {
-					event_target:target_spouse = {
-						personal_opinion = {
-							who = ROOT
-							value = 40
-						}
-					}
+				reverse_personal_opinion = {
+					who = event_target:target_spouse
+					value < 40
 				}
 			}
-			event_target:target_spouse = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_marital_love
-				}
-			}
-		}
-
-		if = {
-			limit = {
-				NOT = {
-					personal_opinion = {
-						who = event_target:target_spouse
-						value = 40
-					}
-				}
-			}
-			opinion = {
+			reverse_opinion = {
 				who = event_target:target_spouse
-				modifier = opinion_marital_love
+				name = opinion_marital_love
 			}
 		}
 
@@ -400,11 +365,24 @@ character_event = {
 			limit = {
 				personal_opinion = {
 					who = event_target:target_spouse
-					value = 40
+					value < 40
+				}
+			}
+			opinion = {
+				who = event_target:target_spouse
+				name = opinion_marital_love
+			}
+		}
+
+		if = {
+			limit = {
+				personal_opinion = {
+					who = event_target:target_spouse
+					value >= 40
 				}
 				reverse_personal_opinion = {
 					who = event_target:target_spouse
-					value = 40
+					value >= 40
 				}
 			}
 			add_lover = event_target:target_spouse
@@ -420,39 +398,42 @@ character_event = {
 
 	is_triggered_only = yes
 
+	only_capable = yes
 	prisoner = no
 	in_command = no
-	only_capable = yes
 
 	trigger = {
 		has_focus = focus_family
 		has_regent = no
-		in_command = no
 		is_ill = no
 		any_sibling = {
 			is_alive = yes
-			NOT = { is_friend = ROOT }
 			is_incapable = no
-			NOT = { trait = inbred }
-			NOT = { trait = imbecile }
 			prisoner = no
-			OR = {
-				age = 13
-				AND = {
-					age = 4
+			NOR = {
+				is_friend = ROOT
+				trait = inbred
+				trait = imbecile
+			}
+			trigger_if = {
+				limit = {
 					host = { character = ROOT }
 				}
+				age >= 4
+			}
+			trigger_else = {
+				age >= 13
 			}
 		}
 	}
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 0.66
 			trait = cruel
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			trait = kind
 		}
@@ -462,17 +443,21 @@ character_event = {
 		random_sibling = {
 			limit = {
 				is_alive = yes
-				NOT = { is_friend = ROOT }
 				is_incapable = no
-				NOT = { trait = inbred }
-				NOT = { trait = imbecile }
 				prisoner = no
-				OR = {
-					age = 13
-					AND = {
-						age = 4
+				NOR = {
+					is_friend = ROOT
+					trait = inbred
+					trait = imbecile
+				}
+				trigger_if = {
+					limit = {
 						host = { character = ROOT }
 					}
+					age >= 4
+				}
+				trigger_else = {
+					age >= 13
 				}
 			}
 			character_event = { id = WoL.3021 }
@@ -511,7 +496,7 @@ character_event = {
 		text = EVTDESC_WOL_3022
 		trigger = {
 			FROM = {
-				age = 13
+				age >= 13
 				host = { character = ROOT }
 			}
 		}
@@ -521,7 +506,7 @@ character_event = {
 		text = EVTDESC_WOL_3022_ABROAD
 		trigger = {
 			FROM = {
-				age = 13
+				age >= 13
 				host = { NOT = { character = ROOT } }
 			}
 		}
@@ -530,7 +515,7 @@ character_event = {
 	desc = {
 		text = EVTDESC_WOL_3022_CHILD
 		trigger = {
-			FROM = { NOT = { age = 13 } }
+			FROM = { age < 13 }
 		}
 	}
 
@@ -542,59 +527,52 @@ character_event = {
 				is_rival = FROM
 			}
 			remove_rival = FROM
-			break = yes
 		}
 
-		if = {
-			limit = {
-				NOT = {
-					FROM = {
-						personal_opinion = {
-							who = ROOT
-							value = 50
-						}
+		else = {
+			if = {
+				limit = {
+					reverse_personal_opinion = {
+						who = FROM
+						value < 50
 					}
 				}
-			}
-			FROM = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_family_love
+				reverse_opinion = {
+					who = FROM
+					name = opinion_family_love
 				}
 			}
-		}
 
-		if = {
-			limit = {
-				NOT = {
+			if = {
+				limit = {
 					personal_opinion = {
 						who = FROM
-						value = 50
+						value < 50
 					}
 				}
+				opinion = {
+					who = FROM
+					name = opinion_family_love
+				}
 			}
-			opinion = {
-				who = FROM
-				modifier = opinion_family_love
-			}
-		}
 
-		if = {
-			limit = {
-				personal_opinion = {
-					who = FROM
-					value = 50
+			if = {
+				limit = {
+					personal_opinion = {
+						who = FROM
+						value >= 50
+					}
+					reverse_personal_opinion = {
+						who = FROM
+						value >= 50
+					}
+					FROM = {
+						is_adult = yes
+					}
 				}
-				reverse_personal_opinion = {
-					who = FROM
-					value = 50
-				}
-				FROM = {
-					is_adult = yes
-				}
-			}
 			add_friend = FROM
 #			log = "WoL.3022: [Root.GetTitledName] becomes friend with sibling [From.GetTitledName]."
+			}
 		}
 	}
 }
@@ -606,36 +584,31 @@ character_event = {
 
 	is_triggered_only = yes
 
-	prisoner = no
 	in_command = no
 	only_capable = yes
+	prisoner = no
 
 	trigger = {
 		has_focus = focus_family
 		has_regent = no
-		in_command = no
 		is_ill = no
 		OR = {
-			father = {
+			father_even_if_dead = {
 				is_alive = yes
-				prisoner = no
 				is_incapable = no
-				NOT = {
-					personal_opinion = {
-						who = ROOT
-						value = 50
-					}
+				prisoner = no
+				personal_opinion = {
+					who = ROOT
+					value < 50
 				}
 			}
-			mother = {
+			mother_even_if_dead = {
 				is_alive = yes
-				prisoner = no
 				is_incapable = no
-				NOT = {
-					personal_opinion = {
-						who = ROOT
-						value = 50
-					}
+				prisoner = no
+				personal_opinion = {
+					who = ROOT
+					value < 50
 				}
 			}
 		}
@@ -643,11 +616,11 @@ character_event = {
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 0.66
 			trait = cruel
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			trait = kind
 		}
@@ -659,39 +632,36 @@ character_event = {
 			character_event = { id = WoL.3000 } # Chance to "level up"
 		}
 
-		if = {
-			limit = {
-				father = {
-					is_alive = yes
-					prisoner = no
-					is_incapable = no
-					NOT = {
+		# TODO: weight by succession law?
+		random_list = {
+			50 = {
+				trigger = {
+					father_even_if_dead = {
+						is_alive = yes
+						is_incapable = no
+						prisoner = no
 						personal_opinion = {
 							who = ROOT
-							value = 50
+							value < 50
 						}
 					}
 				}
+				father = { character_event = { id = WoL.3031 } }
 			}
-			father = { character_event = { id = WoL.3031 } }
-			break = yes
-		}
-
-		if = {
-			limit = {
-				mother = {
-					is_alive = yes
-					prisoner = no
-					is_incapable = no
-					NOT = {
+			50 = {
+				trigger = {
+					mother_even_if_dead = {
+						is_alive = yes
+						is_incapable = no
+						prisoner = no
 						personal_opinion = {
 							who = ROOT
-							value = 50
+							value < 50
 						}
 					}
 				}
+				mother = { character_event = { id = WoL.3031 } }
 			}
-			mother = { character_event = { id = WoL.3031 } }
 		}
 	}
 }
@@ -705,28 +675,29 @@ character_event = {
 
 	immediate = {
 		FROM = {
-			if = {
-				limit = { is_female = yes } # Just to get different event pictures
-				character_event = { id = WoL.3032 }
-			}
-			if = {
-				limit = { is_female = no } # Just to get different event pictures
-				character_event = { id = WoL.3033 }
-			}
+			character_event = { id = WoL.3032 }
 		}
 	}
 }
 
-# The shown event - female
+# The shown event
 character_event = {
 	id = WoL.3032
 
-	picture = GFX_evt_daughter_asking_father
+	desc = EVTDESC_WOL_3032
 	border = GFX_event_normal_frame_diplomacy
+
+	picture = {
+		trigger = { is_female = yes }
+		picture = GFX_evt_daughter_asking_father
+	}
+	picture = {
+		trigger = { is_female = no }
+		picture = GFX_evt_son_asking_father
+	}
 
 	is_triggered_only = yes
 
-	desc = EVTDESC_WOL_3032
 
 	option = {
 		name = EVTOPTA_WOL_3022
@@ -736,106 +707,99 @@ character_event = {
 				is_rival = FROM
 			}
 			remove_rival = FROM
-			break = yes
 		}
 
-		if = {
-			limit = {
-				NOT = {
-					FROM = {
-						personal_opinion = {
-							who = ROOT
-							value = 50
-						}
+		else = {
+			if = {
+				limit = {
+					reverse_personal_opinion = {
+						who = FROM
+						value < 50
 					}
 				}
-			}
-			FROM = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_family_love
+				reverse_opinion = {
+					who = FROM
+					name = opinion_family_love
 				}
 			}
-		}
 
-		if = {
-			limit = {
-				NOT = {
+			if = {
+				limit = {
 					personal_opinion = {
 						who = FROM
-						value = 50
+						value < 50
 					}
 				}
+				opinion = {
+					who = FROM
+					name = opinion_family_love
+				}
 			}
-			opinion = {
-				who = FROM
-				modifier = opinion_family_love
-			}
+#			log = "WoL.3032: [Root.GetTitledName] befriends parent [From.GetTitledName]."
 		}
-
-#		log = "WoL.3032: [Root.GetTitledName] befriends parent [From.GetTitledName]."
 	}
 }
 
+# Collapsed into WoL.3032
 # The shown event - male
-character_event = {
-	id = WoL.3033
+# character_event = {
+	# id = WoL.3033
 
-	picture = GFX_evt_son_asking_father
-	border = GFX_event_normal_frame_diplomacy
+	# picture = GFX_evt_son_asking_father
+	# border = GFX_event_normal_frame_diplomacy
 
-	is_triggered_only = yes
+	# is_triggered_only = yes
 
-	desc = EVTDESC_WOL_3032
+	# desc = EVTDESC_WOL_3032
 
-	option = {
-		name = EVTOPTA_WOL_3022
+	# option = {
+		# name = EVTOPTA_WOL_3022
 
-		if = {
-			limit = {
-				is_rival = FROM
-			}
-			remove_rival = FROM
-			break = yes
-		}
+		# if = {
+			# limit = {
+				# is_rival = FROM
+			# }
+			# remove_rival = FROM
+			# break = yes
+		# }
 
-		if = {
-			limit = {
-				NOT = {
-					FROM = {
-						personal_opinion = {
-							who = ROOT
-							value = 50
-						}
-					}
-				}
-			}
-			FROM = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_family_love
-				}
-			}
-		}
+		# if = {
+			# limit = {
+				# NOT = {
+					# FROM = {
+						# personal_opinion = {
+							# who = ROOT
+							# value = 50
+						# }
+					# }
+				# }
+			# }
+			# FROM = {
+				# opinion = {
+					# who = ROOT
+					# name = opinion_family_love
+				# }
+			# }
+		# }
 
-		if = {
-			limit = {
-				NOT = {
-					personal_opinion = {
-						who = FROM
-						value = 50
-					}
-				}
-			}
-			opinion = {
-				who = FROM
-				modifier = opinion_family_love
-			}
-		}
+		# if = {
+			# limit = {
+				# NOT = {
+					# personal_opinion = {
+						# who = FROM
+						# value = 50
+					# }
+				# }
+			# }
+			# opinion = {
+				# who = FROM
+				# name = opinion_family_love
+			# }
+		# }
 
 #		log = "WoL.3033: [Root.GetTitledName] befriends parent [From.GetTitledName]."
-	}
-}
+	# }
+# }
 
 # Relations with child improves
 character_event = {
@@ -851,37 +815,38 @@ character_event = {
 	trigger = {
 		has_focus = focus_family
 		has_regent = no
-		in_command = no
 		is_ill = no
 		any_child = {
 			is_alive = yes
 			is_incapable = no
-			NOT = { trait = inbred }
-			NOT = { trait = imbecile }
 			prisoner = no
-			OR = {
-				age = 13
-				AND = {
-					age = 4
+			NOR = {
+				trait = inbred
+				trait = imbecile
+			}
+			trigger_if = {
+				limit = {
 					host = { character = ROOT }
 				}
+				age >= 4
 			}
-			NOT = {
-				personal_opinion = {
-					who = ROOT
-					value = 50
-				}
+			trigger_else = {
+				age >= 13
+			}
+			personal_opinion = {
+				who = ROOT
+				value < 50
 			}
 		}
 	}
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 0.66
 			trait = cruel
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			trait = kind
 		}
@@ -892,21 +857,23 @@ character_event = {
 			limit = {
 				is_alive = yes
 				is_incapable = no
-				NOT = { trait = inbred }
-				NOT = { trait = imbecile }
 				prisoner = no
-				OR = {
-					age = 13
-					AND = {
-						age = 4
+				NOR = {
+					trait = inbred
+					trait = imbecile
+				}
+				trigger_if = {
+					limit = {
 						host = { character = ROOT }
 					}
+					age >= 4
 				}
-				NOT = {
-					personal_opinion = {
-						who = ROOT
-						value = 50
-					}
+				trigger_else = {
+					age >= 13
+				}
+				personal_opinion = {
+					who = ROOT
+					value < 50
 				}
 			}
 			character_event = { id = WoL.3041 }
@@ -945,7 +912,7 @@ character_event = {
 		text = EVTDESC_WOL_3042
 		trigger = {
 			FROM = {
-				age = 13
+				age >= 13
 				host = { character = ROOT }
 			}
 		}
@@ -955,7 +922,7 @@ character_event = {
 		text = EVTDESC_WOL_3042_ABROAD
 		trigger = {
 			FROM = {
-				age = 13
+				age >= 13
 				host = { NOT = { character = ROOT } }
 			}
 		}
@@ -964,7 +931,7 @@ character_event = {
 	desc = {
 		text = EVTDESC_WOL_3042_CHILD
 		trigger = {
-			FROM = { NOT = { age = 13 } }
+			FROM = { age < 13 }
 		}
 	}
 
@@ -976,44 +943,36 @@ character_event = {
 				is_rival = FROM
 			}
 			remove_rival = FROM
-			break = yes
 		}
 
-		if = {
-			limit = {
-				NOT = {
-					FROM = {
-						personal_opinion = {
-							who = ROOT
-							value = 50
-						}
+		else = {
+			if = {
+				limit = {
+					reverse_personal_opinion = {
+						who = FROM
+						value < 50
 					}
 				}
-			}
-			FROM = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_family_love
+				reverse_opinion = {
+					who = FROM
+					name = opinion_family_love
 				}
 			}
-		}
 
-		if = {
-			limit = {
-				NOT = {
+			if = {
+				limit = {
 					personal_opinion = {
 						who = FROM
-						value = 50
+						value < 50
 					}
 				}
+				opinion = {
+					who = FROM
+					name = opinion_family_love
+				}
 			}
-			opinion = {
-				who = FROM
-				modifier = opinion_family_love
-			}
+#			log = "WoL.3042: [Root.GetTitledName] befriends child [From.GetTitledName]."
 		}
-
-#		log = "WoL.3042: [Root.GetTitledName] befriends child [From.GetTitledName]."
 	}
 }
 
@@ -1025,23 +984,23 @@ character_event = {
 
 	is_triggered_only = yes
 
-	prisoner = no
 	only_capable = yes
+	prisoner = no
+	in_command = no
 
 	trigger = {
 		has_focus = focus_family
 		has_regent = no
-		in_command = no
 		is_ill = no
 	}
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+		mult_modifier = {
 			factor = 0.66
 			trait = cruel
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			trait = kind
 		}
@@ -1054,14 +1013,18 @@ character_event = {
 				is_offmap_ruler = no
 				is_adult = yes
 				is_alive = yes
-				is_incapable = no
-				NOT = { trait = inbred }
-				NOT = { trait = imbecile }
-				prisoner = no
 				is_close_relative = ROOT
+				is_incapable = no
+				prisoner = no
+				NOR = {
+					trait = inbred
+					trait = imbecile
+				}
 				OR = {
-					AND = {
-						is_female = no
+					trigger_if = {
+						limit = {
+							is_female = no
+						}
 						ROOT = {
 							OR = {
 								has_law = agnatic_succession
@@ -1069,12 +1032,11 @@ character_event = {
 							}
 						}
 					}
-					AND = {
-						is_female = yes
+					trigger_else = {
 						ROOT = {
-							NOR = {
-								has_law = agnatic_succession
-								has_law = cognatic_succession
+							OR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
 							}
 						}
 					}
@@ -1100,16 +1062,20 @@ character_event = {
 				is_offmap_ruler = no
 				is_adult = yes
 				is_alive = yes
-				is_incapable = no
-				NOT = { trait = inbred }
-				NOT = { trait = imbecile }
-				prisoner = no
-				NOT = { character = FROM }
 				is_close_relative = FROM
-				NOT = { is_friend = ROOT }
+				is_incapable = no
+				prisoner = no
+				NOR = {
+					character = FROM
+					is_friend = ROOT
+					trait = inbred
+					trait = imbecile
+				}
 				OR = {
-					AND = {
-						is_female = no
+					trigger_if = {
+						limit = {
+							is_female = no
+						}
 						ROOT = {
 							OR = {
 								has_law = agnatic_succession
@@ -1117,12 +1083,11 @@ character_event = {
 							}
 						}
 					}
-					AND = {
-						is_female = yes
+					trigger_else = {
 						ROOT = {
-							NOR = {
-								has_law = agnatic_succession
-								has_law = cognatic_succession
+							OR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
 							}
 						}
 					}
@@ -1179,10 +1144,8 @@ character_event = {
 			factor = 100
 		}
 
-		hidden_tooltip = {
-			event_target:target_second = {
-				character_event = { id = WoL.3052 days = 7 }
-			}
+		event_target:target_second = {
+			character_event = { id = WoL.3052 days = 7 }
 		}
 	}
 
@@ -1191,13 +1154,11 @@ character_event = {
 		ai_chance = {
 			factor = 0
 		}
-		hidden_tooltip = {
-			FROM = {
-				character_event = { id = WoL.3053 days = 7 }
-			}
-			event_target:target_second = {
-				character_event = { id = WoL.3055 days = 7 }
-			}
+		FROM = {
+			character_event = { id = WoL.3053 days = 7 }
+		}
+		event_target:target_second = {
+			character_event = { id = WoL.3055 days = 7 }
 		}
 	}
 }
@@ -1224,16 +1185,14 @@ character_event = {
 		if = {
 			limit = {
 				NOT = { is_rival = FROM }
-				NOT = {
-					personal_opinion = {
-						who = FROM
-						value = 50
-					}
+				personal_opinion = {
+					who = FROM
+					value < 50
 				}
 			}
 			opinion = {
 				who = FROM
-				modifier = opinion_family_love
+				name = opinion_family_love
 			}
 		}
 
@@ -1242,23 +1201,21 @@ character_event = {
 				NOT = { is_rival = FROM }
 				personal_opinion = {
 					who = FROM
-					value = 50
+					value >= 50
 				}
 				reverse_personal_opinion = {
 					who = FROM
-					value = 50
+					value >= 50
 				}
 			}
 			tooltip = { add_friend = FROM }
 		}
 
-		hidden_tooltip = {
-			FROMFROM = {
-				character_event = { id = WoL.3057 }
-			}
-			FROM = {
-				character_event = { id = WoL.3056 }
-			}
+		FROMFROM = {
+			character_event = { id = WoL.3057 }
+		}
+		FROM = {
+			character_event = { id = WoL.3056 }
 		}
 	}
 
@@ -1267,13 +1224,11 @@ character_event = {
 		ai_chance = {
 			factor = 0
 		}
-		hidden_tooltip = {
-			FROM = {
-				character_event = { id = WoL.3055 }
-			}
-			FROMFROM = {
-				character_event = { id = WoL.3054 }
-			}
+		FROM = {
+			character_event = { id = WoL.3055 }
+		}
+		FROMFROM = {
+			character_event = { id = WoL.3054 }
 		}
 	}
 }
@@ -1293,8 +1248,8 @@ character_event = {
 		name = EVTOPTA_WOL_3053
 		opinion = {
 			who = FROM
-			modifier = opinion_disappointed
-			months = 36
+			name = opinion_disappointed
+			years = 3
 		}
 	}
 }
@@ -1314,8 +1269,8 @@ character_event = {
 		name = EVTOPTA_WOL_3053
 		opinion = {
 			who = FROM
-			modifier = opinion_disappointed
-			months = 36
+			name = opinion_disappointed
+			years = 3
 		}
 	}
 }
@@ -1335,8 +1290,8 @@ character_event = {
 		name = EVTOPTA_WOL_3055
 		opinion = {
 			who = FROM
-			modifier = opinion_disappointed
-			months = 36
+			name = opinion_disappointed
+			years = 3
 		}
 	}
 }
@@ -1360,37 +1315,36 @@ character_event = {
 				is_rival = FROM
 			}
 			remove_rival = FROM
-			break = yes
 		}
 
-		if = {
-			limit = {
-				NOT = {
+		else = {
+			if = {
+				limit = {
 					personal_opinion = {
 						who = FROM
-						value = 50
+						value < 50
 					}
 				}
+				opinion = {
+					who = FROM
+					name = opinion_family_love
+				}
 			}
-			opinion = {
-				who = FROM
-				modifier = opinion_family_love
-			}
-		}
 
-		if = {
-			limit = {
-				personal_opinion = {
-					who = FROM
-					value = 50
+			if = {
+				limit = {
+					personal_opinion = {
+						who = FROM
+						value >= 50
+					}
+					reverse_personal_opinion = {
+						who = FROM
+						value >= 50
+					}
 				}
-				reverse_personal_opinion = {
-					who = FROM
-					value = 50
-				}
+				add_friend = FROM
+#				log = "WoL.3056: [Root.GetTitledName] becomes friend with dynasty member [From.GetTitledName]."
 			}
-			add_friend = FROM
-#			log = "WoL.3056: [Root.GetTitledName] becomes friend with dynasty member [From.GetTitledName]."
 		}
 	}
 }
@@ -1418,32 +1372,30 @@ character_event = {
 	hide_window = yes
 
 	is_triggered_only = yes
-	prisoner = no
+
 	only_capable = yes
+	prisoner = no
 
 	trigger = {
 		has_focus = focus_family
 		has_regent = no
 		in_command = no
 		is_ill = no
-		num_of_children = 2
+		num_of_children >= 2
 		any_child = {
-			age = 5
+			age >= 5
 			is_adult = no
 			is_alive = yes
 		}
 	}
 
 	weight_multiplier = {
-		factor = 1
-		modifier = {
-			factor = 2.0
-		}
-		modifier = {
+		factor = 2
+		mult_modifier = {
 			factor = 0.66
 			trait = cruel
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.33
 			trait = kind
 		}
@@ -1452,17 +1404,22 @@ character_event = {
 	immediate = {
 		random_child = {
 			limit = {
+				age >= 5
 				is_adult = no
 				is_alive = yes
-				age = 5
 				is_incapable = no
-				NOT = { trait = inbred }
-				NOT = { trait = imbecile }
 				prisoner = no
+				NOR = {
+					trait = inbred
+					trait = imbecile
+				}
 				host = { character = ROOT }
+				
 				OR = {
-					AND = {
-						is_female = no
+					trigger_if = {
+						limit = {
+							is_female = no
+						}
 						ROOT = {
 							OR = {
 								has_law = agnatic_succession
@@ -1470,78 +1427,80 @@ character_event = {
 							}
 						}
 					}
-					AND = {
-						is_female = yes
+					trigger_else = {
 						ROOT = {
-							NOR = {
+							OR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
+							}
+						}
+					}
+					
+					is_primary_heir = ROOT
+					ROOT = { has_law = true_cognatic_succession }
+				}
+			}
+			save_event_target_as = target_first
+		}
+		
+		random_child = {
+			limit = {
+				age >= 5
+				is_adult = no
+				is_alive = yes
+				is_incapable = no
+				prisoner = no
+				NOR = {
+					character = event_target:target_first
+					is_friend = event_target:target_first
+					trait = inbred
+					trait = imbecile
+				}
+				host = { character = ROOT }
+				
+				OR = {
+					trigger_if = {
+						limit = {
+							is_female = no
+						}
+						ROOT = {
+							OR = {
 								has_law = agnatic_succession
 								has_law = cognatic_succession
 							}
 						}
 					}
-					is_primary_heir = ROOT
-					ROOT = { has_law = true_cognatic_succession }
-				}
-			}
-
-			ROOT = { set_character_flag = found_second }
-			save_event_target_as = target_second
-
-			ROOT = {
-				random_child = {
-					limit = {
-						is_adult = no
-						is_alive = yes
-						age = 5
-						is_incapable = no
-						NOT = { trait = inbred }
-						NOT = { trait = imbecile }
-						prisoner = no
-						NOT = { character = PREVPREV }
-						host = { character = ROOT }
-						OR = {
-							AND = {
-								is_female = no
-								ROOT = {
-									OR = {
-										has_law = agnatic_succession
-										has_law = cognatic_succession
-									}
-								}
-							}
-							AND = {
-								is_female = yes
-								ROOT = {
-									NOR = {
-										has_law = agnatic_succession
-										has_law = cognatic_succession
-									}
-								}
-							}
-							ROOT = { has_law = true_cognatic_succession }
-							is_primary_heir = ROOT
-						}
-						NOT = { is_friend = PREVPREV }
-						NOT = {
-							personal_opinion = {
-								who = PREVPREV
-								value = 50
+					trigger_else = {
+						ROOT = {
+							OR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
 							}
 						}
 					}
-					ROOT = { set_character_flag = found_first }
-					save_event_target_as = target_first
+					
+					ROOT = { has_law = true_cognatic_succession }
+					is_primary_heir = ROOT
+				}
+				OR = {
+					personal_opinion = {
+						who = event_target:target_first
+						value < 50
+					}
+					reverse_personal_opinion = {
+						who = event_target:target_first
+						value < 50
+					}
 				}
 			}
+			save_event_target_as = target_second
 		}
 
 		if = {
 			limit = {
-				has_character_flag = found_second
-				has_character_flag = found_first
+				event_target:target_first = { always = yes }
+				event_target:target_second = { always = yes }
 			}
-			clr_character_flag = found_second
-			clr_character_flag = found_first
 			random = {
 				chance = 33
 				character_event = { id = WoL.3000 } # Chance to "level up"
@@ -1568,48 +1527,46 @@ character_event = {
 #		log = "WoL.3060: Fires, valid for [target_second.GetTitledName] and [target_first.GetTitledName]."
 
 		event_target:target_second = {
+			show_scope_change = no
 			if = {
 				limit = {
-					NOT = {
-						personal_opinion = {
-							who = event_target:target_first
-							value = 50
-						}
+					personal_opinion = {
+						who = event_target:target_first
+						value < 50
 					}
 				}
 				opinion = {
 					who = event_target:target_first
-					modifier = opinion_family_love
-					months = 360
+					name = opinion_family_love
+					years = 30
 				}
 			}
 		}
 
 		event_target:target_first = {
+			show_scope_change = no
 			if = {
 				limit = {
-					NOT = {
-						personal_opinion = {
-							who = event_target:target_second
-							value = 50
-						}
+					personal_opinion = {
+						who = event_target:target_second
+						value < 50
 					}
 				}
 				opinion = {
 					who = event_target:target_second
-					modifier = opinion_family_love
-					months = 360
+					name = opinion_family_love
+					years = 30
 				}
 			}
 			if = {
 				limit = {
 					personal_opinion = {
 						who = event_target:target_second
-						value = 50
+						value >= 50
 					}
 					reverse_personal_opinion = {
 						who = event_target:target_second
-						value = 50
+						value >= 50
 					}
 				}
 				add_friend = event_target:target_second

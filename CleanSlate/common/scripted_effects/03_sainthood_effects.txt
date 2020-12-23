@@ -8,32 +8,13 @@ setting_up_saintly_burial_site_effect = {
 	province_event = { id = HF.40021 }
 }
 
+# Used by Christians to canonize saints. Pagans use check_if_ancestor_worship_worthy_effect
 deciding_upon_saint_effect = {
 	if = {
 		limit = {
 			# Religions without a Religious Head cannot Canonize
 			rightful_religious_head_scope = {
 				always = yes
-			}
-
-			# Have to be a Christian denomination with a potential Religious head, and have been singled out for Beatification
-			event_target:saint_person = {
-				OR = {
-					religion = catholic
-					religion = fraticelli
-					religion = orthodox
-					religion = iconoclast
-					religion = miaphysite
-					religion = monophysite
-					religion = monothelite
-					religion = paulician
-					has_religion_feature = religion_beatification
-				}
-
-				OR = {
-					has_character_flag = beatified
-					has_religion_feature = religion_beatification
-				}
 			}
 		}
 
@@ -74,8 +55,10 @@ deciding_upon_saint_effect = {
 				OR = {
 					has_landed_title = k_papal_state
 					has_landed_title = d_fraticelli
-					any_claim = { title = k_papal_state }
-					any_claim = { title = d_fraticelli }
+					
+					# Antipopes can't be beatified anyway
+					# has_claim = k_papal_state
+					# has_claim = d_fraticelli
 				}
 			}
 
@@ -89,16 +72,10 @@ deciding_upon_saint_effect = {
 			mult_modifier = {
 				factor = 0.8
 
-				event_target:saint_person = {
-					OR = {
-						religion = iconoclast
-						religion = nestorian
-						religion = miaphysite
-						religion = monophysite
-						religion = monothelite
-						religion = paulician
-						religion = orthodox
-					}
+				OR = {
+					is_orthodox_branch = yes
+					is_miaphysite_branch = yes
+					is_nestorian_branch = yes
 				}
 			}
 
@@ -106,75 +83,9 @@ deciding_upon_saint_effect = {
 			mult_modifier = {
 				factor = 2
 
-				event_target:saint_person = {
-					ai = no
+				ai = no
 
-					NOT = {
-						any_owned_bloodline = {
-							OR = {
-								has_bloodline_flag = defender_of_the_faith
-								has_bloodline_flag = monastic_saintly_bloodline
-								has_bloodline_flag = cultural_saintly_bloodline
-								has_bloodline_flag = inquisitional_saintly_bloodline
-								has_bloodline_flag = jewish_saintly_bloodline
-								has_bloodline_flag = theologian_saintly_bloodline
-							}
-						}
-					}
-				}
-			}
-
-			# Positive traits increase your chances of becoming a Saint
-			mult_modifier = {
-				factor = 1.5
-				event_target:saint_person = { trait = patient }
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				event_target:saint_person = { trait = diligent }
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				event_target:saint_person = { trait = kind }
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				event_target:saint_person = { trait = chaste }
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				event_target:saint_person = { trait = charitable }
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				event_target:saint_person = { trait = temperate }
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				event_target:saint_person = { trait = humble }
-			}
-
-			mult_modifier = {
-				factor = 1.2
-				event_target:saint_person = { trait = just }
-			}
-
-			mult_modifier = {
-				factor = 1.2
-				event_target:saint_person = { has_crusade_trait_trigger = yes }
-			}
-
-			# Having the bloodline of a Saint severely decrease your chance of becoming a Saint
-			mult_modifier = {
-				factor = 0.2
-
-				event_target:saint_person = {
+				NOT = {
 					any_owned_bloodline = {
 						OR = {
 							has_bloodline_flag = defender_of_the_faith
@@ -184,9 +95,71 @@ deciding_upon_saint_effect = {
 							has_bloodline_flag = jewish_saintly_bloodline
 							has_bloodline_flag = theologian_saintly_bloodline
 						}
-
-						bloodline_is_active_for = PREV
 					}
+				}
+			}
+
+			# Positive traits increase your chances of becoming a Saint
+			mult_modifier = {
+				factor = 1.5
+				trait = patient
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = diligent
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = chaste
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = charitable
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = temperate
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = humble
+			}
+
+			mult_modifier = {
+				factor = 1.2
+				trait = just
+			}
+
+			mult_modifier = {
+				factor = 1.2
+				has_crusade_trait_trigger = yes
+			}
+
+			# Having the bloodline of a Saint severely decrease your chance of becoming a Saint
+			mult_modifier = {
+				factor = 0.2
+
+				any_owned_bloodline = {
+					OR = {
+						has_bloodline_flag = defender_of_the_faith
+						has_bloodline_flag = monastic_saintly_bloodline
+						has_bloodline_flag = cultural_saintly_bloodline
+						has_bloodline_flag = inquisitional_saintly_bloodline
+						has_bloodline_flag = jewish_saintly_bloodline
+						has_bloodline_flag = theologian_saintly_bloodline
+					}
+
+					bloodline_is_active_for = PREV
 				}
 			}
 
@@ -317,6 +290,7 @@ deciding_upon_saint_effect = {
 	}
 }
 
+# Used by pagans to canonize ancestors. Christians use deciding_upon_saint_effect
 check_if_ancestor_worship_worthy_effect = {
 	random = {
 		chance = 3
