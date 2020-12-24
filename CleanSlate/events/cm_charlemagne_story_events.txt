@@ -238,11 +238,12 @@ narrative_event = {
 				name = charlemagne_story
 				value = off
 			}
+
+			has_character_flag = nagged_about_lombard_queen
 		}
 
 		year >= 770
 		year < 850
-		NOT = { has_character_flag = kept_lombard_queen }
 
 		OR = {
 			culture = frankish
@@ -254,6 +255,10 @@ narrative_event = {
 				any_spouse = { culture = lombard }
 			}
 		}
+	}
+
+	immediate = {
+		set_character_flag = nagged_about_lombard_queen
 	}
 
 	option = {
@@ -291,6 +296,8 @@ narrative_event = {
 			}
 
 			any_child = {
+				show_scope_change = no
+
 				limit = {
 					is_child_of = ROOT
 					NOT = { culture = ROOT }
@@ -303,8 +310,6 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTB_CM_1011 # No, she's my wife
-
-		set_character_flag = kept_lombard_queen
 
 		custom_tooltip = {
 			text = most_lords_angry
@@ -705,11 +710,10 @@ narrative_event = {
 	option = {
 		name = EVTOPTA_CM_1050
 
-		custom_tooltip = { text = roland_arrives }
-
 		character_event = {
 			id = CM.1052
 			days = 350
+			text = roland_arrives
 		}
 	}
 
@@ -728,7 +732,7 @@ character_event = {
 	portrait = new_character
 
 	is_triggered_only = yes
-	show_root = yes
+	hide_new = yes
 
 	trigger = {
 		NOT = {	is_friend = new_character }
@@ -1015,6 +1019,9 @@ narrative_event = {
 	title = EVTTITLE_CM_1070
 	desc = EVTDESC_CM_1070
 	picture = GFX_evt_emissary
+	portrait = new_character
+
+	hide_new = yes
 
 	only_independent = yes
 	religion_group = christian
@@ -1024,29 +1031,21 @@ narrative_event = {
 	prisoner = no
 
 	trigger = {
-		year < 820
+		trigger_if = {
+			limit = { character = c_6392 }
+			c_144999 = { is_alive = no }
+		}
+		trigger_else = {
+			c_6392 = { independent = no }
+			c_144999 = { independent = no }
+		}
+
 		higher_real_tier_than = DUKE
+		year < 820
+
 		OR = {
 			culture = frankish
 			culture = old_frankish
-		}
-		OR = {
-			AND = {
-				has_character_flag = is_charlemagne
-				NOT = {
-					any_sibling = {
-						has_character_flag = is_carloman
-					}
-				}
-			}
-			NOT = {
-				any_independent_ruler = {
-					OR = {
-						has_character_flag = is_charlemagne
-						has_character_flag = is_carloman
-					}
-				}
-			}
 		}
 
 		NOR = {
@@ -1065,46 +1064,63 @@ narrative_event = {
 
 	immediate = {
 		set_global_flag = ogier_spawned
+
+		create_character = {
+			random_traits = no
+			dynasty = random
+			religion = ROOT
+			culture = norse
+			age = 35
+			add_trait = honest
+			add_trait = zealous
+			add_trait = skilled_tactician
+			add_trait = strong
+			add_trait = trickster
+
+			attributes = {
+				diplomacy = 11
+				martial = 12
+				stewardship = 8
+				intrigue = 5
+				learning = 8
+			}
+		}
+
+		new_character = {
+			set_name = "Ogier"
+			set_character_flag = is_ogier
+			set_character_flag = hero_knight
+		}
 	}
 
 	option = {
 		name = EVTOPTA_CM_1070
-		custom_tooltip = { text = ogier_arrives }
-		hidden_tooltip = {
-			create_character = {
-				random_traits = no
-				dynasty = random
-				religion = ROOT
-				culture = norse
-				age = 35
-				trait = honest
-				trait = zealous
-				trait = skilled_tactician
-				trait = strong
-				trait = trickster
-				attributes = {
-					diplomacy = 11
-					martial = 12
-					stewardship = 8
-					intrigue = 5
-					learning = 8
+
+		custom_tooltip = {
+			text = ogier_arrives
+
+			new_character = {
+				opinion = {
+					name = opinion_loyal_servant
+					who = ROOT
+					years = 100
 				}
 			}
 		}
-		new_character = {
-			set_name = Ogier
-			set_character_flag = is_ogier
-			set_character_flag = hero_knight
-			opinion = {
-				modifier = opinion_loyal_servant
-				who = ROOT
-				years = 100
-			}
-		}
 	}
+
 	option = {
 		name = EVTOPTB_CM_1070
+
 		prestige = -5
+
+		hidden_effect = {
+			new_character = {
+				death = {
+					death_reason = death_missing
+				}
+			}
+		}
 	}
 }
 
