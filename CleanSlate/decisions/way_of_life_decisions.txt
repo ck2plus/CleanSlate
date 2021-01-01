@@ -68,8 +68,43 @@ targeted_decisions = {
 		}
 
 		potential = {
-			is_valid_romance_target = FROM
+			is_marriage_adult = yes
+
+			trigger_if = {
+				limit = { same_sex = FROM }
+
+				trait = homosexual
+				FROM = { trait = homosexual }
+			}
+			trigger_else = {
+				NOR = {
+					trait = homosexual
+					FROM = { trait = homosexual }
+				}
+			}
+
+			trigger_if = {
+				limit = {
+					OR = {
+						is_child_of = FROM
+						is_grandchild_of = FROM
+						is_parent_of = FROM
+						is_grandparent_of = FROM
+					}
+				}
+
+				trigger_if = {
+					limit = { religion_group = zoroastrian_group }
+					religion_group = FROM
+				}
+				trigger_else = {
+					religion = messalian
+					religion = FROM
+				}
+			}
+
 			prisoner = no
+			is_incapable = no
 
 			NOR = {
 				character = FROM
@@ -81,12 +116,12 @@ targeted_decisions = {
 		}
 
 		allow = {
-			is_within_diplo_range = FROM
-
 			OR = {
 				religion_group = FROM
 				is_vassal_or_below_of = FROM
 			}
+
+			is_within_diplo_range = FROM
 
 			NOR = {
 				has_opinion_modifier = {
@@ -102,7 +137,11 @@ targeted_decisions = {
 
 		effect = {
 			hidden_effect = {
+				save_event_target_as = seduced
+
 				FROM = {
+					save_event_target_as = seducer
+
 					opinion = {
 						name = opinion_seducing
 						who = ROOT
@@ -112,25 +151,16 @@ targeted_decisions = {
 					if = {
 						limit = {
 							is_close_relative = ROOT
-
-							NOR = {
-								is_married = ROOT # Spouses are considered close relatives
-								religion_has_incest = yes
-							}
+							NOT = { is_married = ROOT } # Spouses are considered close relatives
+							religion_has_incest = no
 						}
 
-						character_event = {
-							id = WoL.102 # Warning - Incest scandal risk
-							days = 1
-						}
+						set_character_flag = warning_incest
 					}
 					else_if = {
 						limit = { same_sex = ROOT }
 
-						character_event = {
-							id = WoL.104 # Warning - Homosexual scandal risk
-							days = 1
-						}
+						set_character_flag = warning_homosexual
 					}
 					else_if = {
 						limit = {
@@ -139,15 +169,17 @@ targeted_decisions = {
 							OR = {
 								is_priest = yes
 								is_ascetic_trigger = yes
-								ROOT = { is_priest = yes }
-								ROOT = { is_ascetic_trigger = yes }
+
+								ROOT = {
+									OR = {
+										is_priest = yes
+										is_ascetic_trigger = yes
+									}
+								}
 							}
 						}
 
-						character_event = {
-							id = WoL.103 # Warning - Priest scandal risk
-							days = 1
-						}
+						set_character_flag = warning_priest
 					}
 					else_if = {
 						limit = {
@@ -157,16 +189,15 @@ targeted_decisions = {
 							}
 						}
 
-						character_event = {
-							id = WoL.101 # Warning - Age scandal risk
-							days = 1
-						}
+						set_character_flag = warning_age
 					}
 					else = {
-						character_event = {
-							id = WoL.100 # No warning - Let the chase begin!
-							days = 1
-						}
+						set_character_flag = warning_none
+					}
+
+					character_event = {
+						id = WoL.100 # Let the chase begin!
+						days = 1
 					}
 				}
 			}
@@ -428,9 +459,10 @@ targeted_decisions = {
 		}
 
 		effect = {
-			save_event_target_as = target_seduced
+			save_event_target_as = seduced
 
 			FROM = {
+				save_event_target_as = seducer
 				character_event = { id = WoL.118 }
 			}
 		}
