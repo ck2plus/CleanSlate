@@ -61,6 +61,53 @@ character_event = {
 
 	immediate = {
 		set_character_flag = seduction_confirmed
+		
+		if = {
+			limit = {
+				is_close_relative = event_target:seduced
+				NOT = { is_married = event_target:seduced } # Spouses are considered close relatives
+				religion_has_incest = no
+			}
+
+			set_character_flag = warning_incest
+		}
+		else_if = {
+			limit = { same_sex = event_target:seduced }
+
+			set_character_flag = warning_homosexual
+		}
+		else_if = {
+			limit = {
+				religion_group = christian
+
+				OR = {
+					is_priest = yes
+					is_ascetic_trigger = yes
+
+					event_target:seduced = {
+						OR = {
+							is_priest = yes
+							is_ascetic_trigger = yes
+						}
+					}
+				}
+			}
+
+			set_character_flag = warning_priest
+		}
+		else_if = {
+			limit = {
+				age_diff = {
+					who = event_target:seduced
+					years >= 25
+				}
+			}
+
+			set_character_flag = warning_age
+		}
+		else = {
+			set_character_flag = warning_none
+		}
 	}
 
 	option = {
