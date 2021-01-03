@@ -16,8 +16,8 @@ is_inaccessible_trigger = {
 			trait = travelling
 			trait = troubled_pregnancy
 			trait = pregnancy_finishing
+			in_seclusion = yes
 			has_character_modifier = mother_minor_rest
-			has_character_modifier = in_seclusion
 			has_character_modifier = in_meditation
 			has_character_modifier = doing_penance
 			has_character_modifier = out_traveling
@@ -46,7 +46,7 @@ is_unimportant_trigger = {
 		num_of_claims >= 1
 		has_character_flag = eternal_life_mystic
 		trait = horse
-		has_character_modifier = in_seclusion
+		in_seclusion = yes
 		has_character_modifier = elder_long_life_modifier
 		immortal = yes
 	}
@@ -425,12 +425,9 @@ proselytize_convert_independent_trigger = {
 		independent = yes
 		religion_group = pagan_group
 		is_within_diplo_range = FROM
-
-		NOR = {
-			religion = FROM
-			controls_religion = yes
-			is_reformed_religion = yes
-		}
+		controls_religion = no
+		is_reformed_religion = no
+		NOT = { religion = FROM }
 
 		capital_scope = {
 			province = ROOT
@@ -452,8 +449,8 @@ proselytize_convert_independent_trigger = {
 
 		NOT = {
 			has_opinion_modifier = {
+				name = opinion_sent_preacher
 				who = FROM
-				modifier = opinion_sent_preacher
 			}
 		}
 
@@ -613,6 +610,7 @@ can_build_hillfort_trigger = {
 				TECH_CASTLE_CONSTRUCTION >= 0
 			}
 		}
+
 		OR = {
 			NOR = {
 				is_building = tb_hillfort_1
@@ -629,12 +627,14 @@ can_build_hillfort_trigger = {
 			}
 		}
 	}
+
 	trigger_if = {
 		limit = {
 			location = {
 				TECH_CASTLE_CONSTRUCTION >= 1
 			}
 		}
+
 		OR = {
 			AND = {
 				has_building = tb_hillfort_2
@@ -880,7 +880,6 @@ this_is_diplomatic_culture_trigger = {
 	OR = {
 		is_feudal = yes
 		is_patrician = yes
-		is_merchant_republic = yes
 	}
 
 	OR = {
@@ -948,24 +947,19 @@ parent_for_elective_succession_trigger = {
 	}
 
 	# Candidate should not be a landless Courtier who is about to inherit a Theocracy or Republic
-	OR = {
-		AND = {
-			is_ruler = yes
-			is_landed = yes
-			is_republic = no
-			is_merchant_republic = no
-			is_theocracy = no
-		}
-
-		NOT = {
+	trigger_if = {
+		limit = {
 			any_heir_title = {
 				OR = {
 					is_republic = yes
-					is_merchant_republic = yes
 					is_theocracy = yes
 				}
 			}
 		}
+
+		is_landed = yes
+		is_republic = no
+		is_theocracy = no
 	}
 
 	# If the title controls the religion, candidates must be of the same religion
@@ -974,17 +968,19 @@ parent_for_elective_succession_trigger = {
 		religion = ROOT
 	}
 
+	is_ascetic_trigger = no
+	is_theocracy = no
+	is_republic = no
+
 	NOR = {
-		character = ROOT # Not the current ruler
-		is_ascetic_trigger = yes
-		is_theocracy = yes
-		is_republic = yes
-		is_merchant_republic = yes
 		trait = disinherited
 		trait = eunuch
 		trait = bastard
 		trait = cat
 		trait = horse
+		trait = crusader_king
+		trait = crusader_queen
+		character = ROOT # Not the current ruler
 	}
 }
 
@@ -1033,13 +1029,13 @@ region_africa_west_central_or_east_trigger = {
 }
 
 varangian_guard_events_default_trigger = {
-	has_dlc = "The Old Gods"
 	has_character_flag = serving_varangian
 	culture_group = north_germanic
-	ai = yes
+	has_dlc = "The Old Gods"
 	is_adult = yes
 	is_incapable = no
 	prisoner = no
+	ai = yes
 }
 
 is_mongol_empire_leader_trigger = {
