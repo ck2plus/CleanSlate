@@ -1767,15 +1767,16 @@ character_event = {
 		name = EVTOPTA_WoL_4161
 
 		set_character_flag = game_play_for_money
-
-		event_target:player_2 = {
-			character_event = { id = WoL.4162 }
+		hidden_effect = {
+			event_target:player_2 = { set_character_flag = game_play_for_money }
 		}
 	}
 
 	option = { # Play just for fun
 		name = EVTOPTB_WoL_4161
+	}
 
+	after = {
 		event_target:player_2 = {
 			character_event = { id = WoL.4162 }
 		}
@@ -1836,19 +1837,27 @@ character_event = {
 		name = EVTOPTA_WoL_4162
 
 		random_list = {
-			10 = { # Player 1 wins
+			10 = { # Player 2 wins
+			
 				mult_modifier = {
 					factor = 3
 					is_smart_trigger = yes # MORE
 				}
-
-				FROM = {
-					set_character_flag = game_player_winner
-				}
-			}
-
-			10 = { # Player 2 wins
+				
 				set_character_flag = game_player_winner
+				custom_tooltip = { text = game_winning }
+			}
+			
+			10 = { # Player 1 wins
+				mult_modifier = {
+					factor = 3
+					FROM { is_smart_trigger = yes } # MORE
+				}
+				
+				hidden_effect = {
+					FROM = { set_character_flag = game_player_winner }
+				}
+				custom_tooltip = { text = game_losing }
 			}
 		}
 
@@ -1915,7 +1924,7 @@ character_event = {
 		set_character_flag = played_games_today
 
 		if = {
-			limit = {has_character_flag = game_play_for_money }
+			limit = { has_character_flag = game_play_for_money }
 			wealth = -5
 		}
 
