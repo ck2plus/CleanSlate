@@ -724,35 +724,35 @@ character_event = {
 					on_trigger = title
 
 					c_hamburg = {
-						PREVPREV = {
+						PREV = {
 							grant_title = b_altona
 							grant_title = c_hamburg
 						}
 					}
 
 					c_bremen = {
-						PREVPREV = {
+						PREV = {
 							grant_title = b_beverstedt
 							grant_title = c_bremen
 						}
 					}
 
 					c_lubeck = {
-						PREVPREV = {
+						PREV = {
 							grant_title = b_lubeck
 							grant_title = c_hamburg
 						}
 					}
 
 					c_mecklemburg = {
-						PREVPREV = {
+						PREV = {
 							grant_title = b_wismar
 							grant_title = c_mecklemburg
 						}
 					}
 
 					c_rostock = {
-						PREVPREV = {
+						PREV = {
 							grant_title = b_gustrow
 							grant_title = c_rostock
 						}
@@ -1068,7 +1068,7 @@ character_event = {
 	picture = GFX_evt_trade_post_republic
 
 	is_triggered_only = yes
-	
+
 	ai = no
 
 	option = {
@@ -1627,33 +1627,34 @@ letter_event = {
 
 ### Dynastic Marriage Events
 
-# Family member marries burgher daughter (AI)
+# Family member marries burgher daughter
 character_event = {
-	id = REP.400
-	hide_window = yes
+	id = REP.401
+	desc = EVTDESC_REP_401
+	picture = GFX_evt_marriage
+ 	portrait = event_target:dynasty_member
 
-	only_men = yes
-	min_age = 18
-	is_married = no
-	ai = yes
-	only_capable = yes
-	prisoner = no
+	is_patrician = yes
 
 	trigger = {
-		liege = {
-			is_patrician = yes
-		}
+		any_courtier = {
+			dynasty = ROOT
+			is_female = no
+			practical_age >= 18
+			is_married = no
+			can_marry = yes
+			is_incapable = no
+			prisoner = no
+			is_primary_heir = no
+			is_pretender = no
+			is_ruler = no
+			ai = yes
 
-		dynasty = liege
-		can_marry = yes
-		is_primary_heir = no
-		is_pretender = no
-
-		NOR = {
-			is_child_of = liege
-			has_character_flag = getting_married
-			trait = chaste
-			trait = celibate
+			NOR = {
+				is_child_of = ROOT
+				trait = chaste
+				trait = celibate
+			}
 		}
 	}
 
@@ -1662,37 +1663,44 @@ character_event = {
 	}
 
 	immediate = {
-		set_character_flag = getting_married
+		random_courtier = {
+			limit = {
+				dynasty = ROOT
+				is_female = no
+				practical_age >= 18
+				is_married = no
+				can_marry = yes
+				is_incapable = no
+				prisoner = no
+				is_primary_heir = no
+				is_pretender = no
+				is_ruler = no
+				ai = yes
 
-		liege = {
-			character_event = { id = REP.401 }
+				NOR = {
+					is_child_of = ROOT
+					trait = chaste
+					trait = celibate
+				}
+			}
+
+			save_event_target_as = dynasty_member
 		}
-	}
-}
 
-# Family member marries burgher daughter
-character_event = {
-	id = REP.401
-	desc = EVTDESC_REP_401
-	picture = GFX_evt_marriage
-
-	is_triggered_only = yes
-
-	immediate = {
 		create_character = {
 			random_traits = yes
 			dynasty = none
 			female = yes
 			age = 24
-			religion = FROM
-			culture = FROM
+			religion = event_target:dynasty_member
+			culture = event_target:dynasty_member
 		}
 
 		# Set appropriate age
 		new_character = {
 			if = {
 				limit = {
-					FROM = {
+					event_target:dynasty_member = {
 						practical_age >= 45
 					}
 				}
@@ -1701,7 +1709,7 @@ character_event = {
 			}
 			else_if = {
 				limit = {
-					FROM = {
+					event_target:dynasty_member = {
 						practical_age >= 30
 					}
 				}
@@ -1714,43 +1722,54 @@ character_event = {
 	option = {
 		name = EVTOPTA_REP_401
 
-		FROM = {
+		event_target:dynasty_member = {
 			show_scope_change = no
 
 			add_spouse = new_character
-			clr_character_flag = getting_married
 		}
 	}
 }
 
-# Family member marries bar wench/peasant girl/rich girl (AI)
+# Family member marries bar wench/peasant girl/rich girl
 character_event = {
 	id = REP.404
-	hide_window = yes
+	picture = GFX_evt_marriage
+	portrait = event_target:dynasty_member
 
-	only_men = yes
-	is_married = no
-	min_age = 18
-	max_age = 40
-	ai = yes
-	only_capable = yes
-	prisoner = no
+	desc = {
+		text = EVTDESC_REP_405
+		trigger = { has_character_flag = bar_wench }
+	}
+	desc = {
+		text = EVTDESC_REP_406
+		trigger = { has_character_flag = peasant_girl }
+	}
+	desc = {
+		text = EVTDESC_REP_407
+		trigger = { has_character_flag = rich_girl }
+	}
+
+	is_patrician = yes
 
 	trigger = {
-		liege = {
-			is_patrician = yes
-		}
+		any_courtier = {
+			dynasty = ROOT
+			is_female = no
+			practical_age >= 18
+			is_married = no
+			can_marry = yes
+			is_incapable = no
+			prisoner = no
+			is_primary_heir = no
+			is_pretender = no
+			is_ruler = no
+			ai = yes
 
-		dynasty = liege
-		can_marry = yes
-		is_primary_heir = no
-		is_pretender = no
-
-		NOR = {
-			trait = chaste
-			trait = celibate
-			has_character_flag = getting_married
-			is_child_of = liege
+			NOR = {
+				is_child_of = ROOT
+				trait = chaste
+				trait = celibate
+			}
 		}
 	}
 
@@ -1759,151 +1778,105 @@ character_event = {
 	}
 
 	immediate = {
-		set_character_flag = getting_married
+		random_courtier = {
+			limit = {
+				dynasty = ROOT
+				is_female = no
+				practical_age >= 18
+				practical_age < 40
+				is_married = no
+				can_marry = yes
+				is_incapable = no
+				prisoner = no
+				is_primary_heir = no
+				is_pretender = no
+				is_ruler = no
+				ai = yes
 
-		liege = {
-			random_list = {
-				33 = { character_event = { id = REP.405 } }
-				33 = { character_event = { id = REP.406 } }
-				33 = { character_event = { id = REP.407 } }
+				NOR = {
+					is_child_of = ROOT
+					trait = chaste
+					trait = celibate
+				}
 			}
+
+			save_event_target_as = dynasty_member
 		}
-	}
-}
 
-# Family member marries bar wench
-character_event = {
-	id = REP.405
-	desc = EVTDESC_REP_405
-	picture = GFX_evt_marriage
-
-	is_triggered_only = yes
-
-	immediate = {
-		create_character = {
-			random_traits = yes
-			dynasty = none
-			female = yes
-			age = 25
-			religion = FROM
-			culture = FROM
+		random_list = {
+			33 = { set_character_flag = bar_wench }
+			33 = { set_character_flag = peasant_girl }
+			33 = { set_character_flag = rich_girl }
 		}
-	}
 
-	option = {
-		name = I_SEE
-
-		FROM = {
-			show_scope_change = no
-
-			add_spouse = new_character
-			clr_character_flag = getting_married
-		}
-	}
-}
-
-# Family member marries peasant girl
-character_event = {
-	id = REP.406
-	desc = EVTDESC_REP_406
-	picture = GFX_evt_marriage
-
-	is_triggered_only = yes
-
-	immediate = {
 		create_character = {
 			random_traits = yes
 			dynasty = none
 			female = yes
 			age = 24
-			religion = FROM
-			culture = FROM
-			add_trait = fair
+			religion = event_target:dynasty_member
+			culture = event_target:dynasty_member
+		}
+
+		new_character = {
+			random_list = {
+				1 = { add_age = 0 }
+				1 = { add_age = 1 }
+				1 = { add_age = 2 }
+				1 = { add_age = 3 }
+				1 = { add_age = 4 }
+			}
+
+			if = {
+				limit = {
+					ROOT = { has_character_flag = peasant_girl }
+				}
+
+				add_trait = fair
+			}
+			else_if = {
+				limit = {
+					ROOT = { has_character_flag = rich_girl }
+				}
+
+				add_trait = ugly
+			}
 		}
 	}
 
 	option = {
-		name = EVTOPTA_REP_406
+		name = {
+			text = I_SEE
+			trigger = { has_character_flag = bar_wench }
+		}
+		name = {
+			text = EVTOPTA_REP_406
+			trigger = { has_character_flag = peasant_girl }
+		}
+		name = {
+			text = EVTOPTA_REP_407
+			trigger = { has_character_flag = rich_girl }
+		}
 
-		FROM = {
+		event_target:dynasty_member = {
 			show_scope_change = no
 
 			add_spouse = new_character
-			clr_character_flag = getting_married
-		}
-	}
-}
 
-# Family member marries rich girl
-character_event = {
-	id = REP.407
-	desc = EVTDESC_REP_407
-	picture = GFX_evt_marriage
+			if = {
+				limit = {
+					ROOT = { has_character_flag = rich_girl }
+				}
 
-	is_triggered_only = yes
-
-	immediate = {
-		create_character = {
-			random_traits = yes
-			dynasty = none
-			female = yes
-			age = 28
-			religion = FROM
-			culture = FROM
-			add_trait = ugly
+				wealth = 100
+			}
 		}
 	}
 
-	option = {
-		name = EVTOPTA_REP_407
-
-		FROM = {
-			show_scope_change = no
-
-			add_spouse = new_character
-			wealth = 100
-			clr_character_flag = getting_married
-		}
-	}
-}
-
-# Old family member marries young woman (AI)
-character_event = {
-	id = REP.408
-	hide_window = yes
-
-	ai = yes
-	only_capable = yes
-	prisoner = no
-	min_age = 42
-	only_men = yes
-	is_married = no
-
-	trigger = {
-		liege = {
-			is_patrician = yes
-		}
-
-		dynasty = liege
-		can_marry = yes
-		is_primary_heir = no
-		is_pretender = no
-
-		NOR = {
-			trait = chaste
-			trait = celibate
-			is_child_of = liege
-		}
-	}
-
-	mean_time_to_happen = {
-		months = 450
-	}
-
-	immediate = {
-		liege = {
-			character_event = { id = REP.409 }
-		}
+	after = {
+		clr_character_flag = bar_wench
+		clr_character_flag = peasant_girl
+		clr_character_flag = rich_girl
 	}
 }
 
@@ -1912,58 +1885,29 @@ character_event = {
 	id = REP.409
 	desc = EVTDESC_REP_409
 	picture = GFX_evt_marriage
+	portrait = event_target:dynasty_member
 
-	is_triggered_only = yes
-
-	immediate = {
-		create_character = {
-			random_traits = yes
-			dynasty = none
-			female = yes
-			age = 20
-			religion = FROM
-			culture = FROM
-		}
-	}
-
-	option = {
-		name = EVTOPTA_REP_409
-
-		FROM = {
-			show_scope_change = no
-
-			add_spouse = new_character
-		}
-	}
-}
-
-# Young family member marries older woman (AI)
-character_event = {
-	id = REP.410
-	hide_window = yes
-
-	ai = yes
-	only_capable = yes
-	prisoner = no
-	min_age = 18
-	max_age = 26
-	only_men = yes
-	is_married = no
+	is_patrician = yes
 
 	trigger = {
-		liege = {
-			is_patrician = yes
-		}
+		any_courtier = {
+			dynasty = ROOT
+			is_female = no
+			practical_age >= 42
+			is_married = no
+			can_marry = yes
+			is_incapable = no
+			prisoner = no
+			is_primary_heir = no
+			is_pretender = no
+			is_ruler = no
+			ai = yes
 
-		dynasty = liege
-		can_marry = yes
-		is_primary_heir = no
-		is_pretender = no
-
-		NOR = {
-			is_child_of = liege
-			trait = chaste
-			trait = celibate
+			NOR = {
+				is_child_of = ROOT
+				trait = chaste
+				trait = celibate
+			}
 		}
 	}
 
@@ -1972,8 +1916,47 @@ character_event = {
 	}
 
 	immediate = {
-		liege = {
-			character_event = { id = REP.411 }
+		random_courtier = {
+			limit = {
+				dynasty = ROOT
+				is_female = no
+				practical_age >= 42
+				is_married = no
+				can_marry = yes
+				is_incapable = no
+				prisoner = no
+				is_primary_heir = no
+				is_pretender = no
+				is_ruler = no
+				ai = yes
+
+				NOR = {
+					is_child_of = ROOT
+					trait = chaste
+					trait = celibate
+				}
+			}
+
+			save_event_target_as = dynasty_member
+		}
+
+		create_character = {
+			random_traits = yes
+			dynasty = none
+			female = yes
+			age = 20
+			religion = event_target:dynasty_member
+			culture = event_target:dynasty_member
+		}
+	}
+
+	option = {
+		name = EVTOPTA_REP_409
+
+		event_target:dynasty_member = {
+			show_scope_change = no
+
+			add_spouse = new_character
 		}
 	}
 }
@@ -1983,61 +1966,30 @@ character_event = {
 	id = REP.411
 	desc = EVTDESC_REP_411
 	picture = GFX_evt_marriage
+	portrait = event_target:dynasty_member
 
-	is_triggered_only = yes
-
-	immediate = {
-		create_character = {
-			random_traits = yes
-			dynasty = none
-			female = yes
-			age = 41
-			religion = FROM
-			culture = FROM
-		}
-	}
-
-	option = {
-		name = EVTOPTA_REP_411
-
-		FROM = {
-			show_scope_change = no
-
-			add_spouse = new_character
-		}
-	}
-}
-
-# Family member marries foreign woman (AI)
-character_event = {
-	id = REP.412
-	hide_window = yes
-
-	only_men = yes
-	min_age = 18
-	is_married = no
-	only_capable = yes
-	prisoner = no
-	ai = yes
+	is_patrician = yes
 
 	trigger = {
-		dynasty = liege
-		can_marry = yes
-		is_primary_heir = no
-		is_pretender = no
+		any_courtier = {
+			dynasty = ROOT
+			is_female = no
+			practical_age >= 42
+			is_married = no
+			can_marry = yes
+			is_incapable = no
+			prisoner = no
+			is_primary_heir = no
+			is_pretender = no
+			is_ruler = no
+			ai = yes
 
-		liege = {
-			is_patrician = yes
-			NOT = { culture = manden }
+			NOR = {
+				is_child_of = ROOT
+				trait = chaste
+				trait = celibate
+			}
 		}
-
-		NOR = {
-			trait = chaste
-			trait = celibate
-			culture = manden
-			is_child_of = liege
-		}
-
 	}
 
 	mean_time_to_happen = {
@@ -2045,8 +1997,48 @@ character_event = {
 	}
 
 	immediate = {
-		liege = {
-			character_event = { id = REP.413 }
+		random_courtier = {
+			limit = {
+				dynasty = ROOT
+				is_female = no
+				practical_age >= 18
+				practical_age < 26
+				is_married = no
+				can_marry = yes
+				is_incapable = no
+				prisoner = no
+				is_primary_heir = no
+				is_pretender = no
+				is_ruler = no
+				ai = yes
+
+				NOR = {
+					is_child_of = ROOT
+					trait = chaste
+					trait = celibate
+				}
+			}
+
+			save_event_target_as = dynasty_member
+		}
+
+		create_character = {
+			random_traits = yes
+			dynasty = none
+			female = yes
+			age = 41
+			religion = event_target:dynasty_member
+			culture = event_target:dynasty_member
+		}
+	}
+
+	option = {
+		name = EVTOPTA_REP_411
+
+		event_target:dynasty_member = {
+			show_scope_change = no
+
+			add_spouse = new_character
 		}
 	}
 }
@@ -2056,16 +2048,72 @@ character_event = {
 	id = REP.413
 	desc = EVTDESC_REP_413
 	picture = GFX_evt_marriage
+	portrait = event_target:dynasty_member
 
-	is_triggered_only = yes
+	is_patrician = yes
+
+	trigger = {
+		NOT = { culture = manden }
+
+		any_courtier = {
+			dynasty = ROOT
+			is_female = no
+			practical_age >= 42
+			is_married = no
+			can_marry = yes
+			is_incapable = no
+			prisoner = no
+			is_primary_heir = no
+			is_pretender = no
+			is_ruler = no
+			ai = yes
+
+			NOR = {
+				is_child_of = ROOT
+				trait = chaste
+				trait = celibate
+				culture = manden
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 450
+	}
 
 	immediate = {
+		random_courtier = {
+			limit = {
+				dynasty = ROOT
+				is_female = no
+				practical_age >= 18
+				practical_age < 26
+				is_married = no
+				can_marry = yes
+				is_incapable = no
+				prisoner = no
+				is_primary_heir = no
+				is_pretender = no
+				is_ruler = no
+				ai = yes
+
+				NOR = {
+					is_child_of = ROOT
+					trait = chaste
+					trait = celibate
+					culture = manden
+				}
+			}
+
+			save_event_target_as = dynasty_member
+		}
+
 		create_character = {
 			random_traits = yes
 			dynasty = none
 			female = yes
 			age = 26
-			religion = FROM
+			religion = event_target:dynasty_member
 			culture = manden
 		}
 	}
@@ -2073,7 +2121,7 @@ character_event = {
 	option = {
 		name = EVTOPTA_REP_413
 
-		FROM = {
+		event_target:dynasty_member = {
 			show_scope_change = no
 
 			add_spouse = new_character
@@ -2094,16 +2142,7 @@ letter_event = {
 		if = {
 			limit = {
 				FROM = {
-					num_of_trade_posts >= 1
-				}
-
-				any_vassal = {
-					is_patrician = yes
-
-					num_of_trade_post_diff = {
-						character = FROM
-						value >= 10
-					}
+					num_of_trade_posts > 0
 				}
 			}
 
@@ -2120,18 +2159,7 @@ letter_event = {
 				save_event_target_as = target_patrician
 			}
 		}
-		else_if = {
-			limit = {
-				FROM = {
-					num_of_trade_posts < 1
-				}
-
-				any_vassal = {
-					is_patrician = yes
-					num_of_trade_posts >= 10
-				}
-			}
-
+		else = {
 			random_vassal = {
 				limit = {
 					is_patrician = yes
@@ -2150,7 +2178,7 @@ letter_event = {
 	option = {
 		name = EVTOPTA_REP_500
 
-		FROM = {
+		event_target:poor_patrician = {
 			letter_event = { id = REP.501 }
 		}
 	}
@@ -2311,7 +2339,7 @@ letter_event = {
 	option = {
 		name = EVTOPTA_REP_504
 
-		FROMFROM = {
+		event_target:target_patrician = {
 			show_scope_change = no
 
 			opinion = {
@@ -2330,7 +2358,7 @@ letter_event = {
 
 					limit = {
 						trade_post_owner = {
-							character = PREVPREVPREV
+							character = event_target:target_patrician
 						}
 					}
 
