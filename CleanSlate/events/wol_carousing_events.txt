@@ -150,6 +150,20 @@ letter_event = {
 				id = WoL.4001
 				days = 7
 			}
+
+			hidden_effect = {
+				opinion = {
+					name = opinion_carousing
+					who = ROOT
+					months = 4 # Just long enough to start carousing proper
+				}
+
+				reverse_opinion = {
+					name = opinion_carousing
+					who = ROOT
+					years = 1
+				}
+			}
 		}
 
 		set_character_flag = do_not_disturb
@@ -245,13 +259,17 @@ letter_event = {
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
 		name = EVTOPTA_WoL_4001
 
-		reverse_opinion = {
-			name = opinion_carousing
-			who = FROM
-			years = 1
+		tooltip = {
+			reverse_opinion = {
+				name = opinion_carousing
+				who = FROM
+				years = 1
+			}
 		}
 	}
 }
@@ -324,24 +342,17 @@ character_event = {
 	is_triggered_only = yes
 	hide_window = yes
 
-	immediate = {
+	war = no
+	only_capable = yes
+
+	trigger = {
+		has_any_opinion_modifier = opinion_carousing
+	}
+
+	fail_trigger_effect = {
 		clr_character_flag = inviting_guests_to_party_timer
 
 		if = {
-			limit = {
-				NOT = {
-					any_opinion_modifier_target = {
-						has_opinion_modifier = {
-							name = opinion_carousing
-							who = ROOT
-						}
-					}
-				}
-			}
-
-			character_event = { id = WoL.4015 }  # Cancel carousing due to no one accepting invitation
-		}
-		else_if = {
 			limit = {
 				OR = {
 					war = yes
@@ -352,9 +363,13 @@ character_event = {
 			character_event = { id = WoL.4011 } # Cancel carousing due to unforeseen circumstances
 		}
 		else = {
-			clr_character_flag = guest_confirmed
-			character_event = { id = WoL.4030 } # ... or start the party!
+			character_event = { id = WoL.4015 } # Cancel carousing due to no one accepting invitation
 		}
+	}
+
+	immediate = {
+		clr_character_flag = inviting_guests_to_party_timer
+		character_event = { id = WoL.4030 } # ... or start the party!
 	}
 }
 
@@ -419,6 +434,7 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	is_triggered_only = yes
+	hide_from = yes
 
 	immediate = {
 		clr_character_flag = do_not_disturb
