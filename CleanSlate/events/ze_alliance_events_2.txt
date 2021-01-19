@@ -19,65 +19,65 @@ character_event = {
 	picture = GFX_evt_large_army
 	border = GFX_event_normal_frame_war
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse
 
 	only_playable = yes
+	war = yes
+	has_dlc = "Conclave"
 	only_capable = yes
 	prisoner = no
-	has_dlc = "Zeus"
-	war = yes
 
 	trigger = {
 		OR = {
 			is_primary_war_attacker = yes
 			is_primary_war_defender = yes
 		}
+
 		any_allied_character = {
-			NOR = {
-				AND = {
-					is_tributary = yes
-					suzerain = {
-						OR = {
-							character = ROOT
-							any_liege = {
-								character = ROOT
-							}
-						}
-					}
-				}
-				ROOT = {
-					is_tributary = yes
-					suzerain = {
-						OR = {
-							character = PREV
-							any_liege = {
-								character = PREV
-							}
-						}
-					}
-				}
-				AND = {
-					is_tribal = yes
-					same_realm = ROOT
-					ROOT = {
-						is_tribal = yes
-					}
-				}
-				AND = {
-					is_nomadic = yes
-					same_realm = ROOT
-					ROOT = {
-						is_nomadic = yes
-					}
-				}
-			}
 			war = yes
+
 			ROOT = {
 				any_war = {
 					days_since_last_hostile_action = {
-						who = PREVPREV     # The character whose activity is being checked
-						days = 1460    # Number of days since last battle participation or offensive siege (4 years)
+						who = PREVPREV	# The character whose activity is being checked
+						days >= 1460	# Number of days since last battle participation or offensive siege (4 years)
 					}
+				}
+
+				trigger_if = {
+					limit = { is_tributary = yes }
+
+					suzerain = {
+						NOR = {
+							character = PREVPREV
+							is_vassal_or_below_of = PREVPREV
+						}
+					}
+				}
+			}
+
+			trigger_if = {
+				limit = { is_tributary = yes }
+
+				suzerain = {
+					NOR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
+			}
+
+			trigger_if = {
+				limit = { same_realm = ROOT }
+
+				NAND = {
+					is_tribal = yes
+					ROOT = { is_tribal = yes }
+				}
+
+				NAND = {
+					is_nomadic = yes
+					ROOT = { is_nomadic = yes }
 				}
 			}
 		}
@@ -86,86 +86,89 @@ character_event = {
 	immediate = {
 		random_allied_character = {
 			limit = {
-				NOR = {
-					AND = {
-						is_tributary = yes
-						suzerain = {
-							OR = {
-								character = ROOT
-								any_liege = {
-									character = ROOT
-								}
-							}
-						}
-					}
-					ROOT = {
-						is_tributary = yes
-						suzerain = {
-							OR = {
-								character = PREV
-								any_liege = {
-									character = PREV
-								}
-							}
-						}
-					}
-					AND = {
-						is_tribal = yes
-						same_realm = ROOT
-						ROOT = {
-							is_tribal = yes
-						}
-					}
-					AND = {
-						is_nomadic = yes
-						same_realm = ROOT
-						ROOT = {
-							is_nomadic = yes
-						}
-					}
-				}
 				war = yes
+
 				ROOT = {
 					any_war = {
 						days_since_last_hostile_action = {
-							who = PREVPREV     # The character whose activity is being checked
-							days = 1460    # Number of days since last battle participation or offensive siege (4 years)
+							who = PREVPREV	# The character whose activity is being checked
+							days >= 1460	# Number of days since last battle participation or offensive siege (4 years)
+						}
+					}
+
+					trigger_if = {
+						limit = { is_tributary = yes }
+
+						suzerain = {
+							NOR = {
+								character = PREVPREV
+								is_vassal_or_below_of = PREVPREV
+							}
 						}
 					}
 				}
+
+				trigger_if = {
+					limit = { is_tributary = yes }
+
+					suzerain = {
+						NOR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
+					}
+				}
+
+				trigger_if = {
+					limit = { same_realm = ROOT }
+
+					NAND = {
+						is_tribal = yes
+						ROOT = { is_tribal = yes }
+					}
+
+					NAND = {
+						is_nomadic = yes
+						ROOT = { is_nomadic = yes }
+					}
+				}
 			}
+
 			save_event_target_as = ally_not_active_in_war
 		}
 	}
 
 	option = {
 		name = EVTOPTA_ZE_9000  # Send angry letter and break alliance
+
+		opinion = {
+			name = ally_inactive_in_war
+			who = event_target:ally_not_active_in_war
+			years = 5
+		}
+
+		if = {
+			limit = { is_allied_with = event_target:ally_not_active_in_war }
+			break_alliance = event_target:ally_not_active_in_war
+		}
+
 		event_target:ally_not_active_in_war = {
-			reverse_opinion = {
-				who = ROOT
-				modifier = ally_inactive_in_war
-				years = 5
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9001
+				tooltip = ze_9000_letter_sent
 			}
-			ROOT = {
-				if = {
-					limit = {
-						is_allied_with = PREV
-					}
-					break_alliance = PREV
-				}
-			}
-			custom_tooltip = { text = ze_9000_letter_sent }
-			hidden_tooltip = { letter_event = { id = ZE.9001 } }
 		}
 	}
+
 	option = {
 		name = EVTOPTB_ZE_9000	# Forgive and forget
-		event_target:ally_not_active_in_war = {
-			reverse_opinion = {
-				who = ROOT
-				modifier = opinion_disappointed
-				years = 3
-			}
+
+		opinion = {
+			who = event_target:ally_not_active_in_war
+			name = opinion_disappointed
+			years = 3
 		}
 	}
 }
@@ -180,7 +183,10 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9001
-		tooltip = { break_alliance = FROM }
+
+		tooltip = {
+			break_alliance = FROM
+		}
 	}
 }
 
@@ -198,113 +204,96 @@ character_event = {
 	is_triggered_only = yes
 
 	only_independent = yes
+	has_dlc = "Conclave"
 	only_capable = yes
 	prisoner = no
 	war = no
-	has_dlc = "Zeus"
 
 	trigger = {
 		is_tributary = no
+
 		any_realm_province = {
-			port = yes
+			is_coastal = yes
 		}
+
 		any_independent_ruler = {
-			NOR = {
-				AND = {
-					is_tributary = yes
-					suzerain = {
-						OR = {
-							character = ROOT
-							any_liege = {
-								character = ROOT
-							}
-						}
-					}
-				}
-				ROOT = {
-					is_tributary = yes
-					suzerain = {
-						OR = {
-							character = PREV
-							any_liege = {
-								character = PREV
-							}
-						}
-					}
-				}
-			}
 			OR = {
 				has_non_aggression_pact_with = ROOT
 				is_allied_with = ROOT
 			}
+
+			any_realm_province = {
+				is_coastal = yes
+			}
+
+			trigger_if = {
+				limit = { is_tributary = yes }
+
+				suzerain = {
+					NOR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
+			}
+
 			is_within_diplo_range = ROOT
 			war = no
-			any_realm_province = {
-				port = yes
-			}
 		}
 	}
 
 	immediate = {
 		random_independent_ruler = {
 			limit = {
-				NOR = {
-					AND = {
-						is_tributary = yes
-						suzerain = {
-							OR = {
-								character = ROOT
-								any_liege = {
-									character = ROOT
-								}
-							}
-						}
-					}
-					ROOT = {
-						is_tributary = yes
-						suzerain = {
-							OR = {
-								character = PREV
-								any_liege = {
-									character = PREV
-								}
-							}
-						}
-					}
-				}
 				OR = {
 					has_non_aggression_pact_with = ROOT
 					is_allied_with = ROOT
 				}
+
+				any_realm_province = {
+					is_coastal = yes
+				}
+
+				trigger_if = {
+					limit = { is_tributary = yes }
+
+					suzerain = {
+						NOR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
+					}
+				}
+
 				is_within_diplo_range = ROOT
 				war = no
 			}
+
 			save_event_target_as = pirate_alliance_friction_ally
 		}
 	}
 
 	option = {
 		name = EVTOPTA_ZE_9100	# Send letter with suspicion
+
 		custom_tooltip = {
 			text = EVTOPTA_ZE_9100_TOOLTIP
-			hidden_tooltip = {
-				event_target:pirate_alliance_friction_ally = {
-					letter_event = { id = ZE.9101 }
-				}
-				any_realm_province = {
-					limit = {
-						port = yes
-					}
-					add_province_modifier = {
-						name = marauding_pirates
-						years = 5
-					}
+
+			event_target:pirate_alliance_friction_ally = {
+				letter_event = { id = ZE.9101 }
+			}
+
+			any_realm_province = {
+				limit = { is_coastal = yes }
+
+				add_province_modifier = {
+					name = marauding_pirates
+					years = 5
 				}
 			}
 		}
 	}
 }
-
 
 # Ally receives first letter
 letter_event = {
@@ -318,29 +307,52 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9101 # Answer cordially
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = trusting
 			}
 		}
+
 		prestige = -50
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9110 days = 20 } } }
-		custom_tooltip = { text = ze_9101_cordial }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9110
+				days = 20
+				tooltip = ze_9101_cordial
+			}
+		}
 	}
+
 	option = {
 		name = EVTOPTB_ZE_9101 # Answer with countersuspicion
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = paranoid
 			}
 		}
+
 		prestige = 50
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9120 days = 20 } } }
-		custom_tooltip = { text = ze_9101_angry }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9120
+				days = 20
+				tooltip = ze_9101_angry
+			}
+		}
 	}
 }
 
@@ -356,41 +368,53 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9110 # Accept
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = trusting
 			}
 		}
+
 		prestige = -50
 	}
+
 	option = {
 		name = EVTOPTB_ZE_9110 # They are playing dumb. Break pact
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = paranoid
 			}
 		}
-		custom_tooltip = { text = ze_9121_break_pact }
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9111 } } }
-		if = {
-			limit = {
-				is_allied_with = FROM
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9111
+				tooltip = ze_9121_break_pact
 			}
-			tooltip = { break_alliance = FROM }
 		}
-		if = {
-			limit = {
-				has_non_aggression_pact_with = FROM
+
+		tooltip = {
+			if = {
+				limit = { is_allied_with = FROM }
+				break_alliance = FROM
 			}
-			tooltip = {
+
+			if = {
+				limit = { has_non_aggression_pact_with = FROM }
+
 				reverse_opinion = {
+					name = broken_non_aggression_pact
 					who = FROM
 					years = 5
-					modifier = broken_non_aggression_pact
 				}
 			}
 		}
@@ -407,21 +431,21 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9111 # Accept
+
 		prestige = -50
+
 		if = {
-			limit = {
-				is_allied_with = FROM
-			}
+			limit = { is_allied_with = FROM }
 			break_alliance = FROM
 		}
+
 		if = {
-			limit = {
-				has_non_aggression_pact_with = FROM
-			}
+			limit = { has_non_aggression_pact_with = FROM }
+
 			opinion = {
+				name = broken_non_aggression_pact
 				who = FROM
 				years = 5
-				modifier = broken_non_aggression_pact
 			}
 		}
 	}
@@ -439,29 +463,52 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9120 # Try to repair it
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				diplomacy = 15
 			}
 		}
+
 		prestige = -50
-		custom_tooltip = { text = ze_9120_soothing }
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9121 days = 20 } } }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9121
+				days = 20
+				tooltip = ze_9120_soothing
+			}
+		}
 	}
+
 	option = {
 		name = EVTOPTB_ZE_9120 # Answer with counter-countersuspicion
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = paranoid
 			}
 		}
+
 		prestige = 50
-		custom_tooltip = { text = ze_9101_angry }
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9130 days = 20 } } }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9130
+				days = 20
+				tooltip = ze_9101_angry
+			}
+		}
 	}
 }
 
@@ -477,44 +524,64 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9121 # Accept
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
-				diplomacy = 15
+				diplomacy >= 15
 			}
 		}
+
 		prestige = -50
-		custom_tooltip = { text = ze_9121_accept_apology }
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9122 } } }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9122
+				tooltip = ze_9121_accept_apology
+			}
+		}
 	}
+
 	option = {
 		name = EVTOPTB_ZE_9121 # Pact broken
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = paranoid
 			}
 		}
+
 		prestige = 50
-		custom_tooltip = { text = ze_9121_break_pact }
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9123 } } }
-		if = {
-			limit = {
-				is_allied_with = FROM
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9123
+				tooltip = ze_9121_break_pact
 			}
-			tooltip = { break_alliance = FROM }
 		}
-		if = {
-			limit = {
-				has_non_aggression_pact_with = FROM
+
+		tooltip = {
+			if = {
+				limit = { is_allied_with = FROM }
+				break_alliance = FROM
 			}
-			tooltip = {
+
+			if = {
+				limit = { has_non_aggression_pact_with = FROM }
+
 				reverse_opinion = {
+					name = broken_non_aggression_pact
 					who = FROM
 					years = 5
-					modifier = broken_non_aggression_pact
 				}
 			}
 		}
@@ -531,6 +598,7 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9122
+
 		prestige = 50
 	}
 }
@@ -545,21 +613,21 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9123
+
 		prestige = -50
+
 		if = {
-			limit = {
-				is_allied_with = FROM
-			}
+			limit = { is_allied_with = FROM }
 			break_alliance = FROM
 		}
+
 		if = {
-			limit = {
-				has_non_aggression_pact_with = FROM
-			}
+			limit = { has_non_aggression_pact_with = FROM }
+
 			opinion = {
+				name = broken_non_aggression_pact
 				who = FROM
 				years = 5
-				modifier = broken_non_aggression_pact
 			}
 		}
 	}
@@ -577,44 +645,64 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9130 # Swallow it and shut up
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				diplomacy = 15
 			}
 		}
+
 		prestige = -50
-		custom_tooltip = { text = ze_9130_apology }
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9131 } } }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9131
+				tooltip = ze_9130_apology
+			}
+		}
 	}
+
 	option = {
 		name = EVTOPTB_ZE_9130 # Pact broken
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = paranoid
 			}
 		}
+
 		prestige = 50
-		custom_tooltip = { text = ze_9121_break_pact }
-		hidden_tooltip = { FROM = { letter_event = { id = ZE.9132 } } }
-		if = {
-			limit = {
-				is_allied_with = FROM
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.9132
+				tooltip = ze_9121_break_pact
 			}
-			tooltip = { break_alliance = FROM }
 		}
-		if = {
-			limit = {
-				has_non_aggression_pact_with = FROM
+
+		tooltip = {
+			if = {
+				limit = { is_allied_with = FROM }
+				break_alliance = FROM
 			}
-			tooltip = {
+
+			if = {
+				limit = { has_non_aggression_pact_with = FROM }
+
 				reverse_opinion = {
+					name = broken_non_aggression_pact
 					who = FROM
 					years = 5
-					modifier = broken_non_aggression_pact
 				}
 			}
 		}
@@ -631,6 +719,7 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_ZE_9131
+
 		prestige = 50
 	}
 }
@@ -645,21 +734,21 @@ letter_event = {
 
 	option = {
 		name = GOOD_RIDDANCE
+
 		prestige = -50
+
 		if = {
-			limit = {
-				is_allied_with = FROM
-			}
+			limit = { is_allied_with = FROM }
 			break_alliance = FROM
 		}
+
 		if = {
-			limit = {
-				has_non_aggression_pact_with = FROM
-			}
+			limit = { has_non_aggression_pact_with = FROM }
+
 			opinion = {
+				name = broken_non_aggression_pact
 				who = FROM
 				years = 5
-				modifier = broken_non_aggression_pact
 			}
 		}
 	}
