@@ -94,7 +94,8 @@ narrative_event = {
 
 	trigger = {
 		trigger_if = {
-			limit = { ai = no }
+			limit = { ai = yes }
+			
 			has_game_rule = {
 				name = supernatural_events
 				value = unrestricted
@@ -160,6 +161,7 @@ narrative_event = {
 
 	is_triggered_only = yes # on_yearly_pulse
 
+	min_age = 16
 	only_playable = yes
 	culture_group = altaic
 	only_capable = yes
@@ -175,7 +177,6 @@ narrative_event = {
 			}
 		}
 
-		is_adult = yes
 		has_children = no
 
 		NOR = {
@@ -458,8 +459,8 @@ narrative_event = {
 		}
 
 		reverse_opinion = {
-			who = mother
 			name = strengthened_loyalty
+			who = mother
 			years = 3
 		}
 	}
@@ -536,8 +537,8 @@ narrative_event = {
 		name = EVTOPTA_HL_1031 # Accept gossip
 
 		opinion = {
-			who = FROM
 			name = opinion_approves
+			who = FROM
 			years = 3
 		}
 	}
@@ -1058,8 +1059,8 @@ narrative_event = {
 			limit = { has_character_flag = wolf_homecoming_worried_character }
 
 			reverse_opinion = {
-				who = event_target:wolf_worried_homecoming
 				name = opinion_afraid
+				who = event_target:wolf_worried_homecoming
 				years = 3
 			}
 		}
@@ -1099,7 +1100,7 @@ narrative_event = {
 	picture = GFX_evt_wolf
 	border = GFX_event_narrative_frame_war
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse
 
 	min_age = 18
 	has_dlc = "Horse Lords"
@@ -1142,10 +1143,6 @@ narrative_event = {
 		}
 	}
 
-	immediate = {
-		set_character_flag = lycanthropy
-	}
-
 	option = {
 		name = EVTOPTA_HL_1510
 
@@ -1153,8 +1150,6 @@ narrative_event = {
 			name = lycanthropy
 			duration = -1
 		}
-
-		clr_character_flag = lycanthropy
 
 		# Select random werewolf event...
 		hidden_effect = {
@@ -1180,7 +1175,7 @@ character_event = {
 	picture = GFX_evt_wolf
 	border = GFX_event_normal_frame_war
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse
 
 	min_age = 18
 	only_capable = yes
@@ -1460,55 +1455,58 @@ character_event = {
 	option = {
 		name = EVTOPTA_HL_1490
 
-		if = {
-			limit = { has_character_flag = werewolf_howling_on_mountaintop }
+		trigger_switch = {
+			on_trigger = has_character_flag
+			
+			werewolf_howling_on_mountaintop = {
 
-			add_character_modifier = {
-				name = hoarse
-				years = 2
-			}
-		}
-
-		if = {
-			limit = { has_character_flag = werewolf_swims_river_sleeps_outside }
-
-			if = {
-				limit = { trait = pneumonic }
-
-				random = {
-					chance = 20
-					add_trait_infirm_effect = yes
+				clr_character_flag = werewolf_howling_on_mountaintop
+				
+				add_character_modifier = {
+					name = hoarse
+					years = 2
 				}
 			}
-			else_if = {
-				limit = { trait = ill }
-				add_trait = pneumonic
-			}
-			else_if = {
-				limit = { is_ill = no }
 
+			werewolf_swims_river_sleeps_outside = {
+
+				clr_character_flag = werewolf_swims_river_sleeps_outside
+				
 				if = {
-					limit = { has_dlc = "Reapers" }
-					add_symptom_effect = yes
+					limit = { trait = pneumonic }
+
+					random = {
+						chance = 20
+						add_trait_infirm_effect = yes
+					}
 				}
-				else = {
-					add_trait = ill
+				else_if = {
+					limit = { trait = ill }
+					add_trait = pneumonic
+				}
+				else_if = {
+					limit = { is_ill = no }
+
+					if = {
+						limit = { has_dlc = "Reapers" }
+						add_symptom_effect = yes
+					}
+					else = {
+						add_trait = ill
+					}
+				}
+			}
+
+			werewolf_killed_something = {
+
+				clr_character_flag = werewolf_killed_something
+				
+				add_character_modifier = {
+					name = werewolf_killed
+					years = 2
 				}
 			}
 		}
-
-		if = {
-			limit = { has_character_flag = werewolf_killed_something }
-
-			add_character_modifier = {
-				name = werewolf_killed
-				years = 2
-			}
-		}
-
-		clr_character_flag = werewolf_howling_on_mountaintop
-		clr_character_flag = werewolf_swims_river_sleeps_outside
-		clr_character_flag = werewolf_killed_something
 	}
 }
 
@@ -1750,14 +1748,10 @@ character_event = {
 
 		set_character_flag = wolf_hunting_instinct_at_court
 
-		event_target:wolf_hunting_instinct_at_court_courtier = {
-			show_scope_change = no
-
-			opinion = {
-				who = ROOT
-				name = opinion_horrified
-				years = 3
-			}
+		reverse_opinion = {
+			name = opinion_horrified
+			who = event_target:wolf_hunting_instinct_at_court_courtier
+			years = 3
 		}
 	}
 }
@@ -1818,17 +1812,17 @@ character_event = {
 			on_trigger = trait
 
 			misguided_warrior = {
-				remove_trait = misguided_warrior
+				hidden_effect = { remove_trait = misguided_warrior }
 				add_trait = tough_soldier
 			}
 
 			tough_soldier = {
-				remove_trait = tough_soldier
+				hidden_effect = { remove_trait = tough_soldier }
 				add_trait = skilled_tactician
 			}
 
 			skilled_tactician = {
-				remove_trait = skilled_tactician
+				hidden_effect = { remove_trait = skilled_tactician }
 				add_trait = brilliant_strategist
 			}
 		}
@@ -1955,13 +1949,7 @@ character_event = {
 			}
 		}
 
-		if = {
-			limit = {
-				NOT = { trait = lustful }
-			}
-
-			add_trait = lustful
-		}
+		add_trait_silently_lustful_effect = yes
 	}
 
 	option = {
@@ -2152,11 +2140,11 @@ character_event = {
 
 	is_triggered_only = yes
 
+	has_character_flag = wolf_blood_inherited
 	only_capable = yes
 
 	trigger = {
 		has_character_modifier = wolf_blood
-		has_character_flag = wolf_blood_inherited
 		NOT = { trait = wroth }
 	}
 
@@ -2199,10 +2187,10 @@ character_event = {
 	is_triggered_only = yes
 
 	only_capable = yes
+	has_character_flag = wolf_blood_inherited
 
 	trigger = {
 		has_character_modifier = wolf_blood
-		has_character_flag = wolf_blood_inherited
 		NOT = { trait = uncouth }
 	}
 
@@ -2243,10 +2231,10 @@ character_event = {
 	is_triggered_only = yes
 
 	only_capable = yes
+	has_character_flag = wolf_blood_inherited
 
 	trigger = {
 		has_character_modifier = wolf_blood
-		has_character_flag = wolf_blood_inherited
 
 		OR = {
 			trait = martial_cleric
@@ -2286,17 +2274,17 @@ character_event = {
 			on_trigger = trait
 
 			mastermind_theologian = {
-				remove_trait = mastermind_theologian
+				hidden_effect = { remove_trait = mastermind_theologian }
 				add_trait = scholarly_theologian
 			}
 
 			scholarly_theologian = {
-				remove_trait = scholarly_theologian
+				hidden_effect = { remove_trait = scholarly_theologian }
 				add_trait = martial_cleric
 			}
 
 			martial_cleric = {
-				remove_trait = martial_cleric
+				hidden_effect = { remove_trait = martial_cleric }
 				add_trait = detached_priest
 			}
 		}
@@ -2314,10 +2302,10 @@ narrative_event = {
 	is_triggered_only = yes
 
 	only_capable = yes
+	has_character_flag = wolf_blood_inherited
 
 	trigger = {
 		has_character_modifier = wolf_blood
-		has_character_flag = wolf_blood_inherited
 		NOT = { has_character_flag = wolf_howled_at_moon }
 	}
 
