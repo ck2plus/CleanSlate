@@ -1,55 +1,57 @@
 namespace = RIP
 
+# RIP.14000 - RIP.14020
+# RIP.15100 - RIP.15116
+# RIP.22000 - RIP.22020
+
 character_event = {
 	id = RIP.14000
-	hide_window = yes
-	is_triggered_only = yes
 
-	only_playable = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+	hide_window = yes
+
+	ai = no
+	only_independent = yes
 	min_age = 16
 	only_capable = yes
-	ai = no
 	prisoner = no
-	only_independent = yes
 
 	trigger = {
-		OR = {
-			any_demesne_province = { disease = bubonic_plague }
-			AND = {
+		# OR = {
+		#	any_demesne_province = { disease = bubonic_plague }
+		#
+		#	AND = {
 				any_realm_province = { disease = bubonic_plague }
-				independent = yes
-			}
-		}
-		host = { character = ROOT }
+		#		independent = yes
+		#	}
+		# }
 
+	#	host = { character = ROOT }
 		NOT = { has_character_flag = end_of_days }
 	}
 
 	immediate = {
 		random_list = {
-			20 = {
-				narrative_event = { id = RIP.14001 } #Doomsday
-			}
-			20 = {
-				character_event = { id = RIP.15099 } #The living dead
-			}
-			20 = {
-				narrative_event = { id = RIP.22000 } #The white rider
-			}
+			20 = { narrative_event = { id = RIP.14001 } } # Doomsday
+			20 = { narrative_event = { id = RIP.15100 } } # The white rider
+			20 = { narrative_event = { id = RIP.22000 } } # The living dead
 		}
 
 		set_character_flag = end_of_days
 
-		character_event = { id = RIP.22020 days = 730 }
+		character_event = {
+			id = RIP.22020 # Clean-up
+			years = 2
+		}
 	}
 }
 
-#Doomsday
+# Doomsday
 narrative_event = {
 	id = RIP.14001
-	picture = GFX_evt_bring_out_your_dead
 	title = EVTTITLE_RIP_14001
 	desc = EVTDESC_RIP_14001
+	picture = GFX_evt_bring_out_your_dead
 	border = GFX_event_narrative_frame_religion
 
 	is_triggered_only = yes
@@ -62,277 +64,199 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTA_RIP_14001
-		hidden_tooltip = {
+
+		hidden_effect = {
 			random_list = {
 				100 = {
-					modifier = {
-						factor = 0
-						NOR = {
-							job_chancellor = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							job_marshal = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							job_treasurer = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							job_spymaster = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							job_spiritual = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
+					trigger = {
+						any_voter = {
+							has_job_title = yes
+
+							OR = {
+								trait = greedy
+								trait = deceitful
 							}
 						}
 					}
-					job_chancellor = {
-						if = {
-							limit = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
+
+					random_voter = {
+						limit = {
+							has_job_title = yes
+
+							OR = {
+								trait = greedy
+								trait = deceitful
 							}
-							save_event_target_as = greedy_councillor
-							ROOT = { set_character_flag = greedy_chancellor }
-							character_event = { id = RIP.14003 }
-							break = yes
+						}
+
+						save_event_target_as = greedy_councillor
+
+						trigger_switch = {
+							on_trigger = has_job_title
+
+							job_chancellor = { ROOT = { set_character_flag = greedy_chancellor } }
+							job_marshal = { ROOT = { set_character_flag = greedy_marshal } }
+							job_treasurer = { ROOT = { set_character_flag = greedy_treasurer } }
+							job_spymaster = { ROOT = { set_character_flag = greedy_spymaster } }
+							job_spiritual = { ROOT = { set_character_flag = greedy_spiritual } }
 						}
 					}
-					job_marshal = {
-						if = {
-							limit = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							save_event_target_as = greedy_councillor
-							ROOT = { set_character_flag = greedy_marshal }
-							character_event = { id = RIP.14003 }
-							break = yes
-						}
-					}
-					job_treasurer = {
-						if = {
-							limit = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							save_event_target_as = greedy_councillor
-							ROOT = { set_character_flag = greedy_treasurer }
-							character_event = { id = RIP.14003 }
-							break = yes
-						}
-					}
-					job_spymaster = {
-						if = {
-							limit = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							save_event_target_as = greedy_councillor
-							ROOT = { set_character_flag = greedy_spymaster }
-							character_event = { id = RIP.14003 }
-							break = yes
-						}
-					}
-					job_spiritual = {
-						if = {
-							limit = {
-								OR = {
-									trait = greedy
-									trait = deceitful
-								}
-							}
-							save_event_target_as = greedy_councillor
-							ROOT = { set_character_flag = greedy_spiritual }
-							character_event = { id = RIP.14003 }
-						}
+
+					character_event = {
+						id = RIP.14002
+						days = 10
+						random = 5
 					}
 				}
-				#Blame a rival
+
+				# Blame a rival
 				100 = {
-					modifier = {
-						factor = 0
-						NOT = {
-							any_rival = {
-								at_location = ROOT
-							}
-						}
-					}
-					random_rival = {
-						limit = {
+					trigger = {
+						any_rival = {
 							at_location = ROOT
 						}
-						character_event = { id = RIP.14005 }
+					}
+
+					random_rival = {
+						limit = { at_location = ROOT }
+						save_event_target_as = rival
+					}
+
+					character_event = {
+						id = RIP.14006
+						days = 10
+						random = 5
 					}
 				}
-				#Become depressed
+
+				# Become depressed
 				25 = {
-					modifier = {
-						factor = 0
-						NOR = {
+					trigger = {
+						OR = {
 							trait = stressed
 							trait = paranoid
 							trait = craven
 							is_weak_trigger = yes
 						}
 					}
+
 					character_event = { id = RIP.14004 }
 				}
-				#nothing special happens
+
+				# Nothing special happens
 				10 = {
-					character_event = { id = RIP.14010 days = 20 random = 20 }
+					character_event = {
+						id = RIP.14010
+						days = 20
+						random = 20
+					}
 				}
 			}
 		}
 	}
 }
 
-#Greedy councillor
+# Greedy councillor
 character_event = {
 	id = RIP.14002
 	picture = GFX_evt_whispers
 	border = GFX_event_normal_frame_intrigue
+
 	desc = {
 		text = EVTDESCA_RIP_14002
-		trigger = {
-			has_character_flag = greedy_chancellor
-		}
+		trigger = { has_character_flag = greedy_chancellor }
 	}
 	desc = {
 		text = EVTDESCB_RIP_14002
-		trigger = {
-			has_character_flag = greedy_marshal
-		}
+		trigger = { has_character_flag = greedy_marshal }
 	}
 	desc = {
 		text = EVTDESCC_RIP_14002
-		trigger = {
-			has_character_flag = greedy_treasurer
-		}
+		trigger = { has_character_flag = greedy_treasurer }
 	}
 	desc = {
 		text = EVTDESCD_RIP_14002
-		trigger = {
-			has_character_flag = greedy_spymaster
-		}
+		trigger = { has_character_flag = greedy_spymaster }
 	}
 	desc = {
 		text = EVTDESCE_RIP_14002
-		trigger = {
-			has_character_flag = greedy_spiritual
-		}
+		trigger = { has_character_flag = greedy_spiritual }
 	}
 
 	is_triggered_only = yes
 
-	#make a deal
+	# Make a deal
 	option = {
 		name = EVTOPTA_RIP_14002
+
 		custom_tooltip = {
 			text = EVTOPTA_RIP_14002_TOOLTIP
-		}
-		clr_character_flag = greedy_chancellor
-		clr_character_flag = greedy_marshal
-		clr_character_flag = greedy_treasurer
-		clr_character_flag = greedy_spymaster
-		clr_character_flag = greedy_spiritual
-		hidden_tooltip = {
+
+			clr_character_flag = greedy_chancellor
+			clr_character_flag = greedy_marshal
+			clr_character_flag = greedy_treasurer
+			clr_character_flag = greedy_spymaster
+			clr_character_flag = greedy_spiritual
+
 			set_character_flag = eod_deal_made
-			character_event = { id = RIP.14010 days = 10 random = 20 }
+
+			character_event = {
+				id = RIP.14010
+				days = 10
+				random = 20
+			}
 		}
 	}
 
-	#dont take advantage of people
+	# Don't take advantage of people
 	option = {
 		name = EVTOPTB_RIP_14002
+
 		piety = 100
 		clr_character_flag = greedy_chancellor
 		clr_character_flag = greedy_marshal
 		clr_character_flag = greedy_treasurer
 		clr_character_flag = greedy_spymaster
 		clr_character_flag = greedy_spiritual
-		hidden_tooltip = {
-			character_event = { id = RIP.14010 days = 10 random = 20 }
+
+		character_event = {
+			id = RIP.14010
+			days = 10
+			random = 20
 		}
 	}
 }
 
-#Ping greedy councillor
-character_event = {
-	id = RIP.14003
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			character_event = { id = RIP.14002 days = 10 random = 5 }
-		}
-	}
-}
-
-#overcome with worry
+# Overcome with worry
 character_event = {
 	id = RIP.14004
+	desc = EVTDESC_RIP_14004
 	picture = GFX_evt_bad_news
 	border = GFX_event_normal_frame_religion
-	desc = EVTDESC_RIP_14004
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_RIP_14004
+
 		if = {
 			limit = {
 				NOT = { trait = depressed }
 			}
+
+			add_trait = depressed
+			set_character_flag = eod_depressed
 		}
-		add_trait = depressed
-		set_character_flag = eod_depressed
-		hidden_tooltip = {
-			character_event = { id = RIP.14010 days = 10 random = 20 }
-		}
-	}
-}
 
-#ping rival
-character_event = {
-	id = RIP.14005
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		save_event_target_as = rival
-		FROM = {
-			character_event = { id = RIP.14006 days = 10 random = 5 }
+		character_event = {
+			id = RIP.14010
+			days = 10
+			random = 20
 		}
 	}
 }
 
-#rival annoys you
+# Rival annoys you
 character_event = {
 	id = RIP.14006
 	picture = GFX_evt_poke_king_in_chest
@@ -341,264 +265,283 @@ character_event = {
 
 	is_triggered_only = yes
 
-	#forge some evidence
+	# Forge some evidence
 	option = {
 		name = EVTOPTA_RIP_14006
+
 		custom_tooltip = {
 			text = EVTOPTA_RIP_14006_TOOLTIP
+
+			set_character_flag = eod_rival
+
+			character_event = {
+				id = RIP.14010
+				days = 10
+				random = 20
+			}
 		}
+
 		piety = -100
-		set_character_flag = eod_rival
-		hidden_tooltip = {
-			character_event = { id = RIP.14010 days = 10 random = 20 }
-		}
 	}
 
-	#grow up
+	# Grow up
 	option = {
 		name = EVTOPTB_RIP_14006
-		hidden_tooltip = {
-			character_event = { id = RIP.14010 days = 10 random = 20 }
+
+		character_event = {
+			id = RIP.14010
+			days = 10
+			random = 20
 		}
 	}
 }
 
-#solar eclipse event
+# Solar eclipse event
 character_event = {
 	id = RIP.14010
 	picture = GFX_evt_end_of_days
 	border = GFX_event_normal_frame_religion
 	desc = EVTDESC_RIP_14010
 
-	hide_from = yes
-
 	is_triggered_only = yes
 
-	#Scam the people
+	# Scam the people
 	option = {
 		name = EVTOPTA_RIP_14010
+
 		trigger = {
 			has_character_flag = eod_deal_made
 			NOT = { has_character_flag = eod_depressed }
 		}
-		custom_tooltip = {
-			text = EVTOPTA_RIP_14010_TOOLTIP
-		}
-		clr_character_flag = eod_deal_made
-		hidden_tooltip = {
-			event_target:greedy_councillor = {
-				character_event = { id = RIP.14011 }
-			}
+
+		character_event = {
+			id = RIP.14012
+			days = 7
+			tooltip = EVTOPTA_RIP_14010_TOOLTIP
 		}
 	}
 
-	#Send mob after rival
+	# Send mob after rival
 	option = {
 		name = EVTOPTB_RIP_14010
+
 		trigger = {
 			has_character_flag = eod_rival
 			NOT = { has_character_flag = eod_depressed }
 		}
+
 		custom_tooltip = {
 			text = EVTOPTB_RIP_14010_TOOLTIP
-		}
-		clr_character_flag = eod_rival
-		hidden_tooltip = {
-			event_target:rival = {
-				character_event = { id = RIP.14013 days = 5 random = 2 }
+
+			clr_character_flag = eod_rival
+
+			hidden_effect = {
+				event_target:rival = {
+					character_event = {
+						id = RIP.14013
+						days = 5
+						random = 2
+					}
+				}
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPTC_RIP_14010
+
 		trigger = {
 			has_character_flag = eod_depressed
 		}
+
 		add_character_modifier = {
 			name = bad_crisis_management
 			years = 10
 		}
-		hidden_tooltip = {
-			narrative_event = { id = RIP.14020 days = 30 random = 60 }
+
+		narrative_event = {
+			id = RIP.14020
+			days = 30
+			random = 60
 		}
 	}
 
 	option = {
 		name = EVTOPTD_RIP_14010
+
 		trigger = {
 			NOT = { has_character_flag = eod_depressed }
 		}
+
 		custom_tooltip = {
 			text = EVTOPTD_RIP_14010_TOOLTIP
+
+			set_character_flag = eod_pious
+
+			narrative_event = {
+				id = RIP.14020
+				days = 30
+				random = 60
+			}
 		}
-		set_character_flag = eod_pious
+
 		piety = 100
+
 		add_character_modifier = {
 			name = church_appreciates
 			years = 20
-		}
-		hidden_tooltip = {
-			narrative_event = { id = RIP.14020 days = 30 random = 60 }
 		}
 	}
 
 	option = {
 		name = EVTOPTE_RIP_14010
+
 		trigger = {
 			NOT = { has_character_flag = eod_depressed }
 		}
+
 		custom_tooltip = {
 			text = EVTOPTE_RIP_14010_TOOLTIP
+
+			set_character_flag = eod_diplomat
+
+			narrative_event = {
+				id = RIP.14020
+				days = 30
+				random = 60
+			}
 		}
-		set_character_flag = eod_diplomat
+
 		prestige = 100
+
 		add_character_modifier = {
 			name = confident
 			years = 10
 		}
-		hidden_tooltip = {
-			narrative_event = { id = RIP.14020 days = 30 random = 60 }
-		}
 	}
 }
 
-#ping greedy councillor
-character_event = {
-	id = RIP.14011
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			character_event = { id = RIP.14012 days = 7 }
-		}
-	}
-}
-
-#councillor brings back profits
+# Councillor brings back profits
 character_event = {
 	id = RIP.14012
+	desc = EVTDESC_RIP_14012
 	picture = GFX_evt_bribe_accepted
 	border = GFX_event_normal_frame_intrigue
-	desc = EVTDESC_RIP_14012
 
 	is_triggered_only = yes
 
 	immediate = {
 		random_list = {
-			33 = {
-				set_character_flag = earnings_1
-			}
-			33 = {
-				set_character_flag = earnings_2
-			}
-			33 = {
-				set_character_flag = earnings_3
-			}
+			33 = { set_character_flag = earnings_1 }
+			33 = { set_character_flag = earnings_2 }
+			33 = { set_character_flag = earnings_3 }
 		}
 	}
 
-	#accept
+	# Accept
 	option = {
 		name = EVTOPTA_RIP_14012
-		custom_tooltip = {
-			text = EVTOPTA_RIP_14012_TOOLTIP
+
+		narrative_event = {
+			id = RIP.14020
+			days = 30
+			random = 60
+			tooltip = EVTOPTA_RIP_14012_TOOLTIP
 		}
-		if = {
-			limit = {
-				has_character_flag = earnings_1
-			}
-			scaled_wealth = 0.5
-			clr_character_flag = earnings_1
+
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			earnings_1 = { scaled_wealth = 0.5 }
+			earnings_1 = { scaled_wealth = 1.0 }
+			earnings_1 = { scaled_wealth = 1.5 }
 		}
-		if = {
-			limit = {
-				has_character_flag = earnings_2
-			}
-			scaled_wealth = 1
-			clr_character_flag = earnings_2
-		}
-		if = {
-			limit = {
-				has_character_flag = earnings_3
-			}
-			scaled_wealth = 1.5
-			clr_character_flag = earnings_3
-		}
+
+		clr_character_flag = earnings_1
+		clr_character_flag = earnings_2
+		clr_character_flag = earnings_3
+
 		set_character_flag = eod_scam
-		hidden_tooltip = {
-			narrative_event = { id = RIP.14020 days = 30 random = 60 }
-		}
 	}
 }
 
-#desperate mob went after rival
+# Desperate mob went after rival
 character_event = {
 	id = RIP.14013
+	desc = EVTDESC_RIP_14013
 	picture = GFX_evt_hiding_from_pursuers
 	border = GFX_event_normal_frame_war
-	desc = EVTDESC_RIP_14013
 
 	is_triggered_only = yes
 
-	#uh oh
+	# Uh oh
 	option = {
-		name = EVTOPTA_RIP_14012
+		name = EVTOPTA_RIP_14013
+
 		custom_tooltip = {
-			text = EVTOPTA_RIP_14012_TOOLTIP
-		}
-		random_list = {
-			33 = {
+			text = EVTOPTA_RIP_14012_TOOLTIP # TODO: Tooltip for 14013 is missing
+
+			hidden_effect = {
+				random_list = {
+					33 = {
+						FROM = {
+							set_character_flag = eod_rival_dies
+						}
+
+						death = {
+							death_reason = death_murder_unknown
+							killer = FROM
+						}
+					}
+
+					33 = {
+						FROM = {
+							set_character_flag = eod_rival_maimed
+						}
+
+						add_maimed_trait_effect = yes
+					}
+
+					33 = {
+						FROM = {
+							set_character_flag = eod_mob_failed
+						}
+
+						character_event = {
+							id = RIP.14014
+							days = 1
+						}
+					}
+				}
+
 				FROM = {
-					set_character_flag = eod_rival_dies
-					character_event = { id = RIP.14015 days = 3 random = 3 }
-				}
-				hidden_tooltip = {
-					death = {
-						death_reason = death_murder_unknown
-						killer = FROM
+					character_event = {
+						id = RIP.14015
+						days = 3
+						random = 3
 					}
 				}
-			}
-			33 = {
-				hidden_tooltip = {
-					FROM = {
-						set_character_flag = eod_rival_maimed
-						character_event = { id = RIP.14015 days = 3 random = 3 }
-					}
-				}
-				add_maimed_trait_effect = yes
-			}
-			33 = {
-				hidden_tooltip = {
-					FROM = {
-						set_character_flag = eod_mob_failed
-						character_event = { id = RIP.14015 days = 3 random = 3 }
-					}
-				}
-				character_event = { id = RIP.14014 days = 1 }
 			}
 		}
 	}
 }
 
-#rival discoveres culprit
+# Rival discoveres culprit
 character_event = {
 	id = RIP.14014
+	desc = EVTDESC_RIP_14014
 	picture = GFX_evt_hiding_from_pursuers
 	border = GFX_event_normal_frame_war
-	desc = EVTDESC_RIP_14014
 
 	is_triggered_only = yes
 
-	#that snake
+	# That snake
 	option = {
 		name = EVTOPTA_RIP_14014
+
 		opinion = {
+			name = opinion_charge_slanderer
 			who = FROMFROM
-			modifier = opinion_charge_slanderer
 			years = 10
 		}
 	}
@@ -609,78 +552,76 @@ character_event = {
 	id = RIP.14015
 	picture = GFX_evt_hiding_from_pursuers
 	border = GFX_event_normal_frame_intrigue
+
 	desc = {
 		text = EVTDESCA_RIP_14015
-		trigger = {
-			has_character_flag = eod_rival_dies
-		}
+		trigger = { has_character_flag = eod_rival_dies }
 	}
-
 	desc = {
 		text = EVTDESCB_RIP_14015
-		trigger = {
-			has_character_flag = eod_rival_maimed
-		}
+		trigger = { has_character_flag = eod_rival_maimed }
 	}
-
 	desc = {
 		text = EVTDESCC_RIP_14015
-		trigger = {
-			has_character_flag = eod_mob_failed
-		}
+		trigger = { has_character_flag = eod_mob_failed }
 	}
 
 	is_triggered_only = yes
 
-	#everyone gets what they deserve
+	# Everyone gets what they deserve
 	option = {
 		name = EVTOPTA_RIP_14015
+
 		trigger = {
 			OR = {
 				has_character_flag = eod_rival_dies
 				has_character_flag = eod_rival_maimed
 			}
 		}
-		hidden_tooltip = {
-			narrative_event = { id = RIP.14020 days = 30 random = 60 }
+
+		narrative_event = {
+			id = RIP.14020
+			days = 30
+			random = 60
 		}
 	}
 
-	#not good
+	# Not good
 	option = {
 		name = ALAS
-		trigger = {
-			has_character_flag = eod_mob_failed
-		}
+
+		trigger = { has_character_flag = eod_mob_failed }
+
 		tooltip = {
 			reverse_opinion = {
 				who = FROM
-				modifier = opinion_charge_slanderer
+				name = opinion_charge_slanderer
 				years = 10
 			}
 		}
-		hidden_tooltip = {
-			narrative_event = { id = RIP.14020 days = 30 random = 60 }
+
+		narrative_event = {
+			id = RIP.14020
+			days = 30
+			random = 60
 		}
 	}
 }
 
-#end of end of days
+# End of End of Days
 narrative_event = {
 	id = RIP.14020
-	picture = GFX_evt_depopulated_town
 	title = EVTTITLE_RIP_14020
+	picture = GFX_evt_depopulated_town
 	border = GFX_event_narrative_frame_religion
 
-	#scam outcome
+	# Scam outcome
 	desc = {
 		text = EVTDESCA_RIP_14020
-		trigger = {
-			has_character_flag = eod_scam
-		}
+		trigger = { has_character_flag = eod_scam }
 	}
 
-	#Rival blamed and hurt
+	# Rival blamed and hurt
 	desc = {
 		text = EVTDESCB_RIP_14020
 		trigger = {
@@ -691,36 +632,28 @@ narrative_event = {
 		}
 	}
 
-	#Rival blamed but lived
+	# Rival blamed but lived
 	desc = {
 		text = EVTDESCC_RIP_14020
-		trigger = {
-			has_character_flag = eod_mob_failed
-		}
+		trigger = { has_character_flag = eod_mob_failed }
 	}
 
-	#live pure lives
+	# Live pure lives
 	desc = {
 		text = EVTDESCD_RIP_14020
-		trigger = {
-			has_character_flag = eod_pious
-		}
+		trigger = { has_character_flag = eod_pious}
 	}
 
-	#disappointed in ruler
+	# Disappointed in ruler
 	desc = {
 		text = EVTDESCE_RIP_14020
-		trigger = {
-			has_character_flag = eod_depressed
-		}
+		trigger = { has_character_flag = eod_depressed }
 	}
 
-	#disappointed in ruler
+	# Disappointed in ruler
 	desc = {
 		text = EVTDESCF_RIP_14020
-		trigger = {
-			has_character_flag = eod_diplomat
-		}
+		trigger = { has_character_flag = eod_diplomat }
 	}
 
 	is_triggered_only = yes
@@ -729,17 +662,20 @@ narrative_event = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 
 		clr_character_flag = end_of_days
 	}
 
-	#normal life resumes
+	# Normal life resumes
 	option = {
 		name = EXCELLENT
+
 		trigger = {
 			OR = {
 				has_character_flag = eod_scam
@@ -747,46 +683,38 @@ narrative_event = {
 				has_character_flag = eod_diplomat
 			}
 		}
-		clr_character_flag = eod_rival_dies
-		clr_character_flag = eod_rival_maimed
-		clr_character_flag = eod_mob_failed
-		clr_character_flag = eod_scam
-		clr_character_flag = eod_pious
-		clr_character_flag = eod_depressed
-		clr_character_flag = eod_diplomat
 	}
 
-	#rival hurt
+	# Rival hurt
 	option = {
 		name = EVTOPTA_RIP_14020
+
 		trigger = {
 			OR = {
 				has_character_flag = eod_rival_dies
 				has_character_flag = eod_rival_maimed
 			}
 		}
-		clr_character_flag = eod_rival_dies
-		clr_character_flag = eod_rival_maimed
-		clr_character_flag = eod_mob_failed
-		clr_character_flag = eod_scam
-		clr_character_flag = eod_pious
-		clr_character_flag = eod_depressed
-		clr_character_flag = eod_diplomat
 	}
 
-	#rival unhurt
+	# Rival unhurt
 	option = {
 		name = EVTOPTB_RIP_14020
+
 		trigger = {
 			OR = {
 				has_character_flag = eod_mob_failed
 				has_character_flag = eod_depressed
 			}
 		}
+
 		add_character_modifier = {
 			name = vicious_rumors
 			years = 10
 		}
+	}
+
+	after = {
 		clr_character_flag = eod_rival_dies
 		clr_character_flag = eod_rival_maimed
 		clr_character_flag = eod_mob_failed
@@ -799,11 +727,37 @@ narrative_event = {
 
 ### WHITE RIDER ###
 
-#The White Rider is created, invisible start of chain (for hiding new char...)
-character_event = {
-	id = RIP.15099
+# The White Rider appears, rumors are spreading
+narrative_event = {
+	id = RIP.15100
+	title = EVTNAME_RIP_15100
+	desc = EVTDSC_RIP_15100
+	picture = GFX_evt_depopulated_town
+	border = GFX_event_narrative_frame_religion
+
 	is_triggered_only = yes
-	hide_window = yes
+
+	# Deal with it
+	option = {
+		name = EVTOPTA_RIP_15100
+
+		character_event = {
+			id = RIP.15101
+			days = 20
+			random = 10
+		}
+	}
+}
+
+# The rumors reach court
+character_event = {
+	id = RIP.15101
+	desc = EVTDSC_RIP_15101
+	picture = GFX_evt_end_of_days
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	hide_new = yes
 
 	immediate = {
 		if = {
@@ -814,123 +768,46 @@ character_event = {
 			}
 
 			random_courtier = {
-				limit = {
-					can_be_prophet_of_doom_trigger = yes
+				limit = { can_be_prophet_of_doom_trigger = yes }
+
+				add_trait = adventurer
+				change_diplomacy = 10
+				change_martial = 7
+				change_learning = 5
+				health = 3
+				save_event_target_as = EoD_doomsday_prophet
+			}
+		}
+		else = {
+			create_character = {
+				age = 36
+				female = 50
+				random_traits = yes
+				health = 5
+				religion = ROOT
+				dynasty = random
+				race = ROOT
+				culture = ROOT
+				add_trait = adventurer
+				add_trait = zealous
+				add_trait = fair
+
+				attributes = {
+					diplomacy = 10
+					martial = 7
+					learning = 5
 				}
-				hidden_tooltip = {
-					add_trait = adventurer
-					change_diplomacy = 10
-					change_martial = 7
-					change_learning = 5
-					health = 3
-				}
+			}
+
+			new_character = {
+				remove_trait = content
+				remove_trait = slow
+				remove_trait = imbecile
+				remove_trait = ugly
 				save_event_target_as = EoD_doomsday_prophet
 			}
 		}
 
-		if = {
-			limit = {
-				NOT = {
-					any_courtier = { can_be_prophet_of_doom_trigger = yes }
-				}
-			}
-			random_list = {
-				50 = {
-					create_character = {
-						age = 36
-						female = yes
-						random_traits = yes
-						health = 5
-						attributes = {
-							diplomacy = 10
-							martial = 7
-							learning = 5
-						}
-						trait = adventurer
-						trait = zealous
-						trait = fair
-						religion = ROOT
-						dynasty = random
-						race = ROOT
-						culture = ROOT
-					}
-					new_character = {
-						remove_trait = content
-						remove_trait = slow
-						remove_trait = imbecile
-						remove_trait = ugly
-						save_event_target_as = EoD_doomsday_prophet
-					}
-				}
-				50 = {
-					create_character = {
-						age = 36
-						random_traits = yes
-						health = 5
-						attributes = {
-							diplomacy = 10
-							martial = 7
-							learning = 5
-						}
-						trait = adventurer
-						trait = zealous
-						trait = fair
-						religion = ROOT
-						dynasty = random
-						race = ROOT
-						culture = ROOT
-					}
-					new_character = {
-						remove_trait = content
-						remove_trait = slow
-						remove_trait = imbecile
-						remove_trait = ugly
-						save_event_target_as = EoD_doomsday_prophet
-					}
-				}
-			}
-		}
-	}
-
-	option = {
-		narrative_event = { id = RIP.15100 }
-	}
-}
-
-
-#The White Rider appears, rumors are spreading
-narrative_event = {
-	title = EVTNAME_RIP_15100
-	id = RIP.15100
-	desc = EVTDSC_RIP_15100
-	picture = GFX_evt_depopulated_town
-	border = GFX_event_narrative_frame_religion
-
-	is_triggered_only = yes
-
-	hide_from = yes
-	hide_new = yes
-
-	#Deal with it
-	option = {
-		name = EVTOPTA_RIP_15100
-		hidden_tooltip = {
-			character_event = { id = RIP.15101 days = 20 random = 10 }
-		}
-	}
-}
-
-#The rumors reach court
-character_event = {
-	id = RIP.15101
-	desc = EVTDSC_RIP_15101
-	picture = GFX_evt_end_of_days
-	border = GFX_event_normal_frame_religion
-
-	is_triggered_only = yes
-	hide_from = yes
-
-	immediate = {
 		if = {
 			limit = {
 				any_friend = {
@@ -939,44 +816,49 @@ character_event = {
 			}
 
 			random_friend = {
-				limit = {
-					is_adult = yes
-				}
+				limit = { is_adult = yes }
+
 				save_event_target_as = EoD_worried_one
 				set_character_flag = worried_friend
 			}
 		}
-
-		if = {
+		else_if = {
 			limit = {
-				NOT = {
-					any_friend = {
-						is_adult = yes
-					}
-				}
-				any_playable_ruler = {
-					ai = yes
+				any_independent_ruler = {
 					is_adult = yes
+					is_landed = yes
+
+					distance = {
+						who = ROOT
+						value < 200
+					}
+
+					ai = yes
 					NOT = { is_rival = ROOT }
 				}
 			}
 
 			random_independent_ruler = {
 				limit = {
-					ai = yes
 					is_adult = yes
 					is_landed = yes
+
+					distance = {
+						who = ROOT
+						value < 200
+					}
+
+					ai = yes
 					NOT = { is_rival = ROOT }
-					NOT = { distance = { value = 200 who = ROOT } }
 				}
+
 				save_event_target_as = EoD_worried_one
 				set_character_flag = worried_ruler
 			}
 		}
 	}
 
-
-	#Make fun of horses
+	# Make fun of horses
 	option = {
 		name = EVTOPTA_RIP_15101
 
@@ -984,15 +866,9 @@ character_event = {
 			name = gave_funny_speech
 			duration = 200
 		}
-
-		hidden_tooltip = {
-			event_target:EoD_worried_one = {
-				letter_event = { id = RIP.15102 }
-			}
-		}
 	}
 
-	#Give a speech of warning
+	# Give a speech of warning
 	option = {
 		name = EVTOPTB_RIP_15101
 
@@ -1000,15 +876,9 @@ character_event = {
 			name = gave_pious_speech
 			duration = 200
 		}
-
-		hidden_tooltip = {
-			event_target:EoD_worried_one = {
-				letter_event = { id = RIP.15102 }
-			}
-		}
 	}
 
-	#Give a scary speech
+	# Give a scary speech
 	option = {
 		name = EVTOPTC_RIP_15101
 
@@ -1017,13 +887,7 @@ character_event = {
 			duration = 200
 		}
 
-		hidden_tooltip = {
-			event_target:EoD_worried_one = {
-				clr_character_flag = worried_friend
-				clr_character_flag = worried_ruler
-				clear_event_target = EoD_worried_one
-			}
-
+		hidden_effect = {
 			if = {
 				limit = {
 					any_rival = {
@@ -1031,85 +895,34 @@ character_event = {
 					}
 				}
 
+				event_target:EoD_worried_one = {
+					clr_character_flag = worried_friend
+					clr_character_flag = worried_ruler
+					clear_event_target = EoD_worried_one
+				}
+
 				random_rival = {
-					limit = {
-						is_adult = yes
-					}
+					limit = { is_adult = yes }
+
 					save_event_target_as = EoD_worried_one
 					set_character_flag = worried_rival
 				}
 			}
+		}
+	}
 
-			if = {
-				limit = {
-					NOT = {
-						any_rival = {
-							is_adult = yes
-						}
-					}
-					any_playable_ruler = {
-						ai = yes
-						is_adult = yes
-					}
-				}
-
-				random_independent_ruler = {
-					limit = {
-						ai = yes
-						is_adult = yes
-						is_landed = yes
-						NOT = { distance = { value = 200 who = ROOT } }
-					}
-					save_event_target_as = EoD_worried_one
-					set_character_flag = worried_ruler
-				}
-			}
-			event_target:EoD_worried_one = {
-				letter_event = { id = RIP.15102 }
-			}
+	after = {
+		letter_event = {
+			id = RIP.15103
+			days = 10
 		}
 	}
 }
 
-
-#Worried other - ping event
-letter_event = {
-	id = RIP.15102
-
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		is_alive = yes
-	}
-
-	#I should write a letter expressing my concern!
-	option = {
-		hidden_tooltip = {
-			FROM = {
-				letter_event = { id = RIP.15103 days = 10 }
-			}
-		}
-	}
-}
-
-#Someone's worried
+# Someone's worried
 letter_event = {
 	id = RIP.15103
-
-	immediate = {
-		any_realm_province = {
-			limit = {
-				owner = {
-					character = ROOT
-				}
-			}
-			add_province_modifier = {
-				name = "religious_tension"
-				duration = 365
-			}
-		}
-	}
+	portrait = event_target:EoD_worried_one
 
 	desc = {
 		text = EVTDSC_RIP_15103_A
@@ -1126,43 +939,63 @@ letter_event = {
 
 	is_triggered_only = yes
 
-	#Oh dear
-	option = {
-		name = EVTOPTA_RIP_15103
-		custom_tooltip = { text = EVTOPTA_RIP_15103_TOOLTIP }
-		hidden_tooltip = {
-			character_event = { id = RIP.15104 days = 30 }
-		}
-		trigger = {
-			event_target:EoD_worried_one = { has_character_flag = worried_friend }
-		}
-	}
-	#Very well
-	option = {
-		name = EVTOPTB_RIP_15103
-		custom_tooltip = { text = EVTOPTA_RIP_15103_TOOLTIP }
-		hidden_tooltip = {
-			character_event = { id = RIP.15104 days = 30 }
-		}
-		trigger = {
-			event_target:EoD_worried_one = { has_character_flag = worried_ruler }
+	immediate = {
+		any_demesne_province = {
+			add_province_modifier = {
+				name = religious_tension
+				years = 1
+			}
 		}
 	}
 
-	#That jackal!
+	# Oh dear
+	option = {
+		name = EVTOPTA_RIP_15103
+
+		trigger = {
+			event_target:EoD_worried_one = {
+				has_character_flag = worried_friend
+			}
+		}
+
+		custom_tooltip = { text = EVTOPTA_RIP_15103_TOOLTIP }
+	}
+
+	# Very well
+	option = {
+		name = EVTOPTB_RIP_15103
+
+		trigger = {
+			event_target:EoD_worried_one = {
+				has_character_flag = worried_ruler
+			}
+		}
+
+		custom_tooltip = { text = EVTOPTA_RIP_15103_TOOLTIP }
+	}
+
+	# That jackal!
 	option = {
 		name = EVTOPTC_RIP_15103
-		custom_tooltip = { text = EVTOPTA_RIP_15103_TOOLTIP }
-		hidden_tooltip = {
-			character_event = { id = RIP.15104 days = 30 }
-		}
+
 		trigger = {
-			event_target:EoD_worried_one = { has_character_flag = worried_rival }
+			event_target:EoD_worried_one = {
+				has_character_flag = worried_rival
+			}
+		}
+
+		custom_tooltip = { text = EVTOPTA_RIP_15103_TOOLTIP }
+	}
+
+	after = {
+		character_event = {
+			id = RIP.15104
+			days = 30
 		}
 	}
 }
 
-#Troops outside the city!
+# Troops outside the city!
 character_event = {
 	id = RIP.15104
 	desc = EVTDSC_RIP_15104
@@ -1170,66 +1003,72 @@ character_event = {
 	border = GFX_event_normal_frame_religion
 
 	is_triggered_only = yes
-	hide_from = yes
 
 	immediate = {
 		capital_scope = {
 			county = {
-				hidden_tooltip = {
-					event_target:EoD_doomsday_prophet = {
-						create_title = {
-							tier = DUKE
-							landless = yes
-							temporary = yes
-							#rebel = yes
-							adventurer = yes
-							culture = ROOT
-							name = "EoD_UPRISING"
-							holder = THIS
-						}
-						wealth = 100
+				event_target:EoD_doomsday_prophet = {
+					opinion = {
+						name = opinion_evil_tyrant
+						who = ROOT
+					}
 
-						spawn_unit = {
-							owner = THIS
-							province = PREVPREV
-							home = THIS
-							match_character = ROOT
-							match_mult = 0.5
-							match_min = 300
-							match_max = 5000
-							attrition = 1.0
-							earmark = "EoD_uprising_troops"
-						}
+					create_title = {
+						tier = DUKE
+						landless = yes
+						temporary = yes
+						# rebel = yes
+						adventurer = yes
+						culture = ROOT
+						name = EoD_UPRISING
+						holder = THIS
+					}
+
+					wealth = 100
+
+					spawn_unit = {
+						owner = THIS
+						province = PREVPREV
+						home = THIS
+						match_character = ROOT
+						match_mult = 0.5
+						match_min = 300
+						match_max = 5000
+						attrition = 1.0
+						earmark = EoD_uprising_troops
 					}
 				}
 			}
 		}
 	}
 
-	#Parlay
+	# Parlay
 	option = {
 		name = EVTOPTA_RIP_15104
-		custom_tooltip = { text = EVTOPTA_RIP_15104_TOOLTIP }
-		piety = 100
 
-		hidden_tooltip = {
-			character_event = { id = RIP.15105 days = 10 }
+		character_event = {
+			id = RIP.15105
+			days = 10
+			tooltip = EVTOPTA_RIP_15104_TOOLTIP
 		}
+
+		piety = 100
 	}
 
-	#Fight
+	# Fight
 	option = {
 		name = EVTOPTB_RIP_15104
-		custom_tooltip = { text = EVTOPTB_RIP_15104_TOOLTIP }
-		prestige = 100
 
-		hidden_tooltip = {
-			character_event = { id = RIP.15112 }
+		character_event = {
+			id = RIP.15112
+			tooltip = EVTOPTB_RIP_15104_TOOLTIP
 		}
+
+		prestige = 100
 	}
 }
 
-#The White Rider discovered - what to do?
+# The White Rider discovered - what to do?
 character_event = {
 	id = RIP.15105
 	desc = EVTDSC_RIP_15105
@@ -1239,142 +1078,189 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		random_demesne_title = { limit = { tier = COUNT can_be_given_away = yes location = { is_capital = no } } save_event_target_as = EoD_some_province }
+		random_demesne_title = {
+			limit = {
+				real_tier = COUNT
+				can_be_given_away = yes
+
+				location = {
+					is_capital = no
+				}
+			}
+
+			save_event_target_as = EoD_some_province
+		}
 	}
 
-	#BRIBE prophet
+	# BRIBE prophet
 	option = {
 		name = EVTOPTA_RIP_15105
-		custom_tooltip = { text = EVTOPTA_RIP_15105_TOOLTIP }
 
-		if = {
-			limit = { NOT = { trait = cynical } }
-			random = {
-				chance = 25
-				add_trait = cynical
-				hidden_tooltip = { character_event = { id = 38258 } } #Notify Cynical
+		custom_tooltip = {
+			text = EVTOPTA_RIP_15105_TOOLTIP
+
+			any_demesne_province = {
+				remove_province_modifier = religious_tension
+			}
+
+			reverse_remove_opinion = {
+				name = opinion_evil_tyrant
+				who = event_target:EoD_doomsday_prophet
+			}
+
+			random_list = {
+				33 = {
+					# Prophet abdicates
+					letter_event = {
+						id = RIP.15106
+						days = 50
+					}
+				}
+
+				33 = {
+					# Prophet kill themselves
+					character_event = {
+						id = RIP.15114
+						days = 30
+					}
+				}
+
+				33 = {
+					# Prophet is readjusted to society
+					character_event = {
+						id = RIP.15113
+						days = 50
+					}
+				}
 			}
 		}
 
-		hidden_tooltip = {
-			any_realm_province = {
-				limit = {
-					owner = {
-						character = ROOT
-					}
-				}
-				remove_province_modifier = religious_tension
+		if = {
+			limit = {
+				NOT = { trait = cynical }
 			}
-			event_target:EoD_doomsday_prophet = {
-				remove_opinion = { modifier = opinion_evil_tyrant who = ROOT }
-			}
-			random_list = {
-				33 = {
-					#prophet abdicates
-					letter_event = { id = RIP.15106 days = 50 }
+
+			random = {
+				chance = 25
+
+				tooltip = {
+					remove_trait_silently_zealous_effect = yes
+					add_trait = cynical
 				}
-				33 = {
-					#prophet kill themselves
-					character_event = { id = RIP.15114 days = 30 }
-				}
-				33 = {
-					#prophet is readjusted to society
-					character_event = { id = RIP.15113 days = 50 }
+
+				hidden_effect = {
+					remove_trait_silently_zealous_effect = yes
+					add_trait_cynical_effect = yes
 				}
 			}
 		}
 
 		event_target:EoD_doomsday_prophet = {
+			show_scope_change = no
+
 			grant_title = event_target:EoD_some_province
 			set_defacto_liege = ROOT
 			disband_event_forces = EoD_uprising_troops
 		}
 	}
 
-	#IMPRISON prophet
+	# IMPRISON prophet
 	option = {
 		name = EVTOPTB_RIP_15105
-		custom_tooltip = { text = EVTOPTB_RIP_15105_TOOLTIP }
-		prestige = 50
 
-		hidden_tooltip = {
-			event_target:EoD_doomsday_prophet = {
-				imprison = ROOT
-				disband_event_forces = EoD_uprising_troops
-			}
-			random_list = {
-				#they escape from prison
-				50 = {
-					character_event = { id = RIP.15111 days = 20 }
+		custom_tooltip = {
+			text = EVTOPTB_RIP_15105_TOOLTIP
+
+			hidden_effect = {
+				event_target:EoD_doomsday_prophet = {
+					imprison = ROOT
+					disband_event_forces = EoD_uprising_troops
 				}
-				#they kill themselves
-				50 = {
-					set_character_flag = imprisoned_white_rider
-					character_event = { id = RIP.15114 days = 20 }
-				}
-			}
-			any_realm_province = {
-				limit = {
-					owner = {
-						character = ROOT
+
+				random_list = {
+					# They escape from prison
+					50 = {
+						character_event = {
+							id = RIP.15111
+							days = 20
+						}
+					}
+
+					# They kill themselves
+					50 = {
+						set_character_flag = imprisoned_white_rider
+
+						character_event = {
+							id = RIP.15114
+							days = 20
+						}
 					}
 				}
-				remove_province_modifier = religious_tension
+
+				any_demesne_province = {
+					remove_province_modifier = religious_tension
+				}
 			}
 		}
+
+		prestige = 50
 	}
 
-	#EXECUTE prophet
+	# EXECUTE prophet
 	option = {
 		name = EVTOPTC_RIP_15105
-		custom_tooltip = { text = EVTOPTC_RIP_15105_TOOLTIP }
-		piety = 50
 
-		hidden_tooltip = {
-			random_list = {
-				#they die
-				40 = {
-					event_target:EoD_doomsday_prophet = {
-						death = { death_reason = death_execution_burning killer = FROM }
-					}
-				}
+		custom_tooltip = {
+			text = EVTOPTC_RIP_15105_TOOLTIP
 
-				#they escape execution
-				60 = {
-					#botched execution
-					character_event = { id = RIP.15109 }
-
-					event_target:EoD_doomsday_prophet = {
-
-						give_nickname = nick_the_survivor
-
-						add_character_modifier = {
-							name = escaped_execution
-							duration = -1
+			hidden_effect = {
+				random_list = {
+					# They die
+					40 = {
+						event_target:EoD_doomsday_prophet = {
+							death = {
+								death_reason = death_execution_burning
+								killer = ROOT
+							}
 						}
-						leave_court_effect = yes
 					}
-				}
-			}
-			any_realm_province = {
-				limit = {
-					owner = {
-						character = ROOT
-					}
-				}
-				remove_province_modifier = religious_tension
 
-				add_province_modifier = {
-					name = "ordered_our_prophet_executed"
-					duration = 365
+					# They escape execution
+					60 = {
+						# Botched execution
+						character_event = { id = RIP.15109 }
+
+						event_target:EoD_doomsday_prophet = {
+							give_nickname = nick_the_survivor
+
+							add_character_modifier = {
+								name = escaped_execution
+								duration = -1
+							}
+
+							leave_court_effect = yes
+						}
+					}
 				}
+
+				any_demesne_province = {
+					remove_province_modifier = religious_tension
+
+					add_province_modifier = {
+						name = ordered_our_prophet_executed
+						years = 1
+					}
+				}
+
+				disband_event_forces = EoD_uprising_troops
 			}
-			disband_event_forces = EoD_uprising_troops
 		}
+
+		piety = 50
 	}
 }
 
-#Outcome: The White Rider lives, abdicates, sends farewell note
+# Outcome: The White Rider lives, abdicates, sends farewell note
 letter_event = {
 	id = RIP.15106
 	desc = EVTDSC_RIP_15106
@@ -1387,9 +1273,9 @@ letter_event = {
 				limit = { is_ruler = yes}
 				abdicate_to = ROOT
 			}
+
 			leave_court_effect = yes
 		}
-
 
 		if = {
 			limit = {
@@ -1397,23 +1283,23 @@ letter_event = {
 				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
 
 	option = {
 		name = I_SEE
+
 		clr_character_flag = end_of_days
 	}
 }
 
-#The White Rider committs suicide
+# The White Rider committs suicide
 character_event = {
 	id = RIP.15107
 	picture = GFX_evt_death
 	border = GFX_event_normal_frame_religion
-
-	is_triggered_only = yes
 
 	desc = {
 		text = EVTDSC_RIP_15107_A
@@ -1421,27 +1307,25 @@ character_event = {
 			NOT = { has_character_flag = imprisoned_white_rider }
 		}
 	}
-
 	desc = {
 		text = EVTDSC_RIP_15107_B
-		trigger = {
-			has_character_flag = imprisoned_white_rider
-		}
+		trigger = { has_character_flag = imprisoned_white_rider }
 	}
 
-	#Read note
+	is_triggered_only = yes
+
+	# Read note
 	option = {
 		name = EVTOPTA_RIP_15107
 
-		hidden_tooltip = {
-			#suicide note
-			letter_event = { id = RIP.15108 }
-			clr_character_flag = imprisoned_white_rider
-		}
+		letter_event = { id = RIP.15108 } # Suicide note
+		clr_character_flag = imprisoned_white_rider
 	}
-	#Don't read note
+
+	# Don't read note
 	option = {
 		name = EVTOPTB_RIP_15107
+
 		clr_character_flag = imprisoned_white_rider
 	}
 }
@@ -1450,33 +1334,30 @@ character_event = {
 letter_event = {
 	id = RIP.15108
 
+	desc = {
+		text = EVTDSC_RIP_15108_A
+		trigger = { prisoner = no }
+	}
+	desc = {
+		text = EVTDSC_RIP_15108_B
+		trigger = { prisoner = yes }
+	}
+
 	is_triggered_only = yes
 
 	immediate = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
 
-	desc = {
-		text = EVTDSC_RIP_15108_A
-		trigger = {
-			prisoner = no
-		}
-	}
-
-	desc = {
-		text = EVTDSC_RIP_15108_B
-		trigger = {
-			prisoner = yes
-		}
-	}
-
-	#Oh noes!
+	# Oh noes!
 	option = {
 		name = EVTOPTA_RIP_15108
 
@@ -1484,8 +1365,7 @@ letter_event = {
 	}
 }
 
-
-#The White Rider - botched execution
+# The White Rider - botched execution
 character_event = {
 	id = RIP.15109
 	desc = EVTDSC_RIP_15109
@@ -1494,18 +1374,18 @@ character_event = {
 
 	is_triggered_only = yes
 
-	#Oh noes!
+	# Oh noes!
 	option = {
 		name = EVTOPTA_RIP_15109
 
-		hidden_tooltip = {
-			letter_event = { id = RIP.15110 days = 30 }
+		letter_event = {
+			id = RIP.15110
+			days = 30
 		}
 	}
 }
 
-
-#Outcome: The White Rider - sends letter after escaping execution/prison
+# Outcome: The White Rider - sends letter after escaping execution/prison
 letter_event = {
 	id = RIP.15110
 	desc = EVTDSC_RIP_15110
@@ -1516,22 +1396,24 @@ letter_event = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
 
-	#Oh noes!
+	# Oh noes!
 	option = {
 		name = I_SEE
+
 		clr_character_flag = imprisoned_white_rider
 		clr_character_flag = end_of_days
 	}
 }
 
-
-#The White Rider - escapes prison
+# The White Rider - escapes prison
 character_event = {
 	id = RIP.15111
 	desc = EVTDSC_RIP_15111
@@ -1546,18 +1428,18 @@ character_event = {
 		}
 	}
 
-
 	#Oh noes!
 	option = {
 		name = EVTOPTA_RIP_15111
 
-		hidden_tooltip = {
-			letter_event = { id = RIP.15110 days = 30 }
+		letter_event = {
+			id = RIP.15110
+			days = 30
 		}
 	}
 }
 
-#They turn hostile
+# They turn hostile
 character_event = {
 	id = RIP.15112
 
@@ -1570,6 +1452,7 @@ character_event = {
 
 			event_target:EoD_doomsday_prophet = {
 				set_character_flag = EoD_prophet_attacker
+
 				war = {
 					target = ROOT
 					casus_belli = claim
@@ -1578,13 +1461,9 @@ character_event = {
 			}
 		}
 	}
-
-	#Oh noes!
-	option = {
-	}
 }
 
-#Outcome: The White Rider - doing well at court
+# Outcome: The White Rider - doing well at court
 character_event = {
 	id = RIP.15113
 	desc = EVTDSC_RIP_15113
@@ -1607,37 +1486,38 @@ character_event = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
 
-	#I'm impressed
+	# I'm impressed
 	option = {
 		name = EVTOPTA_RIP_15113
 
 		clr_character_flag = end_of_days
-
 		add_friend = event_target:EoD_doomsday_prophet
 
 		event_target:EoD_doomsday_prophet = {
+			show_scope_change = no
 
 			add_character_modifier = {
 				name = friends_in_high_places
-				duration = 365
+				years = 1
 			}
 		}
 	}
 
-	#I'll never trust the White Rider
+	# I'll never trust the White Rider
 	option = {
 		name = EVTOPTB_RIP_15113
 	}
 }
 
-
-#The White Rider suicide-event itself
+# The White Rider suicide-event itself
 character_event = {
 	id = RIP.15114
 
@@ -1645,20 +1525,18 @@ character_event = {
 	hide_window = yes
 
 	immediate = {
-		hidden_tooltip = {
-			event_target:EoD_doomsday_prophet = {
-				death = { death_reason = death_suicide_hanging }
-			}
+		event_target:EoD_doomsday_prophet = {
+			death = { death_reason = death_suicide_hanging }
 		}
-	}
 
-	#send event
-	option = {
-		character_event = { id = RIP.15107 days = 10 }
+		character_event = {
+			id = RIP.15107
+			days = 10
+		}
 	}
 }
 
-#Outcome: You kill all the troops
+# Outcome: You kill all the troops
 narrative_event = {
 	id = RIP.15115
 	title = EVTNAME_RIP_15115
@@ -1666,11 +1544,13 @@ narrative_event = {
 	picture = GFX_evt_battle
 	border = GFX_event_narrative_frame_religion
 
+	is_triggered_only = yes # on_battle_won_owner
+
 	trigger = {
 		FROM = {
 			has_character_flag = EoD_prophet_attacker
-			is_dying = no
 			is_alive = yes
+			is_dying = no
 		}
 	}
 
@@ -1678,33 +1558,29 @@ narrative_event = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
+		}
+
+		FROM = {
+			disband_event_forces = EoD_uprising_troops
 		}
 	}
 
-	is_triggered_only = yes
-
-	#It was the only way
+	# It was the only way
 	option = {
 		name = EVTOPTA_RIP_15115
+
 		end_war = invalid
-
 		clr_character_flag = end_of_days
-
-		FROM = {
-			imprison = ROOT
-		}
-		hidden_tooltip = {
-			FROM = {
-				disband_event_forces = EoD_uprising_troops
-			}
-		}
+		reverse_imprison = FROM
 	}
 }
 
-#Outcome: The White Rider died in battle
+# Outcome: The White Rider died in battle
 narrative_event = {
 	id = RIP.15116
 	title = EVTNAME_RIP_15116
@@ -1716,15 +1592,17 @@ narrative_event = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
 
 	is_triggered_only = yes
 
-	#A tragic end to a tragic tale
+	# A tragic end to a tragic tale
 	option = {
 		name = EVTOPTA_RIP_15116
 
@@ -1732,11 +1610,9 @@ narrative_event = {
 	}
 }
 
+### THE LIVING DEAD ###
 
-
-###THE LIVING DEAD###
-
-#Introduction
+# Introduction
 narrative_event = {
 	title = EVTNAME_RIP_22000
 	id = RIP.22000
@@ -1749,11 +1625,15 @@ narrative_event = {
 	option = {
 		name = EVTOPTA_RIP_22000
 
-		hidden_tooltip = { character_event = { id = RIP.22001 days = 110 random = 20 } }
+		character_event = {
+			id = RIP.22001
+			days = 110
+			random = 20
+		}
 	}
 }
 
-#Peasant uprising outside of the gates
+# Peasant uprising outside of the gates
 character_event = {
 	id = RIP.22001
 	desc = EVTDSC_RIP_22001
@@ -1762,73 +1642,73 @@ character_event = {
 
 	is_triggered_only = yes
 
-	#Invite the leader
+	# Invite the leader
 	option = {
 		name = EVTOPTA_RIP_22001
-		custom_tooltip = { text = EVTOPTA_RIP_22001_TOOLTIP }
 
-		hidden_tooltip = {
+		custom_tooltip = {
+			text = EVTOPTA_RIP_22001_TOOLTIP
+
 			create_character = {
 				female = no
 				age = 35
 				race = ROOT
 				culture = ROOT
 				religion = ROOT
-				trait = disfigured
-				trait = paranoid
-				trait = wroth
-				trait = stubborn
-				trait = gregarious
-				trait = peasant_leader
-				trait = tough_soldier
 				dynasty = none
+				add_trait = disfigured
+				add_trait = paranoid
+				add_trait = wroth
+				add_trait = stubborn
+				add_trait = gregarious
+				add_trait = peasant_leader
+				add_trait = tough_soldier
 			}
 
 			new_character = {
-				character_event = { id = RIP.22002 days = 7 }
 				save_global_event_target_as = end_peasant_leader
 			}
 
 			set_character_flag = exposed_to_outside
+
+			character_event = {
+				id = RIP.22003
+				days = 7
+			}
 		}
 	}
 
-	#Keep the gates closed
+	# Keep the gates closed
 	option = {
 		name = EVTOPTB_RIP_22001
-		custom_tooltip = { text = EVTOPTB_RIP_22001_TOOLTIP }
 
-		hidden_tooltip = {
-			any_realm_province = { limit = { owner = { character = ROOT } }
-				add_province_modifier = {
-					name = peasant_unrest
-					years = 2
+		custom_tooltip = {
+			text = EVTOPTB_RIP_22001_TOOLTIP
+
+			hidden_effect = {
+				any_demesne_province = {
+					add_province_modifier = {
+						name = peasant_unrest
+						years = 2
+					}
 				}
-			}
 
-			event_target:end_peasant_leader = { leave_court_effect = yes }
+				event_target:end_peasant_leader = {
+					leave_court_effect = yes
+				}
 
-			#Ending
-			random_list = {
-				33 = { narrative_event = { id = RIP.22009 days = 110 random = 20 } }
-				33 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
-				33 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
+				# Ending
+				random_list = {
+					33 = { narrative_event = { id = RIP.22009 days = 110 random = 20 } }
+					33 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
+					33 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
+				}
 			}
 		}
 	}
 }
 
-#Ping event
-character_event = {
-	id = RIP.22002
-
-	hide_window = yes
-	is_triggered_only = yes
-
-	option = { FROM = { character_event = { id = RIP.22003 } } }
-}
-
-#Peasant leader forces you to make a choice
+# Peasant leader forces you to make a choice
 character_event = {
 	id = RIP.22003
 	desc = EVTDSC_RIP_22003
@@ -1837,69 +1717,102 @@ character_event = {
 
 	is_triggered_only = yes
 
-	#Heal them
+	# Heal them
 	option = {
 		name = EVTOPTA_RIP_22003
-		custom_tooltip = { text = EVTOPTA_RIP_22003_TOOLTIP }
-		scaled_wealth = { value = -1 min = -150 }
 
-		hidden_tooltip = {
-			#Good ending or death
+		custom_tooltip = {
+			text = EVTOPTA_RIP_22003_TOOLTIP
+
+			# Good ending or death
 			random_list = {
 				30 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
 				70 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 			}
 		}
+
+		scaled_wealth = {
+			value = -1
+			min = -150
+		}
 	}
 
-	#Teach him about what the holy scripture really says, turn him into a prophet
+	# Teach him about what the holy scripture really says, turn him into a prophet
 	option = {
-		trigger = { learning = 12 }
-		tooltip_info = learning
 		name = EVTOPTB_RIP_22003
-		custom_tooltip = { text = EVTOPTB_RIP_22003_TOOLTIP }
-		FROM = { add_trait = zealous }
-		hidden_tooltip = { FROM = { character_event = { id = RIP.22012 days = 110 random = 20 } } }
+		tooltip_info = learning
+
+		trigger = { learning >= 12 }
+
+		character_event = {
+			id = RIP.22006
+			days = 110
+			random = 20
+			tooltip = EVTOPTB_RIP_22003_TOOLTIP
+		}
+
+		event_target:end_peasant_leader = {
+			show_scope_change = no
+
+			add_trait = zealous
+		}
 	}
 
-	#Kill them
+	# Kill them
 	option = {
 		name = EVTOPTC_RIP_22003
 
-		hidden_tooltip = {
-			character_event = { id = RIP.22004 days = 110 random = 20 }
+		custom_tooltip = {
+			text = EVTOPTC_RIP_22003_TOOLTIP
 
-			any_realm_province = { limit = { owner = { character = ROOT } }
+			character_event = {
+				id = RIP.22005
+				days = 110
+				random = 20
+			}
+
+			any_demesne_province = {
 				add_province_modifier = {
 					name = hunting_dead
 					years = 1
 				}
 			}
 		}
-		custom_tooltip = { text = EVTOPTC_RIP_22003_TOOLTIP }
 	}
 
-	#Convince him to work for you
+	# Convince him to work for you
 	option = {
-		trigger = { diplomacy = 12 }
-		tooltip_info = diplomacy
 		name = EVTOPTD_RIP_22003
-		custom_tooltip = { text = EVTOPTD_RIP_22003_TOOLTIP }
+		tooltip_info = diplomacy
 
-		hidden_tooltip = { character_event = { id = RIP.22004 days = 110 random = 20 } }
+		trigger = { diplomacy >= 12 }
 
-		FROM = { add_trait = brave }
+		character_event = {
+			id = RIP.22005
+			days = 110
+			random = 20
+			tooltip = EVTOPTD_RIP_22003_TOOLTIP
+		}
+
+		event_target:end_peasant_leader = {
+			show_scope_change = no
+
+			add_trait = brave
+		}
 	}
 }
 
-#Mother & child created
+# Mother wants you to apologize
 character_event = {
-	id = RIP.22004
+	id = RIP.22005
+	desc = EVTDSC_RIP_22005
+	border = GFX_event_normal_frame_war
+	picture = GFX_evt_peasants
 
-	hide_window = yes
 	is_triggered_only = yes
 
-	option = {
+	immediate = {
+		# Mother & child created
 		create_character = {
 			female = yes
 			age = 29
@@ -1908,14 +1821,13 @@ character_event = {
 			religion = ROOT
 			dynasty = none
 			random_traits = yes
-			trait = depressed
+			add_trait = depressed
 		}
 
 		new_character = {
 			remove_trait = cruel
 			remove_trait = arbitrary
 			save_event_target_as = end_mother
-			FROM = { character_event = { id = RIP.22005 } }
 		}
 
 		create_character = {
@@ -1931,100 +1843,99 @@ character_event = {
 		new_character = {
 			set_mother = event_target:end_mother
 		#	save_global_event_target_as = end_child
-			death = { death_reason = death_execution_beheading killer = FROM }
+
+			death = {
+				death_reason = death_execution_beheading
+				killer = FROM
+			}
 		}
 	}
-}
 
-#Mother wants you to apologize
-character_event = {
-	id = RIP.22005
-	desc = EVTDSC_RIP_22005
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_peasants
-
-	is_triggered_only = yes
-
-	#Apologize and give money
+	# Apologize and give money
 	option = {
 		name = EVTOPTA_RIP_22005
-		custom_tooltip = { text = EVTOPTA_RIP_22005_TOOLTIP }
-		scaled_wealth = { value = -0.1 min = -25 }
-		prestige = -200
 
-		hidden_tooltip = {
+		custom_tooltip = {
+			text = EVTOPTA_RIP_22005_TOOLTIP
 
-			#Good ending or death
+			# Good ending or death
 			random_list = {
 				33 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
 				67 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 			}
 		}
+
+		scaled_wealth = {
+			value = -0.1
+			min = -25
+		}
+
+		prestige = -200
+
 	}
 
-	#Blame it on the leader
+	# Blame it on the leader
 	option = {
-		trigger = { intrigue = 12 }
+		name = EVTOPTB_RIP_22005
 		tooltip_info = intrigue
 
-		name = EVTOPTB_RIP_22005
-		custom_tooltip = { text = EVTOPTB_RIP_22005_TOOLTIP }
+		trigger = { intrigue >= 12 }
 
-		event_target:end_peasant_leader = { imprison = yes }
+		custom_tooltip = {
+			text = EVTOPTB_RIP_22005_TOOLTIP
 
-		hidden_tooltip = {
-
-			#Death or good ending
+			# Death or good ending
 			random_list = {
 				20 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
 				80 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 			}
 		}
+
+		reverse_imprison = event_target:end_peasant_leader
 	}
 
-	#Send her away
+	# Send her away
 	option = {
 		name = EVTOPTC_RIP_22005
-		custom_tooltip = { text = EVTOPTC_RIP_22005_TOOLTIP }
-		hidden_tooltip = { event_target:end_mother = { leave_court_effect = yes } }
 
-		if = {
-			limit = { NOR = { trait = cruel trait = kind } }
-			add_trait = cruel
-		}
-		if = {
-			limit = { trait = kind }
-			remove_trait = kind
-		}
+		custom_tooltip = {
+			text = EVTOPTC_RIP_22005_TOOLTIP
 
-		hidden_tooltip = {
-			any_realm_province = { limit = { owner = { character = ROOT } }
+			hidden_effect = {
+				event_target:end_mother = {
+					leave_court_effect = yes
+				}
+			}
+
+			any_demesne_province = {
 				add_province_modifier = {
 					name = peasant_crisis
 					years = 3
 				}
 			}
 
-			#Revolt or good ending
+			# Revolt or good ending
 			random_list = {
 				80 = { narrative_event = { id = RIP.22009 days = 110 random = 20 } }
 				20 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 			}
 		}
+
+		if = {
+			limit = { trait = kind }
+			remove_trait = kind
+		}
+		else_if = {
+			limit = {
+				NOT = { trait = cruel }
+			}
+
+			add_trait = cruel
+		}
 	}
 }
 
-#Ping event (prophet)
-character_event = {
-	id = RIP.22012
-
-	hide_window = yes
-	is_triggered_only = yes
-
-	option = { FROM = { character_event = { id = RIP.22006 } } }
-}
-
-#PROPHET
+# PROPHET
 character_event = {
 	id = RIP.22006
 	desc = EVTDSC_RIP_22006
@@ -2033,107 +1944,118 @@ character_event = {
 
 	is_triggered_only = yes
 
-	#Arrest him
+	# Arrest him
 	option = {
 		name = EVTOPTA_RIP_22006
-		custom_tooltip = { text = EVTOPTA_RIP_22006_TOOLTIP }
 
-		FROM = { imprison = yes }
+		custom_tooltip = {
+			text = EVTOPTA_RIP_22006_TOOLTIP
 
-		hidden_tooltip = {
-			any_realm_province = { limit = { owner = { character = ROOT } }
+			any_demesne_province = {
 				add_province_modifier = {
 					name = peasant_crisis
 					years = 3
 				}
 			}
 
-			#Revolt, death or good ending
+			# Revolt, death or good ending
 			random_list = {
 				60 = { narrative_event = { id = RIP.22009 days = 110 random = 20 } }
 				20 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
 				20 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 			}
 		}
+
+		reverse_imprison = event_target:end_peasant_leader
 	}
 
-	#Assassinate
+	# Assassinate
 	option = {
-		trigger = { intrigue = 12 }
+		name = EVTOPTB_RIP_22006
 		tooltip_info = intrigue
 
-		name = EVTOPTB_RIP_22006
-		custom_tooltip = { text = EVTOPTB_RIP_22006_TOOLTIP }
+		trigger = { intrigue >= 12 }
 
-		hidden_tooltip = {
+		custom_tooltip = {
+			text = EVTOPTB_RIP_22006_TOOLTIP
+
 			random_list = {
-				#Good outcome
+				# Good outcome
 				50 = {
-					modifier = {
+					mult_modifier = {
 						factor = 1.5
-						FROM = { intrigue = 13 }
-					}
-					modifier = {
-						factor = 1.5
-						FROM = { intrigue = 16 }
-					}
-					modifier = {
-						factor = 1.5
-						FROM = { intrigue = 19 }
-					}
-					modifier = {
-						factor = 1.5
-						FROM = { intrigue = 22 }
+						event_target:end_peasant_leader = { intrigue >= 13 }
 					}
 
-					character_event = { id = RIP.22007 days = 20 }
+					mult_modifier = {
+						factor = 1.5
+						event_target:end_peasant_leader = { intrigue >= 16 }
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						event_target:end_peasant_leader = { intrigue >= 19 }
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						event_target:end_peasant_leader = { intrigue >= 22 }
+					}
+
+					character_event = {
+						id = RIP.22007
+						days = 20
+					}
 				}
-				#Bad outcome
-				50 = { character_event = { id = RIP.22008 days = 20 } }
+
+				# Bad outcome
+				50 = {
+					character_event = {
+						id = RIP.22008
+						days = 20
+					}
+				}
 			}
 		}
 	}
 
-	#Let it be
+	# Let it be
 	option = {
 		name = EVTOPTC_RIP_22006
-		custom_tooltip = { text = EVTOPTC_RIP_22006_TOOLTIP }
 
-		hidden_tooltip = {
-			#Death or good ending
+		custom_tooltip = {
+			text = EVTOPTC_RIP_22006_TOOLTIP
+
+			# Death or good ending
 			random_list = {
 				60 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
 				40 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 			}
-			any_realm_province = {
-				limit = { owner = { character = ROOT } }
 
-				if = {
-					limit = {
-						NOR = {
-							has_province_modifier = depopulated_1
-							has_province_modifier = depopulated_2
-							has_province_modifier = depopulated_3
-						}
-					}
-					add_province_modifier = {
-						name = depopulated_1
-						duration = -1
-					}
-					break = yes
-				}
+			any_demesne_province = {
 				if = {
 					limit = { has_province_modifier = depopulated_1 }
+
 					add_province_modifier = {
 						name = depopulated_2
 						duration = -1
 					}
-					break = yes
 				}
-				if = {
+				else_if = {
 					limit = { has_province_modifier = depopulated_2 }
+
 					add_province_modifier = {
 						name = depopulated_3
+						duration = -1
+					}
+				}
+				else_if = {
+					limit = {
+						NOT = { has_province_modifier = depopulated_3 }
+					}
+
+					add_province_modifier = {
+						name = depopulated_1
 						duration = -1
 					}
 				}
@@ -2142,7 +2064,7 @@ character_event = {
 	}
 }
 
-#Good assassination
+# Good assassination
 character_event = {
 	id = RIP.22007
 	desc = EVTDSC_RIP_22007
@@ -2150,24 +2072,28 @@ character_event = {
 	picture = GFX_evt_peasants
 
 	is_triggered_only = yes
-	hide_from = yes
 
 	option = {
 		name = EXCELLENT
 
-		event_target:end_peasant_leader = { death = { death_reason = death_murder_unknown killer = ROOT } }
+		event_target:end_peasant_leader = {
+			show_scope_change = no
 
-		hidden_tooltip = {
-			#Death or good ending
-			random_list = {
-				20 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
-				80 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
+			death = {
+				death_reason = death_murder_unknown
+				killer = ROOT
 			}
+		}
+
+		# Death or good ending
+		random_list = {
+			20 = { narrative_event = { id = RIP.22010 days = 110 random = 20 } }
+			80 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 		}
 	}
 }
 
-#Failed assassination
+# Failed assassination
 character_event = {
 	id = RIP.22008
 	desc = EVTDSC_RIP_22008
@@ -2175,53 +2101,61 @@ character_event = {
 	picture = GFX_evt_peasants
 
 	is_triggered_only = yes
-	hide_from = yes
 
 	option = {
 		name = EVTOPTA_RIP_22008
 
-		custom_tooltip = { text = EVTOPTA_RIP_22008_TOOLTIP }
+		custom_tooltip = {
+			text = EVTOPTA_RIP_22008_TOOLTIP
 
-		event_target:end_peasant_leader = { death = { death_reason = death_murder killer = ROOT } }
-
-		add_character_modifier = {
-			name = known_murderer
-			years = 50
-		}
-
-		hidden_tooltip = {
-			any_realm_province = { limit = { owner = { character = ROOT } }
+			any_demesne_province = {
 				add_province_modifier = {
 					name = peasant_crisis
 					years = 3
 				}
 			}
-			#Revolt or good ending
+
+			# Revolt or good ending
 			random_list = {
 				85 = { narrative_event = { id = RIP.22009 days = 110 random = 20 } }
 				15 = { narrative_event = { id = RIP.22011 days = 110 random = 20 } }
 			}
 		}
+
+		event_target:end_peasant_leader = {
+			show_scope_change = no
+
+			death = {
+				death_reason = death_murder
+				killer = ROOT
+			}
+		}
+
+		add_character_modifier = {
+			name = known_murderer
+			years = 50
+		}
 	}
 }
 
-#Negative outcome, revolt
+# Negative outcome, revolt
 narrative_event = {
-	title = EVTNAME_RIP_22009
 	id = RIP.22009
+	title = EVTNAME_RIP_22009
 	desc = EVTDSC_RIP_22009
 	border = GFX_event_narrative_frame_war
 	picture = GFX_evt_end_of_days
 
 	is_triggered_only = yes
-	hide_from = yes
 
 	immediate = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
@@ -2229,40 +2163,35 @@ narrative_event = {
 	option = {
 		name = EVTOPTA_RIP_22009
 
-		custom_tooltip = { text = EVTOPTA_RIP_22009_TOOLTIP }
+		custom_tooltip = {
+			text = EVTOPTA_RIP_22009_TOOLTIP
 
-		hidden_tooltip = {
 			clr_character_flag = end_of_days
 
-			any_realm_province = {
-				limit = { owner = { character = ROOT } }
-
-				if = {
-					limit = {
-						NOR = {
-							has_province_modifier = depopulated_1
-							has_province_modifier = depopulated_2
-							has_province_modifier = depopulated_3
-						}
-					}
-					add_province_modifier = {
-						name = depopulated_1
-						duration = -1
-					}
-					break = yes
-				}
+			any_demesne_province = {
 				if = {
 					limit = { has_province_modifier = depopulated_1 }
+
 					add_province_modifier = {
 						name = depopulated_2
 						duration = -1
 					}
-					break = yes
 				}
-				if = {
+				else_if = {
 					limit = { has_province_modifier = depopulated_2 }
+
 					add_province_modifier = {
 						name = depopulated_3
+						duration = -1
+					}
+				}
+				else_if = {
+					limit = {
+						NOT = { has_province_modifier = depopulated_3 }
+					}
+
+					add_province_modifier = {
+						name = depopulated_1
 						duration = -1
 					}
 				}
@@ -2271,23 +2200,24 @@ narrative_event = {
 	}
 }
 
-#Negative outcome, death
+# Negative outcome, death
 narrative_event = {
-	title = EVTNAME_RIP_22010
 	id = RIP.22010
+	title = EVTNAME_RIP_22010
 	desc = EVTDSC_RIP_22010
 	border = GFX_event_narrative_frame_religion
 	picture = GFX_evt_depopulated_town
 
 	is_triggered_only = yes
-	hide_from = yes
 
 	immediate = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
@@ -2295,41 +2225,35 @@ narrative_event = {
 	option = {
 		name = EVTOPTA_RIP_22010
 
-		custom_tooltip = { text = EVTOPTA_RIP_22010_TOOLTIP }
-
-		hidden_tooltip = {
+		custom_tooltip = {
+			text = EVTOPTA_RIP_22010_TOOLTIP
 
 			clr_character_flag = end_of_days
 
-			any_realm_province = {
-				limit = { owner = { character = ROOT } }
-
-				if = {
-					limit = {
-						NOR = {
-							has_province_modifier = depopulated_1
-							has_province_modifier = depopulated_2
-							has_province_modifier = depopulated_3
-						}
-					}
-					add_province_modifier = {
-						name = depopulated_1
-						duration = -1
-					}
-					break = yes
-				}
+			any_demesne_province = {
 				if = {
 					limit = { has_province_modifier = depopulated_1 }
+
 					add_province_modifier = {
 						name = depopulated_2
 						duration = -1
 					}
-					break = yes
 				}
-				if = {
+				else_if = {
 					limit = { has_province_modifier = depopulated_2 }
+
 					add_province_modifier = {
 						name = depopulated_3
+						duration = -1
+					}
+				}
+				else_if = {
+					limit = {
+						NOT = { has_province_modifier = depopulated_3 }
+					}
+
+					add_province_modifier = {
+						name = depopulated_1
 						duration = -1
 					}
 				}
@@ -2338,23 +2262,24 @@ narrative_event = {
 	}
 }
 
-#"Positive" outcome
+# "Positive" outcome
 narrative_event = {
-	title = EVTNAME_RIP_22011
 	id = RIP.22011
+	title = EVTNAME_RIP_22011
 	desc = EVTDSC_RIP_22011
 	border = GFX_event_narrative_frame_religion
 	picture = GFX_evt_bishop
 
 	is_triggered_only = yes
-	hide_from = yes
 
 	immediate = {
 		if = {
 			limit = {
 				ai = no
+				is_ironman = yes
 				NOT = { has_character_flag = achievement_not_so_bad }
 			}
+
 			set_character_flag = achievement_not_so_bad
 		}
 	}
@@ -2363,30 +2288,25 @@ narrative_event = {
 		name = EVTOPTA_RIP_22011
 
 		capital_scope = {
-			if = {
-				limit = { has_province_modifier = peasant_unrest }
-				custom_tooltip = { text = EVTOPTA_RIP_22011_TOOLTIP_A }
-			}
-			if = {
-				limit = { has_province_modifier = peasant_crisis }
-				custom_tooltip = { text = EVTOPTA_RIP_22011_TOOLTIP_B }
+			show_scope_change = no
+
+			trigger_switch = {
+				on_trigger = has_province_modifier
+
+				peasant_unrest = { custom_tooltip = { text = EVTOPTA_RIP_22011_TOOLTIP_A } }
+				peasant_crisis = { custom_tooltip = { text = EVTOPTA_RIP_22011_TOOLTIP_B } }
 			}
 		}
 
-		hidden_tooltip = {
+		hidden_effect = {
 			clr_character_flag = end_of_days
 
-			any_realm_province = {
-				limit = { owner = { character = ROOT } }
+			any_demesne_province = {
+				trigger_switch = {
+					on_trigger = has_province_modifier
 
-				if = {
-					limit = { has_province_modifier = peasant_unrest }
-					remove_province_modifier = peasant_unrest
-
-				}
-				if = {
-					limit = { has_province_modifier = peasant_crisis }
-					remove_province_modifier = peasant_crisis
+					peasant_unrest = { remove_province_modifier = peasant_unrest }
+					peasant_crisis = {remove_province_modifier = peasant_crisis }
 				}
 			}
 		}
@@ -2395,15 +2315,11 @@ narrative_event = {
 
 character_event = {
 	id = RIP.22020
-	hide_window = yes
+
 	is_triggered_only = yes
+	hide_window = yes
 
 	immediate = {
 		clr_character_flag = end_of_days
-
-	}
-
-	option = {
-
 	}
 }
