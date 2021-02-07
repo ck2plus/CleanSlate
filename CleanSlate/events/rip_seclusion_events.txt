@@ -207,14 +207,15 @@ character_event = {
 		}
 
 		# Achievement flag
-		if = {
-			limit = {
-				ai = no
-				is_ironman = yes
-			}
+		# CleanSlate: It's an ai only event...
+		# if = {
+			# limit = {
+				# ai = no
+				# is_ironman = yes
+			# }
 
-			set_character_flag = achievement_no_solicitors
-		}
+			# set_character_flag = achievement_no_solicitors
+		# }
 
 		if = {
 			limit = { has_minor_title = title_commander }
@@ -328,9 +329,7 @@ character_event = {
 
 	only_playable = yes
 
-	trigger = {
-		in_seclusion = yes
-	}
+	trigger = { in_seclusion = yes }
 
 	mean_time_to_happen = {
 		months = 9
@@ -354,9 +353,7 @@ character_event = {
 		random_list = {
 			20 = {
 				trigger = {
-					location = {
-						has_disease = yes
-					}
+					location = { has_disease = yes }
 
 					is_ill = yes
 					num_of_symptoms < 1
@@ -367,15 +364,7 @@ character_event = {
 						any_host_courtier = {
 							in_seclusion = yes
 
-							OR = {
-								trait = has_tuberculosis
-								trait = has_typhoid_fever
-								trait = has_typhus
-								trait = has_bubonic_plague
-								trait = has_measles
-								trait = has_small_pox
-								trait = has_aztec_disease
-							}
+							has_epidemic_disease_trigger = yes
 						}
 					}
 				}
@@ -386,15 +375,7 @@ character_event = {
 					any_host_courtier = {
 						in_seclusion = yes
 
-						OR = {
-							has_character_flag = got_tuberculosis
-							has_character_flag = got_typhoid_fever
-							has_character_flag = got_typhus
-							has_character_flag = got_bubonic_plague
-							has_character_flag = got_measles
-							has_character_flag = got_small_pox
-							has_character_flag = got_aztec_disease
-						}
+						developing_epidemic_disease_trigger = yes
 					}
 				}
 
@@ -459,7 +440,6 @@ character_event = {
 				trigger = {
 					is_adult = yes
 					can_marry = yes
-					is_married = no
 					is_consort = no
 					has_lover = no
 
@@ -470,11 +450,9 @@ character_event = {
 
 					any_courtier = {
 						in_seclusion = yes
-						is_opposite_sex = ROOT
+						is_valid_romance_target = ROOT
 						can_marry = yes
-						is_adult = yes
 						at_location = ROOT
-						is_married = no
 						is_consort = no
 						has_lover = no
 
@@ -482,6 +460,8 @@ character_event = {
 							who = ROOT
 							value >= 0
 						}
+
+						NOT = { trait = celibate }
 					}
 				}
 
@@ -618,20 +598,19 @@ character_event = {
 					}
 
 					any_courtier = {
-						has_vice_trigger = yes
 						in_seclusion = yes
 						is_adult = yes
-						is_incapable = no
 						prisoner = no
-					}
+						is_incapable = no
 
-					any_courtier = {
-						is_close_relative = ROOT
-						is_pious_trigger = no
-						in_seclusion = yes
-						is_adult = yes
-						prisoner = no
-						is_incapable = no
+						OR = {
+							has_vice_trigger = yes
+
+							AND = {
+								is_close_relative = ROOT
+								is_pious_trigger = no
+							}
+						}
 					}
 
 					NOR = {
@@ -719,9 +698,7 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		in_seclusion = yes
-	}
+	trigger = { in_seclusion = yes }
 
 	immediate = {
 		set_character_flag = seclusion_food_shortage
@@ -1033,7 +1010,7 @@ character_event = {
 		name = RIP.11554.a # Angry but keep them in
 
 		ai_chance = {
-			factor = 10
+			factor = 25
 
 			mult_modifier = {
 				factor = 2
@@ -1071,7 +1048,7 @@ character_event = {
 		name = EVTOPTB_RIP_13230 # Prison
 
 		ai_chance = {
-			factor = 10
+			factor = 25
 
 			mult_modifier = {
 				factor = 2
@@ -1105,7 +1082,7 @@ character_event = {
 		name = RIP.11554.b # Expel them
 
 		ai_chance = {
-			factor = 10
+			factor = 25
 
 			mult_modifier = {
 				factor = 2
@@ -1150,7 +1127,7 @@ character_event = {
 		name = RIP.11555.a # Cannibal option - eat them in turn?
 
 		ai_chance = {
-			factor = 10
+			factor = 25
 
 			trigger = {
 				OR = {
@@ -1315,7 +1292,6 @@ character_event = {
 				NOT = { trait = temperate }
 			}
 
-			remove_trait_silently_gluttonous_effect = yes
 			add_trait = temperate
 			lose_weight_small_effect = yes
 			weight_trait_check_effect = yes
@@ -1441,13 +1417,11 @@ character_event = {
 
 	option = { # Guards can clear them out
 		name = EVTOPTA_RIP_12003
+		custom_tooltip = { text = EVTOPTA_RIP_12003_TOOLTIP }
 
 		ai_chance = { factor = 30 }
 
-		custom_tooltip = {
-			text = EVTOPTA_RIP_12003_TOOLTIP
-			set_character_flag = exposed_to_outside
-		}
+		set_character_flag = exposed_to_outside
 	}
 
 	option = { # We should all help clear out the dead
@@ -1642,8 +1616,8 @@ character_event = {
 			limit = { in_seclusion = yes }
 
 			opinion = {
-				who = ROOT
 				name = opinion_tyrant
+				who = ROOT
 				years = 5
 			}
 		}
@@ -1807,8 +1781,8 @@ character_event = {
 		}
 
 		reverse_opinion = {
-			who = event_target:lover_two
 			name = opinion_angry
+			who = event_target:lover_two
 			years = 5
 		}
 	}
@@ -1943,7 +1917,7 @@ character_event = {
 			random_realm_character = {
 				limit = {
 					at_location = ROOT
-					is_opposite_sex = ROOT
+					is_valid_romance_target = ROOT
 					can_marry = yes
 					is_adult = yes
 					in_seclusion = yes
@@ -1955,6 +1929,8 @@ character_event = {
 						who = ROOT
 						value >= 0
 					}
+
+					NOT = { trait = celibate }
 				}
 
 				# For Sway events...
@@ -2132,8 +2108,8 @@ character_event = {
 
 		tooltip = {
 			opinion = {
-				who = FROM
 				name = opinion_declined_romance
+				who = FROM
 				years = 2
 			}
 		}
@@ -2741,10 +2717,10 @@ character_event = {
 		}
 
 		new_character = {
-			add_trait = lustful
-			add_trait = fair
 			remove_trait = chaste
 			remove_trait = ugly
+			add_trait = lustful
+			add_trait = fair
 			save_event_target_as = seclusion_childs_lover
 
 			random_list = {
@@ -2765,7 +2741,7 @@ character_event = {
 			}
 
 			if = {
-				limit = { ROOT = { trait = homosexual } }
+				limit = { same_sex = ROOT }
 				add_trait = homosexual
 			}
 
@@ -2800,6 +2776,7 @@ character_event = {
 	picture = GFX_evt_lovers
 
 	desc = {
+		text = EVTDESC_RIP_12034_A
 		trigger = {
 			FROM = {
 				NOR = {
@@ -2808,9 +2785,9 @@ character_event = {
 				}
 			}
 		}
-		text = EVTDESC_RIP_12034_A
 	}
 	desc = {
+		text = EVTDESC_RIP_12034_B
 		trigger = {
 			FROM = {
 				OR = {
@@ -2819,7 +2796,6 @@ character_event = {
 				}
 			}
 		}
-		text = EVTDESC_RIP_12034_B
 	}
 
 
@@ -3022,14 +2998,14 @@ character_event = {
 	picture = GFX_evt_spymaster
 
 	desc = {
-		trigger = { FROM = { in_seclusion = yes } }
 		text = EVTDESC_RIP_12036_A
 		picture = GFX_evt_spymaster
+		trigger = { FROM = { in_seclusion = yes } }
 	}
 	desc = {
-		trigger = { FROM = { in_seclusion = no } }
 		text = EVTDESC_RIP_12036_B
 		picture = GFX_evt_recieve_letter
+		trigger = { FROM = { in_seclusion = no } }
 	}
 
 	is_triggered_only = yes
@@ -3263,9 +3239,7 @@ character_event = {
 	hide_from = no
 	hide_new = yes
 
-	trigger = {
-		in_seclusion = yes
-	}
+	trigger = { in_seclusion = yes }
 
 	# Create the tunnel sneaker: a lover, instigator or assassin
 	immediate = {
@@ -3278,7 +3252,6 @@ character_event = {
 					age = 25
 					random_traits = yes
 					add_trait = robust
-					add_trait = homosexual
 					dynasty = none
 					religion = ROOT
 					culture = ROOT
@@ -3383,7 +3356,6 @@ character_event = {
 
 		new_character = {
 			save_event_target_as = captured_sneaker
-			remove_trait = homosexual
 
 			random_list = {
 				10 = {
@@ -3515,27 +3487,13 @@ character_event = {
 			}
 
 			add_trait = stressed
-		}
 
-		if = {
-			limit = {
-				is_female = yes
-				prefers_men_trigger = no
-			}
-
-			event_target:captured_sneaker = {
+			if = {
+				limit = { same_sex = ROOT }
 				add_trait = homosexual
 			}
-		}
-
-		if = {
-			limit = {
-				is_female = no
-				prefers_men_trigger = yes
-			}
-
-			event_target:captured_sneaker = {
-				add_trait = homosexual
+			else = {
+				remove_trait = homosexual
 			}
 		}
 	}
@@ -3595,16 +3553,16 @@ character_event = {
 				killer = ROOT
 			}
 
-			if = {
-				limit = { has_character_flag = sneaky_lover }
+			# if = {
+				# limit = { has_character_flag = sneaky_lover }
 
 				# event for grieving lover?
-			}
+			# }
 		}
 	}
 }
 
-# sneaker has joined court/been imprisoned: ping to sneaker
+# Sneaker has joined court/been imprisoned: ping to sneaker
 character_event = {
 	id = RIP.12061
 
@@ -3612,27 +3570,25 @@ character_event = {
 	hide_window = yes
 
 	immediate = {
-		hidden_tooltip = {
+		trigger_switch = {
+			on_trigger = has_character_flag
+
 			# Could lead to pitchforks coming at you:
-			if = { limit = { has_character_flag = sneaky_revolutionary }
+			sneaky_revolutionary = {
 				event_target:secluded_friendly_ruler = {
 					character_event = { id = RIP.12056 }
 				}
 			}
 
 			# Could lead to assassination attempt:
-			if = { limit = { has_character_flag = sneaky_assassin }
+			sneaky_assassin = {
 				event_target:secluded_friendly_ruler = {
 					character_event = { id = RIP.12057 }
 				}
 			}
 
 			# Could lead to seduction attempt: add block for prison
-			if = {
-				limit = {
-					has_character_flag = sneaky_lover
-
-				}
+			sneaky_lover = {
 				event_target:secluded_friendly_ruler = {
 					character_event = { id = RIP.12058 }
 				}
@@ -3731,8 +3687,8 @@ character_event = {
 			add_trait = depressed
 
 			opinion = {
-				who = ROOT
 				name = opinion_hate
+				who = ROOT
 				years = 2
 			}
 		}
@@ -3778,8 +3734,6 @@ character_event = {
 				50 = {
 					mult_modifier = {
 						factor = 1.5
-
-						has_character_flag = did_not_trust_steward
 
 						event_target:secluded_steward = {
 							OR = {
@@ -4254,7 +4208,7 @@ narrative_event = {
 	}
 	desc = {
 		text = EVTDESC_RIP_12070_C # EVIL - will prio over impious
-		trigger = {	is_evil_trigger = yes }
+		trigger = { is_evil_trigger = yes }
 	}
 	desc = {
 		text = EVTDESC_RIP_12070_D # IMPIOUS - will be rare?
@@ -4280,7 +4234,6 @@ narrative_event = {
 
 		any_courtier = {
 			limit = {
-				has_vice_trigger = yes
 				in_seclusion = yes
 				is_adult = yes
 				prisoner = no
@@ -4290,24 +4243,16 @@ narrative_event = {
 			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
-			}
 
-			save_event_target_as = bored_courtier_target
-		}
-
-		any_courtier = {
-			limit = {
-				is_close_relative = ROOT
-				in_seclusion = yes
-				is_adult = yes
-				prisoner = no
-				is_incapable = no
-				is_pious_trigger = no
-			}
-
-			score_value = {
-				value = 10
-				interesting_courtier_selection_score = yes
+				additive_modifier = {
+					factor = 2000
+					is_close_relative = ROOT
+					is_pious_trigger = no
+				}
+				additive_modifier = {
+					factor = 1000
+					has_vice_trigger = yes
+				}
 			}
 
 			save_event_target_as = bored_courtier_target
@@ -4376,7 +4321,7 @@ narrative_event = {
 		name = EVTOPTB_RIP_12070
 
 		trigger = {
-			NOT = {	trait = lunatic	}
+			NOT = { trait = lunatic }
 		}
 
 		custom_tooltip = { text = EVTOPTB_RIP_12070_TT }
@@ -4467,7 +4412,7 @@ narrative_event = {
 				}
 			}
 
-			NOT = {	trait = lunatic	}
+			NOT = { trait = lunatic }
 		}
 	}
 }
@@ -4527,15 +4472,6 @@ character_event = {
 
 			random_courtier = {
 				limit = {
-					OR = {
-						has_vice_trigger = yes
-
-						AND = {
-							is_close_relative = ROOT
-							is_pious_trigger = no
-						}
-					}
-
 					in_seclusion = yes
 					is_adult = yes
 					prisoner = no
@@ -4545,6 +4481,10 @@ character_event = {
 				preferred_limit = {
 					is_close_relative = ROOT
 					is_pious_trigger = no
+				}
+
+				preferred_limit = {
+					has_vice_trigger = yes
 				}
 
 				save_event_target_as = bored_courtier_target
@@ -4675,86 +4615,42 @@ character_event = {
 	has_character_flag = masque_of_red_death
 
 	immediate = {
-		random_list = {
-			10 = {
-				create_character = {
-					female = no
-					age = 21
-					random_traits = no
-					dynasty = none
-					add_trait = elusive_shadow
-					add_trait = arbitrary
-					add_trait = patient
-					religion = ROOT
-					culture = ROOT
-					race = ROOT
-					health = 7
+		create_character = {
+			female = 50
+			age = 21
+			random_traits = no
+			dynasty = none
+			add_trait = elusive_shadow
+			add_trait = arbitrary
+			add_trait = patient
+			religion = ROOT
+			culture = ROOT
+			race = ROOT
+			health = 7
 
-					attributes = {
-						intrigue = 15
-						martial = 10
-						diplomacy = 9
-					}
-				}
+			attributes = {
+				intrigue = 15
+				martial = 10
+				diplomacy = 9
+			}
+		}
 
-				new_character = {
-					will_not_marry_effect = yes
+		new_character = {
+			will_not_marry_effect = yes
 
-					add_character_modifier = {
-						name = in_seclusion
-						duration = -1
-					}
-
-					add_character_modifier = {
-						name = attending_masquerade
-						duration = -1
-					}
-
-					set_character_flag = immune_bubonic_plague
-					set_character_flag = is_death
-					save_event_target_as = partying_stranger
-				}
+			add_character_modifier = {
+				name = in_seclusion
+				duration = -1
 			}
 
-			10 = {
-				create_character = {
-					female = yes
-					age = 21
-					random_traits = no
-					dynasty = none
-					add_trait = elusive_shadow
-					add_trait = arbitrary
-					add_trait = patient
-					religion = ROOT
-					culture = ROOT
-					race = ROOT
-					health = 7
-
-					attributes = {
-						intrigue = 15
-						martial = 10
-						diplomacy = 9
-					}
-				}
-
-				new_character = {
-					will_not_marry_effect = yes
-
-					add_character_modifier = {
-						name = in_seclusion
-						duration = -1
-					}
-
-					add_character_modifier = {
-						name = attending_masquerade
-						duration = -1
-					}
-
-					set_character_flag = immune_bubonic_plague
-					set_character_flag = is_death
-					save_event_target_as = partying_stranger
-				}
+			add_character_modifier = {
+				name = attending_masquerade
+				duration = -1
 			}
+
+			set_character_flag = immune_bubonic_plague
+			set_character_flag = is_death
+			save_event_target_as = partying_stranger
 		}
 	}
 
@@ -4872,9 +4768,7 @@ character_event = {
 		name = EVTOPTC_RIP_12075
 		tooltip_info = immortal
 
-		trigger = {
-			trait = immortal
-		}
+		trigger = { immortal = yes }
 
 		character_event = {
 			id = RIP.12079
@@ -4898,11 +4792,9 @@ character_event = {
 
 		trigger = {
 			intrigue >= 15
+			immortal = no
 
-			NOR = {
-				trait = immortal
-				trait = lunatic
-			}
+			NOR = { trait = lunatic }
 		}
 	}
 
@@ -5249,19 +5141,15 @@ character_event = {
 	desc = {
 		text = EVTDESC_RIP_12079_A
 		trigger = {
-			trait = immortal
+			immortal = yes
 			NOT = { has_character_flag = picked_lunatic_opt }
 		}
 	}
 	desc = {
 		text = EVTDESC_RIP_12079_B
 		trigger = {
-			intrigue >= 15
-
-			NOR = {
-				trait = immortal
-				has_character_flag = picked_lunatic_opt
-			}
+			immortal = no
+			NOT = { has_character_flag = picked_lunatic_opt }
 		}
 	}
 	desc = {
@@ -5279,7 +5167,7 @@ character_event = {
 		name = EVTOPTA_RIP_12079 # That's not good
 
 		trigger = {
-			trait = immortal
+			immortal = yes
 			NOT = { has_character_flag = picked_lunatic_opt }
 		}
 
@@ -5408,12 +5296,8 @@ character_event = {
 		name = EVTOPTB_RIP_12079 # That's not good
 
 		trigger = {
-			intrigue >= 15
-
-			NOR = {
-				trait = immortal
-				has_character_flag = picked_lunatic_opt
-			}
+			immortal = no
+			NOT = { has_character_flag = picked_lunatic_opt }
 		}
 
 		custom_tooltip = { text = EVTOPTB_RIP_12079_TT }
@@ -5919,9 +5803,7 @@ character_event = {
 	is_triggered_only = yes
 	hide_window = yes
 
-	trigger = {
-		in_seclusion = yes
-	}
+	trigger = { in_seclusion = yes }
 
 	immediate = {
 		remove_character_modifier = in_seclusion
@@ -5965,6 +5847,7 @@ character_event = {
 						has_character_modifier = minor_food_shortage
 						has_character_modifier = normal_food_shortage
 						has_character_modifier = starving_food_shortage
+						has_character_modifier = greedy_food_shortage
 					}
 				}
 
@@ -5973,6 +5856,7 @@ character_event = {
 				remove_character_modifier = minor_food_shortage
 				remove_character_modifier = normal_food_shortage
 				remove_character_modifier = starving_food_shortage
+				remove_character_modifier = greedy_food_shortage
 			}
 		}
 	}
@@ -5987,9 +5871,7 @@ character_event = {
 	trigger = {
 		in_seclusion = yes
 
-		host = {
-			in_seclusion = no
-		}
+		host = { in_seclusion = no }
 
 		NAND = {
 			is_landed = yes
@@ -6011,7 +5893,7 @@ character_event = {
 	}
 }
 
-# Liege notification for councillors going into seclusion
+# Liege notification for councillors going into seclusion (Player only)
 # letter_event = {
 character_event = {
 	id = RIP.12101
