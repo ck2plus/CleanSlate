@@ -285,7 +285,6 @@ character_event = {
 						any_child = {
 							is_incapable = no
 							prisoner = no
-							is_child_of = ROOT
 							age >= 6
 							NOT = { is_rival = ROOT }
 							opinion = {
@@ -293,15 +292,15 @@ character_event = {
 								value >= 0
 							}
 						}
-						mother = {
+						any_close_relative = {
+							is_parent_of = ROOT
 							is_incapable = no
 							prisoner = no
 							NOT = { is_rival = ROOT }
-						}
-						father = {
-							is_incapable = no
-							prisoner = no
-							NOT = { is_rival = ROOT }
+							opinion = {
+								who = ROOT
+								value >= 0
+							}
 						}
 					}
 				}
@@ -601,7 +600,7 @@ character_event = {
 
 	immediate = {
 		society = {
-			any_society_member = {
+			random_society_member = {
 				limit = { has_character_flag = debate_winner }
 				character_event = { id = MNM.1989 }
 			}
@@ -627,28 +626,31 @@ character_event = {
 		prestige = 300
 		change_society_currency = 200
 
-		society = {
-			any_society_member = {
-				limit = { has_character_flag = hosting_grand_debate }
+		hidden_effect = {
+			society = {
+				random_society_member = {
+					limit = { has_character_flag = hosting_grand_debate }
 
-				if = {
-					limit = { character = ROOT }
-					character_event = { id = MNM.1993 days = 3 } # If host is winner - End the debate
-				}
-				else = {
-					character_event = { id = MNM.1990 days = 3 } # Inform host
-				}
-			}
-			any_society_member = {
-				limit = {
-					ai = no
-					has_character_flag = attending_grand_debate
-					NOR = {
-						has_character_flag = hosting_grand_debate
-						character = ROOT
+					if = {
+						limit = { character = ROOT }
+						character_event = { id = MNM.1993 days = 3 } # If host is winner - End the debate
+					}
+					else = {
+						character_event = { id = MNM.1990 days = 3 } # Inform host
 					}
 				}
-				character_event = { id = MNM.1991 days = 3 } # Inform other participants
+
+				any_player = {
+					limit = {
+						same_society_as = ROOT
+						has_character_flag = attending_grand_debate
+						NOR = {
+							has_character_flag = hosting_grand_debate
+							character = ROOT
+						}
+					}
+					character_event = { id = MNM.1991 days = 3 } # Inform other participants
+				}
 			}
 		}
 	}
@@ -712,122 +714,119 @@ character_event = {
 		hidden_effect = {
 			society = {
 				any_society_member = {
-					limit = {
-						has_character_flag = attending_grand_debate
-						NOT = { has_character_flag = debate_winner }
-					}
+					limit = { has_character_flag = attending_grand_debate }
+
 					if = {
-						limit = {
-							NOT = { character = ROOT }
-						}
-						opinion = {
-							name = opinion_debate_participant
-							who = ROOT
-							years = 5
-						}
-					}
+						limit = { has_character_flag = debate_winner }
 
-					random_list = { # Select outcome
-						10 = { # Good outcome - Upgrade your education trait
-							trigger = {
-								has_top_tier_education_trait_trigger = no
-							}
-							mult_modifier = {
-								factor = 2
-								OR = {
-									has_character_flag = debate_score_20
-									has_character_flag = debate_score_19
-									has_character_flag = debate_score_18
-									has_character_flag = debate_score_17
-									has_character_flag = debate_score_16
-								}
-							}
-							character_event = { id = MNM.1994 }
-						}
-						20 = { # Good outcome
-							mult_modifier = {
-								factor = 2
-								OR = {
-									has_character_flag = debate_score_20
-									has_character_flag = debate_score_19
-									has_character_flag = debate_score_18
-									has_character_flag = debate_score_17
-									has_character_flag = debate_score_16
-									has_character_flag = debate_score_15
-									has_character_flag = debate_score_14
-									has_character_flag = debate_score_13
-									has_character_flag = debate_score_12
-								}
-							}
-							character_event = { id = MNM.1995 }
-						}
-						30 = { # Decent outcome
-							character_event = { id = MNM.1996 }
-						}
-						30 = { # Normal outcome
-							character_event = { id = MNM.1997 }
-						}
-						10 = { # Bad outcome
-							trigger = {
-								NOR = {
-									has_character_flag = debate_score_20
-									has_character_flag = debate_score_19
-									has_character_flag = debate_score_18
-									has_character_flag = debate_score_17
-									has_character_flag = debate_score_16
-									has_character_flag = debate_score_15
-									has_character_flag = debate_score_14
-									has_character_flag = debate_score_13
-									has_character_flag = debate_score_12
-								}
-							}
-							mult_modifier = {
-								factor = 2
-								OR = {
-									has_character_flag = debate_score_03
-									has_character_flag = debate_score_02
-									has_character_flag = debate_score_01
-									has_character_flag = debate_score_00
-								}
-							}
-							character_event = { id = MNM.1998 }
-						}
+						clr_character_flag = debate_winner
+						clr_character_flag = attending_grand_debate
+						clr_character_flag = do_not_disturb
+						set_character_flag = grand_debate_has_ended
 					}
+					else = {
+						if = {
+							limit = {
+								NOT = { character = ROOT }
+							}
+							opinion = {
+								name = opinion_debate_participant
+								who = ROOT
+								years = 5
+							}
+						}
 
-					clr_character_flag = attending_grand_debate
-					clr_character_flag = do_not_disturb
-					clr_character_flag = debate_score_20
-					clr_character_flag = debate_score_19
-					clr_character_flag = debate_score_18
-					clr_character_flag = debate_score_17
-					clr_character_flag = debate_score_16
-					clr_character_flag = debate_score_15
-					clr_character_flag = debate_score_14
-					clr_character_flag = debate_score_13
-					clr_character_flag = debate_score_12
-					clr_character_flag = debate_score_11
-					clr_character_flag = debate_score_10
-					clr_character_flag = debate_score_09
-					clr_character_flag = debate_score_08
-					clr_character_flag = debate_score_07
-					clr_character_flag = debate_score_06
-					clr_character_flag = debate_score_05
-					clr_character_flag = debate_score_04
-					clr_character_flag = debate_score_03
-					clr_character_flag = debate_score_02
-					clr_character_flag = debate_score_01
-					clr_character_flag = debate_score_00
-				}
+						random_list = { # Select outcome
+							10 = { # Good outcome - Upgrade your education trait
+								trigger = {
+									has_top_tier_education_trait_trigger = no
+								}
+								mult_modifier = {
+									factor = 2
+									OR = {
+										has_character_flag = debate_score_20
+										has_character_flag = debate_score_19
+										has_character_flag = debate_score_18
+										has_character_flag = debate_score_17
+										has_character_flag = debate_score_16
+									}
+								}
+								character_event = { id = MNM.1994 }
+							}
+							20 = { # Good outcome
+								mult_modifier = {
+									factor = 2
+									OR = {
+										has_character_flag = debate_score_20
+										has_character_flag = debate_score_19
+										has_character_flag = debate_score_18
+										has_character_flag = debate_score_17
+										has_character_flag = debate_score_16
+										has_character_flag = debate_score_15
+										has_character_flag = debate_score_14
+										has_character_flag = debate_score_13
+										has_character_flag = debate_score_12
+									}
+								}
+								character_event = { id = MNM.1995 }
+							}
+							30 = { # Decent outcome
+								character_event = { id = MNM.1996 }
+							}
+							30 = { # Normal outcome
+								character_event = { id = MNM.1997 }
+							}
+							10 = { # Bad outcome
+								trigger = {
+									NOR = {
+										has_character_flag = debate_score_20
+										has_character_flag = debate_score_19
+										has_character_flag = debate_score_18
+										has_character_flag = debate_score_17
+										has_character_flag = debate_score_16
+										has_character_flag = debate_score_15
+										has_character_flag = debate_score_14
+										has_character_flag = debate_score_13
+										has_character_flag = debate_score_12
+									}
+								}
+								mult_modifier = {
+									factor = 2
+									OR = {
+										has_character_flag = debate_score_03
+										has_character_flag = debate_score_02
+										has_character_flag = debate_score_01
+										has_character_flag = debate_score_00
+									}
+								}
+								character_event = { id = MNM.1998 }
+							}
+						}
 
-				any_society_member = {
-					limit = {
-						has_character_flag = attending_grand_debate
-						has_character_flag = debate_winner
+						clr_character_flag = attending_grand_debate
+						clr_character_flag = do_not_disturb
+						clr_character_flag = debate_score_20
+						clr_character_flag = debate_score_19
+						clr_character_flag = debate_score_18
+						clr_character_flag = debate_score_17
+						clr_character_flag = debate_score_16
+						clr_character_flag = debate_score_15
+						clr_character_flag = debate_score_14
+						clr_character_flag = debate_score_13
+						clr_character_flag = debate_score_12
+						clr_character_flag = debate_score_11
+						clr_character_flag = debate_score_10
+						clr_character_flag = debate_score_09
+						clr_character_flag = debate_score_08
+						clr_character_flag = debate_score_07
+						clr_character_flag = debate_score_06
+						clr_character_flag = debate_score_05
+						clr_character_flag = debate_score_04
+						clr_character_flag = debate_score_03
+						clr_character_flag = debate_score_02
+						clr_character_flag = debate_score_01
+						clr_character_flag = debate_score_00
 					}
-					clr_character_flag = debate_winner
-					clr_character_flag = attending_grand_debate
-					clr_character_flag = do_not_disturb
-					set_character_flag = grand_debate_has_ended
 				}
 			}
 
@@ -853,13 +852,13 @@ character_event = {
 	desc = {
 		text = EVTDESC_MNM_1994
 		trigger = {
-			event_target:debate_host = { NOT = { character = ROOT } }
+			NOT = { character = event_target:debate_host }
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1994_HOST
 		trigger = {
-			event_target:debate_host = { character = ROOT }
+			character = event_target:debate_host
 		}
 	}
 
@@ -882,13 +881,13 @@ character_event = {
 	desc = {
 		text = EVTDESC_MNM_1995
 		trigger = {
-			event_target:debate_host = { NOT = { character = ROOT } }
+			NOT = { character = event_target:debate_host }
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1995_HOST
 		trigger = {
-			event_target:debate_host = { character = ROOT }
+			character = event_target:debate_host
 		}
 	}
 
@@ -915,13 +914,13 @@ character_event = {
 	desc = {
 		text = EVTDESC_MNM_1996
 		trigger = {
-			event_target:debate_host = { NOT = { character = ROOT } }
+			NOT = { character = event_target:debate_host }
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1996_HOST
 		trigger = {
-			event_target:debate_host = { character = ROOT }
+			character = event_target:debate_host
 		}
 	}
 
@@ -943,13 +942,13 @@ character_event = {
 	desc = {
 		text = EVTDESC_MNM_1997
 		trigger = {
-			event_target:debate_host = { NOT = { character = ROOT } }
+			NOT = { character = event_target:debate_host }
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1997_HOST
 		trigger = {
-			event_target:debate_host = { character = ROOT }
+			character = event_target:debate_host
 		}
 	}
 
@@ -975,13 +974,13 @@ character_event = {
 	desc = {
 		text = EVTDESC_MNM_1998
 		trigger = {
-			event_target:debate_host = { NOT = { character = ROOT } }
+			NOT = { character = event_target:debate_host }
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1998_HOST
 		trigger = {
-			event_target:debate_host = { character = ROOT }
+			character = event_target:debate_host
 		}
 	}
 
@@ -1399,6 +1398,7 @@ character_event = { # The Mediator
 					NOR = {
 						character = ROOT
 						is_close_relative = ROOT
+						character = event_target:fellow_member_1
 					}
 				}
 				save_event_target_as = fellow_member_2
@@ -1641,7 +1641,6 @@ character_event = {
 				any_child = {
 					is_incapable = no
 					prisoner = no
-					is_child_of = ROOT
 					age >= 6
 					opinion = {
 						who = ROOT
@@ -1654,7 +1653,6 @@ character_event = {
 				limit = {
 					is_incapable = no
 					prisoner = no
-					is_child_of = ROOT
 					age >= 6
 					opinion = {
 						who = ROOT
@@ -1668,8 +1666,8 @@ character_event = {
 		}
 		else_if = {
 			limit = {
-				mother = {
-					is_alive = yes
+				any_close_relative = {
+					is_parent_of = ROOT
 					is_incapable = no
 					prisoner = no
 					opinion = {
@@ -1679,28 +1677,10 @@ character_event = {
 					NOT = { is_rival = ROOT }
 				}
 			}
-			mother = {
+			random_close_relative = {
 				if = {
 					limit = {
-						is_alive = yes
-						is_incapable = no
-						prisoner = no
-						opinion = {
-							who = ROOT
-							value >= 0
-						}
-						NOT = { is_rival = ROOT }
-					}
-					save_event_target_as = inspired_letter_target
-					set_character_flag = delighted_parent_flag
-				}
-			}
-		}
-		else = {
-			father = {
-				if = {
-					limit = {
-						is_alive = yes
+						is_parent_of = ROOT
 						is_incapable = no
 						prisoner = no
 						opinion = {

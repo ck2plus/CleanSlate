@@ -36,6 +36,10 @@ letter_event = {
 			duration = -1
 		}
 		set_character_flag = block_payback
+
+		society = {
+			leader = { save_event_target_as = grand_master }
+		}
 	}
 
 	# 50
@@ -248,38 +252,14 @@ character_event = {
 				duration = -1
 			}
 
-			if = {
-				limit = { ROOT = { check_variable = { which = assassins_debt value == 50 } } }
-				set_variable = {
-					which = assassins_debt
-					value = 50
-				}
-				set_variable = {
-					which = twice_assassins_debt
-					value = 100
-				}
+			set_variable = {
+				which = assassins_debt
+				which = ROOT
 			}
-			else_if = {
-				limit = { ROOT = { check_variable = { which = assassins_debt value == 250 } } }
-				set_variable = {
-					which = assassins_debt
-					value = 250
-				}
-				set_variable = {
-					which = twice_assassins_debt
-					value = 500
-				}
-			}
-			else_if = {
-				limit = { ROOT = { check_variable = { which = assassins_debt value == 500 } } }
-				set_variable = {
-					which = assassins_debt
-					value = 500
-				}
-				set_variable = {
-					which = twice_assassins_debt
-					value = 1000
-				}
+
+			set_variable = {
+				which = twice_assassins_debt
+				which = ROOT
 			}
 
 			letter_event = { id = MNM.6006 days = 50 }
@@ -289,12 +269,18 @@ character_event = {
 
 # Donating
 letter_event = {
-	id = MNM.6004
+	id = MNM.6005
 	desc = EVTDESC_MNM_6005
 	border = GFX_event_letter_frame_religion
 	portrait = event_target:grand_master
 
 	is_triggered_only = yes # mnm_assassins_decisions.txt
+
+	immediate = {
+		society = {
+			leader = { save_event_target_as = grand_master }
+		}
+	}
 
 	option = {
 		name = EXCELLENT
@@ -306,7 +292,7 @@ letter_event = {
 			event_target:grand_master = {
 				if = {
 					limit = {
-						ai = no
+						ai = yes
 						has_landed_title = d_hashshashin
 					}
 					wealth = 100
@@ -1166,7 +1152,7 @@ character_event = {
 	}
 }
 
-# Recruit: Sign written delcaration of loyalty to grand master
+# Recruit: Sign written declaration of loyalty to grand master
 character_event = {
 	id = MNM.6029
 	desc = EVTDESC_MNM_6029
@@ -1404,8 +1390,8 @@ character_event = {
 					is_close_relative = ROOT
 				}
 
-				OR = {
-					NOT = { true_religion = shiite }
+				trigger_if = {
+					limit = { true_religion = shiite }
 					trait = cynical
 				}
 			}
@@ -1668,9 +1654,7 @@ character_event = {
 
 		if = {
 			limit = {
-				event_target:assassins_sacrifice = {
-					NOT = { character = ROOT }
-				}
+				NOT = { character = event_target:assassins_sacrifice }
 			}
 			add_friend = event_target:assassins_sacrifice
 		}
@@ -2759,11 +2743,11 @@ letter_event = {
 			sound_effect = assassins_assassinate_character
 
 			if = {
-				limit = { event_target:plot_target = { higher_tier_than = DUKE } }
+				limit = { event_target:plot_target = { higher_real_tier_than = DUKE } }
 				add_society_currency_major_effect = yes
 			}
 			else_if = {
-				limit = { event_target:plot_target = { tier = DUKE } }
+				limit = { event_target:plot_target = { real_tier = DUKE } }
 				add_society_currency_medium_effect = yes
 			}
 			else = {
@@ -2900,11 +2884,11 @@ character_event = {
 			sound_effect = assassins_assassinate_character
 
 			if = {
-				limit = { event_target:plot_target = { higher_tier_than = DUKE } }
+				limit = { event_target:plot_target = { higher_real_tier_than = DUKE } }
 				add_society_currency_major_effect = yes
 			}
 			else_if = {
-				limit = { event_target:plot_target = { tier = DUKE } }
+				limit = { event_target:plot_target = { real_tier = DUKE } }
 				add_society_currency_medium_effect = yes
 			}
 			else = {
@@ -2969,11 +2953,11 @@ letter_event = {
 			sound_effect = assassins_assassinate_character
 
 			if = {
-				limit = { event_target:plot_target = { higher_tier_than = DUKE } }
+				limit = { event_target:plot_target = { higher_real_tier_than = DUKE } }
 				add_society_currency_major_effect = yes
 			}
 			else_if = {
-				limit = { event_target:plot_target = { tier = DUKE } }
+				limit = { event_target:plot_target = { real_tier = DUKE } }
 				add_society_currency_medium_effect = yes
 			}
 			else = {
@@ -3109,6 +3093,13 @@ letter_event = {
 	desc = EVTDESC_MNM_6113
 
 	is_triggered_only = yes
+
+	immediate = {
+		# For localisation
+		FROM = {
+			save_event_target_as = event_target_1_insulter
+		}
+	}
 
 	option = {
 		name = EVTOPTA_MNM_6113
@@ -3257,6 +3248,11 @@ letter_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		# For localisation
+		save_event_target_as = event_target_1_insulter
+	}
+
 	option = {
 		name = EVTOPTA_MNM_6116
 		custom_tooltip = { text = EVTOPTA_MNM_6116_TOOLTIP }
@@ -3388,7 +3384,6 @@ letter_event = {
 	id = MNM.6119
 	desc = EVTDESC_MNM_6119
 	border = GFX_event_letter_frame_intrigue
-#	picture = GFX_evt_melee
 
 	is_triggered_only = yes
 
@@ -3466,8 +3461,9 @@ character_event = {
 				trigger = {
 					ai = no
 					religion = shiite
+					any_realm_province = { NOT = { religion = shiite } }
 				}
-				society_quest_event = { id = MNM.6204 } # Convert a specific holding
+				society_quest_event = { id = MNM.6204 } # Convert a specific province
 			}
 			15 = {
 				trigger = {
@@ -3494,7 +3490,7 @@ character_event = {
 						any_realm_province = {
 							owner = { NOT = { religion = shiite } }
 							any_province_holding = {
-								owner = { NOT = { religion = shiite } }
+								holder_scope = { NOT = { religion = shiite } }
 								OR = {
 									holding_type = temple
 									holding_type = castle
@@ -3748,36 +3744,31 @@ character_event = {
 					set_character_flag = assassins_target_persecutes_shiites
 				}
 			}
-		}
 
-		if = { # Fallback
-			limit = {
-				NOT = { event_target:assassins_target = { always = yes } }
-			}
-			random_playable_ruler = {
-				limit = {
-					assassins_appropriate_target_trigger = yes
-					NOR = {
-						character = ROOT
-						society_member_of = the_assassins
-						religion = shiite
+			fallback = {
+				random_playable_ruler = {
+					limit = {
+						assassins_appropriate_target_trigger = yes
+						NOR = {
+							character = ROOT
+							society_member_of = the_assassins
+							religion = shiite
+						}
 					}
-				}
-				preferred_limit = {
-					OR = {
-						is_evil_trigger = yes
-						trait = zealous
+					preferred_limit = {
+						OR = {
+							is_evil_trigger = yes
+							trait = zealous
+						}
 					}
+					save_event_target_as = assassins_target
+					set_character_flag = assassins_target_fallback
 				}
-				save_event_target_as = assassins_target
-				set_character_flag = assassins_target_fallback
 			}
 		}
 
 		if = {
-			limit = {
-				is_within_diplo_range = event_target:assassins_target
-			}
+			limit = { is_within_diplo_range = event_target:assassins_target }
 			society_quest_event = { id = MNM.6202 }
 		}
 		else = {
@@ -3835,16 +3826,14 @@ society_quest_event = {
 	is_triggered_only = yes
 
 	immediate = { # For loc
-		hidden_effect = {
-			event_target:assassins_target = {
-				any_war = {
-					limit = { defender = { religion = shiite } }
-					defender = { save_event_target_as = shiite_defender }
-				}
-				random_realm_province = {
-					limit = { religion = shiite }
-					save_event_target_as = shiite_province
-				}
+		event_target:assassins_target = {
+			any_war = {
+				limit = { defender = { religion = shiite } }
+				defender = { save_event_target_as = shiite_defender }
+			}
+			random_realm_province = {
+				limit = { religion = shiite }
+				save_event_target_as = shiite_province
 			}
 		}
 	}
@@ -3925,7 +3914,7 @@ society_quest_event = {
 						mult_modifier = { event_target:assassins_target = { real_tier = KING } factor = 2.5 }
 						mult_modifier = { event_target:assassins_target = { real_tier = EMPEROR } factor = 5 }
 
-						character_event = { id = MNM.6949 } # Clears quest
+						character_event = { id = MNM.6949 } # Clears quest (failure)
 					}
 				}
 			}
@@ -3973,7 +3962,7 @@ character_event = {
 	}
 
 	immediate = {
-		character_event = { id = MNM.6100 }
+		character_event = { id = MNM.6100 } # Plotter sees an opportunity
 	}
 }
 
@@ -4016,7 +4005,7 @@ character_event = {
 		sound_effect = assassins_assassinate_character
 
 		if = {
-			limit = { event_target:plot_target = { higher_tier_than = DUKE } }
+			limit = { event_target:plot_target = { higher_real_tier_than = DUKE } }
 			add_society_currency_medium_effect = yes
 		}
 		else = {
@@ -4033,15 +4022,17 @@ society_quest_event = {
 	desc = {
 		text = EVTDESC_MNM_6204_A
 		trigger = {
-			event_target:conversion_province = { owner = { character = ROOT } }
+			owns = event_target:conversion_province
 			NOT = { has_alternate_start_parameter = { key = religion_names value = random } }
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_6204_B
 		trigger = {
-			event_target:conversion_province = { NOT = { owner = { character = ROOT } } }
-			NOT = { has_alternate_start_parameter = { key = religion_names value = random } }
+			NOR = {
+				owns = event_target:conversion_province
+				has_alternate_start_parameter = { key = religion_names value = random }
+			}
 		}
 	}
 	desc = {
@@ -4059,7 +4050,7 @@ society_quest_event = {
 				NOT = { religion = shiite }
 			}
 			preferred_limit = {
-				owner = { character = ROOT }
+				owned_by = ROOT
 			}
 			preferred_limit = {
 				owner = { NOT = { religion = shiite } }
@@ -4073,6 +4064,8 @@ society_quest_event = {
 		name = ACCEPT
 
 		event_target:conversion_province = {
+			show_scope_change = no
+
 			set_quest_target = {
 				id = quest_the_assassins_convert_province
 				holder = ROOT
@@ -4109,63 +4102,6 @@ province_event = {
 	}
 }
 
-# character_event = { # Event for clearing quest_the_assassins_convert_province
-#    id = MNM.6230
-#    hide_window = yes
-#    is_triggered_only = yes
-#   	trigger = {
-#   		FROM = {
-#   			tier = COUNT
-#   			location = { is_quest_target = yes }
-#   			OR = {
-#	   			location = {
-#	   				any_quester_targeting_this = {
-#	   					character = FROMFROM
-#	   					NOT = { is_vassal_or_below = ROOT }
-#	   					has_quest = quest_the_assassins_convert_province
-#	   				}
-#	   			}
-#	   			location = {
-#	   				any_quester_targeting_this = {
-#	   					is_vassal_or_below = FROMFROM
-#	   					NOR = {
-#	   						character = ROOT
-#	   						is_vassal_or_below = ROOT
-#	   					}
-#	   					has_quest = quest_the_assassins_convert_province
-#	   				}
-#	   			}
-#   			}
-#   		}
-#   	}
-#   	immediate = {
-#   		FROM = {
-#   			location = {
-#   				any_quester_targeting_this = {
-#		   			limit = {
-#		   				OR = {
-#		   					AND = {
-#		   						character = FROMFROM
-#			   					NOT = { is_vassal_or_below = ROOT }
-#			   					has_quest = quest_the_assassins_convert_province
-#		   					}
-#		   					AND = {
-#		   						is_vassal_or_below = FROMFROM
-#			   					NOR = {
-#			   						character = ROOT
-#			   						is_vassal_or_below = ROOT
-#			   					}
-#		   					}
-#		   				}
-#		   				has_quest = quest_the_assassins_convert_province
-#		   			}
-#					wealth = 5000
-#		   		}
-#   			}
-#   		}
-#   	}
-# }
-
 # Mission completion
 character_event = {
 	id = MNM.6205
@@ -4185,10 +4121,6 @@ character_event = {
 	hide_from = yes
 
 	trigger = { religion = FROM }
-
-	immediate = {
-		FROM = { save_event_target_as = conversion_province }
-	}
 
 	option = {
 		trigger = {
@@ -4239,9 +4171,10 @@ society_quest_event = {
 
 	option = {
 		name = ACCEPT
-		show_portrait = event_target:owes_the_assassins
 
 		event_target:owes_the_assassins = {
+			show_scope_change = no
+
 			set_quest_target = {
 				id = quest_the_assassins_collect_debt
 				holder = ROOT
@@ -4995,7 +4928,7 @@ society_quest_event = {
 					}
 				}
 				preferred_limit = {
-					owner = { character = PREVPREV }
+					owned_by = PREVPREV
 				}
 				random_province_holding = {
 					limit = {
@@ -5020,9 +4953,10 @@ society_quest_event = {
 
 	option = {
 		name = ACCEPT
-		show_portrait = event_target:infidel_holding_owner
 
 		event_target:infidel_holding = {
+			show_scope_change = no
+
 			set_quest_target = {
 				id = quest_the_assassins_occupy_holding
 				holder = ROOT
@@ -5308,11 +5242,9 @@ character_event = {
 			10 = { # Discover a plot
 				trigger = {
 					top_liege = {
-						any_realm_character = {
-							has_plot = yes
-							NOT = {
-								plot_is_known_by = ROOT
-							}
+						any_plotter = {
+							same_realm = ROOT
+							NOT = { plot_is_known_by = ROOT }
 						}
 					}
 				}
@@ -5330,7 +5262,7 @@ character_event = {
 					trait = possessed
 				}
 
-				character_event = { id = MNM.6811 }
+				character_event = { id = MNM.6811 days = 4 }
 			}
 			10 = { # Gain a lover, perhaps your spouse?
 				trigger = {
@@ -5631,43 +5563,46 @@ character_event = {
 				character_event = { id = MNM.6818 days = 4 }
 			}
 		}
+
 		# Gives addiction
-		random = {
-			chance = 5
-
-			character_event = {
-				id = MNM.6803
-				days = 20
-				random = 20
-			}
-
-			trigger = {
+		if = {
+			limit = {
 				NOT = { has_character_modifier = hashish_addict }
 			}
 
-			mult_modifier = {
-				factor = 4
-				has_character_modifier = drugs_timer
-			}
-			mult_modifier = {
-				factor = 1.5
-				has_character_flag = drugs_big_dose
-			}
-			mult_modifier = {
-				factor = 0.5
-				has_character_flag = drugs_small_dose
-			}
-			mult_modifier = {
-				factor = 1.5
-				trait = gluttonous
-			}
-			mult_modifier = {
-				factor = 0.5
-				trait = temperate
-			}
-			mult_modifier = {
-				factor = 2
-				has_mental_disorder_trigger = yes
+			random = {
+				chance = 5
+
+				character_event = {
+					id = MNM.6803
+					days = 20
+					random = 20
+				}
+
+				mult_modifier = {
+					factor = 4
+					has_character_modifier = drugs_timer
+				}
+				mult_modifier = {
+					factor = 1.5
+					has_character_flag = drugs_big_dose
+				}
+				mult_modifier = {
+					factor = 0.5
+					has_character_flag = drugs_small_dose
+				}
+				mult_modifier = {
+					factor = 1.5
+					trait = gluttonous
+				}
+				mult_modifier = {
+					factor = 0.5
+					trait = temperate
+				}
+				mult_modifier = {
+					factor = 2
+					has_mental_disorder_trigger = yes
+				}
 			}
 		}
 
@@ -5847,7 +5782,7 @@ character_event = {
 			}
 		}
 
-		character_event = { id = MNM.6804 days = 100 }
+		repeat_event = { id = MNM.6804 days = 100 }
 	}
 }
 
@@ -5969,8 +5904,9 @@ character_event = {
 			40 = {
 				trigger = {
 					top_liege = {
-						any_realm_character = {
-							plot_target_char = { character = ROOT }
+						any_plotter = {
+							target = ROOT
+							same_realm = ROOT
 							NOT = { plot_is_known_by = ROOT }
 						}
 					}
@@ -5980,8 +5916,10 @@ character_event = {
 					factor = 0.5
 					NOT = {
 						top_liege = {
-							any_realm_lord = {
-								plot_target_char = { character = ROOT }
+							any_plotter = {
+								target = ROOT
+								is_ruler = yes
+								same_realm = ROOT
 								NOT = { plot_is_known_by = ROOT }
 							}
 						}
@@ -5991,33 +5929,25 @@ character_event = {
 				save_event_target_as = drug_plotter_target
 
 				top_liege = {
-					random_realm_lord = {
+					random_plotter = {
+						target = ROOT
+
 						limit = {
-							plot_target_char = { character = ROOT }
+							same_realm = ROOT
 							NOT = { plot_is_known_by = ROOT }
 						}
-						save_event_target_as = drug_plotter_reveal
-						ROOT = { character_event = { id = MNM.68112 days = 4 } }
-					}
 
-					if = {
-						limit = {
-							NOT = { event_target:drug_plotter_reveal = { always = yes } }
+						preferred_limit = {
+							is_ruler = yes
 						}
-						random_realm_character = {
-							limit = {
-								plot_target_char = { character = ROOT }
-								NOT = { plot_is_known_by = ROOT }
-							}
-							save_event_target_as = drug_plotter_reveal
-							ROOT = { character_event = { id = MNM.68112 days = 4 } }
-						}
+
+						save_event_target_as = drug_plotter_reveal
 					}
 				}
 			}
 			20 = {
 				trigger = {
-					any_realm_character = {
+					any_plotter = {
 						plot_target_char = { dynasty = ROOT }
 						NOT = { plot_is_known_by = ROOT }
 					}
@@ -6025,76 +5955,61 @@ character_event = {
 
 				mult_modifier = {
 					factor = 1.5
-					any_realm_lord = {
+					any_plotter = {
 						plot_target_char = { dynasty = ROOT }
+						is_ruler = yes
 						NOT = { plot_is_known_by = ROOT }
 					}
 				}
 
-				random_realm_lord = {
+				random_plotter = {
 					limit = {
-						has_plot = yes
+						plot_target_char = { dynasty = ROOT }
 						NOT = { plot_is_known_by = ROOT }
-						plot_target_char = {
-							dynasty = ROOT
-						}
+					}
+
+					preferred_limit = {
+						is_ruler = yes
 					}
 
 					save_event_target_as = drug_plotter_reveal
 					plot_target_char = { save_event_target_as = drug_plotter_target }
-					ROOT = { character_event = { id = MNM.68112 days = 4 } }
-				}
-				if = {
-					limit = {
-						NOT = { event_target:drug_plotter_reveal = { always = yes } }
-					}
-					random_realm_character = {
-						limit = {
-							has_plot = yes
-							NOT = { plot_is_known_by = ROOT }
-						}
-
-						save_event_target_as = drug_plotter_reveal
-						plot_target_char = { save_event_target_as = drug_plotter_target }
-						ROOT = { character_event = { id = MNM.68112 days = 4 } }
-					}
 				}
 			}
 			10 = {
 				trigger = {
-					any_realm_character = {
-						has_plot = yes
+					any_plotter = {
+						is_vassal_or_below_of = ROOT
 						NOT = { plot_is_known_by = ROOT }
 					}
 				}
 
-				random_realm_character = {
+				random_plotter = {
 					limit = {
-						has_plot = yes
+						is_vassal_or_below_of = ROOT
 						NOT = { plot_is_known_by = ROOT }
 					}
 
 					save_event_target_as = drug_plotter_reveal
 					plot_target_char = { save_event_target_as = drug_plotter_target }
-					ROOT = { character_event = { id = MNM.68112 days = 4 } }
-
 				}
 			}
 			1 = {
 				top_liege = {
-					random_realm_character = {
+					random_plotter = {
 						limit = {
-							has_plot = yes
+							same_realm = ROOT
 							NOT = { plot_is_known_by = ROOT }
 						}
 
 						save_event_target_as = drug_plotter_reveal
 						plot_target_char = { save_event_target_as = drug_plotter_target }
-						ROOT = { character_event = { id = MNM.68112 days = 4 } }
 					}
 				}
 			}
 		}
+
+		character_event = { id = MNM.68112 }
 	}
 }
 
@@ -6110,7 +6025,7 @@ character_event = {
 	desc = {
 		text = EVTDESCA_MNM_68112
 		trigger = {
-			event_target:drug_plotter_target = { character = ROOT }
+			character = event_target:drug_plotter_target
 			event_target:drug_plotter_reveal = {
 				OR = {
 					has_plot = plot_kill_character
@@ -6123,7 +6038,7 @@ character_event = {
 	desc = {
 		text = EVTDESCB_MNM_68112
 		trigger = {
-			event_target:drug_plotter_target = { character = ROOT }
+			character = event_target:drug_plotter_target
 			event_target:drug_plotter_reveal = {
 				NOR = {
 					has_plot = plot_kill_character
@@ -6136,7 +6051,7 @@ character_event = {
 	desc = {
 		text = EVTDESCC_MNM_68112
 		trigger = {
-			event_target:drug_plotter_target = { NOT = { character = ROOT } }
+			NOT = { character = event_target:drug_plotter_target }
 			event_target:drug_plotter_reveal = {
 				OR = {
 					has_plot = plot_kill_character
@@ -6149,7 +6064,7 @@ character_event = {
 	desc = {
 		text = EVTDESCD_MNM_68112
 		trigger = {
-			event_target:drug_plotter_target = { NOT = { character = ROOT } }
+			NOT = { character = event_target:drug_plotter_target }
 			event_target:drug_plotter_reveal = {
 				NOR = {
 					has_plot = plot_kill_character
@@ -6167,7 +6082,7 @@ character_event = {
 		name = {
 			text = EVTOPTA_MNM_68112
 			trigger = {
-				event_target:drug_plotter_target = { character = ROOT }
+				character = event_target:drug_plotter_target
 				event_target:drug_plotter_reveal = {
 					OR = {
 						has_plot = plot_kill_character
@@ -6179,7 +6094,7 @@ character_event = {
 		name = {
 			text = EVTOPTB_MNM_68112
 			trigger = {
-				event_target:drug_plotter_target = { character = ROOT }
+				character = event_target:drug_plotter_target
 				event_target:drug_plotter_reveal = {
 					NOR = {
 						has_plot = plot_kill_character
@@ -6191,7 +6106,7 @@ character_event = {
 		name = {
 			text = EVTOPTC_MNM_68112
 			trigger = {
-				event_target:drug_plotter_target = { NOT = { character = ROOT } }
+				NOT = { character = event_target:drug_plotter_target }
 				event_target:drug_plotter_reveal = {
 					OR = {
 						has_plot = plot_kill_character
@@ -6203,9 +6118,9 @@ character_event = {
 		name = {
 			text = EVTOPTD_MNM_68112
 			trigger = {
-				event_target:drug_plotter_target = { NOT = { character = ROOT } }
+				NOT = { character = event_target:drug_plotter_target }
 				event_target:drug_plotter_reveal = {
-					NOT = {
+					NOR = {
 						has_plot = plot_kill_character
 						has_plot = plot_kill_spouse
 					}
@@ -6355,9 +6270,9 @@ character_event = {
 
 			random_spouse = {
 				limit = {
-					OR = {
-						has_lover = no
-						is_lover = ROOT
+					trigger_if = {
+						limit = { has_lover = yes }
+						NOT = { is_lover = ROOT }
 					}
 				}
 				save_event_target_as = drug_cheater_spouse
@@ -6391,38 +6306,29 @@ character_event = {
 	# reveal
 	option = {
 		name = EVTOPTA_MNM_6813
-		if = {
-			limit = {
-				event_target:drug_cheater_lover = {
-					is_female = no
-					same_sex = event_target:drug_cheater_spouse
-				}
-			}
-			event_target:drug_cheater_lover = {
-				show_scope_change = no
+
+		event_target:drug_cheater_lover = {
+			show_scope_change = no
+
+			if = {
+				limit = { same_sex = event_target:drug_cheater_spouse }
 
 				add_character_modifier = {
 					name = known_sodomite
 					duration = -1
 				}
-			}
-			event_target:drug_cheater_spouse = {
-				show_scope_change = no
 
-				add_character_modifier = {
-					name = known_sodomite
-					duration = -1
-				}
-			}
-		}
-		if = {
-			limit = {
 				event_target:drug_cheater_spouse = {
-					dynasty = event_target:drug_cheater_lover # TODO: make sure this doesn't have the 'dynasty = liege' issue
+					show_scope_change = no
+
+					add_character_modifier = {
+						name = known_sodomite
+						duration = -1
+					}
 				}
 			}
-			event_target:drug_cheater_lover = {
-				show_scope_change = no
+			else_if = {
+				limit = { dynasty = event_target:drug_cheater_spouse } # TODO: make sure this doesn't have the 'dynasty = liege' issue
 
 				if = {
 					limit = { is_female = no }
@@ -6437,29 +6343,26 @@ character_event = {
 						duration = -1
 					}
 				}
-			}
-			event_target:drug_cheater_spouse = {
-				show_scope_change = no
 
-				if = {
-					limit = { is_female = no }
-					add_character_modifier = {
-						name = incestuous_adulterer
-						duration = -1
+				event_target:drug_cheater_spouse = {
+					show_scope_change = no
+
+					if = {
+						limit = { is_female = no }
+						add_character_modifier = {
+							name = incestuous_adulterer
+							duration = -1
+						}
+					}
+					else = {
+						add_character_modifier = {
+							name = incestuous_adulteress
+							duration = -1
+						}
 					}
 				}
-				else = {
-					add_character_modifier = {
-						name = incestuous_adulteress
-						duration = -1
-					}
-				}
 			}
-		}
-		else = {
-			event_target:drug_cheater_lover = {
-				show_scope_change = no
-
+			else = {
 				if = {
 					limit = { is_female = no }
 
@@ -6474,22 +6377,23 @@ character_event = {
 						duration = -1
 					}
 				}
-			}
-			event_target:drug_cheater_lover = {
-				show_scope_change = no
 
-				if = {
-					limit = { is_female = no }
+				event_target:drug_cheater_lover = {
+					show_scope_change = no
 
-					add_character_modifier = {
-						name = adulterer
-						duration = -1
+					if = {
+						limit = { is_female = no }
+
+						add_character_modifier = {
+							name = adulterer
+							duration = -1
+						}
 					}
-				}
-				else = {
-					add_character_modifier = {
-						name = adulteress
-						duration = -1
+					else = {
+						add_character_modifier = {
+							name = adulteress
+							duration = -1
+						}
 					}
 				}
 			}
@@ -6794,7 +6698,7 @@ character_event = {
 
 			reverse_opinion = {
 				name = opinion_threatened_me
-				who = FROMFROM
+				who = FROM
 				years = 5
 			}
 		}
@@ -6937,7 +6841,6 @@ character_event = {
 			else = { # Means you got this as a pulse-event
 				random_child = {
 					limit = {
-						is_child_of = ROOT
 						age >= 12
 						age < 21
 						is_ruler = no
@@ -6956,7 +6859,6 @@ character_event = {
 
 				random_child = {
 					limit = {
-						is_child_of = ROOT
 						age >= 12
 						age < 21
 						is_ruler = no
@@ -6978,7 +6880,6 @@ character_event = {
 
 				random_child = {
 					limit = {
-						is_child_of = ROOT
 						age >= 12
 						age < 21
 						is_ruler = no
@@ -7082,9 +6983,8 @@ character_event = {
 		clr_character_flag = is_using_train_protege_decision
 
 		if = {
-			limit = {
-				event_target:assassin_protege = { is_child_of = ROOT }
-			}
+			limit = { is_parent_of = event_target:assassin_protege  }
+
 			reverse_opinion = {
 				name = opinion_parental_praise
 				who = event_target:assassin_protege
@@ -7219,18 +7119,28 @@ character_event = {
 	}
 
 	after = {
-		event_target:assassin_protege = {
-			set_quest_target = {
-				id = quest_the_assassins_protege
-				society = the_assassins
-				holder = ROOT
-			}
-		}
+		hidden_effect = {
+			if = {
+				limit = {
+					event_target:assassin_protege = { always = yes }
+				}
 
-		character_event = {
-			id = MNM.6252 # specialization event
-			months = 2
-			random = 20
+				event_target:assassin_protege = {
+					show_scope_change = no
+
+					set_quest_target = {
+						id = quest_the_assassins_protege
+						society = the_assassins
+						holder = ROOT
+					}
+				}
+
+				character_event = {
+					id = MNM.6252 # specialization event
+					months = 2
+					random = 20
+				}
+			}
 		}
 	}
 }
@@ -7469,7 +7379,6 @@ character_event = { # good outcome
 		custom_tooltip = { text = EVTOPTA_MNM_6254_TT }
 
 		set_character_flag = apprentice_did_great
-		character_event = { id = MNM.6261 days = 25 }
 	}
 }
 
@@ -7507,8 +7416,6 @@ character_event = { # mediocre outcome
 			show_scope_change = no
 			add_maimed_trait_effect = yes
 		}
-
-		character_event = { id = MNM.6261 days = 25 }
 	}
 }
 
@@ -7784,23 +7691,6 @@ character_event = { # Fallback - apprentice has died somehow during chain
 	}
 }
 
-# CleanSlate: this seems superfluous?
-character_event = { # Fallback doublecheck - apprentice died before the Assassins could be notified of the success (leads to fail of mission)
-	id = MNM.6261
-
-	hide_window = yes
-	is_triggered_only = yes
-
-	has_character_flag = training_protege
-
-	immediate = {
-		if = {
-			limit = { event_target:assassin_protege = { is_alive = yes } }
-			character_event = { id = MNM.6259 }
-		}
-	}
-}
-
 ### INTERACTIONS###
 
 # Interaction: Friend or foe?
@@ -7866,7 +7756,7 @@ character_event = {
 					}
 				}
 				preferred_limit = {
-					age_diff = { who = ROOT years < 5 }
+					age_diff = { who = ROOT years >= 5 }
 				}
 				save_event_target_as = friend_or_foe
 			}
@@ -8609,11 +8499,10 @@ character_event = {
 					society_rank >= 3
 				}
 				save_event_target_as = assassins_plotter
+				plot_target_char = { save_event_target_as = assassin_quest_target }
 			}
 		}
-		event_target:assassins_plotter = {
-			plot_target_char = { save_event_target_as = assassin_quest_target }
-		}
+
 		plot_target_char = { save_event_target_as = my_quest_target }
 	}
 
@@ -8625,8 +8514,7 @@ character_event = {
 		}
 		name = EVTOPTA_MNM_6912
 
-		event_target:assassins_plotter = { back_plot = ROOT }
-
+		reverse_back_plot = event_target:assassins_plotter
 		back_plot = event_target:assassins_plotter
 
 		reverse_opinion = {
@@ -8968,6 +8856,8 @@ character_event = {
 
 	}
 
+	### I found out their secret, what do?
+
 	# Promote me
 	option = {
 		name = EVTOPTA_MNM_6922
@@ -9102,7 +8992,7 @@ character_event = {
 			}
 		}
 
-		# Make every apropriate courtier member of society
+		# Make every appropriate courtier member of society
 		if = {
 			limit = {
 				primary_title = { title = d_hashshashin }

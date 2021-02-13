@@ -278,7 +278,7 @@ character_event = {
 	option = {
 		name = EVTOPTA_MNM_9103
 		trigger = { real_tier = EMPEROR }
-		
+
 		custom_tooltip = { text = EVTOPTA_MNM_9103_TT }
 
 		scaled_wealth = { value = -3.5 min = -300 max = -2000 }
@@ -313,6 +313,7 @@ character_event = {
 						NOT = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_artisan_craftsmen
+								bloodline_is_active_for = PREV
 							}
 						}
 					}
@@ -405,6 +406,7 @@ character_event = {
 						NOT = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_artisan_craftsmen
+								bloodline_is_active_for = PREV
 							}
 						}
 					}
@@ -491,6 +493,7 @@ character_event = {
 						NOT = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_artisan_craftsmen
+								bloodline_is_active_for = PREV
 							}
 						}
 					}
@@ -690,12 +693,13 @@ character_event = {
 		random_demesne_province = {
 			limit = {
 				any_neighbor_province = {
-					NOT = { owner = { character = ROOT } }
+					has_owner = yes
+					NOT = { owned_by = ROOT }
 				}
 			}
 			random_neighbor_province = {
 				limit = {
-					NOT = { owner = { character = ROOT } }
+					NOT = { owned_by = ROOT }
 				}
 				save_event_target_as = neighbor_province
 			}
@@ -1091,10 +1095,10 @@ character_event = {
 
 		event_target:smith = {
 			show_scope_change = no
-			
+
 			trigger_switch = {
 				on_trigger = has_character_flag
-				
+
 				weapon_sword = { custom_tooltip = { text = EVTOPTA_MNM_9120_TT_SWORD_EMPEROR } }
 				weapon_scimitar = { custom_tooltip = { text = EVTOPTA_MNM_9120_TT_SWORDSCIMITAR_EMPEROR } }
 				weapon_lance = { custom_tooltip = { text = EVTOPTA_MNM_9120_TT_LANCE_EMPEROR } }
@@ -1138,6 +1142,7 @@ character_event = {
 						NOT = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_artisan_craftsmen
+								bloodline_is_active_for = PREV
 							}
 						}
 					}
@@ -1189,10 +1194,10 @@ character_event = {
 
 		event_target:smith = {
 			show_scope_change = no
-			
+
 			trigger_switch = {
 				on_trigger = has_character_flag
-				
+
 				weapon_sword = {
 					if = {
 						limit = { ROOT = { real_tier = EMPEROR } }
@@ -1292,6 +1297,7 @@ character_event = {
 						NOT = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_artisan_craftsmen
+								bloodline_is_active_for = PREV
 							}
 						}
 					}
@@ -1355,10 +1361,10 @@ character_event = {
 
 		event_target:smith = {
 			show_scope_change = no
-			
+
 			trigger_switch = {
 				on_trigger = has_character_flag
-				
+
 				weapon_bow = {
 					if = {
 						limit = { ROOT = { real_tier = EMPEROR } }
@@ -1414,6 +1420,7 @@ character_event = {
 						NOT = {
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_artisan_craftsmen
+								bloodline_is_active_for = PREV
 							}
 						}
 					}
@@ -1446,9 +1453,7 @@ character_event = {
 
 			trigger = {
 				trigger_if = {
-					limit = {
-						NOT = { religion_group = pagan_group }
-					}
+					limit = { is_allowed_to_loot = no }
 					wealth >= 75
 					yearly_income >= 7.5
 				}
@@ -1491,7 +1496,9 @@ character_event = {
 	}
 }
 
-# Your own smiths have a go
+### Your own smiths have a go
+
+# Don't have an armory
 character_event = {
 	id = MNM.9999
 	picture = GFX_evt_weaponsmith
@@ -1962,7 +1969,7 @@ character_event = {
 
 	immediate = {
 		if = {
-			limit = { NOT = { event_target:smith_employer = { is_alive = yes } } }
+			limit = { event_target:smith_employer = { is_alive = no } }
 			liege = { save_event_target_as = smith_employer }
 		}
 
@@ -2109,7 +2116,7 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = { is_landed = no }
+	trigger = { is_ruler = no }
 
 	fail_trigger_effect = {
 		clear_smith_flags_effect = yes
@@ -2484,16 +2491,15 @@ character_event = {
 		}
 
 		# Give to landed rivals first, then nearby rulers who dislike the employer, else keep for self and run away.
-		if = {
-			limit = {
-				event_target:smith_employer = {
+		event_target:smith_employer = {
+			if = {
+				limit = {
 					any_rival = {
 						is_landed = yes
 						is_within_diplo_range = ROOT
 					}
 				}
-			}
-			event_target:smith_employer = {
+
 				random_rival = {
 					limit = {
 						is_landed = yes
@@ -2502,59 +2508,41 @@ character_event = {
 					save_event_target_as = smith_steal_target
 				}
 			}
-		}
-		else_if = {
-			limit = {
-				event_target:smith_employer = {
+			else_if = {
+				limit = {
 					any_neighbor_independent_ruler = {
 						is_landed = yes
 						opinion = {
-							who = PREV
-							value < -30
-						}
-					}
-				}
-			}
-			event_target:smith_employer = {
-				any_neighbor_independent_ruler = {
-					limit = {
-						is_landed = yes
-						opinion = {
-							who = PREV
-							value < -30
-						}
-					}
-					save_event_target_as = smith_steal_target
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				event_target:smith_employer = {
-					any_neighbor_independent_ruler = {
-						is_landed = yes
-						opinion = {
-							who = PREV
+							who = event_target:smith_employer
 							value < 0
 						}
 					}
 				}
-			}
-			event_target:smith_employer = {
-				any_neighbor_independent_ruler = {
+
+				random_neighbor_independent_ruler = {
 					limit = {
 						is_landed = yes
 						opinion = {
-							who = PREV
+							who = event_target:smith_employer
 							value < 0
 						}
 					}
+
+					preferred_limit = {
+						opinion = {
+							who = event_target:smith_employer
+							value < -30
+						}
+					}
+
 					save_event_target_as = smith_steal_target
 				}
 			}
-		}
-		else = {
-			save_event_target_as = smith_steal_target
+			else = {
+				event_target:smith = {
+					save_event_target_as = smith_steal_target
+				}
+			}
 		}
 
 		any_artifact = {
@@ -2617,35 +2605,32 @@ character_event = {
 	option = {
 		name = EVTOPTA_MNM_9132
 
-		event_target:smith_steal_target = {
-			show_scope_change = no
-
-			any_artifact = {
-				limit = { has_artifact_flag = stolen_by_smith }
-				clr_artifact_flag = stolen_by_smith
-			}
-
-			reverse_opinion = {
-				name = opinion_thief
-				who = ROOT
-				years = 10
-			}
+		opinion = {
+			name = opinion_thief
+			who = event_target:smith_steal_target
+			years = 10
 		}
 
-		event_target:smith = {
-			show_scope_change = no
+		opinion = {
+			name = opinion_thief
+			who = event_target:smith
+			years = 10
+		}
 
-			reverse_opinion = {
-				name = opinion_thief
-				who = ROOT
-				years = 10
+		hidden_effect = {
+			event_target:smith_steal_target = {
+				any_artifact = {
+					limit = { has_artifact_flag = stolen_by_smith }
+					clr_artifact_flag = stolen_by_smith
+				}
 			}
 
-			hidden_effect = {
+			event_target:smith = {
 				remove_nickname = yes
 				clear_smith_flags_effect = yes
 			}
 		}
+
 		ai_chance = {
 			factor = 1
 
@@ -2711,27 +2696,11 @@ character_event = {
 		random_list = {
 			20 = { # Smith teaches someone stewardship
 				trigger = {
-					OR = {
-						any_courtier = {
-							is_inaccessible_or_incapable_trigger = no
-							age > 12
-							stewardship < 14
-							NOT = { character = event_target:smith }
-						}
-						any_friend = {
-							is_inaccessible_or_incapable_trigger = no
-							vassal_of = ROOT
-							age > 12
-							stewardship < 14
-							NOT = { character = event_target:smith }
-						}
-						any_child = {
-							is_inaccessible_or_incapable_trigger = no
-							vassal_of = ROOT
-							age > 12
-							stewardship < 14
-							NOT = { character = event_target:smith }
-						}
+					any_courtier_or_vassal = {
+						is_inaccessible_or_incapable_trigger = no
+						age > 12
+						stewardship < 14
+						NOT = { character = event_target:smith }
 					}
 				}
 
@@ -2807,6 +2776,7 @@ character_event = {
 					NOT = {
 						any_owned_bloodline = {
 							has_bloodline_flag = bloodline_artisan_craftsmen # A Legendary Bloodline
+							bloodline_is_active_for = PREV
 						}
 					}
 				}
@@ -2857,45 +2827,18 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		random_child = {
+		random_courtier_or_vassal = {
 			limit = {
 				is_inaccessible_or_incapable_trigger = no
-				vassal_of = ROOT
 				age > 12
 				stewardship < 14
+				NOT = { character = event_target:smith }
 			}
+
+			preferred_limit = { is_child_of = ROOT }
+			preferred_limit = { is_friend = ROOT }
+
 			save_event_target_as = smith_event_target
-		}
-
-		if = {
-			limit = {
-				NOT = { event_target:smith_event_target = { always = yes } }
-			}
-			random_friend = {
-				limit = {
-					is_inaccessible_or_incapable_trigger = no
-					vassal_of = ROOT
-					age > 12
-					stewardship < 14
-					NOT = { character = event_target:smith }
-				}
-				save_event_target_as = smith_event_target
-			}
-		}
-
-		if = {
-			limit = {
-				NOT = { event_target:smith_event_target = { always = yes } }
-			}
-			random_courtier = {
-				limit = {
-					is_inaccessible_or_incapable_trigger = no
-					age > 12
-					stewardship < 14
-					NOT = { character = event_target:smith }
-				}
-				save_event_target_as = smith_event_target
-			}
 		}
 	}
 
@@ -2904,6 +2847,7 @@ character_event = {
 		prestige = -50
 
 		event_target:smith_event_target = {
+			show_scope_change = no
 
 			change_stewardship = 1
 
@@ -2912,20 +2856,18 @@ character_event = {
 				who = ROOT
 				years = 1
 			}
-		}
-		event_target:smith = {
-			show_scope_change = no
 
-			reverse_opinion = {
+			opinion = {
 				name = opinion_grateful
-				who = event_target:smith_event_target
+				who = event_target:smith
 				years = 1
 			}
-			reverse_opinion = {
-				name = opinion_grateful
-				who = ROOT
-				years = 1
-			}
+		}
+
+		opinion = {
+			name = opinion_grateful
+			who = event_target:smith
+			years = 1
 		}
 	}
 
@@ -3156,7 +3098,7 @@ character_event = {
 		hidden_effect = {
 			clear_delayed_event = { id = MNM.9111 }
 			clear_smith_employer_flags_effect = yes
-			
+
 			event_target:smith = {
 				remove_nickname = yes
 				clear_smith_flags_effect = yes

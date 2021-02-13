@@ -1736,8 +1736,8 @@ character_event = { # Hunt Apostates meta event
 					}
 				}
 
-				# A devil worshiper, and I'm amazingly good at my job
-				any_realm_character = {
+				AND = {
+					# A devil worshiper, and I'm amazingly good at my job
 					ROOT = {
 						trigger_if = {
 							limit = { society_member_of = monastic_order_dominican }
@@ -1748,41 +1748,44 @@ character_event = { # Hunt Apostates meta event
 						}
 					}
 
-					is_devil_worshiper_trigger = yes
-					is_adult = yes
-					prisoner = no
-					ai = yes
+					any_realm_character = {
 
-					NOR = {
-						character = ROOT # Don't catch yourself
-						character = PREV # Don't catch your liege
-						same_society_as = ROOT # Nor your brethren
-						same_society_as = PREV # Nor liege's brethren
+						is_devil_worshiper_trigger = yes
+						is_adult = yes
+						prisoner = no
+						ai = yes
 
-						# If you share the same secret religion, dont catch them
-						secret_religion = {
-							target = ROOT
-							target_type = true
+						NOR = {
+							character = ROOT # Don't catch yourself
+							character = PREV # Don't catch your liege
+							same_society_as = ROOT # Nor your brethren
+							same_society_as = PREV # Nor liege's brethren
+
+							# If you share the same secret religion, dont catch them
+							secret_religion = {
+								target = ROOT
+								target_type = true
+							}
+
+							# If they share secret religion with the liege, dont catch them
+							secret_religion = {
+								target = PREV
+								target_type = true
+							}
+
+							reverse_has_opinion_modifier = {
+								name = opinion_accused_apostate
+								who = PREV
+							}
+
+							has_character_modifier = highly_suspect
+							has_character_modifier = under_suspicion
 						}
-
-						# If they share secret religion with the liege, dont catch them
-						secret_religion = {
-							target = PREV
-							target_type = true
-						}
-
-						reverse_has_opinion_modifier = {
-							name = opinion_accused_apostate
-							who = PREV
-						}
-
-						has_character_modifier = highly_suspect
-						has_character_modifier = under_suspicion
 					}
 				}
 
-				# Someone random, and I'm incompetent
-				any_realm_character = {
+				AND = {
+					# Someone random, and I'm incompetent
 					ROOT = {
 						OR = {
 							learning < 8
@@ -1790,34 +1793,36 @@ character_event = { # Hunt Apostates meta event
 						}
 					}
 
-					lower_real_tier_than = COUNT
-					is_adult = yes
-					prisoner = no
-					has_secret_religion = no
+					any_realm_character = {
+						lower_real_tier_than = COUNT
+						is_adult = yes
+						prisoner = no
+						has_secret_religion = no
 
-					NOR = {
-						has_character_modifier = highly_suspect
-						has_character_modifier = under_suspicion
-						character = ROOT # Don't catch yourself
-						character = PREV # Don't catch your liege
-						same_society_as = ROOT # Nor your brethren
-						same_society_as = PREV # Nor liege's brethren
+						NOR = {
+							has_character_modifier = highly_suspect
+							has_character_modifier = under_suspicion
+							character = ROOT # Don't catch yourself
+							character = PREV # Don't catch your liege
+							same_society_as = ROOT # Nor your brethren
+							same_society_as = PREV # Nor liege's brethren
 
-						# If you share the same secret religion, dont catch them
-						secret_religion = {
-							target = ROOT
-							target_type = true
-						}
+							# If you share the same secret religion, dont catch them
+							secret_religion = {
+								target = ROOT
+								target_type = true
+							}
 
-						# If they share secret religion with the liege, dont catch them
-						secret_religion = {
-							target = PREV
-							target_type = true
-						}
+							# If they share secret religion with the liege, dont catch them
+							secret_religion = {
+								target = PREV
+								target_type = true
+							}
 
-						reverse_has_opinion_modifier = {
-							name = opinion_accused_apostate
-							who = PREV
+							reverse_has_opinion_modifier = {
+								name = opinion_accused_apostate
+								who = PREV
+							}
 						}
 					}
 				}
@@ -2007,40 +2012,8 @@ character_event = { # Hunt Apostates meta event
 				set_character_flag = apostate_secret_religion
 			}
 
-			# Devil worshipers without any suspicion
-			random_realm_character = {
+			if = {
 				limit = {
-					is_devil_worshiper_trigger = yes
-					is_adult = yes
-					prisoner = no
-					ai = yes
-
-					NOR = {
-						has_character_modifier = highly_suspect
-						has_character_modifier = under_suspicion
-						character = ROOT # Don't catch yourself
-						character = event_target:my_liege # Don't catch your liege
-						same_society_as = ROOT # Nor your brethren
-						same_society_as = event_target:my_liege # Nor liege's brethren
-
-						# If you share the same secret religion, dont catch them
-						secret_religion = {
-							target = ROOT
-							target_type = true
-						}
-
-						# If they share secret religion with the liege, dont catch them
-						secret_religion = {
-							target = PREV
-							target_type = true
-						}
-
-						reverse_has_opinion_modifier = {
-							name = opinion_accused_apostate
-							who = event_target:my_liege
-						}
-					}
-
 					ROOT = {
 						trigger_if = {
 							limit = { society_member_of = monastic_order_dominican }
@@ -2052,8 +2025,44 @@ character_event = { # Hunt Apostates meta event
 					}
 				}
 
-				save_event_target_as = no_suspicion
-				set_character_flag = apostate_no_suspicion
+				# Devil worshipers without any suspicion
+				random_realm_character = {
+					limit = {
+						is_devil_worshiper_trigger = yes
+						is_adult = yes
+						prisoner = no
+						ai = yes
+
+						NOR = {
+							has_character_modifier = highly_suspect
+							has_character_modifier = under_suspicion
+							character = ROOT # Don't catch yourself
+							character = event_target:my_liege # Don't catch your liege
+							same_society_as = ROOT # Nor your brethren
+							same_society_as = event_target:my_liege # Nor liege's brethren
+
+							# If you share the same secret religion, dont catch them
+							secret_religion = {
+								target = ROOT
+								target_type = true
+							}
+
+							# If they share secret religion with the liege, dont catch them
+							secret_religion = {
+								target = PREV
+								target_type = true
+							}
+
+							reverse_has_opinion_modifier = {
+								name = opinion_accused_apostate
+								who = event_target:my_liege
+							}
+						}
+					}
+
+					save_event_target_as = no_suspicion
+					set_character_flag = apostate_no_suspicion
+				}
 			}
 
 			# Innocent person!
@@ -2140,7 +2149,7 @@ character_event = { # Hunt Apostates meta event
 
 		if = { # If there is someone who is highly suspicious, always succeed
 			limit = {
-				event_target:highly_suspected_society_member = { is_alive = yes }
+				event_target:highly_suspected_society_member = { always = yes }
 				NOT = { event_target:accused_apostate = { always = yes } }
 			}
 
@@ -2151,7 +2160,7 @@ character_event = { # Hunt Apostates meta event
 
 		if = { # If there is someone semi-suspicious, succeed a bit less often
 			limit = {
-				event_target:suspected_society_member = { is_alive = yes }
+				event_target:suspected_society_member = { always = yes }
 				NOT = { event_target:accused_apostate = { always = yes } }
 			}
 
@@ -2226,7 +2235,7 @@ character_event = { # Hunt Apostates meta event
 
 		if = { # If there is someone with a secret religion, only succeed if you're really good
 			limit = {
-				event_target:suspected_apostate = { is_alive = yes }
+				event_target:suspected_apostate = { always = yes }
 				NOT = { event_target:accused_apostate = { always = yes } }
 			}
 
@@ -2287,7 +2296,7 @@ character_event = { # Hunt Apostates meta event
 
 		if = { # If there is a devil worshiper without any level of suspicion, only succeed if you're amazingly good
 			limit = {
-				event_target:no_suspicion = { is_alive = yes }
+				event_target:no_suspicion = { always = yes }
 				NOT = { event_target:accused_apostate = { always = yes } }
 			}
 
@@ -2745,7 +2754,7 @@ character_event = { # What does the liege wish to do with the apostate?
 
 			mult_modifier = {
 				factor = 5
-				event_target:accused_apostate = { dynasty = ROOT }
+				dynasty = event_target:accused_apostate
 			}
 		}
 

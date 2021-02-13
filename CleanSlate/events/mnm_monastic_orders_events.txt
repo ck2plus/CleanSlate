@@ -46,15 +46,7 @@ letter_event = {
 	option = {
 		name = EVTOPTA_MNM_4450
 
-		event_target:monastic_leader = {
-			show_scope_change = no
-
-			ROOT = {
-				show_scope_change = no
-				join_prev_monastic_order_society = yes
-			}
-		}
-
+		join_society = FROM
 		scaled_wealth = -0.25
 		clr_character_flag = society_join_block
 	}
@@ -461,7 +453,7 @@ character_event = {
 				}
 
 				# Sends the tombola again
-				character_event = {
+				repeat_event = {
 					id = MNM.4404
 					days = 40
 					random = 30
@@ -1056,47 +1048,38 @@ character_event = {
 				}
 			}
 			holy_seclusion_gluttonous = {
-				if = {
-					limit = { NOT = { trait = gluttonous } }
-					random = {
-						chance = 50
-						add_trait_temperate_effect = yes
+				random = {
+					chance = 50
+					if = {
+						limit = { trait = gluttonous }
+						remove_trait_gluttonous_effect = yes
 					}
-				}
-				else = {
-					random = {
-						chance = 50
-						remove_trait_silently_gluttonous_effect = yes
+					else = {
+						add_trait_temperate_effect = yes
 					}
 				}
 			}
 			holy_seclusion_greedy = {
-				if = {
-					limit = { NOT = { trait = greedy } }
-					random = {
-						chance = 50
-						add_trait_charitable_effect = yes
+				random = {
+					chance = 50
+					if = {
+						limit = { trait = greedy }
+						remove_trait_greedy_effect = yes
 					}
-				}
-				else = {
-					random = {
-						chance = 50
-						remove_trait_silently_greedy_effect = yes
+					else = {
+						add_trait_charitable_effect = yes
 					}
 				}
 			}
 			holy_seclusion_slothful = {
-				if = {
-					limit = { NOT = { trait = slothful } }
-					random = {
-						chance = 50
-						add_trait_diligent_effect = yes
-					}
-				}
-				else = {
-					random = {
-						chance = 50
+				random = {
+					chance = 50
+					if = {
+						limit = { trait = slothful }
 						remove_trait_slothful_effect = yes
+					}
+					else = {
+						add_trait_diligent_effect = yes
 					}
 				}
 			}
@@ -1191,12 +1174,14 @@ character_event = {
 			holy_seclusion_gluttonous = {
 				if = {
 					limit = { NOT = { trait = gluttonous } }
+
 					random = {
 						chance = 30
 						add_trait_gluttonous_effect = yes
 					}
 				}
 			}
+
 			holy_seclusion_greedy = {
 				scaled_wealth = { value = 0.5 min = 50 }
 
@@ -1306,23 +1291,22 @@ character_event = {
 				tooltip = {
 					if = {
 						limit = {
-							trait = stressed
-							NOT = { trait = depressed }
-						}
-						random = {
-							chance = 50
-							tooltip = { add_trait = depressed }
-							set_character_flag = add_depressed
-						}
-					}
-					else_if = {
-						limit = {
 							NOT = { trait = stressed }
 						}
 						random = {
 							chance = 50
 							tooltip = { add_trait = stressed }
 							set_character_flag = add_stressed
+						}
+					}
+					else_if = {
+						limit = {
+							NOT = { trait = depressed }
+						}
+						random = {
+							chance = 50
+							tooltip = { add_trait = depressed }
+							set_character_flag = add_depressed
 						}
 					}
 				}
@@ -1745,8 +1729,9 @@ character_event = {
 				}
 				mult_modifier = {
 					factor = 1.5
-					event_target:interrupting_child = {
-						opinion = { who = ROOT value >= 50 }
+					reverse_opinion = {
+						who = event_target:interrupting_child
+						value >= 50
 					}
 				}
 
@@ -1866,7 +1851,7 @@ character_event = {
 
 			if = {
 				limit = {
-					has_dlc = "Zeus"
+					has_dlc = "Conclave"
 					NOT = { trait = idolizer }
 				}
 				add_trait = idolizer
@@ -1874,7 +1859,7 @@ character_event = {
 			else_if = {
 				limit = {
 					NOR = {
-						has_dlc = "Zeus"
+						has_dlc = "Conclave"
 						trait = zealous
 					}
 				}
@@ -2167,6 +2152,7 @@ letter_event = {
 			limit = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+					bloodline_is_active_for = PREV
 				}
 			}
 			add_society_currency_major_effect = yes
@@ -2377,6 +2363,7 @@ letter_event = {
 			limit = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+					bloodline_is_active_for = PREV
 				}
 			}
 			add_society_currency_medium_effect = yes
@@ -2467,6 +2454,7 @@ letter_event = {
 			limit = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+					bloodline_is_active_for = PREV
 				}
 			}
 			add_society_currency_large_effect = yes
@@ -2622,6 +2610,7 @@ letter_event = {
 			limit = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+					bloodline_is_active_for = PREV
 				}
 			}
 			add_society_currency_large_effect = yes
@@ -2672,45 +2661,45 @@ character_event = {
 
 # # POWER: Passive trait improvement ### Purity effect now only triggered through mission success
 # character_event = {
-	# id = MNM.4430
-	# hide_window = yes
+#	id = MNM.4430
+#	hide_window = yes
 #
-	# religion_group = indian_group
-	# is_in_society = yes
-	# only_capable = yes
-	# prisoner = no
-	# min_age = 16
+#	religion_group = indian_group
+#	is_in_society = yes
+#	only_capable = yes
+#	prisoner = no
+#	min_age = 16
 #
-	# is_triggered_only = yes
-	# is_in_society = yes
+#	is_triggered_only = yes
+#	is_in_society = yes
 #
-	# trigger = {
-		# OR = {
-			# society_member_of = monastic_order_buddhist
-			# society_member_of = monastic_order_jain
-		# }
-	# }
+#	trigger = {
+#		OR = {
+#			society_member_of = monastic_order_buddhist
+#			society_member_of = monastic_order_jain
+#		}
+#	}
 #
-	# immediate = {
-		# change_variable = { which = "global_passive_purity_possible" value = 1 }
-		# random = {
-			# chance = 20
-			# mult_modifier = {
-				# factor = 1.3
-				# society_rank >= 2
-			# }
-			# mult_modifier = {
-				# factor = 1.3
-				# society_rank >= 3
-			# }
-			# mult_modifier = {
-				# factor = 1.3
-				# society_rank >= 4
-			# }
-			# change_variable = { which = "global_passive_purity_fired" value = 1 }
-			# character_event = { id = MNM.4400 }
-		# }
-	# }
+#	immediate = {
+#		change_variable = { which = global_passive_purity_possible value = 1 }
+#		random = {
+#			chance = 20
+#			mult_modifier = {
+#				factor = 1.3
+#				society_rank >= 2
+#			}
+#			mult_modifier = {
+#				factor = 1.3
+#				society_rank >= 3
+#			}
+#			mult_modifier = {
+#				factor = 1.3
+#				society_rank >= 4
+#			}
+#			change_variable = { which = global_passive_purity_fired value = 1 }
+#			character_event = { id = MNM.4400 }
+#		}
+#	}
 # }
 
 
@@ -2845,7 +2834,7 @@ character_event = {
 				15 = { add_trait = theologian }
 				10 = { add_trait = mystic }
 				20 = {
-					trigger = { society_member_of = monastic_order_benedictine }
+					trigger = { ROOT = { society_member_of = monastic_order_benedictine } }
 					add_trait = gardener
 				}
 			}
@@ -3581,6 +3570,7 @@ letter_event = {
 				limit = {
 					any_owned_bloodline = {
 						has_bloodline_flag = monastic_saintly_bloodline
+						bloodline_is_active_for = PREV
 					}
 				}
 				add_society_currency_major_effect = yes
@@ -3595,6 +3585,7 @@ letter_event = {
 				limit = {
 					any_owned_bloodline = {
 						has_bloodline_flag = monastic_saintly_bloodline
+						bloodline_is_active_for = PREV
 					}
 				}
 				add_society_currency_medium_effect = yes
@@ -4627,8 +4618,8 @@ character_event = {
 
 		random = {
 			chance = 25
-			remove_trait_silently_ambitious_effect = yes
 			add_trait_content_effect = yes
+			remove_trait_ambitious_effect = yes
 		}
 
 		ai_chance = {
@@ -5173,147 +5164,54 @@ character_event = { # win - no wound
 		set_character_flag = monastic_stole_artifact
 
 		hidden_effect = {
+			random = {
+				chance = 10
+
+				additive_modifier = {
+					value = 10 # 20%
+					intrigue < 22
+				}
+				additive_modifier = {
+					value = 10 # 30%
+					intrigue < 18
+				}
+				additive_modifier = {
+					value = 10 # 40%
+					intrigue < 14
+				}
+				additive_modifier = {
+					value = 10 # 50%
+					intrigue < 10
+				}
+				additive_modifier = {
+					value = 25 # 75%
+					intrigue < 6
+				}
+
+				set_character_flag = someone_figured_it_out
+			}
+
 			if = {
-				limit = { intrigue < 6 }
+				limit = { has_character_flag = someone_figured_it_out }
 
-				random_list = {
-					75 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					25 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 10 }
+				clr_character_flag = someone_figured_it_out
 
-				random_list = {
-					50 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					50 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 14 }
-
-				random_list = {
-					40 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					60 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 18 }
-
-				random_list = {
-					30 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					70 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 22 }
-
-				random_list = {
-					20 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					80 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
+				letter_event = {
+					id = MNM.4624
+					months = 3
+					random = 30
 				}
 			}
 			else = {
-				random_list = {
-					10 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					90 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
+				clr_character_flag = monastic_artifact_lover
+				clr_character_flag = monastic_artifact_seamless_robe_of_jesus
+				clr_character_flag = monastic_artifact_crown_of_thorns
+				clr_character_flag = monastic_artifact_fragment_of_true_cross
+				clr_character_flag = monastic_artifact_holy_foreskin
+				clr_character_flag = monastic_artifact_image_of_edessa
+				clr_character_flag = monastic_artifact_elaborate_danda
+				clr_character_flag = monastic_artifact_sariraka_actual_body_part
+				clr_character_flag = monastic_artifact_sarira
 			}
 		}
 	}
@@ -5357,145 +5255,54 @@ character_event = { # win - wound
 		set_character_flag = monastic_stole_artifact
 
 		hidden_effect = {
+			random = {
+				chance = 10
+
+				additive_modifier = {
+					value = 10 # 20%
+					intrigue < 22
+				}
+				additive_modifier = {
+					value = 10 # 30%
+					intrigue < 18
+				}
+				additive_modifier = {
+					value = 10 # 40%
+					intrigue < 14
+				}
+				additive_modifier = {
+					value = 10 # 50%
+					intrigue < 10
+				}
+				additive_modifier = {
+					value = 25 # 75%
+					intrigue < 6
+				}
+
+				set_character_flag = someone_figured_it_out
+			}
+
 			if = {
-				limit = { intrigue < 6 }
-				random_list = {
-					75 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					25 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 10 }
-				random_list = {
-					50 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					50 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 14 }
+				limit = { has_character_flag = someone_figured_it_out }
 
-				random_list = {
-					40 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					60 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 18 }
+				clr_character_flag = someone_figured_it_out
 
-				random_list = {
-					30 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					70 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 22 }
-
-				random_list = {
-					20 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					80 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
+				letter_event = {
+					id = MNM.4624
+					months = 3
+					random = 30
 				}
 			}
 			else = {
-				random_list = {
-					10 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					90 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
+				clr_character_flag = monastic_artifact_lover
+				clr_character_flag = monastic_artifact_seamless_robe_of_jesus
+				clr_character_flag = monastic_artifact_crown_of_thorns
+				clr_character_flag = monastic_artifact_fragment_of_true_cross
+				clr_character_flag = monastic_artifact_holy_foreskin
+				clr_character_flag = monastic_artifact_image_of_edessa
+				clr_character_flag = monastic_artifact_elaborate_danda
+				clr_character_flag = monastic_artifact_sariraka_actual_body_part
+				clr_character_flag = monastic_artifact_sarira
 			}
 		}
 	}
@@ -5545,147 +5352,54 @@ character_event = { # win - maimed
 		set_character_flag = monastic_stole_artifact
 
 		hidden_effect = {
+			random = {
+				chance = 10
+
+				additive_modifier = {
+					value = 10 # 20%
+					intrigue < 22
+				}
+				additive_modifier = {
+					value = 10 # 30%
+					intrigue < 18
+				}
+				additive_modifier = {
+					value = 10 # 40%
+					intrigue < 14
+				}
+				additive_modifier = {
+					value = 10 # 50%
+					intrigue < 10
+				}
+				additive_modifier = {
+					value = 25 # 75%
+					intrigue < 6
+				}
+
+				set_character_flag = someone_figured_it_out
+			}
+
 			if = {
-				limit = { intrigue < 6 }
+				limit = { has_character_flag = someone_figured_it_out }
 
-				random_list = {
-					75 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					25 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 10 }
+				clr_character_flag = someone_figured_it_out
 
-				random_list = {
-					50 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					50 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 14 }
-
-				random_list = {
-					40 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					60 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 18 }
-
-				random_list = {
-					30 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					70 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
-			}
-			else_if = {
-				limit = { intrigue < 22 }
-
-				random_list = {
-					20 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					80 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
+				letter_event = {
+					id = MNM.4624
+					months = 3
+					random = 30
 				}
 			}
 			else = {
-				random_list = {
-					10 = {
-						letter_event = { # someone figures it out
-							id = MNM.4624
-							months = 3
-							random = 30
-						}
-					}
-					90 = {
-						clr_character_flag = monastic_artifact_lover
-						clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-						clr_character_flag = monastic_artifact_crown_of_thorns
-						clr_character_flag = monastic_artifact_fragment_of_true_cross
-						clr_character_flag = monastic_artifact_holy_foreskin
-						clr_character_flag = monastic_artifact_image_of_edessa
-						clr_character_flag = monastic_artifact_elaborate_danda
-						clr_character_flag = monastic_artifact_sariraka_actual_body_part
-						clr_character_flag = monastic_artifact_sarira
-					}
-				}
+				clr_character_flag = monastic_artifact_lover
+				clr_character_flag = monastic_artifact_seamless_robe_of_jesus
+				clr_character_flag = monastic_artifact_crown_of_thorns
+				clr_character_flag = monastic_artifact_fragment_of_true_cross
+				clr_character_flag = monastic_artifact_holy_foreskin
+				clr_character_flag = monastic_artifact_image_of_edessa
+				clr_character_flag = monastic_artifact_elaborate_danda
+				clr_character_flag = monastic_artifact_sariraka_actual_body_part
+				clr_character_flag = monastic_artifact_sarira
 			}
 		}
 	}
@@ -5764,7 +5478,7 @@ character_event = {
 	}
 }
 
-# Lover stops witness letting you escape
+# Lover stops witness, letting you escape
 character_event = {
 	id = MNM.4616
 	desc = EVTDESC_MNM_4616
@@ -6857,7 +6571,11 @@ character_event = {
 
 	option = { # Insinuate that they owe you
 		name = EVTOPTB_MNM_4214
-		trigger = { has_dlc = "Conclave" }
+
+		trigger = {
+			has_dlc = "Conclave"
+			NOT = { holds_favor_on =  event_target:monastic_sleeper }
+		}
 
 		add_favor = event_target:monastic_sleeper
 	}
@@ -6949,7 +6667,7 @@ character_event = {
 	}
 
 	immediate = {
-		any_artifact = {
+		random_artifact = {
 			limit = {
 				has_artifact_flag = book
 				OR = {
@@ -6957,7 +6675,7 @@ character_event = {
 					has_artifact_flag = hermetics
 				}
 			}
-			set_artifact_flag = selected_book
+			save_event_target_as = selected_book
 		}
 	}
 
@@ -6986,9 +6704,8 @@ character_event = {
 			}
 		}
 
-		random_artifact = { # destroys a book...
+		event_target:selected_book = { # destroys a book...
 			show_scope_change = no
-			limit = { has_artifact_flag = selected_book }
 
 			destroy_artifact = yes
 		}
@@ -6999,6 +6716,7 @@ character_event = {
 			limit = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+					bloodline_is_active_for = PREV
 				}
 			}
 			add_society_currency_major_effect = yes
@@ -7063,6 +6781,7 @@ character_event = {
 			limit = {
 				any_owned_bloodline = {
 					has_bloodline_flag = monastic_saintly_bloodline
+					bloodline_is_active_for = PREV
 				}
 			}
 			add_society_currency_large_effect = yes
@@ -7083,10 +6802,6 @@ character_event = {
 		}
 
 		set_character_flag = considered_burning_heretical_books
-	}
-
-	after = {
-		any_artifact = { clr_artifact_flag = selected_book }
 	}
 }
 
@@ -7193,34 +6908,25 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		if = { # If no stat over 8 no extra bonues
-			limit = {
-				diplomacy < 8
-				martial < 8
-				stewardship < 8
-				intrigue < 8
+		random_list = {
+			25 = {
+				trigger = { diplomacy >= 8 }
+				set_character_flag = monastic_order_education_diplomacy
 			}
-			set_character_flag = monastic_order_education_learning
-		}
-		# Else mark a random stat over 8
-		else = {
-			random_list = {
-				25 = {
-					trigger = { diplomacy >= 8 }
-					set_character_flag = monastic_order_education_diplomacy
-				}
-				25 = {
-					trigger = { martial >= 8 }
-					set_character_flag = monastic_order_education_martial
-				}
-				25 = {
-					trigger = { stewardship >= 8 }
-					set_character_flag = monastic_order_education_stewardship
-				}
-				25 = {
-					trigger = { intrigue >= 8 }
-					set_character_flag = monastic_order_education_intrigue
-				}
+			25 = {
+				trigger = { martial >= 8 }
+				set_character_flag = monastic_order_education_martial
+			}
+			25 = {
+				trigger = { stewardship >= 8 }
+				set_character_flag = monastic_order_education_stewardship
+			}
+			25 = {
+				trigger = { intrigue >= 8 }
+				set_character_flag = monastic_order_education_intrigue
+			}
+			fallback = {
+				set_character_flag = monastic_order_education_learning
 			}
 		}
 	}

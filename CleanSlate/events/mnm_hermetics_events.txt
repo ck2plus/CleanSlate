@@ -31,85 +31,40 @@ letter_event = {
 	is_triggered_only = yes # on_character_ask_to_join_society
 
 	trigger = {
-		FROM = { leader = { society_member_of = hermetics } } # TODO: Is this necessary?
+		FROM = { is_society = hermetics }
 	}
 
 	immediate = {
 		set_character_flag = society_join_block
 
+		# Find a non-imprisoned member
 		FROM = {
 			if = {
 				limit = {
-					leader = { prisoner = no }
+					leader = { prisoner = yes }
+
+					any_society_member = {
+						prisoner = no
+						is_society_grandmaster = no
+					}
 				}
-				leader = { save_event_target_as = inviter }
+
+				random_society_member = {
+					limit = {
+						is_society_grandmaster = no
+						prisoner = no
+					}
+
+					preferred_limit = { society_rank == 4 }
+					preferred_limit = { society_rank == 3 }
+					preferred_limit = { society_rank == 2 }
+
+					save_event_target_as = inviter
+				}
 			}
-			# Find a non-prisoner member
+			# Grandmaster is not in prison, or everyone is somehow in prison so just use the leader anyway
 			else = {
-				if = {
-					limit = {
-						any_society_member = {
-							society_rank == 4
-							prisoner = no
-						}
-					}
-					random_society_member = {
-						limit = {
-							society_rank == 4
-							prisoner = no
-						}
-						save_event_target_as = inviter
-					}
-				}
-				else_if = {
-					limit = {
-						any_society_member = {
-							society_rank == 3
-							prisoner = no
-						}
-					}
-					random_society_member = {
-						limit = {
-							society_rank == 3
-							prisoner = no
-						}
-						save_event_target_as = inviter
-					}
-				}
-				else_if = {
-					limit = {
-						any_society_member = {
-							society_rank == 2
-							prisoner = no
-						}
-					}
-					random_society_member = {
-						limit = {
-							society_rank == 2
-							prisoner = no
-						}
-						save_event_target_as = inviter
-					}
-				}
-				else_if = {
-					limit = {
-						any_society_member = {
-							society_rank == 1
-							prisoner = no
-						}
-					}
-					random_society_member = {
-						limit = {
-							society_rank == 1
-							prisoner = no
-						}
-						save_event_target_as = inviter
-					}
-				}
-				# Everyone is somehow in prison so just use the leader anyway
-				else = {
-					leader = { save_event_target_as = inviter }
-				}
+				leader = { save_event_target_as = inviter }
 			}
 		}
 	}
@@ -228,8 +183,8 @@ character_event = {
 
 			20 = { # Find an apprentice
 				trigger = {
-					NOT = { any_courtier_or_vassal = { has_minor_title = title_hermetics_apprentice } }
 					ai = no
+					NOT = { has_assigned_minor_title = title_hermetics_apprentice }
 				}
 				society_quest_event = { id = MNM.1405 }
 			}
@@ -406,13 +361,13 @@ character_event = {
 		name = {
 			text = EVTOPTC_MNM_1101
 			trigger = {
-				capital_scope = { port = yes }
+				capital_scope = { is_coastal = yes }
 			}
 		}
 		name = {
 			text = EVTOPTD_MNM_1101
 			trigger = {
-				capital_scope = { port = no }
+				capital_scope = { is_coastal = no }
 			}
 		}
 
@@ -1059,32 +1014,6 @@ character_event = {
 		hidden_effect = {
 			change_variable = { which = local_laboratory_level value = -2 }
 		}
-
-		if = {
-			limit = { has_character_flag = hidden_lab } # Lab built in castle
-
-			event_target:sacrifice_for_science = {
-				show_scope_change = no
-
-				add_maimed_trait_effect = yes
-
-				if = {
-					limit = {
-						is_close_relative = ROOT
-						NOT = { trait = cruel }
-					}
-
-					random = {
-						chance = 20
-
-						ROOT = {
-							show_scope_change = no
-							add_trait_depressed_effect = yes
-						}
-					}
-				}
-			}
-		}
 	}
 
 	option = {
@@ -1097,7 +1026,9 @@ character_event = {
 		}
 
 		wealth = -10
+	}
 
+	after = {
 		if = {
 			limit = { has_character_flag = hidden_lab } # Lab built in castle
 
@@ -1121,9 +1052,6 @@ character_event = {
 				}
 			}
 		}
-	}
-
-	after = {
 		# destroy ingredients
 		if = {
 			limit = {
@@ -1512,6 +1440,7 @@ character_event = {
 		add_society_currency_major_effect = yes
 
 		FROM = {
+			show_scope_change = no
 			set_character_flag = completed_apprenticeship
 			remove_title = title_hermetics_apprentice
 			change_learning = 2
@@ -1619,6 +1548,7 @@ society_quest_event = {
 		name = ACCEPT
 
 		event_target:hermetic_collaborator = {
+			show_scope_change = no
 			set_quest_target = {
 				id = quest_hermetics_find_text
 				holder = ROOT
@@ -1946,7 +1876,6 @@ letter_event = {
 		}
 		character_event = { id = MNM.1421 months = 1 random = 10 }
 	}
-	# after = { hidden_effect = { character_event = { id = MNM.1427 days = 450 } } }
 }
 
 # Ping event for outcome in book search
@@ -2255,7 +2184,7 @@ society_quest_event = {
 							OR = {
 								any_artifact = {
 									has_artifact_flag = hermetics
-									has_artifact_flag = text
+									has_artifact_flag = text # CleanSlate: This is literally only the emerald_tablet, perhaps also allow inventions?
 								}
 
 								wealth >= 200
@@ -2290,7 +2219,7 @@ society_quest_event = {
 							OR = {
 								any_artifact = {
 									has_artifact_flag = hermetics
-									has_artifact_flag = text # CleanSlate: This is literally only the emerald_tablet
+									has_artifact_flag = text # CleanSlate: This is literally only the emerald_tablet, perhaps also allow inventions?
 								}
 
 								wealth >= 200
@@ -2328,6 +2257,8 @@ society_quest_event = {
 		ai_chance = { factor = 100 }
 
 		event_target:infiltration_target = {
+			show_scope_change = no
+
 			set_quest_target = {
 				id = quest_hermetics_infiltrate_laboratory
 				holder = ROOT
@@ -2520,8 +2451,7 @@ character_event = {
 	# Make a sleeping potion (potentially great effect)
 	option = {
 		name = EVTOPTB_MNM_1435
-		tooltip_info = yes
-		custom_tooltip = { text = multiple_ingredient_option_available_tt }
+		tooltip_info_custom = multiple_ingredient_option_available_tt
 		custom_tooltip = { text = EVTOPTB_MNM_1435_TT }
 
 		trigger = {
@@ -2594,8 +2524,7 @@ character_event = {
 	# Make a sleeping potion (mild effect)
 	option = {
 		name = EVTOPTB_MNM_1435_single_ingredient
-		tooltip_info = yes
-		custom_tooltip = { text = ingredient_option_available_tt }
+		tooltip_info_custom = ingredient_option_available_tt
 		custom_tooltip = { text = EVTOPTB_MNM_1435_TT }
 
 		trigger = {
@@ -2678,7 +2607,7 @@ character_event = {
 					text = EVTOPTX_MNM_1435_FAIL_TT
 					random_list = {
 						50 = {
-							character_event = { id = MNM.1438 days = 7 } # You get deteced later, but continue for now
+							character_event = { id = MNM.1438 days = 7 } # You get detected later, but continue for now
 							set_character_flag = distraction_failed
 						}
 						50 = {
@@ -3094,7 +3023,7 @@ character_event = {
 
 		if = {
 			limit = { NOT = { is_rival = FROM } }
-			add_rival = FROM
+			tooltip = { add_rival = FROM }
 		}
 		if = {
 			limit = { NOT = { is_rival = event_target:infiltration_companion } }
@@ -3223,14 +3152,12 @@ character_event = {
 
 	is_triggered_only = yes
 
-	ai = no
-
 	option = {
 		name = EVTOPTA_MNM_1455
 
 		if = {
 			limit = { NOT = { is_rival = FROM } }
-			tooltip = { add_rival = FROM }
+			add_rival = FROM
 		}
 	}
 }
@@ -3400,6 +3327,7 @@ character_event = {
 		if = {
 			limit = { FROM = { has_character_flag = great_theft } }
 			random_artifact = {
+				show_scope_change = no
 				limit = {
 					has_artifact_flag = hermetics
 					has_artifact_flag = text
@@ -3415,15 +3343,7 @@ character_event = {
 			}
 		}
 
-		if = {
-			limit = {
-				FROM = {
-					OR = {
-						has_character_flag = great_theft
-						has_character_flag = good_theft
-					}
-				}
-			}
+		else = {
 			if = {
 				limit = {
 					any_artifact = {
@@ -3432,6 +3352,7 @@ character_event = {
 					}
 				}
 				random_artifact = {
+					show_scope_change = no
 					limit = {
 						has_artifact_flag = hermetics
 						has_artifact_flag = ingredient
@@ -3841,6 +3762,7 @@ character_event = {
 		name = EVTOPTA_MNM_1449
 
 		event_target:infiltration_companion = {
+			show_scope_change = no
 			death = { death_reason = death_accident }
 		}
 
@@ -3971,7 +3893,7 @@ character_event = {
 	}
 
 	option = { # I am gonna throw some ingredients into the water...
-		tooltip_info = yes
+		tooltip_info_custom = ingredient_option_available_tt
 
 		trigger = {
 			any_artifact = { has_artifact_flag = ingredient }
@@ -4014,7 +3936,6 @@ character_event = {
 			}
 		}
 
-		custom_tooltip = { text = ingredient_option_available_tt }
 		custom_tooltip = { text = EVTOPTD_MNM_1200_tt }
 
 		random_list = {
@@ -4372,8 +4293,8 @@ character_event = {
 		text = EVTDESC_MNM_1204_B
 		trigger = { has_character_modifier = bad_relationship_omen }
 	}
-	
-	is_triggered_only = yes # on_birth
+
+	is_triggered_only = yes # on_birth (MNM.1204)
 
 	has_dlc = "Mystics"
 
@@ -4553,8 +4474,6 @@ character_event = {
 	option = {
 		save_event_target_as = mnm_scrying_dead
 
-	#	spouse = { save_event_target_as = mnm_scrying_widow }
-
 		# Lover gets event
 		random_lover = {
 			limit = {
@@ -4570,7 +4489,6 @@ character_event = {
 				is_incapable = no
 				has_relationship_omen_modifier_trigger = yes
 			}
-		#	save_event_target_as = mnm_scrying_friend
 			character_event = { id = MNM.1209 months = 1 }
 		}
 
@@ -4580,7 +4498,6 @@ character_event = {
 				is_incapable = no
 				has_relationship_omen_modifier_trigger = yes
 			}
-		#	save_event_target_as = mnm_scrying_enemy
 			character_event = { id = MNM.1210 months = 1 }
 		}
 
@@ -4591,7 +4508,6 @@ character_event = {
 				is_incapable = no
 				has_relationship_omen_modifier_trigger = yes
 			}
-		#	save_event_target_as = mnm_scrying_child
 			character_event = { id = MNM.1211 months = 1 }
 		}
 		# Parent
@@ -4603,7 +4519,6 @@ character_event = {
 				}
 			}
 			mother = {
-			#	save_event_target_as = mnm_scrying_parent
 				character_event = { id = MNM.1212 months = 1 }
 			}
 		}
@@ -4616,7 +4531,6 @@ character_event = {
 				}
 			}
 			father = {
-			#	save_event_target_as = mnm_scrying_parent
 				character_event = { id = MNM.1212 months = 1 }
 			}
 		}
@@ -4824,7 +4738,7 @@ character_event = {
 }
 
 # Ping event for pets
-character_event = { 
+character_event = {
 	id = MNM.1213
 
 	hide_window = yes
@@ -4996,25 +4910,7 @@ character_event = {
 
 ### To handle loss of titles:
 
-# 1. new holder of title (ROOT) sends event to old holder (FROMFROM), if they are still alive
-character_event = {
-	id = MNM.1216
-
-	hide_window = yes
-	is_triggered_only = yes # on_new_holder(_inheritance/usurpation)
-
-	trigger = {
-		FROMFROM = { is_alive = yes }
-	}
-
-	immediate = {
-		save_event_target_as = new_holder_target
-		FROMFROM = { save_event_target_as = old_holder_target }
-		character_event = { id = MNM.1218 days = 1 }
-	}
-}
-
-# 1.B: new holder of title gets exception flag, if the title was granted voluntarily
+# 1: new holder of title gets exception flag, if the title was granted voluntarily
 diploresponse_event = {
 	id = MNM.1217
 
@@ -5027,11 +4923,17 @@ diploresponse_event = {
 }
 
 # 2: gating event, to send event or clearing flag for the new holder
+# ROOT is new holder of title
+# FROMFROM is old holder of title
 character_event = {
 	id = MNM.1218
 
 	hide_window = yes
-	is_triggered_only = yes
+	is_triggered_only = yes # on_new_holder(_inheritance/usurpation), 1 day delay to allow MNM.1217 to fire first.
+
+	trigger = {
+		FROMFROM = { is_alive = yes }
+	}
 
 	immediate = {
 		if = {
@@ -5039,12 +4941,12 @@ character_event = {
 			clr_character_flag = was_granted_title_voluntarily
 		}
 		else = {
-			event_target:old_holder_target = { character_event = { id = MNM.1219 days = 3 } }
+			FROMFROM = { character_event = { id = MNM.1219 days = 3 } }
 		}
 	}
 }
 
-# 3: Scrying vision result: losing a title (not sent if given away freely via targeted decision)
+# 3: Scrying vision result: losing a title (not sent if given away freely via diplomatic interaction)
 character_event = {
 	id = MNM.1219
 	picture = GFX_evt_gathering_of_minds
@@ -5064,9 +4966,6 @@ character_event = {
 	only_capable = yes
 
 	trigger = {
-		event_target:new_holder_target = {
-			NOT = { has_character_flag = was_granted_title_voluntarily }
-		}
 		has_power_omen_modifier_trigger = yes
 	}
 
@@ -5137,7 +5036,7 @@ character_event = {
 	picture = GFX_evt_recovery
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # scrying_omen_fulfilled_by_gaining_disease_effect
 
 	trigger = {
 		FROM = { is_alive = yes }
@@ -5147,28 +5046,28 @@ character_event = {
 	desc = {
 		text = EVTDESC_MNM_1221_A
 		trigger = {
-			FROM = { NOT = { character = ROOT } }
+			NOT = { character = FROM }
 			has_character_modifier = bad_relationship_omen
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1221_B
 		trigger = {
-			FROM = { NOT = { character = ROOT } }
+			NOT = { character = FROM }
 			has_character_modifier = good_relationship_omen
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1221_C
 		trigger = {
-			FROM = { character = ROOT }
+			character = FROM
 			has_character_modifier = bad_relationship_omen
 		}
 	}
 	desc = {
 		text = EVTDESC_MNM_1221_D
 		trigger = {
-			FROM = { character = ROOT }
+			character = FROM
 			has_character_modifier = good_relationship_omen
 		}
 	}
@@ -5884,19 +5783,19 @@ character_event = {
 
 						additive_modifier = {
 							value = 50
-							stewardship >= 15
+							has_top_tier_education_trait_trigger = yes
 						}
 						additive_modifier = {
 							value = 30
 							has_education_stewardship_trigger = yes
 						}
 						additive_modifier = {
-							value = 10
-							has_top_tier_education_trait_trigger = yes
+							value = 20
+							is_guardian = ROOT
 						}
 						additive_modifier = {
-							value = 30
-							is_guardian = ROOT
+							value = 10
+							stewardship >= 15
 						}
 					}
 					save_event_target_as = inspiring_adult
@@ -5916,19 +5815,19 @@ character_event = {
 
 						additive_modifier = {
 							value = 50
-							martial >= 15
+							has_top_tier_education_trait_trigger = yes
 						}
 						additive_modifier = {
 							value = 30
 							has_education_martial_trigger = yes
 						}
 						additive_modifier = {
-							value = 10
-							has_top_tier_education_trait_trigger = yes
+							value = 20
+							is_guardian = ROOT
 						}
 						additive_modifier = {
-							value = 30
-							is_guardian = ROOT
+							value = 10
+							martial >= 15
 						}
 					}
 					save_event_target_as = inspiring_adult
@@ -5948,19 +5847,19 @@ character_event = {
 
 						additive_modifier = {
 							value = 50
-							diplomacy >= 15
+							has_top_tier_education_trait_trigger = yes
 						}
 						additive_modifier = {
 							value = 30
 							has_education_diplomacy_trigger = yes
 						}
 						additive_modifier = {
-							value = 10
-							has_top_tier_education_trait_trigger = yes
+							value = 20
+							is_guardian = ROOT
 						}
 						additive_modifier = {
-							value = 30
-							is_guardian = ROOT
+							value = 10
+							diplomacy >= 15
 						}
 					}
 					save_event_target_as = inspiring_adult
@@ -5980,19 +5879,19 @@ character_event = {
 
 						additive_modifier = {
 							value = 50
-							intrigue >= 15
+							has_top_tier_education_trait_trigger = yes
 						}
 						additive_modifier = {
 							value = 30
 							has_education_intrigue_trigger = yes
 						}
 						additive_modifier = {
-							value = 10
-							has_top_tier_education_trait_trigger = yes
+							value = 20
+							is_guardian = ROOT
 						}
 						additive_modifier = {
-							value = 30
-							is_guardian = ROOT
+							value = 10
+							intrigue >= 15
 						}
 					}
 					save_event_target_as = inspiring_adult
@@ -6012,19 +5911,19 @@ character_event = {
 
 						additive_modifier = {
 							value = 50
-							learning >= 15
+							has_top_tier_education_trait_trigger = yes
 						}
 						additive_modifier = {
 							value = 30
 							has_education_learning_trigger = yes
 						}
 						additive_modifier = {
-							value = 10
-							has_top_tier_education_trait_trigger = yes
+							value = 20
+							is_guardian = ROOT
 						}
 						additive_modifier = {
-							value = 30
-							is_guardian = ROOT
+							value = 10
+							learning >= 15
 						}
 					}
 					save_event_target_as = inspiring_adult
@@ -6608,7 +6507,7 @@ character_event = {
 						character_event = { id = MNM.1252 } # for child: child learns of their destiny
 					}
 					else = {
-						character_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
+						repeat_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
 					}
 				}
 				horoscope_maker_receives_update = {
@@ -6619,7 +6518,7 @@ character_event = {
 						event_target:horoscope_maker = { character_event = { id = MNM.1253 } } # for maker: the child is showing signs of talent
 					}
 					else = {
-						character_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
+						repeat_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
 					}
 				}
 				horoscope_child_contemplates_their_destiny = {
@@ -6630,7 +6529,7 @@ character_event = {
 						character_event = { id = MNM.1254 } # for child: the child contemplates their "destiny"
 					}
 					else = {
-						character_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
+						repeat_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
 					}
 				}
 				horoscope_parent_is_informed = {
@@ -6662,7 +6561,7 @@ character_event = {
 				horoscope_maker_receives_update = {
 					clr_character_flag = horoscope_maker_receives_update
 					set_character_flag = horoscope_child_contemplates_their_destiny
-					character_event = { id = MNM.1297 years = 1 } # for child: skips ahead to next step
+					repeat_event = { id = MNM.1297 years = 1 } # for child: skips ahead to next step
 				}
 				horoscope_child_contemplates_their_destiny = {
 					clr_character_flag = horoscope_child_contemplates_their_destiny
@@ -6673,13 +6572,13 @@ character_event = {
 						character_event = { id = MNM.1254 } # for child: the child contemplates their "destiny"
 					}
 					else = {
-						character_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
+						repeat_event = { id = MNM.1297 years = 1 } # for child: loops this to check back when old enough
 					}
 				}
 				horoscope_parent_is_informed = {
 					clr_character_flag = horoscope_parent_is_informed
 					set_character_flag = horoscope_child_evaluate
-					character_event = { id = MNM.1297 years = 1 } # for child: skips ahead to next step
+					repeat_event = { id = MNM.1297 years = 1 } # for child: skips ahead to next step
 				}
 				horoscope_child_evaluate = {
 					character_event = { id = MNM.1298 } # for child: begin evaluating
@@ -7141,6 +7040,8 @@ character_event = {
 	option = { # Choose Astrology/Scholar
 		name = EVTOPTA_MNM_1900
 
+		show_trait = scholar
+
 		character_event = {
 			id = MNM.1902
 			days = 10
@@ -7165,6 +7066,8 @@ character_event = {
 	option = { # Choose Alchemy/Mystic
 		name = EVTOPTB_MNM_1900
 
+		show_trait = mystic
+
 		character_event = {
 			id = MNM.1904
 			days = 10
@@ -7184,6 +7087,8 @@ character_event = {
 
 	option = { # Choose Theurgy/Theologian
 		name = EVTOPTC_MNM_1900
+
+		show_trait = theologian
 
 		character_event = {
 			id = MNM.1906
@@ -9239,13 +9144,14 @@ character_event = {
 	}
 }
 
+# Major scandal
 character_event = {
 	id = MNM.1481
 	desc = EVTDESC_MNM_1481
 	picture = GFX_evt_scandal
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # hermetics_upgrade_scandal_effect
 	hide_from = yes
 
 	option = {
@@ -9440,8 +9346,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_MNM_1622_use_ingredients # Send them these ingredients to aid in the ritual!
-		tooltip_info = yes
-		custom_tooltip = { text = ingredient_option_available_tt }
+		tooltip_info_custom = ingredient_option_available_tt
 
 		trigger = {
 			any_artifact = { has_artifact_flag = ingredient }
@@ -10425,87 +10330,27 @@ character_event = {
 			which = peer_review
 			value = 0
 		}
-
-		society = {
-			random_society_member = {
-				limit = {
-					NOT = { character = ROOT }
-					is_within_diplo_range = ROOT
-					is_inaccessible_trigger = no
-				}
-				save_event_target_as = peer1
-				set_character_flag = peer_review_temp
-			}
-			random_society_member = {
-				limit = {
-					NOT = { character = ROOT }
-					is_within_diplo_range = ROOT
-					is_inaccessible_trigger = no
-					NOT = { has_character_flag = peer_review_temp }
-				}
-				save_event_target_as = peer2
-				set_character_flag = peer_review_temp
-			}
-			random_society_member = {
-				limit = {
-					NOT = { character = ROOT }
-					is_within_diplo_range = ROOT
-					is_inaccessible_trigger = no
-					NOT = { has_character_flag = peer_review_temp }
-				}
-				save_event_target_as = peer3
-				set_character_flag = peer_review_temp
-			}
-			random_society_member = {
-				limit = {
-					NOT = { character = ROOT }
-					is_within_diplo_range = ROOT
-					is_inaccessible_trigger = no
-					NOT = { has_character_flag = peer_review_temp }
-				}
-				save_event_target_as = peer4
-				set_character_flag = peer_review_temp
-			}
-			random_society_member = {
-				limit = {
-					NOT = { character = ROOT }
-					is_within_diplo_range = ROOT
-					is_inaccessible_trigger = no
-					NOT = { has_character_flag = peer_review_temp }
-				}
-				save_event_target_as = peer5
-				set_character_flag = peer_review_temp
-			}
-			event_target:peer1 = { clr_character_flag = peer_review_temp }
-			event_target:peer2 = { clr_character_flag = peer_review_temp }
-			event_target:peer3 = { clr_character_flag = peer_review_temp }
-			event_target:peer4 = { clr_character_flag = peer_review_temp }
-			event_target:peer5 = { clr_character_flag = peer_review_temp }
-		}
 	}
 
 	option = { # send it out for review!
 		name = EVTOPTA_MNM_1640
 
-		event_target:peer1 = {
-			character_event = { id = MNM.1641 days = 15 }
-			show_portrait = yes
-		}
-		event_target:peer2 = {
-			character_event = { id = MNM.1641 days = 18 }
-			show_portrait = yes
-		}
-		event_target:peer3 = {
-			character_event = { id = MNM.1641 days = 21 }
-			show_portrait = yes
-		}
-		event_target:peer4 = {
-			character_event = { id = MNM.1641 days = 24 }
-			show_portrait = yes
-		}
-		event_target:peer5 = {
-			character_event = { id = MNM.1641 days = 27 }
-			show_portrait = yes
+		society = {
+			show_scope_change = no
+
+			any_society_member = {
+				limit = {
+					NOT = { character = ROOT }
+					is_within_diplo_range = ROOT
+					is_inaccessible_trigger = no
+				}
+
+				count = 5
+
+				set_character_flag = peer_review@ROOT
+				character_event = { id = MNM.1641 days = 15 }
+				show_portrait = yes
+			}
 		}
 
 		custom_tooltip = {
@@ -10942,11 +10787,13 @@ character_event = {
 		add_society_currency_minor_effect = yes
 
 		hidden_effect = {
-			event_target:peer1 = { set_character_flag = paper_success character_event = { id = MNM.1645 } }
-			event_target:peer2 = { set_character_flag = paper_success character_event = { id = MNM.1645 } }
-			event_target:peer3 = { set_character_flag = paper_success character_event = { id = MNM.1645 } }
-			event_target:peer4 = { set_character_flag = paper_success character_event = { id = MNM.1645 } }
-			event_target:peer5 = { set_character_flag = paper_success character_event = { id = MNM.1645 } }
+			society = {
+				any_society_member = {
+					limit = { has_character_flag = peer_review@ROOT }
+					set_character_flag = paper_success@ROOT
+					character_event = { id = MNM.1645 }
+				}
+			}
 		}
 	}
 
@@ -10958,11 +10805,13 @@ character_event = {
 		detract_society_currency_minor_effect = yes
 
 		hidden_effect = {
-			event_target:peer1 = { set_character_flag = paper_failure character_event = { id = MNM.1645 } }
-			event_target:peer2 = { set_character_flag = paper_failure character_event = { id = MNM.1645 } }
-			event_target:peer3 = { set_character_flag = paper_failure character_event = { id = MNM.1645 } }
-			event_target:peer4 = { set_character_flag = paper_failure character_event = { id = MNM.1645 } }
-			event_target:peer5 = { set_character_flag = paper_failure character_event = { id = MNM.1645 } }
+			society = {
+				any_society_member = {
+					limit = { has_character_flag = peer_review@ROOT }
+					set_character_flag = paper_failure@ROOT
+					character_event = { id = MNM.1645 }
+				}
+			}
 		}
 	}
 
@@ -11001,15 +10850,11 @@ character_event = {
 	border = GFX_event_normal_frame_religion
 	desc = {
 		text = EVTDESCA_MNM_1645
-		trigger = {
-			FROM = { has_character_flag = paper_success }
-		}
+		trigger = { has_character_flag = paper_success@FROM }
 	}
 	desc = {
 		text = EVTDESCB_MNM_1645
-		trigger = {
-			FROM = { has_character_flag = paper_failure }
-		}
+		trigger = { has_character_flag = paper_failure@FROM }
 	}
 
 	is_triggered_only = yes
@@ -11020,9 +10865,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_MNM_1645
-		trigger = {
-			FROM = { has_character_flag = paper_success }
-		}
+		trigger = { has_character_flag = paper_success@FROM }
 
 		add_character_modifier = {
 			name = endorsed_theorem
@@ -11032,9 +10875,13 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_MNM_1645
-		trigger = {
-			FROM = { has_character_flag = paper_failure }
-		}
+		trigger = { has_character_flag = paper_failure@FROM }
+	}
+
+	after = {
+		clr_character_flag = paper_failure@FROM
+		clr_character_flag = paper_success@FROM
+		clr_character_flag = peer_review@FROM
 	}
 }
 
@@ -11060,17 +10907,49 @@ character_event = {
 		society = {
 			show_scope_change = no
 
-			any_society_member = { # TODO: Needs a custom tooltip, as it will only be displayed showing a random society member
-				show_scope_change = no
 
+			if = {
+				# Below effect doesn't show any portraits if there are more than 10
 				limit = {
-					NOT = { character = ROOT }
+					any_society_member = {
+						NOT = { character = ROOT }
+						count = 11
+					}
 				}
 
-				opinion = {
-					name = opinion_knowledge_theft
-					who = ROOT
-					years = 20
+				tooltip = {
+					any_society_member = {
+						count = 10
+					}
+				}
+
+				any_society_member = {
+					show_scope_change = no
+
+					limit = {
+						NOT = { character = ROOT }
+					}
+
+					opinion = {
+						name = opinion_knowledge_theft
+						who = ROOT
+						years = 20
+					}
+				}
+			}
+			else = {
+				any_society_member = {
+					show_scope_change = no
+
+					limit = {
+						NOT = { character = ROOT }
+					}
+
+					opinion = {
+						name = opinion_knowledge_theft
+						who = ROOT
+						years = 20
+					}
 				}
 			}
 		}
@@ -11267,21 +11146,13 @@ character_event = {
 
 	immediate = {
 		set_variable = {
-			which = local_gath_try
-			value = 5
-		}
-		set_variable = {
 			which = local_gath_res
 			value = 0
 		}
 
 		while = {
-			limit = {
-				check_variable = {
-					which = local_gath_try
-					value > 0
-				}
-			}
+			count = 5
+
 			random_list = {
 				50 = { # Successful gathering
 					mult_modifier = {
@@ -11352,11 +11223,6 @@ character_event = {
 						trait = drunkard
 					}
 				}
-			}
-
-			change_variable = {
-				which = local_gath_try
-				value = -1
 			}
 		}
 
@@ -11562,21 +11428,13 @@ character_event = {
 
 	immediate = {
 		set_variable = {
-			which = local_gath_try
-			value = 5
-		}
-		set_variable = {
 			which = local_gath_res
 			value = 0
 		}
 
 		while = {
-			limit = {
-				check_variable = {
-					which = local_gath_try
-					value > 0
-				}
-			}
+			count = 5
+
 			random_list = {
 				50 = { # Successful gathering
 					mult_modifier = {
@@ -11636,11 +11494,9 @@ character_event = {
 						trait = hunter
 					}
 
-					FROM = {
-						change_variable = {
-							which = local_gath_res
-							value = 1
-						}
+					change_variable = {
+						which = local_gath_res
+						value = 1
 					}
 				}
 				50 = { # Unsuccessful gathering
@@ -11649,11 +11505,6 @@ character_event = {
 						trait = drunkard
 					}
 				}
-			}
-
-			change_variable = {
-				which = local_gath_try
-				value = -1
 			}
 		}
 
@@ -11850,21 +11701,13 @@ character_event = {
 
 	immediate = {
 		set_variable = {
-			which = local_gath_try
-			value = 5
-		}
-		set_variable = {
 			which = local_gath_res
 			value = 0
 		}
 
 		while = {
-			limit = {
-				check_variable = {
-					which = local_gath_try
-					value > 0
-				}
-			}
+			count = 5
+
 			random_list = {
 				50 = { # Successful gathering
 					mult_modifier = {
@@ -11924,11 +11767,9 @@ character_event = {
 						trait = gregarious
 					}
 
-					FROM = {
-						change_variable = {
-							which = local_gath_res
-							value = 1
-						}
+					change_variable = {
+						which = local_gath_res
+						value = 1
 					}
 				}
 				50 = { # Unsuccessful gathering
@@ -11937,11 +11778,6 @@ character_event = {
 						trait = drunkard
 					}
 				}
-			}
-
-			change_variable = {
-				which = local_gath_try
-				value = -1
 			}
 		}
 
@@ -12342,11 +12178,10 @@ character_event = {
 
 	option = { # Show observatory
 		name = EVTOPTA_MNM_1928
-		tooltip_info = yes
+		tooltip_info_custom = AVAILABLE_DUE_TO_OBSERVATORY
 
 		trigger = { has_character_flag = built_observatory }
 
-		custom_tooltip = { text = AVAILABLE_DUE_TO_OBSERVATORY }
 		custom_tooltip = { text = EVTOPTA_MNM_1928_TOOLTIP }
 
 		event_target:stargazing_guest = {
@@ -12365,13 +12200,12 @@ character_event = {
 
 	option = { # Show fancy equipment
 		name = EVTOPTB_MNM_1928
-		tooltip_info = yes
+		tooltip_info_custom = AVAILABLE_DUE_TO_OBSERVATORY_EQUIPMENT
 
 		trigger = {
 			has_character_flag = owns_observatory_equipment
 			NOT = { has_character_flag = built_observatory }
 		}
-		custom_tooltip = { text = AVAILABLE_DUE_TO_OBSERVATORY_EQUIPMENT }
 		custom_tooltip = { text = EVTOPTB_MNM_1928_TOOLTIP }
 
 		event_target:stargazing_guest = {
@@ -13271,6 +13105,12 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1948 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1947
 
@@ -13291,9 +13131,6 @@ character_event = {
 			}
 		}
 		set_character_flag = stargazing_good_outcome
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1948 }
-		}
 	}
 }
 
@@ -13325,6 +13162,12 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1951 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1950
 
@@ -13333,9 +13176,6 @@ character_event = {
 		culture_techpoints = 50
 
 		set_character_flag = stargazing_good_outcome
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1951 }
-		}
 	}
 }
 
@@ -13365,6 +13205,12 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1954 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1953
 
@@ -13379,9 +13225,6 @@ character_event = {
 		}
 
 		set_character_flag = stargazing_good_outcome
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1954 }
-		}
 	}
 }
 
@@ -13417,13 +13260,16 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1956 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1955
 
 		set_character_flag = stargazing_good_outcome
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1956 }
-		}
 	}
 }
 
@@ -13449,13 +13295,16 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1958 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1957
 
 		set_character_flag = stargazing_bad_outcome
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1958 }
-		}
 	}
 }
 
@@ -13485,6 +13334,12 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1960 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1959
 
@@ -13493,9 +13348,6 @@ character_event = {
 			add_trait_depressed_effect = yes
 		}
 		set_character_flag = stargazing_bad_outcome
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1960 }
-		}
 	}
 }
 
@@ -13587,14 +13439,17 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1963 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1962
 
 		add_friend = event_target:stargazing_guest
 		set_character_flag = stargazing_become_friends
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1963 }
-		}
 	}
 }
 
@@ -13626,14 +13481,16 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1966 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_MNM_1965
 
 		add_rival = event_target:stargazing_guest
-
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1966 }
-		}
 	}
 }
 
@@ -13685,6 +13542,12 @@ character_event = {
 		}
 	}
 
+	immediate = {
+		event_target:stargazing_guest = {
+			character_event = { id = MNM.1969 }
+		}
+	}
+
 	option = {
 		name = {
 			text = EVTOPTA_MNM_1968_A
@@ -13718,9 +13581,6 @@ character_event = {
 			clr_character_flag = stargazing_bad_outcome
 			clr_character_flag = stargazing_become_friends
 			remove_character_modifier = inviting_to_stargazing
-		}
-		event_target:stargazing_guest = {
-			character_event = { id = MNM.1969 }
 		}
 	}
 }
@@ -14755,8 +14615,7 @@ character_event = { # Progress - Child wants help to sleep
 	}
 
 	option = { # this will help you sleep (uses ingredient)
-		tooltip_info = yes
-		custom_tooltip = { text = ingredient_option_available_tt }
+		tooltip_info_custom = ingredient_option_available_tt
 
 		name = {
 			text = EVTOPTC_MNM_1842_herb
@@ -14938,8 +14797,7 @@ character_event = { # Progress - Friends upset about missed event
 	}
 
 	option = {
-		tooltip_info = yes
-		custom_tooltip = { text = ingredient_option_available_tt }
+		tooltip_info_custom = ingredient_option_available_tt
 
 		name = {
 			text = EVTOPTC_MNM_1844_herb
@@ -15144,8 +15002,7 @@ character_event = {
 	}
 
 	option = { # Combine several somethings...!
-		tooltip_info = yes
-		custom_tooltip = { text = multiple_ingredient_option_available_tt }
+		tooltip_info_custom = multiple_ingredient_option_available_tt
 
 		trigger = { has_selected_liquid_ingredient_2_trigger = yes }
 
@@ -15336,6 +15193,10 @@ character_event = { # Outcome - Name a newly found star
 
 	option = { # Name it after myself
 		name = EVTOPTD_MNM_1848
+
+		trigger = {
+			NOT = { has_character_modifier = got_named_star }
+		}
 
 		add_trait = proud
 
