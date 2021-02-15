@@ -10,23 +10,19 @@ character_event = {
 	desc = EVTDESC_HF_15000
 	picture = GFX_evt_moonlit_mountains_hf
 	border = GFX_event_normal_frame_religion
+
 	is_triggered_only = yes
-
-	trigger = {
-
-	}
 
 	immediate = {
 		if = {
 			limit = {
 				any_owned_bloodline = {
 					founder = {
-						NOT = {
-							character = ROOT
-						}
+						NOT = { character = ROOT }
 					}
 				}
 			}
+
 			random_owned_bloodline = {
 				founder = {
 					save_event_target_as = bloodline_founder
@@ -37,61 +33,70 @@ character_event = {
 
 	option = { # Lunatic option
 		name = EVTOPTA_HF_15000
-		add_character_modifier = {
-			modifier = told_story_nr_1
-			years = 5
-		}
-
 		tooltip_info = lunatic
 
 		trigger = { trait = lunatic }
+
+		add_character_modifier = {
+			name = told_story_nr_1
+			years = 5
+		}
 	}
+
 	option = { # Dumb option
 		name = EVTOPTB_HF_15000
-		add_character_modifier = {
-			modifier = told_story_nr_2
-			years = 5
-		}
-
 		tooltip_info_custom = available_because_dumb
 
-		ai_chance = {
-			factor = 100
-		}
-
 		trigger = { is_dumb_trigger = yes }
-	}
-	option = { # Bloodline option (not dumb)
-		name = EVTOPTC_HF_15000
+
 		add_character_modifier = {
-			modifier = told_story_nr_3
+			name = told_story_nr_2
 			years = 5
 		}
+
+		ai_chance = { factor = 100 }
+	}
+
+	option = { # Bloodline option (not dumb)
+		name = EVTOPTC_HF_15000
+
 		trigger = {
 			event_target:bloodline_founder = { always = yes }
 		}
+
+		add_character_modifier = {
+			name = told_story_nr_3
+			years = 5
+		}
 	}
+
 	option = { # About bravery
 		name = EVTOPTD_HF_15000
+
 		add_character_modifier = {
-			modifier = told_story_nr_4
+			name = told_story_nr_4
 			years = 5
 		}
 	}
+
 	option = { # About religion
 		name = EVTOPTE_HF_15000
+
 		add_character_modifier = {
-			modifier = told_story_nr_5
+			name = told_story_nr_5
 			years = 5
 		}
 	}
+
 	option = { # About your tribe
 		name = EVTOPTF_HF_15000
+
+		trigger = { is_tribal = yes }
+
 		add_character_modifier = {
-			modifier = told_story_nr_6
+			name = told_story_nr_6
 			years = 5
 		}
-		trigger = { is_tribal = yes }
 	}
 
 	after = {
@@ -102,32 +107,34 @@ character_event = {
 # Rains down in Africa (SETUP)
 character_event = {
 	id = HF.15099
-	is_triggered_only = yes
+
+	is_triggered_only = yes # on_startup
 	hide_window = yes
+
 	has_dlc = "Holy Fury"
 	only_playable = yes
 
 	trigger = {
-		any_realm_province = {
-			is_land = yes
+		any_demesne_province = {
 			region_africa_west_central_or_east_trigger = yes
 			has_rain_or_drought_modifier_trigger = no
 		}
 	}
 
 	immediate = {
-		any_realm_province = {
+		any_demesne_province = {
 			limit = {
-				is_land = yes
 				region_africa_west_central_or_east_trigger = yes
 				has_rain_or_drought_modifier_trigger = no
 			}
+
 			# Solid start... Activate this for more sunny weather from the get-go...
 			add_province_modifier = {
 				name = africa_light_rain
 				duration = -1
 			}
-			change_rain_effect = yes #Activate this instead, if you want it more random...
+
+			change_rain_effect = yes # Activate this instead, if you want it more random...
 		}
 	}
 }
@@ -136,49 +143,47 @@ character_event = {
 # Rain development (on 5 year pulse)
 character_event = {
 	id = HF.15100
+
 	is_triggered_only = yes
 	hide_window = yes
+
 	has_dlc = "Holy Fury"
 	only_playable = yes
 
 	trigger = {
 		any_demesne_province = {
-			is_land = yes
 			region_africa_west_central_or_east_trigger = yes
 			has_rain_or_drought_modifier_trigger = yes
 		}
 	}
 
 	immediate = {
-		#save_event_target_as = rain_liege
+# 		save_event_target_as = rain_liege
 
 #       while = { # As long as there are some provinces left to change the weather of...
 #           limit = {
 #               any_demesne_province = {
-#                   is_land = yes
 #                   region_africa_west_central_or_east_trigger = yes
 #                   NOT = { has_province_modifier = africa_weather_updated }
-# }
-# }
+#				}
+#			}
 
 			### Current setup: Runs through all demesne provinces and chain-changes them (based on previous status and neighbor's status)
 			any_demesne_province = { #Change weather...
 				limit = {
-					is_land = yes
 					region_africa_west_central_or_east_trigger = yes
 					NOT = { has_province_modifier = africa_weather_updated }
 				}
 				change_rain_effect = yes
-			}
+#
 #               preferred_limit = {
-#                   is_capital = yes #An attempt to make your capital the most important choice for the rain :p
-#                   is_land = yes
+#                   is_capital = yes # An attempt to make your capital the most important choice for the rain :p
 #                   region_africa_west_central_or_east_trigger = yes
 #                   NOT = { has_province_modifier = africa_weather_updated }
-# }
-				#save_event_target_as = target_province
-
-
+#				}
+#
+#				save_event_target_as = target_province
+#
 #               location = { duchy = { save_event_target_as = target_duchy_title } }
 #
 #               # Spread it to the duchy...
@@ -188,12 +193,12 @@ character_event = {
 #                           if = {
 #                               limit = { NOT = { has_province_modifier = africa_weather_updated } }
 #                               event_target:target_province = { clone_weather_to_prev_effect = yes }
-# }
-# }
-# }
-# }
-# }
-# }
+#							}
+#						}
+#					}
+#				}
+			}
+#		}
 	}
 }
 
@@ -201,30 +206,33 @@ character_event = {
 # Delay for the tombola below (from on bi_yearly_pulse)
 character_event = {
 	id = HF.15098
+
 	hide_window = yes
 	is_triggered_only = yes
 
 	only_playable = yes
+	has_dlc = "Holy Fury"
 	min_age = 16
 	only_capable = yes
 	prisoner = no
-	has_dlc = "Holy Fury"
 
-	immediate = { character_event = { id = HF.15120 days = 5 } }
+	immediate = {
+		character_event = { id = HF.15120 days = 5 }
+	}
 }
 
 # Tombola for flavor/risks/bonuses related to the rain/drought... (from event above )
 character_event = {
 	id = HF.15120
+
 	is_triggered_only = yes
 	hide_window = yes
 
 	only_playable = yes
-	#only_independent = yes
+	has_dlc = "Holy Fury"
 	min_age = 16
 	only_capable = yes
 	prisoner = no
-	has_dlc = "Holy Fury"
 
 	trigger = {
 		any_demesne_province = {
@@ -234,19 +242,19 @@ character_event = {
 	}
 
 	immediate = {
-		calculate_weather_status_in_demesne_effect = yes #Run this in an effect file for testing individual events
+		calculate_weather_status_in_demesne_effect = yes # Run this in an effect file for testing individual events
 
-		#The Winds over [PrimaryTitle] (Rain prep)......... HF.15110
-		#Rain dances have effect (?) ...................... HF.15101
-		#To dance or not to dance ......................... HF.15102
+		# The Winds over [PrimaryTitle] (Rain prep)......... HF.15110
+		# Rain dances have effect (?) ...................... HF.15101
+		# To dance or not to dance ......................... HF.15102
 
-		#Landslide in province............................. HF.15121
-		#Molding Library................................... HF.15123
-		#Flooded Armory ................................... HF.15124
+		# Landslide in province............................. HF.15121
+		# Molding Library................................... HF.15123
+		# Flooded Armory ................................... HF.15124
 
-		#The Winds over [PrimaryTitle] (Drought prep)......	HF.15111
-		#Drought causes starvation (notification only) .... HF.15125
-		#Drought spreads disease .......................... HF.15122
+		# The Winds over [PrimaryTitle] (Drought prep)...... HF.15111
+		# Drought causes starvation (notification only) .... HF.15125
+		# Drought spreads disease .......................... HF.15122
 
 		random_list = {
 			### Any rain...
@@ -257,34 +265,47 @@ character_event = {
 						has_character_flag = mostly_heavy_rain
 						has_character_flag = mostly_light_rain
 					}
-					NOR = {
-						has_character_flag = mostly_drought_risk
-						has_character_flag = mostly_drought
-					}
+
 					capital_scope = {
 						OR = {
 							has_province_modifier = africa_heavy_rain
 							has_province_modifier = africa_light_rain
 						}
+
+						NOR = {
+							has_province_modifier = africa_drought_risk
+							has_province_modifier = africa_drought
+						}
 					}
-				}
-			}
-			10 = { # Rain dances have effect (?)
-				character_event = { id = HF.15101 }
-				modifier = {
-					factor = 1.5
-					OR = {
-						has_character_flag = mostly_heavy_rain
-						has_character_flag = mostly_light_rain
-					}
+
 					NOR = {
 						has_character_flag = mostly_drought_risk
 						has_character_flag = mostly_drought
 					}
 				}
+			}
+
+			10 = { # Rain dances have effect (?)
+				character_event = { id = HF.15101 }
+
 				modifier = {
 					factor = 1.5
-					NOT = { #If there are is *no* drought at all
+
+					OR = {
+						has_character_flag = mostly_heavy_rain
+						has_character_flag = mostly_light_rain
+					}
+
+					NOR = {
+						has_character_flag = mostly_drought_risk
+						has_character_flag = mostly_drought
+					}
+				}
+
+				mult_modifier = {
+					factor = 1.5
+
+					NOT = { # If there are is *no* drought at all
 						any_demesne_province = {
 							OR = {
 								has_province_modifier = africa_drought_risk
@@ -293,12 +314,14 @@ character_event = {
 						}
 					}
 				}
+
 				trigger = {
 					any_demesne_province = {
 						OR = {
 							has_province_modifier = africa_light_rain
 							has_province_modifier = africa_heavy_rain
 						}
+
 						OR = {
 							has_province_modifier = africa_rain_dance_1
 							has_province_modifier = africa_rain_dance_2
@@ -306,54 +329,57 @@ character_event = {
 					}
 				}
 			}
+
 			10 = { # To dance or not to dance
 				character_event = { id = HF.15102 }
-				modifier = {
+
+				trigger = {
+					any_demesne_province = {
+						has_province_modifier = africa_light_rain
+
+						NOR = {
+							has_province_modifier = africa_rain_dance_1
+							has_province_modifier = africa_rain_dance_2
+						}
+
+						# You've had it great for way too long...
+						had_province_flag = {
+							flag = africa_light_rain_flag
+							years < 50
+						}
+					}
+				}
+
+				mult_modifier = {
 					factor = 1.5
+
 					OR = {
 						has_character_flag = mostly_heavy_rain
 						has_character_flag = mostly_light_rain
 					}
+
 					NOR = {
 						has_character_flag = mostly_drought_risk
 						has_character_flag = mostly_drought
-					}
-				}
-				trigger = {
-					any_demesne_province = {
-						has_province_modifier = africa_light_rain
-						NOT = { has_province_modifier = africa_rain_dance_1 }
-						NOT = { has_province_modifier = africa_rain_dance_2 }
-
-						NOT = { #You've had it great for way too long...
-							had_province_flag = {
-								flag = africa_light_rain_flag
-								days = 18250 # 50 years...
-							}
-						}
 					}
 				}
 			}
+
 			### Heavy Rain...
 			10 = { # Landslide in a province...
 				character_event = { id = HF.15121 }
-				modifier = {
-					factor = 1.5
-					has_character_flag = mostly_heavy_rain
-					NOR = {
-						has_character_flag = mostly_light_rain
-						has_character_flag = mostly_drought_risk
-						has_character_flag = mostly_drought
-					}
-				}
+
 				trigger = {
 					has_character_flag = mostly_heavy_rain
+
 					any_demesne_province = {
 						has_province_modifier = africa_heavy_rain
 						NOT = { has_province_modifier = africa_heavy_rain_cooldown_1 }
+
 						any_province_holding = {
-							num_of_buildings = 1
+							num_of_buildings >= 1
 						}
+
 						any_province_holding = {
 							holder_scope = {
 								any_courtier = {
@@ -364,70 +390,66 @@ character_event = {
 						}
 					}
 				}
-			}
-			10 = { # Rotting Library...
-				character_event = { id = HF.15123 }
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
+
 					has_character_flag = mostly_heavy_rain
+
 					NOR = {
 						has_character_flag = mostly_light_rain
 						has_character_flag = mostly_drought_risk
 						has_character_flag = mostly_drought
 					}
 				}
-				modifier = {
-					factor = 1.5
-					capital_scope = {
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				modifier = {
-					factor = 0.1
-					has_character_flag = had_book_event
-				}
+			}
+
+			10 = { # Rotting Library...
+				character_event = { id = HF.15123 }
+
 				trigger = {
 					any_demesne_province = {
 						has_province_modifier = africa_heavy_rain
 						NOT = { has_province_modifier = africa_heavy_rain_cooldown_2 }
 					}
+
 					any_artifact = {
 						has_artifact_flag = book
 					}
 				}
-			}
-			10 = { # Rusting Armory...
-				character_event = { id = HF.15124 }
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
+
 					has_character_flag = mostly_heavy_rain
+
 					NOR = {
 						has_character_flag = mostly_light_rain
 						has_character_flag = mostly_drought_risk
 						has_character_flag = mostly_drought
 					}
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
-					capital_scope = {
-						has_province_modifier = africa_heavy_rain
-					}
+					capital_scope = { has_province_modifier = africa_heavy_rain }
 				}
-				modifier = {
-					factor = 1.5
-					any_artifact = {
-						count = 5
-					}
-				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.1
-					has_character_flag = had_weapon_event
+					has_character_flag = had_book_event
 				}
+			}
+
+			10 = { # Rusting Armory...
+				character_event = { id = HF.15124 }
+
 				trigger = {
 					any_demesne_province = {
 						has_province_modifier = africa_heavy_rain
 						NOT = { has_province_modifier = africa_heavy_rain_cooldown_3 }
 					}
+
 					any_artifact = {
 						OR = {
 							has_artifact_flag = armor
@@ -435,66 +457,129 @@ character_event = {
 						}
 					}
 				}
+
+				mult_modifier = {
+					factor = 1.5
+
+					has_character_flag = mostly_heavy_rain
+
+					NOR = {
+						has_character_flag = mostly_light_rain
+						has_character_flag = mostly_drought_risk
+						has_character_flag = mostly_drought
+					}
+				}
+
+				mult_modifier = {
+					factor = 1.5
+					capital_scope = { has_province_modifier = africa_heavy_rain }
+				}
+
+				mult_modifier = {
+					factor = 1.5
+					num_of_artifacts >= 5
+				}
+
+				mult_modifier = {
+					factor = 0.1
+					has_character_flag = had_weapon_event
+				}
 			}
+
 			### Any drought...
 			10 = {
 				character_event = { id = HF.15103 } # Rain dances maybe?
-				modifier = {
-					factor = 1.5
-					OR = {
-						has_character_flag = mostly_drought_risk
-						has_character_flag = mostly_drought
-					}
-				}
+
 				trigger = {
 					any_demesne_province = {
 						has_province_modifier = africa_drought_risk
-						NOT = { has_province_modifier = africa_rain_dance_1 }
-						NOT = { has_province_modifier = africa_rain_dance_2 }
+
+						NOR = {
+							has_province_modifier = africa_rain_dance_1
+							has_province_modifier = africa_rain_dance_2
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 1.5
+
+					OR = {
+						has_character_flag = mostly_drought_risk
+						has_character_flag = mostly_drought
 					}
 				}
 			}
+
 			10 = { # The Winds over [PrimaryTitle] (Drought)
 				character_event = { id = HF.15111 }
-				modifier = {
-					factor = 1.5
-					NOT = { has_character_flag = mostly_drought } #Means you have more to share
-				}
+
 				trigger = {
 					OR = {
 						has_character_flag = mostly_drought_risk
 						has_character_flag = mostly_drought
 					}
+
 					NOR = {
 						has_character_flag = mostly_heavy_rain
 						has_character_flag = mostly_light_rain
 					}
+
 					any_realm_province = {
-						NOT = { has_province_modifier = local_relief_efforts_food }
 						OR = {
 							has_province_modifier = africa_drought_risk
 							has_province_modifier = africa_drought
 						}
-					}
-					capital_scope = {
+
+						is_capital = no
 						NOT = { has_province_modifier = local_relief_efforts_food }
-						NOT = { has_province_modifier = africa_drought } # Can't be completely starving themselves
+					}
+
+					capital_scope = {
+						NOR = {
+							has_province_modifier = local_relief_efforts_food
+							has_province_modifier = africa_drought # Can't be completely starving themselves
+						}
 					}
 				}
-			}
-			10 = { #Disease outbreak... (Requires Reaper's Due)
-				character_event = { id = HF.15122 }
-				modifier = {
+
+				mult_modifier = {
 					factor = 1.5
+					NOT = { has_character_flag = mostly_drought } # Means you have more to share
+				}
+			}
+
+			10 = { # Disease outbreak... (Requires Reaper's Due)
+				character_event = { id = HF.15122 }
+
+				trigger = {
+					has_dlc = "Reapers"
+
+					any_demesne_province = {
+						has_province_modifier = africa_drought
+
+						NOR = {
+							disease = typhoid_fever
+							has_province_modifier = africa_drought_cooldown_1
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 1.5
+
 					has_character_flag = mostly_drought
+
 					NOR = {
 						has_character_flag = mostly_heavy_rain
 						has_character_flag = mostly_light_rain
 						has_character_flag = mostly_drought_risk
 					}
 				}
-				modifier = {
-					factor = 0.5 # less likely if all the affected areas have taken precautions earlier...
+
+				mult_modifier = {
+					factor = 0.5 # Less likely if all the affected areas have taken precautions earlier...
+
 					NOT = {
 						any_demesne_province = {
    							has_province_modifier = africa_drought
@@ -502,35 +587,42 @@ character_event = {
 						}
 					}
 				}
-				modifier = {
-					factor = 1.5 # more likely if an area has already suffered from extra starvation...
+
+				mult_modifier = {
+					factor = 1.5 # More likely if an area has already suffered from extra starvation...
+
 					any_demesne_province = {
 						has_province_modifier = africa_drought
 						has_province_modifier = africa_drought_cooldown_2
 					}
 				}
+			}
+
+			10 = { # Starvation... (notification only)
+				character_event = { id = HF.15125 }
+
 				trigger = {
-					has_dlc = "Reapers"
 					any_demesne_province = {
 						has_province_modifier = africa_drought
-						NOT = { disease = typhoid_fever }
-						NOT = { has_province_modifier = africa_drought_cooldown_1 }
+						NOT = { has_province_modifier = africa_drought_cooldown_2 }
 					}
 				}
-			}
-			10 = { #Starvation... (notification only)
-				character_event = { id = HF.15125 }
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
+
 					has_character_flag = mostly_drought
+
 					NOR = {
 						has_character_flag = mostly_heavy_rain
 						has_character_flag = mostly_light_rain
 						has_character_flag = mostly_drought_risk
 					}
 				}
-				modifier = {
-					factor = 0.5 # less likely if all the affected areas have taken precautions earlier...
+
+				mult_modifier = {
+					factor = 0.5 # Less likely if all the affected areas have taken precautions earlier...
+
 					NOT = {
 						any_demesne_province = {
    							has_province_modifier = africa_drought
@@ -538,8 +630,10 @@ character_event = {
 						}
 					}
 				}
-				modifier = {
-					factor = 0.5 # less likely if all the affected areas have taken precautions earlier...
+
+				mult_modifier = {
+					factor = 0.5 # Less likely if all the affected areas have taken precautions earlier...
+
 					NOT = {
 						any_demesne_province = {
    							has_province_modifier = africa_drought
@@ -547,16 +641,7 @@ character_event = {
 						}
 					}
 				}
-				trigger = {
-					any_demesne_province = {
-						has_province_modifier = africa_drought
-						NOT = { has_province_modifier = africa_drought_cooldown_2 }
-					}
-				}
 			}
-			#10 = {
-				# Nothing happens...
-			# }
 		}
 	}
 }
@@ -567,14 +652,11 @@ character_event = {
 	title = africa_rain_positive_title
 	picture = GFX_evt_west_african_ruler
 	border = GFX_event_normal_frame_religion
+
 	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-	}
-
 	desc = {
-		text = EVTDESC_HF_15101_A #Light rain, rain dances
+		text = EVTDESC_HF_15101_A # Light rain, rain dances
 		trigger = {
 			event_target:rain_dance_province = {
 				has_province_modifier = africa_light_rain
@@ -583,7 +665,7 @@ character_event = {
 		}
 	}
 	desc = {
-		text = EVTDESC_HF_15101_B #Light rain, prosperity festivals
+		text = EVTDESC_HF_15101_B # Light rain, prosperity festivals
 		trigger = {
 			event_target:rain_dance_province = {
 				has_province_modifier = africa_light_rain
@@ -592,7 +674,7 @@ character_event = {
 		}
 	}
 	desc = {
-		text = EVTDESC_HF_15101_C #Heavy rain, rain dances
+		text = EVTDESC_HF_15101_C # Heavy rain, rain dances
 		trigger = {
 			event_target:rain_dance_province = {
 				has_province_modifier = africa_heavy_rain
@@ -601,7 +683,7 @@ character_event = {
 		}
 	}
 	desc = {
-		text = EVTDESC_HF_15101_D #Heavy rain, prosperity festivals
+		text = EVTDESC_HF_15101_D # Heavy rain, prosperity festivals
 		trigger = {
 			event_target:rain_dance_province = {
 				has_province_modifier = africa_heavy_rain
@@ -609,37 +691,42 @@ character_event = {
 			}
 		}
 	}
-
 
 	immediate = {
-		#If things are looking up and you had rain dances...!
+		# If things are looking up and you had rain dances...!
 		random_demesne_province = {
 			limit = {
 				OR = {
 					has_province_modifier = africa_light_rain
 					has_province_modifier = africa_heavy_rain
 				}
+
 				OR = {
 					has_province_modifier = africa_rain_dance_1
 					has_province_modifier = africa_rain_dance_2
 				}
 			}
+
 			save_event_target_as = rain_dance_province
 		}
 	}
 
 	option = { # Our rituals have clearly had an effect!
 		name = EVTOPTA_HF_15101
+
 		piety = 25
 	}
 
 	option = { # This is all me
 		name = EVTOPTB_HF_15101
+
 		prestige = 50
 	}
+
 	after = {
 		any_demesne_province = {
 			show_scope_change = no
+
 			limit = {
 				OR = {
 					has_province_modifier = africa_light_rain
@@ -650,13 +737,15 @@ character_event = {
 					has_province_modifier = africa_rain_dance_2
 				}
 			}
+
 			hidden_effect = {
 				remove_province_modifier = africa_rain_dance_1
 				remove_province_modifier = africa_rain_dance_2
 			}
+
 			add_province_modifier = {
 				name = africa_rain_dance_successful
-				duration = 3650 #10 years
+				years = 10
 			}
 		}
 	}
@@ -669,19 +758,20 @@ character_event = {
 	desc = EVTDESC_HF_15102
 	picture = GFX_evt_west_african_ruler
 	border = GFX_event_normal_frame_religion
-	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		random_demesne_province = {
 			limit = {
    				has_province_modifier = africa_light_rain
-				NOT = { has_province_modifier = africa_rain_dance_1 }
-				NOT = { has_province_modifier = africa_rain_dance_2 }
+
+				NOR = {
+					has_province_modifier = africa_rain_dance_1
+					has_province_modifier = africa_rain_dance_2
+				}
 			}
+
 			save_event_target_as = rainy_province
 		}
 	}
@@ -690,9 +780,8 @@ character_event = {
 		name = EVTOPTA_HF_15102
 
 		if = {
-			limit = {
-				is_tribal = yes
-			}
+			limit = { is_tribal = yes }
+
 			scaled_wealth = {
 				value = -0.5
 				min = -10
@@ -711,16 +800,18 @@ character_event = {
 
 		event_target:rainy_province = {
 			show_scope_change = no
+
 			add_province_modifier = {
 				name = africa_rain_dance_2 # Keep it coming-dance
-				duration = 3650 #10 years
+				years = 10
 			}
 		}
 	}
 
 	option = { # This is good news
 		name = EVTOPTB_HF_15102
-		#custom_tooltip = { text = EVTOPTB_HF_15102_TT }
+
+		# custom_tooltip = { text = EVTOPTB_HF_15102_TT }
 	}
 }
 
@@ -730,14 +821,9 @@ character_event = {
 	title = africa_rain_negative_title
 	picture = GFX_evt_desert
 	border = GFX_event_normal_frame_religion
-	is_triggered_only = yes
-
-	trigger = {
-		is_alive = yes
-	}
 
 	desc = {
-		text = EVTDESC_HF_15103_A #Risk of drought
+		text = EVTDESC_HF_15103_A # Risk of drought
 		trigger = {
 			event_target:drought_province = {
 				has_province_modifier = africa_drought_risk
@@ -745,13 +831,15 @@ character_event = {
 		}
 	}
 	desc = {
-		text = EVTDESC_HF_15103_B #Actual drought
+		text = EVTDESC_HF_15103_B # Actual drought
 		trigger = {
 			event_target:drought_province = {
 				has_province_modifier = africa_drought
 			}
 		}
 	}
+
+	is_triggered_only = yes
 
 	immediate = {
 		random_demesne_province = {
@@ -760,26 +848,32 @@ character_event = {
 					has_province_modifier = africa_drought_risk
 					has_province_modifier = africa_drought
 				}
-				NOT = { has_province_modifier = africa_rain_dance_1 }
-				NOT = { has_province_modifier = africa_rain_dance_2 }
+
+				NOR = {
+					has_province_modifier = africa_rain_dance_1
+					has_province_modifier = africa_rain_dance_2
+				}
 			}
+
 			save_event_target_as = drought_province
 		}
 	}
 
 	option = { # Perhaps a rain dance?
 		name = EVTOPTA_HF_15103
+
 		if = {
-			limit = {
-				is_tribal = yes
-			}
+			limit = { is_tribal = yes }
+
 			scaled_wealth = {
 				value = -0.1
 				min = -5
 				max = -15
 			}
+
 			prestige = -25
 		}
+
 		else = {
 			scaled_wealth = {
 				value = -1
@@ -790,12 +884,14 @@ character_event = {
 
 		event_target:drought_province = {
 			show_scope_change = no
+
 			add_province_modifier = {
 				name = africa_rain_dance_1 # Praying for water
 				duration = -1
 			}
 		}
 	}
+
 	option = { # Do nothing
 		name = EVTOPTB_HF_15103
 	}
@@ -808,27 +904,128 @@ character_event = {
 	desc = EVTDESC_HF_15110
 	picture = GFX_evt_market_hf
 	border = GFX_event_normal_frame_religion
-	is_triggered_only = yes
 	portrait = event_target:my_steward
 
-	trigger = {
-		is_alive = yes
-		capital_scope = {
-			NOR = {
-				has_province_modifier = africa_drought_risk
-				has_province_modifier = africa_drought
-			}
-		}
-	}
+	is_triggered_only = yes
 
 	immediate = {
-		if = {
-			limit = {
-				job_treasurer = {
-					always = yes
+		job_treasurer = { save_event_target_as = my_steward } # For loc...
+
+		# Calculate how much prestige various options cost, if tribal
+		set_variable = {
+			which = local_provinces_without_irrigation
+			value = 0
+		}
+
+		set_variable = {
+			which = local_provinces_rivers_lakes
+			value = 0
+		}
+
+		set_variable = {
+			which = local_provinces_roads
+			value = 0
+		}
+
+		set_variable = {
+			which = local_provinces_grain
+			value = 0
+		}
+
+		any_demesne_province = {
+			if = {
+				limit = { NOT = { has_province_modifier = improved_irrigation } }
+
+				change_variable = {
+					which = local_provinces_without_irrigation
+					value = -15
 				}
 			}
-			job_treasurer = { save_event_target_as = my_steward } # For loc...
+
+			if = {
+				limit = { has_province_modifier = africa_heavy_rain }
+
+				change_variable = {
+					which = local_provinces_rivers_lakes
+					value = -15
+				}
+
+				change_variable = {
+					which = local_provinces_roads
+					value = -15
+				}
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_province_modifier = africa_heavy_rain
+						has_province_modifier = africa_light_rain
+					}
+				}
+
+				change_variable = {
+					which = local_provinces_grain
+					value = -15
+				}
+			}
+		}
+
+		# Means you have fewer than 4 provinces this is happening to anyway
+		if = {
+			limit = {
+				check_variable = {
+					which = local_provinces_without_irrigation
+					value > -60
+				}
+			}
+
+			set_variable = {
+				which = local_provinces_without_irrigation
+				value = -35
+			}
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = local_provinces_rivers_lakes
+					value > -60
+				}
+			}
+
+			set_variable = {
+				which = local_provinces_rivers_lakes
+				value = -35
+			}
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = local_provinces_roads
+					value > -60
+				}
+			}
+
+			set_variable = {
+				which = local_provinces_roads
+				value = -35
+			}
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					which = local_provinces_grain
+					value > -60
+				}
+			}
+
+			set_variable = {
+				which = local_provinces_grain
+				value = -35
+			}
 		}
 	}
 
@@ -836,14 +1033,14 @@ character_event = {
 		name = EVTOPTA_HF_15110
 
 		if = {
-			limit = {
-				is_tribal = yes
-			}
+			limit = { is_tribal = yes }
+
 			scaled_wealth = {
 				value = -0.2
 				min = -10
 				max = -25
 			}
+
 			prestige = -50
 		}
 		else = {
@@ -854,90 +1051,20 @@ character_event = {
 			}
 		}
 
-
 		capital_scope = {
 			show_scope_change = no
+
 			add_province_modifier = {
 				name = focused_traders
-				duration = 1460 # 4 years
+				years = 4
 			}
 		}
 
-		if = {
-			limit = { trait = greedy }
-			remove_trait = greedy
-		}
+		remove_trait_silently_greedy_effect = yes
 	}
+
 	option = { # [LIGHT RAIN ONLY] Let's look into our irrigation
 		name = EVTOPTB_HF_15110_light_rain
-
-		if = {
-			limit = {
-				is_tribal = yes
-			}
-			if = { # Pay some Prestige instead, based around how many of these modifiers you're getting...
-				limit = {
-					any_demesne_province = {
-						count = 10
-						NOT = { has_province_modifier = improved_irrigation }
-					}
-				}
-				prestige = -150
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 8
-						NOT = { has_province_modifier = improved_irrigation }
-					}
-				}
-				prestige = -120
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 6
-						NOT = { has_province_modifier = improved_irrigation }
-					}
-				}
-				prestige = -90
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 4
-						NOT = { has_province_modifier = improved_irrigation }
-					}
-				}
-				prestige = -60
-			}
-			else = { #means you have less than 4 provinces this is happening to anyway
-				prestige = -35
-			}
-
-			scaled_wealth = { #Also pay less money
-				value = -0.1
-				min = -5
-				max = -10
-			}
-		}
-		else = { #If you're not Tribal
-			scaled_wealth = {
-				value = -2
-				min = -25
-				max = -750
-			}
-		}
-		any_demesne_province = {
-			show_scope_change = no
-			limit = {
-				NOT = { has_province_modifier = improved_irrigation }
-			}
-			add_province_modifier = {
-				name = improved_irrigation
-				duration = 1820 # 5 years
-			}
-		}
 
 		trigger = {
 			has_character_flag = mostly_light_rain
@@ -948,54 +1075,64 @@ character_event = {
 				NOT = { has_province_modifier = improved_irrigation }
 			}
 		}
-	}
-	option = { # [HEAVY RAIN ONLY] Keep an eye on rivers & lakes
-		name = EVTOPTB_1_HF_15110
+
 		if = {
-			limit = {
-				is_tribal = yes
-			}
-			if = { # Pay some Prestige instead, based around how many of these modifiers you're getting...
-				limit = {
-					any_demesne_province = {
-						count = 10
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				prestige = -150
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 8
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				prestige = -120
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 6
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				prestige = -90
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 4
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				prestige = -60
-			}
-			else = { #means you have less than 4 provinces this is happening to anyway
-				prestige = -35
+			limit = { is_tribal = yes }
+
+			# Pay some Prestige instead, based around how many of these modifiers you're getting...
+			prestige = local_provinces_without_irrigation
+
+			scaled_wealth = { #Also pay less money
+				value = -0.1
+				min = -5
+				max = -10
 			}
 		}
-		else = { #If you're not Tribal
+		else = {
+			scaled_wealth = {
+				value = -2
+				min = -25
+				max = -750
+			}
+		}
+
+		any_demesne_province = {
+			show_scope_change = no
+
+			limit = {
+				NOT = { has_province_modifier = improved_irrigation }
+			}
+
+			add_province_modifier = {
+				name = improved_irrigation
+				years = 5
+			}
+		}
+	}
+
+	option = { # [HEAVY RAIN ONLY] Keep an eye on rivers & lakes
+		name = EVTOPTB_1_HF_15110
+
+		trigger = {
+			has_character_flag = mostly_heavy_rain
+			NOT = { has_character_flag = mostly_light_rain }
+
+			any_demesne_province = { # If you have lakes and stuff nearby
+				OR = {
+					borders_lake = yes
+					borders_major_river = yes
+					any_neighbor_province = { is_land = no }
+				}
+			}
+		}
+
+		if = {
+			limit = { is_tribal = yes }
+
+			# Pay some Prestige instead, based around how many of these modifiers you're getting...
+			prestige = local_provinces_rivers_lakes
+		}
+		else = {
 			scaled_wealth = {
 				value = -1
 				min = -15
@@ -1005,77 +1142,42 @@ character_event = {
 
 		custom_tooltip = {
 			text = water_watch_1_tt
+
 			any_demesne_province = {
-				show_scope_change = no
-				limit = {
-					has_province_modifier = africa_heavy_rain
-				}
+				limit = { has_province_modifier = africa_heavy_rain }
+
 				add_province_modifier = {
 					name = water_watch_1
-					duration = 1820 # 5 years
-				}
-			}
-		}
-
-		trigger = {
-			has_character_flag = mostly_heavy_rain
-			NOT = { has_character_flag = mostly_light_rain }
-			any_demesne_province = { #If you have lakes and stuff nearby
-				OR = {
-					borders_lake = yes
-					borders_major_river = yes
-					any_neighbor_province = { is_land = no }
+					years = 5
 				}
 			}
 		}
 	}
+
 	option = { # [HEAVY RAIN ONLY] Keep an eye on roads
 		name = EVTOPTB_2_HF_15110
-		if = {
-			limit = {
-				is_tribal = yes
-			}
-			if = { # Pay some Prestige instead, based around how many of these modifiers you're getting...
-				limit = {
-					any_demesne_province = {
-						count = 10
-						has_province_modifier = africa_heavy_rain
-					}
+
+		trigger = {
+			has_character_flag = mostly_heavy_rain
+			NOT = { has_character_flag = mostly_light_rain }
+
+			any_demesne_province = { # If you *don't* have lakes and stuff nearby
+				borders_lake = no
+				borders_major_river = no
+
+				NOT = {
+					any_neighbor_province = { is_land = no }
 				}
-				prestige = -150
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 8
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				prestige = -120
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 6
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				prestige = -90
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 4
-						has_province_modifier = africa_heavy_rain
-					}
-				}
-				prestige = -60
-			}
-			else = { #means you have less than 4 provinces this is happening to anyway
-				prestige = -35
 			}
 		}
-		else = { #If you're not Tribal
+
+		if = {
+			limit = { is_tribal = yes }
+
+			# Pay some Prestige instead, based around how many of these modifiers you're getting...
+			prestige = local_provinces_roads
+		}
+		else = {
 			scaled_wealth = {
 				value = -1
 				min = -15
@@ -1085,88 +1187,28 @@ character_event = {
 
 		custom_tooltip = {
 			text = water_watch_2_tt
+
 			any_demesne_province = {
-				show_scope_change = no
-				limit = {
-					has_province_modifier = africa_heavy_rain
-				}
+				limit = { has_province_modifier = africa_heavy_rain }
+
 				add_province_modifier = {
 					name = water_watch_2
-					duration = 1820 # 5 years
-				}
-			}
-		}
-		trigger = {
-			has_character_flag = mostly_heavy_rain
-			NOT = { has_character_flag = mostly_light_rain }
-			any_demesne_province = { #If you *don't* have lakes and stuff nearby
-				NOR = {
-					borders_lake = yes
-					borders_major_river = yes
-					any_neighbor_province = { is_land = no }
+					years = 5
 				}
 			}
 		}
 	}
+
 	option = { # [ALWAYS VISIBLE] We should put away grain for the future
 		name = EVTOPTC_HF_15110
+
 		if = {
-			limit = {
-				is_tribal = yes
-			}
-			if = { # Pay some Prestige instead, based around how many of these modifiers you're getting...
-				limit = {
-					any_demesne_province = {
-						count = 10
-						OR = {
-							has_province_modifier = africa_heavy_rain
-							has_province_modifier = africa_light_rain
-						}
-					}
-				}
-				prestige = -150
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 8
-						OR = {
-							has_province_modifier = africa_heavy_rain
-							has_province_modifier = africa_light_rain
-						}
-					}
-				}
-				prestige = -120
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 6
-						OR = {
-							has_province_modifier = africa_heavy_rain
-							has_province_modifier = africa_light_rain
-						}
-					}
-				}
-				prestige = -90
-			}
-			else_if = {
-				limit = {
-					any_demesne_province = {
-						count = 4
-						OR = {
-							has_province_modifier = africa_heavy_rain
-							has_province_modifier = africa_light_rain
-						}
-					}
-				}
-				prestige = -60
-			}
-			else = { #means you have less than 4 provinces this is happening to anyway
-				prestige = -35
-			}
+			limit = { is_tribal = yes }
+
+			# Pay some Prestige instead, based around how many of these modifiers you're getting...
+			prestige = local_provinces_grain
 		}
-		else = { #If you're not Tribal
+		else = {
 			scaled_wealth = {
 				value = -1
 				min = -10
@@ -1176,22 +1218,24 @@ character_event = {
 
 		custom_tooltip = {
 			text = africa_surplus_grain_tt
+
 			any_demesne_province = {
-				show_scope_change = no
 				limit = {
 					OR = {
 						has_province_modifier = africa_heavy_rain
 						has_province_modifier = africa_light_rain
 					}
 				}
+
 				add_province_modifier = {
 					name = africa_surplus_grain
-					duration = 3650 # 10 years
+					years = 10
 					hidden = yes
 				}
 			}
 		}
 	}
+
 	option = { # [ALWAYS VISIBLE] Do nothing
 		name = SO_IT_IS
 	}
@@ -1204,119 +1248,41 @@ character_event = {
 	desc = EVTDESC_HF_15110
 	picture = GFX_evt_market_hf
 	border = GFX_event_normal_frame_religion
+
 	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-		any_demesne_province = {
-			OR = {
-				has_province_modifier = africa_drought_risk
-				has_province_modifier = africa_drought
-			}
-			is_capital = no
-		}
-	}
-
 	immediate = {
-		hidden_effect = {
-			if = {
-				limit = {
-					job_treasurer = {
-						always = yes
-					}
+		job_treasurer = { save_event_target_as = my_steward } # For loc...
+
+		# Select a province to randomly help out...
+		random_realm_province = {
+			limit = {
+				OR = {
+					has_province_modifier = africa_drought_risk
+					has_province_modifier = africa_drought
 				}
-				job_treasurer = { save_event_target_as = my_steward } #For loc...
+
+				is_capital = no
+				NOT = { has_province_modifier = local_relief_efforts_food }
 			}
-			if = {	# Select a province to randomly help out...
-				limit = {
-					any_realm_province = {
-						OR = {
-							has_province_modifier = africa_drought_risk
-							has_province_modifier = africa_drought
-						}
-						is_capital = no
-					}
-				}
-				random_realm_province = {
-					limit = {
-						OR = {
-							has_province_modifier = africa_drought_risk
-							has_province_modifier = africa_drought
-						}
-						is_capital = no
-					}
-					preferred_limit = { #prefers to select something you are yourself the liege of...
-						has_province_modifier = africa_drought
-						holder_scope = { character = ROOT }
-					}
-					preferred_limit = { #prefers to select something you are yourself the liege of...
-						holder_scope = { character = ROOT }
-					}
-					save_event_target_as = province_to_save
-				}
+
+			# Prefers to select something you are yourself the liege of...
+			preferred_limit = {
+				has_province_modifier = africa_drought
+				owned_by = ROOT
 			}
+
+			preferred_limit = {
+				owned_by = ROOT
+			}
+
+			save_event_target_as = province_to_save
 		}
 	}
 
 	option = { # Feed our capital province
 		name = EVTOPTA_HF_15111
-		capital_scope = {
-			show_scope_change = no
-			custom_tooltip = {
-				text = EVTOPTA_HF_15111_TT
-			}
-		}
-		if = {
-			limit = {
-				is_tribal = yes
-			}
-			if = { # Pay some Prestige instead, based around how many of these modifiers you're getting...
-				limit = { num_of_count_titles_in_realm = 15 }
-				prestige = -150
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 12 }
-				prestige = -120
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 12 }
-				prestige = -120
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 9 }
-				prestige = -90
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 7 }
-				prestige = -70
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 5 }
-				prestige = -50
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 3 }
-				prestige = -30
-			}
-			else = { #means you have a small realm
-				prestige = -15
-			}
-		}
-		else = { #If you're not Tribal
-			scaled_wealth = {
-				value = -1
-				min = -25
-				max = -500
-			}
-		}
 
-		capital_scope = {
-			show_scope_change = no
-			add_province_modifier = {
-				name = local_relief_efforts_food
-				duration = 1460 # 4 years
-			}
-		}
 		trigger = {
 			capital_scope = {
 				OR = {
@@ -1325,86 +1291,114 @@ character_event = {
 				}
 			}
 		}
-	}
-	option = { # Help random province
-		name = EVTOPTB_HF_15111
-		event_target:province_to_save = {
+
+		capital_scope = {
 			show_scope_change = no
-			custom_tooltip = {
-				text = EVTOPTA_HF_15111_TT
-			}
+
+			custom_tooltip = { text = EVTOPTA_HF_15111_TT }
 		}
+
 		if = {
-			limit = {
-				is_tribal = yes
-			}
-			if = { # Pay some Prestige instead, based around how many of these modifiers you're getting...
-				limit = { num_of_count_titles_in_realm = 15 }
-				prestige = -150
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 12 }
-				prestige = -120
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 12 }
-				prestige = -120
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 9 }
-				prestige = -90
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 7 }
-				prestige = -70
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 5 }
-				prestige = -50
-			}
-			else_if = {
-				limit = { num_of_count_titles_in_realm = 3 }
-				prestige = -30
-			}
-			else = { #means you have a small realm
-				prestige = -15
+			limit = { is_tribal = yes }
+
+			# Pay some Prestige instead, based around how many of these modifiers you're getting...
+			trigger_switch = {
+				on_trigger = num_of_count_titles_in_realm
+
+				15 = { prestige = -150 }
+				12 = { prestige = -120 }
+				9 = { prestige = -90 }
+				7 = { prestige = -70 }
+				5 = { prestige = -50 }
+				3 = { prestige = -30 }
+
+				# Means you have a small realm
+				fallback = { prestige = -15 }
 			}
 		}
-		else = { #If you're not Tribal
+		else = {
 			scaled_wealth = {
 				value = -1
 				min = -25
 				max = -500
 			}
 		}
-		if = {
-			limit = { trait = greedy }
-			remove_trait = greedy
-		}
-		event_target:province_to_save = {
+
+		capital_scope = {
 			show_scope_change = no
+
 			add_province_modifier = {
 				name = local_relief_efforts_food
-				duration = 1460 # 4 years
+				years = 4
 			}
 		}
+	}
+
+	option = { # Help random province
+		name = EVTOPTB_HF_15111
+
 		trigger = {
 			event_target:province_to_save = { always = yes } # Only exists if you have more than one province
 		}
+
+		event_target:province_to_save = {
+			show_scope_change = no
+
+			custom_tooltip = { text = EVTOPTA_HF_15111_TT }
+		}
+
+		if = {
+			limit = { is_tribal = yes }
+
+			# Pay some Prestige instead, based around how many of these modifiers you're getting...
+			trigger_switch = {
+				on_trigger = num_of_count_titles_in_realm
+
+				15 = { prestige = -150 }
+				12 = { prestige = -120 }
+				9 = { prestige = -90 }
+				7 = { prestige = -70 }
+				5 = { prestige = -50 }
+				3 = { prestige = -30 }
+
+				# Means you have a small realm
+				fallback = { prestige = -15 }
+			}
+		}
+		else = {
+			scaled_wealth = {
+				value = -1
+				min = -25
+				max = -500
+			}
+		}
+
+		remove_trait_silently_greedy_effect = yes
+
+		event_target:province_to_save = {
+			show_scope_change = no
+
+			add_province_modifier = {
+				name = local_relief_efforts_food
+				years = 4
+			}
+		}
 	}
+
 	option = { # Character modifier (pious)
 		name = EVTOPTC_HF_15111
 
 		if = {
-			limit = { NOT = { trait = zealous } }
-			add_trait = zealous
-		}
-		else_if = {
 			limit = { trait = cynical }
 			remove_trait = cynical
 		}
+		else_if = {
+			limit = { NOT = { trait = zealous } }
+			add_trait = zealous
+		}
+
 		add_character_modifier = {
-			modifier = superstitious_ruler
+			name = superstitious_ruler
 			years = 5
 		}
 	}
@@ -1421,94 +1415,87 @@ character_event = {
 	desc = EVTDESC_HF_15121
 	picture = GFX_evt_dead_body_hf
 	border = GFX_event_normal_frame_religion
+
 	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-	}
-
 	immediate = {
-		hidden_effect = {
-			random_demesne_province = {
-				limit = {
-					has_province_modifier = africa_heavy_rain
-				}
-				preferred_limit = {
-					terrain = mountain
-				}
-				save_event_target_as = flooded_province
-				add_province_modifier = {
-					name = africa_heavy_rain_cooldown_1
-					duration = 1095 # 3 years
-					hidden = yes
-				}
-				random_province_holding = {
-					limit = { num_of_buildings = 1 }
-					save_event_target_as = flooded_holding
+		random_demesne_province = {
+			limit = { has_province_modifier = africa_heavy_rain }
+			preferred_limit = { terrain = mountain }
 
-					holder_scope = {
-						if = { # if the holder of this holding has a few courtiers around...
-							limit = {
-								any_courtier = {
-									count = 3
-									ai = yes
-								}
+			save_event_target_as = flooded_province
+
+			add_province_modifier = {
+				name = africa_heavy_rain_cooldown_1
+				years = 3
+				hidden = yes
+			}
+
+			random_province_holding = {
+				limit = { num_of_buildings >= 1 }
+
+				save_event_target_as = flooded_holding
+
+				holder_scope = {
+					if = { # if the holder of this holding has a few courtiers around...
+						limit = {
+							any_courtier = {
+								count = 3
+								ai = yes
 							}
-							save_event_target_as = flooded_court_liege
 						}
-						else = { # Otherwise, find someone in the province that *does* have courtiers...
-							event_target:flooded_province = {
-								random_province_holding = {
-									limit = {
-										holder_scope = {
-											any_courtier = {
-												count = 3
-												ai = yes
-											}
+
+						save_event_target_as = flooded_court_liege
+					}
+					else = { # Otherwise, find someone in the province that *does* have courtiers...
+						event_target:flooded_province = {
+							random_province_holding = {
+								limit = {
+									holder_scope = {
+										any_courtier = {
+											count = 3
+											ai = yes
 										}
 									}
-									holder_scope = {
-										save_event_target_as = flooded_court_liege
-									}
+								}
+
+								holder_scope = {
+									save_event_target_as = flooded_court_liege
 								}
 							}
 						}
 					}
-					event_target:flooded_court_liege = { # Now, use that character's court to find flood_victims...
-						while = {
-							count = 5
-							limit = {
-								NOT = {
-									any_courtier = {
-										count = 3
-										ai = yes
-										has_character_flag = flood_victim
-									}
-								}
+				}
+
+				# Now, use that character's court to find flood_victims...
+				event_target:flooded_court_liege = {
+					while = {
+						count = 3
+
+						random_courtier = {
+							limit = { ai = yes }
+
+							preferred_limit = {
+								at_location = event_target:flooded_province
+								is_rival = ROOT
+								prisoner = no
+								is_ruler = no
 							}
-							random_courtier = {
-								limit = { ai = yes }
-								preferred_limit = {
-									prisoner = no
-									is_landed = no
-									is_rival = ROOT
-									at_location = event_target:flooded_province
-								}
-								preferred_limit = {
-									prisoner = no
-									is_landed = no
-									is_rival = ROOT
-								}
-								preferred_limit = {
-									prisoner = no
-									is_landed = no
-									at_location = event_target:flooded_province
-								}
-								preferred_limit = {
-									at_location = event_target:flooded_province
-								}
-								set_character_flag = flood_victim
+							preferred_limit = {
+								is_rival = ROOT
+								prisoner = no
+								is_ruler = no
 							}
+							preferred_limit = {
+								at_location = event_target:flooded_province
+								prisoner = no
+								is_ruler = no
+							}
+							preferred_limit = {
+								at_location = event_target:flooded_province
+							}
+
+							set_character_flag = flood_victim
 						}
 					}
 				}
@@ -1518,24 +1505,37 @@ character_event = {
 
 	option = { # Save the people (destroy building)
 		name = EVTOPTA_HF_15121
+
 		scaled_wealth = {
 			value = -1
 			min = -35
 			max = -350
 		}
+
 		piety = 10
 
 		event_target:flooded_holding = {
 			show_scope_change = no
+
 			custom_tooltip = {
 				text = random_building_is_destroyed_tt
 				destroy_random_building = THIS
 			}
 		}
 	}
+
 	option = { # Save ... some people (building destroyed and rival dies)
 		name = EVTOPTB_HF_15121_rival
 		tooltip_info_custom = available_because_rivals_tt
+
+		trigger = {
+			event_target:flooded_court_liege = {
+				any_courtier = {
+					has_character_flag = flood_victim
+					is_rival = ROOT
+				}
+			}
+		}
 
 		custom_tooltip = { text = EVTOPTB_HF_15121_TT }
 
@@ -1560,6 +1560,7 @@ character_event = {
 
 		event_target:flooded_holding = {
 			show_scope_change = no
+
 			custom_tooltip = {
 				text = random_building_is_destroyed_tt
 				destroy_random_building = THIS
@@ -1568,12 +1569,15 @@ character_event = {
 
 		event_target:flooded_court_liege = {
 			show_scope_change = no
+
 			any_courtier = {
 				show_scope_change = no
+
 				limit = {
 					has_character_flag = flood_victim
 					is_rival = ROOT
 				}
+
 				death = {
 					death_reason = death_accident_drowning
 					killer = ROOT
@@ -1581,19 +1585,9 @@ character_event = {
 			}
 		}
 
-		ai_chance = {
-			factor = 100
-		}
-
-		trigger = {
-			event_target:flooded_court_liege = {
-				any_courtier = {
-					has_character_flag = flood_victim
-					is_rival = ROOT
-				}
-			}
-		}
+		ai_chance = { factor = 100 }
 	}
+
 	option = { # Save the buildings (people die)
 		name = EVTOPTB_HF_15121
 
@@ -1602,13 +1596,17 @@ character_event = {
 			min = -25
 			max = -350
 		}
+
 		prestige = 20
 
 		event_target:flooded_court_liege = {
 			show_scope_change = no
+
 			any_courtier = {
 				show_scope_change = no
+
 				limit = { has_character_flag = flood_victim }
+
 				death = {
 					death_reason = death_accident_drowning
 					killer = ROOT
@@ -1616,6 +1614,7 @@ character_event = {
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTC_HF_15121 #Tragic!
 
@@ -1624,6 +1623,7 @@ character_event = {
 
 		event_target:flooded_holding = {
 			show_scope_change = no
+
 			custom_tooltip = {
 				text = random_building_is_destroyed_tt
 				destroy_random_building = THIS
@@ -1632,19 +1632,25 @@ character_event = {
 
 		event_target:flooded_court_liege = {
 			show_scope_change = no
+
 			any_courtier = {
 				show_scope_change = no
+
 				limit = { has_character_flag = flood_victim }
+
 				death = {
 					death_reason = death_accident_drowning
 					killer = ROOT
 				}
 			}
 		}
+
 		if = {
 			limit = {
 				NOT = { trait = cruel }
 			}
+
+			remove_trait_silently_kind_effect = yes
 			add_trait = cruel
 		}
 	}
@@ -1657,77 +1663,47 @@ character_event = {
 	desc = EVTDESC_HF_15122
 	picture = GFX_evt_desert
 	border = GFX_event_normal_frame_religion
-	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		hidden_effect = {
-#    		random_demesne_province = {
-#	    		limit = {
-#	    			has_province_modifier = africa_drought
-#	    			NOT = { disease = typhoid_fever }
-#	    		}
-#	    		spawn_disease = typhoid_fever
-#	    	}
 			random_demesne_province = {
 				limit = {
 					has_province_modifier = africa_drought
 					NOT = { disease = typhoid_fever }
 				}
-				preferred_limit = {
-					terrain = desert
-					has_province_modifier = africa_drought_cooldown_2
-				}
-				preferred_limit = {
-					terrain = desert
-				}
-				preferred_limit = {
-					has_province_modifier = africa_drought_cooldown_2
-				}
-				save_event_target_as = starved_province
 
-#				random_province_holding = {
-#					holder_scope = {
-#						random_courtier = {
-#							limit = {
-#								NOT = { has_character_flag = immune_typhoid_fever }
-#								ai = yes
-#							}
-#							set_character_flag = starvation_victim
-#							add_trait = has_typhoid_fever
-#
-#							set_character_flag = manifest_typhoid_fever
-#							add_disease_level_effect = yes
-#							scrying_omen_fulfilled_by_gaining_disease_effect = yes
-#							clr_character_flag = developing_illness
-#							clr_character_flag = got_typhoid_fever
-#						}
-#					}
-#				}
+				preferred_limit = {
+					terrain = desert
+					has_province_modifier = africa_drought_cooldown_2
+				}
+				preferred_limit = {
+					terrain = desert
+				}
+				preferred_limit = {
+					has_province_modifier = africa_drought_cooldown_2
+				}
+
+				save_event_target_as = starved_province
 
 				random_province_holding = {
 					holder_scope = {
-					#	save_event_target_as = starved_court_liege
 						while = {
-							limit = {
-								NOT = {
-									any_courtier = {
-										count = 3
-										has_character_flag = starvation_victim
-									}
-								}
-							}
+							count = 3
+
 							random_courtier = {
 								limit = {
-									NOT = { has_character_flag = immune_typhoid_fever }
 									ai = yes
+
+									NOR = {
+										has_character_flag = starvation_victim
+										has_character_flag = immune_typhoid_fever
+									}
 								}
+
 								set_character_flag = starvation_victim
 								add_trait = has_typhoid_fever
-
 								set_character_flag = manifest_typhoid_fever
 								add_disease_level_effect = yes
 								scrying_omen_fulfilled_by_gaining_disease_effect = yes
@@ -1743,9 +1719,11 @@ character_event = {
 
 	option = { # Kill whoever is currently sick...
 		name = EVTOPTB_HF_15122
-		custom_tooltip = { text = EVTOPTB_HF_15122_TT }
-
 		tooltip_info = intrigue
+
+		trigger = { intrigue >= 10 }
+
+		custom_tooltip = { text = EVTOPTB_HF_15122_TT }
 
 		scaled_wealth = {
 			value = -1
@@ -1777,20 +1755,24 @@ character_event = {
 			limit = { NOT = { trait = cruel } }
 			add_trait = cruel
 		}
+
 		any_realm_character = {
 			show_scope_change = no
+
 			limit = { has_character_flag = starvation_victim }
+
 			random_accident_death_effect = yes
 		}
-		ai_chance = {
-			factor = 100
-		}
-		trigger = {
-			intrigue = 10
-		}
+
+		ai_chance = { factor = 100 }
 	}
+
 	option = { # Spend money to recruit builders...
 		name = EVTOPTC_HF_15122
+
+		trigger = {
+			NOT = { has_character_modifier = relief_efforts_builders }
+		}
 
 		prestige = 15
 
@@ -1801,35 +1783,37 @@ character_event = {
 		}
 
 		add_character_modifier = {
-			modifier = relief_efforts_builders
+			name = relief_efforts_builders
 			years = 5
 		}
 
 		custom_tooltip = {
 			text = spawn_slow_fever_tt
+
 			event_target:starved_province = {
 				spawn_disease = typhoid_fever
+
 				add_province_modifier = {
 					name = africa_drought_cooldown_1
-					duration = 1095 # 3 years
+					years = 3
 					hidden = yes
 				}
 			}
 		}
-		trigger = {
-			NOT = { has_character_modifier = relief_efforts_builders }
-		}
 	}
+
 	option = { # Start disease...
 		name = EVTOPTA_HF_15122
 
 		custom_tooltip = {
 			text = spawn_slow_fever_tt
+
 			event_target:starved_province = {
 				spawn_disease = typhoid_fever
+
 				add_province_modifier = {
 					name = africa_drought_cooldown_1
-					duration = 1095 # 3 years
+					years = 3
 					hidden = yes
 				}
 			}
@@ -1844,49 +1828,34 @@ character_event = {
 	desc = EVTDESC_HF_15123
 	picture = GFX_evt_monk
 	border = GFX_event_normal_frame_religion
-	is_triggered_only = yes
-
 	portrait = event_target:my_spiritual
 
-	trigger = {
-		is_alive = yes
-		any_artifact = {
-			has_artifact_flag = book
-		}
-	}
+	is_triggered_only = yes
 
 	immediate = {
-		hidden_effect = {
-			random_demesne_province = {
-				limit = {
-					has_province_modifier = africa_heavy_rain
-					NOT = { has_province_modifier = africa_heavy_rain_cooldown_2 }
-				}
-				save_event_target_as = flooded_province
-				add_province_modifier = {
-					name = africa_heavy_rain_cooldown_2
-					duration = 1095 # 3 years
-					hidden = yes
-				}
+		random_demesne_province = {
+			limit = {
+				has_province_modifier = africa_heavy_rain
+				NOT = { has_province_modifier = africa_heavy_rain_cooldown_2 }
+			}
+
+			save_event_target_as = flooded_province
+
+			add_province_modifier = {
+				name = africa_heavy_rain_cooldown_2
+				years = 3
+				hidden = yes
 			}
 		}
+
 		random_artifact = {
-			limit = {
-				has_artifact_flag = book
-			}
-			preferred_limit = {
-				is_artifact_equipped = yes #Means it reads as in your "Library" in the Treasury UI
-			}
+			limit = { has_artifact_flag = book }
+			preferred_limit = { is_artifact_equipped = yes } # Means it reads as in your "Library" in the Treasury UI
+
 			save_event_target_as = target_artifact
 		}
-		if = {
-			limit = {
-				job_spiritual = {
-					always = yes
-				}
-			}
-			job_spiritual = { save_event_target_as = my_spiritual } # For loc...
-		}
+
+		job_spiritual = { save_event_target_as = my_spiritual } # For loc...
 	}
 
 	option = { # Spend money to save the book...
@@ -1897,18 +1866,22 @@ character_event = {
 			min = -55
 			max = -750
 		}
+
 		reverse_opinion = {
-			modifier = opinion_agreed_with_opinion
+			name = opinion_agreed_with_opinion
 			who = event_target:my_spiritual
 			years = 5
 		}
+
 		set_character_flag = had_book_event
 	}
+
 	option = { # Let the book be destroyed
 		name = EVTOPTB_HF_15123
 
 		event_target:target_artifact = {
 			show_scope_change = no
+
 			destroy_artifact = yes
 		}
 	}
@@ -1921,35 +1894,26 @@ character_event = {
 	desc = EVTDESC_HF_15124
 	picture = GFX_evt_armory
 	border = GFX_event_normal_frame_religion
-	is_triggered_only = yes
-
 	portrait = event_target:my_marshal
 
-	trigger = {
-		is_alive = yes
-		any_artifact = {
-			OR = {
-				has_artifact_flag = armor
-				has_artifact_flag = combat_weapon
-			}
-		}
-	}
+	is_triggered_only = yes
 
 	immediate = {
-		hidden_effect = {
-			random_demesne_province = {
-				limit = {
-					has_province_modifier = africa_heavy_rain
-					NOT = { has_province_modifier = africa_heavy_rain_cooldown_3 }
-				}
-				save_event_target_as = flooded_province
-				add_province_modifier = {
-					name = africa_heavy_rain_cooldown_3
-					duration = 1095 # 3 years
-					hidden = yes
-				}
+		random_demesne_province = {
+			limit = {
+				has_province_modifier = africa_heavy_rain
+				NOT = { has_province_modifier = africa_heavy_rain_cooldown_3 }
+			}
+
+			save_event_target_as = flooded_province
+
+			add_province_modifier = {
+				name = africa_heavy_rain_cooldown_3
+				years = 3
+				hidden = yes
 			}
 		}
+
 		random_artifact = {
 			limit = {
 				OR = {
@@ -1957,19 +1921,15 @@ character_event = {
 					has_artifact_flag = combat_weapon
 				}
 			}
+
 			preferred_limit = {
 				is_artifact_equipped = no # In case you are out and about
 			}
+
 			save_event_target_as = target_artifact
 		}
-		if = {
-			limit = {
-				job_marshal = {
-					always = yes
-				}
-			}
-			job_marshal = { save_event_target_as = my_marshal } # For loc...
-		}
+
+		job_marshal = { save_event_target_as = my_marshal } # For loc...
 	}
 
 	option = { # Spend money to save the weapon/armor...
@@ -1980,92 +1940,91 @@ character_event = {
 			min = -55
 			max = -750
 		}
+
 		reverse_opinion = {
-			modifier = opinion_was_praised
+			name = opinion_was_praised
 			who = event_target:my_marshal
 			years = 5
 		}
+
 		set_character_flag = had_weapon_event
 	}
+
 	option = { # Let the book be destroyed
 		name = EVTOPTB_HF_15124
 
 		event_target:target_artifact = {
 			show_scope_change = no
+
 			destroy_artifact = yes
 		}
 	}
 }
 
-
 # People are suffering from the drought. (negative drought)
 character_event = {
 	id = HF.15125
-	is_triggered_only = yes
 	picture = GFX_evt_desert
-	notification = yes
 
 	desc = {
-		text = EVTDESC_HF_15125_A #People are starving...
+		text = EVTDESC_HF_15125_A # People are starving...
 		trigger = {
 			NOT = { event_target:starving_province = { has_province_modifier = local_relief_efforts_food } }
 		}
 	}
 	desc = {
-		text = EVTDESC_HF_15125_B #In spite of our efforts, people are starving..
+		text = EVTDESC_HF_15125_B # In spite of our efforts, people are starving..
 		trigger = {
 			event_target:starving_province = { has_province_modifier = local_relief_efforts_food }
 		}
 	}
 	desc = {
-		text = EVTDESC_HF_15125_C #In spite of storages, people are starving..
+		text = EVTDESC_HF_15125_C # In spite of storages, people are starving..
 		trigger = {
 			event_target:starving_province = { has_province_modifier = africa_surplus_grain }
 		}
 	}
 
-	trigger = {
-		is_alive = yes
-		any_demesne_province = {
-			has_province_modifier = africa_drought
-			NOT = { has_province_modifier = africa_drought_cooldown_2 }
-		}
-	}
+	is_triggered_only = yes
+	notification = yes
 
 	immediate = {
-		hidden_effect = {
-			random_demesne_province = {
-				limit = {
-					has_province_modifier = africa_drought
-					NOT = { has_province_modifier = africa_drought_cooldown_2 }
-				}
-				preferred_limit = {
-					NOT = { has_province_modifier = africa_surplus_grain }
-					NOT = { has_province_modifier = local_relief_efforts_food }
-				}
-				preferred_limit = {
-					NOT = { has_province_modifier = local_relief_efforts_food }
-				}
-				preferred_limit = {
-					NOT = { has_province_modifier = africa_surplus_grain }
-				}
-				save_event_target_as = starving_province
+		random_demesne_province = {
+			limit = {
+				has_province_modifier = africa_drought
+				NOT = { has_province_modifier = africa_drought_cooldown_2 }
+			}
 
-				add_province_modifier = {
-					name = africa_drought_cooldown_2
-					duration = 365 #a year
-					hidden = yes
+			preferred_limit = {
+				NOR = {
+					has_province_modifier = africa_surplus_grain
+					has_province_modifier = local_relief_efforts_food
 				}
+			}
+			preferred_limit = {
+				NOT = { has_province_modifier = local_relief_efforts_food }
+			}
+			preferred_limit = {
+				NOT = { has_province_modifier = africa_surplus_grain }
+			}
 
-				holder_scope = {
-					any_courtier = {
-						lose_weight_medium_effect = yes
-						weight_trait_check_effect = yes
-					}
+			save_event_target_as = starving_province
+
+			add_province_modifier = {
+				name = africa_drought_cooldown_2
+				years = 1
+				hidden = yes
+			}
+
+			holder_scope = {
+				any_courtier = {
+					lose_weight_medium_effect = yes
+					weight_trait_check_effect = yes
 				}
 			}
 		}
 	}
+
 	option = {
 		name = OK
 	}
