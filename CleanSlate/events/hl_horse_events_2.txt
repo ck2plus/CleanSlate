@@ -12,32 +12,25 @@ namespace = HL
 # Horse dies
 character_event = {
 	id = HL.6500
+	picture = GFX_evt_horse_friend
+	border = GFX_event_normal_frame_war
+
 	desc = {
 		text = EVTDESC_HL_6500_LIGHTNING
-		trigger = {
-			has_character_flag = nomad_warhorse_name_lightning
-		}
+		trigger = { has_character_flag = nomad_warhorse_name_lightning }
 	}
 	desc = {
 		text = EVTDESC_HL_6500_SKY
-		trigger = {
-			has_character_flag = nomad_warhorse_name_sky
-		}
+		trigger = { has_character_flag = nomad_warhorse_name_sky }
 	}
 	desc = {
 		text = EVTDESC_HL_6500_DRAGON
-		trigger = {
-			has_character_flag = nomad_warhorse_name_dragon
-		}
+		trigger = { has_character_flag = nomad_warhorse_name_dragon }
 	}
 	desc = {
 		text = EVTDESC_HL_6500_ARROW
-		trigger = {
-			has_character_flag = nomad_warhorse_name_arrow
-		}
+		trigger = { has_character_flag = nomad_warhorse_name_arrow }
 	}
-	picture = GFX_evt_horse_friend
-	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
@@ -47,17 +40,35 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_6500
+
 		remove_character_modifier = nomad_warhorse
-		hidden_tooltip = {
-			character_event = { id = HL.6999 }
-		}
+		character_event = { id = HL.6999 } # Clean-up
 	}
 }
 
 # Other horse bit my horse
 character_event = {
-	id = HL.6510
-	hide_window = yes
+	id = HL.6512
+	picture = GFX_evt_horse_friend
+	border = GFX_event_normal_frame_war
+
+	desc = {
+		text = EVTDESC_HL_6512_LIGHTNING
+		trigger = { has_character_flag = nomad_warhorse_name_lightning }
+	}
+	desc = {
+		text = EVTDESC_HL_6512_SKY
+		trigger = { has_character_flag = nomad_warhorse_name_sky }
+	}
+	desc = {
+		text = EVTDESC_HL_6512_DRAGON
+		trigger = { has_character_flag = nomad_warhorse_name_dragon }
+	}
+	desc = {
+		text = EVTDESC_HL_6512_ARROW
+		trigger = { has_character_flag = nomad_warhorse_name_arrow }
+	}
+
 	is_triggered_only = yes
 
 	only_playable = yes
@@ -65,20 +76,13 @@ character_event = {
 	trigger = {
 		has_character_modifier = nomad_warhorse
 		is_incapable = no
-		NOT = { is_inaccessible_trigger = yes }
-		OR = {
-			any_vassal = {
-				is_adult = yes
-				prisoner = no
-				is_incapable = no
-				ai = yes
-			}
-			any_courtier = {
-				is_adult = yes
-				prisoner = no
-				is_incapable = no
-				ai = yes
-			}
+		is_inaccessible_trigger = no
+
+		any_courtier_or_vassal = {
+			is_adult = yes
+			prisoner = no
+			is_incapable = no
+			ai = yes
 		}
 	}
 
@@ -96,6 +100,7 @@ character_event = {
 					ai = yes
 				}
 			}
+
 			any_vassal = {
 				limit = {
 					is_adult = yes
@@ -103,84 +108,47 @@ character_event = {
 					is_incapable = no
 					ai = yes
 				}
-				score_value = { #Prioritizes selecting an interesting courtier...
+
+				score_value = {
 					value = 10
 					interesting_courtier_selection_score = yes
 				}
-				character_event = { id = HL.6511 }
-				break = yes
+
+				save_event_target_as = horse_owner
 			}
 		}
-		any_courtier = {
-			limit = {
-				is_adult = yes
-				prisoner = no
-				is_incapable = no
-				ai = yes
+		else = {
+			any_courtier = {
+				limit = {
+					is_adult = yes
+					prisoner = no
+					is_incapable = no
+					ai = yes
+				}
+
+				score_value = {
+					value = 10
+					interesting_courtier_selection_score = yes
+				}
+
+				save_event_target_as = horse_owner
 			}
-			score_value = { #Prioritizes selecting an interesting courtier...
-				value = 10
-				interesting_courtier_selection_score = yes
-			}
-			character_event = { id = HL.6511 }
 		}
 	}
-}
-
-character_event = {
-	id = HL.6511
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			character_event = { id = HL.6512 }
-		}
-	}
-}
-
-character_event = {
-	id = HL.6512
-	desc = {
-		text = EVTDESC_HL_6512_LIGHTNING
-		trigger = {
-			has_character_flag = nomad_warhorse_name_lightning
-		}
-	}
-	desc = {
-		text = EVTDESC_HL_6512_SKY
-		trigger = {
-			has_character_flag = nomad_warhorse_name_sky
-		}
-	}
-	desc = {
-		text = EVTDESC_HL_6512_DRAGON
-		trigger = {
-			has_character_flag = nomad_warhorse_name_dragon
-		}
-	}
-	desc = {
-		text = EVTDESC_HL_6512_ARROW
-		trigger = {
-			has_character_flag = nomad_warhorse_name_arrow
-		}
-	}
-	picture = GFX_evt_horse_friend
-	border = GFX_event_normal_frame_war
-
-	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_HL_6512
+
 		reverse_opinion = {
-			who = FROM
-			modifier = opinion_killed_horse
+			name = opinion_killed_horse
+			who = event_target:horse_owner
 			years = 15
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HL_6512
+
 		prestige = -30
 	}
 }
@@ -194,11 +162,12 @@ character_event = {
 
 	is_triggered_only = yes
 
+	only_capable = yes
+
 	trigger = {
-		prestige = 1500
 		has_character_modifier = nomad_warhorse
-		is_incapable = no
-		NOT = { is_inaccessible_trigger = yes }
+		prestige >= 1500
+		is_inaccessible_trigger = no
 		NOT = { has_character_flag = nomad_painter }
 	}
 
@@ -212,22 +181,27 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_6520
+
 		prestige = 50
 		wealth = -50
 	}
 
 	option = {
 		name = EVTOPTB_HL_6520
-		trigger = {
-			spouse = { always = yes }
-		}
+
+		trigger = { is_married = yes }
+
 		prestige = 25
 		wealth = -50
+
 		spouse = {
+			show_scope_change = no
+
 			prestige = 50
+
 			opinion = {
+				name = opinion_happy
 				who = ROOT
-				modifier = opinion_happy
 				years = 5
 			}
 		}
@@ -235,104 +209,117 @@ character_event = {
 
 	option = {
 		name = EVTOPTC_HL_6520
+
 		trigger = {
-			NOT = {
-				spouse = { always = yes }
-			}
-			any_courtier = { is_consort = ROOT is_female = yes }
-		}
-		prestige = 25
-		wealth = -50
-		any_courtier = {
-			limit = {
-				is_consort = ROOT
+			is_married = no
+			is_senior_consort_party = yes
+
+			any_consort = {
 				is_female = yes
 			}
-			score_value = { #Prioritizes selecting an interesting courtier...
-				value = 10
-				interesting_courtier_selection_score = yes
-			}
-			prestige = 50
-			opinion = {
-				who = ROOT
-				modifier = opinion_delighted
-				years = 5
-			}
 		}
-	}
-	option = {
-		name = EVTOPTC_HL_6520_MALE
-		trigger = {
-			NOT = {
-				spouse = { always = yes }
-			}
-			any_courtier = { is_consort = ROOT is_female = no }
-		}
+
 		prestige = 25
 		wealth = -50
-		any_courtier = {
-			limit = {
-				is_consort = ROOT
-				is_female = no
-			}
-			score_value = { #Prioritizes selecting an interesting courtier...
+
+		any_consort = {
+			show_scope_change = no
+
+			limit = { is_female = yes }
+
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
+
 			prestige = 50
+
 			opinion = {
+				name = opinion_delighted
 				who = ROOT
-				modifier = opinion_delighted
 				years = 5
 			}
 		}
 	}
 
 	option = {
-		name = EVTOPTD_HL_6520_SKY
+		name = EVTOPTC_HL_6520_MALE
+
 		trigger = {
-			has_character_flag = nomad_warhorse_name_sky
+			is_married = no
+			is_senior_consort_party = yes
+
+			any_consort = {
+				is_female = no
+			}
 		}
-		prestige = 100
+
+		prestige = 25
 		wealth = -50
+
+		any_consort = {
+			show_scope_change = no
+
+			limit = { is_female = no }
+
+			score_value = {
+				value = 10
+				interesting_courtier_selection_score = yes
+			}
+
+			prestige = 50
+
+			opinion = {
+				name = opinion_delighted
+				who = ROOT
+				years = 5
+			}
+		}
 	}
 
 	option = {
-		name = EVTOPTD_HL_6520_LIGHTNING
-		trigger = {
-			has_character_flag = nomad_warhorse_name_lightning
+		name = {
+			text = EVTOPTD_HL_6520_SKY
+			trigger = { has_character_flag = nomad_warhorse_name_sky }
 		}
-		prestige = 100
-		wealth = -50
-	}
+		name = {
+			text = EVTOPTD_HL_6520_LIGHTNING
+			trigger = { has_character_flag = nomad_warhorse_name_lightning }
+		}
+		name = {
+			text = EVTOPTD_HL_6520_ARROW
+			trigger = { has_character_flag = nomad_warhorse_name_arrow }
+		}
+		name = {
+			text = EVTOPTD_HL_6520_DRAGON
+			trigger = { has_character_flag = nomad_warhorse_name_dragon }
+		}
 
-	option = {
-		name = EVTOPTD_HL_6520_ARROW
-		trigger = {
-			has_character_flag = nomad_warhorse_name_arrow
-		}
-		prestige = 100
-		wealth = -50
-	}
-
-	option = {
-		name = EVTOPTD_HL_6520_DRAGON
-		trigger = {
-			has_character_flag = nomad_warhorse_name_dragon
-		}
 		prestige = 100
 		wealth = -50
 	}
 
 	option = {
 		name = EVTOPTE_HL_6520
+
 		prestige = -25
-		random = {
-			chance = 40
-			add_trait = shy
-			hidden_tooltip = {
-				character_event = {
-					id = 38263 #Notify Shy
+
+		if = {
+			limit = {
+				NOT = { trait = shy }
+			}
+
+			random = {
+				chance = 40
+
+				tooltip = {
+					remove_trait_silently_gregarious_effect = yes
+					add_trait = shy
+				}
+
+				hidden_effect = {
+					remove_trait_silently_gregarious_effect = yes
+					add_trait_shy_effect = yes
 				}
 			}
 		}
@@ -354,101 +341,105 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_6990
+
 		random = {
 			chance = 5
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = {
-					id = 38288 #Notify Depressed
-				}
-			}
+			add_trait_depressed_effect = yes
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HL_6990
+
 		trigger = {
 			spouse = {
 				opinion = {
 					who = ROOT
-					value = 60
+					value >= 60
 				}
+
 				is_incapable = no
 			}
 		}
+
 		spouse = {
+			show_scope_change = no
+
 			random = {
 				chance = 5
-				add_trait = depressed
-				hidden_tooltip = {
-					character_event = {
-						id = 38288 #Notify Depressed
-					}
-				}
+				add_trait_depressed_effect = yes
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPTC_HL_6990
+
 		trigger = {
 			any_friend = {
 				is_incapable = no
 			}
 		}
+
 		any_friend = {
-			limit = {
-				is_incapable = no
-			}
-			score_value = { #Prioritizes selecting an interesting courtier...
+			show_scope_change = no
+
+			limit = { is_incapable = no }
+
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
+
 			random = {
 				chance = 5
-				add_trait = depressed
-				hidden_tooltip = {
-					character_event = {
-						id = 38288 #Notify Depressed
-					}
-				}
+				add_trait_depressed_effect = yes
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPTC_HL_6990
+
 		trigger = {
 			NOT = {
 				any_friend = {
 					is_incapable = no
 				}
 			}
+
 			any_courtier = {
 				trait = kind
+				is_incapable = no
+
 				opinion = {
 					who = ROOT
-					value = 0
+					value >= 0
 				}
-				is_incapable = no
 			}
 		}
+
 		any_courtier = {
+			show_scope_change = no
+
 			limit = {
 				trait = kind
+				is_incapable = no
+
 				opinion = {
 					who = ROOT
-					value = 0
+					value >= 0
 				}
-				is_incapable = no
 			}
-			score_value = { #Prioritizes selecting an interesting courtier...
+
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
+
 			random = {
 				chance = 5
-				add_trait = depressed
+				add_trait_depressed_effect = yes
 			}
 		}
 	}
@@ -457,8 +448,9 @@ character_event = {
 # Flag and modifier clean-up
 character_event = {
 	id = HL.6999
-	hide_window = yes
+
 	is_triggered_only = yes
+	hide_window = yes
 
 	immediate = {
 		remove_character_modifier = nomad_warhorse
@@ -472,11 +464,17 @@ character_event = {
 			limit = {
 				NOT = { has_character_flag = nomad_warhorse_ignore_grief }
 			}
+
 			random = {
 				chance = 10
-				character_event = { id = HL.6990 days = 150 }
+
+				character_event = {
+					id = HL.6990
+					days = 150
+				}
 			}
 		}
+
 		clr_character_flag = nomad_warhorse_ignore_grief
 	}
 }

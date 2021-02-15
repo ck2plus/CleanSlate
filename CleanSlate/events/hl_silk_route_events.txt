@@ -17,54 +17,58 @@ character_event = {
 	picture = GFX_evt_chinese_emissary
 	border = GFX_event_normal_frame_diplomacy
 
-	only_playable = yes
+	ai = no
+	has_dlc = "Horse Lords"
 	only_independent = yes
 	only_capable = yes
 	prisoner = no
-	ai = no
 
 	trigger = {
-		has_dlc = "Horse Lords"
-		conditional_tooltip = {
-			trigger = {
-				has_dlc = "Jade Dragon"
-			}
-			NOT = { offmap_china = { governor = { character = ROOT } } }
+		higher_tier_than = COUNT
+
+		any_demesne_province = {
+			trade_route = silk_road
+			has_trade_post = yes
+		}
+
+		trigger_if = {
+			limit = { has_dlc = "Jade Dragon" }
+
+			china_diplo_interaction_trigger = yes
+
 			offmap_china = {
+				governor = {
+					NOT = { character = ROOT }
+				}
+
 				NOR = {
 					has_status = china_civil_war
 					has_status = china_plague
 				}
 			}
 		}
-		higher_tier_than = COUNT
-		NOR = {
-			has_character_flag = had_chinese_envoy
-			has_character_flag = do_not_disturb
-			trait = infirm
-		}
-		OR = {
-			AND = {
-				has_dlc = "Jade Dragon"
-		  	  	china_diplo_interaction_trigger = yes
-		  	}
-		  	AND = {
-		  		NOT = { has_dlc = "Jade Dragon" }
-				capital_scope = {
-					OR = {
-						region = world_steppe_east
-						region = world_steppe_tarim
-						duchy = { title = d_samarkand }
-						duchy = { title = d_khiva }
-						duchy = { title = d_merv }
+		trigger_else = {
+			capital_scope = {
+				OR = {
+					region = world_steppe_east
+					region = world_steppe_tarim
+
+					duchy = {
+						OR = {
+							title = d_samarkand
+							title = d_khiva
+							title = d_merv
+						}
 					}
 				}
 			}
 		}
-		any_demesne_province = {
-			has_trade_post = yes
-			trade_route = silk_road
-		#	trade_route_active = silk_road
+
+		is_inaccessible_trigger = no
+
+		NOR = {
+			has_character_flag = had_chinese_envoy
+			trait = infirm
 		}
 	}
 
@@ -74,37 +78,41 @@ character_event = {
 
 	immediate = {
 		set_character_flag = had_chinese_envoy
+
 		random_demesne_province = {
 			limit = {
-				has_trade_post = yes
 				trade_route = silk_road
-			#	trade_route_active = silk_road
+				has_trade_post = yes
 			}
+
 			save_event_target_as = trade_province
 		}
 	}
 
 	option = {
 		name = EVTOPTA_HL_5000
+
 		scaled_wealth = -1.5
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			add_grace_minor_effect = yes
 		}
-		hidden_tooltip = {
-			character_event = {	id = HL.5001 days = 90 random = 41 }
+
+		character_event = {
+			id = HL.5001
+			days = 90
+			random = 41
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HL_5000
-		hidden_tooltip = {
-			if = {
-				limit = { has_dlc = "Jade Dragon" }
-				offmap_china = { governor = { character_event = { id = HL.5062 days = 90 random = 41 } } }
-				break = yes
-			}
-			letter_event = { id = HL.5048 days = 90 random = 41 }
+
+		letter_event = {
+			id = HL.5048 # Emperor upset
+			days = 90
+			random = 41
 		}
 	}
 }
@@ -120,9 +128,9 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5001
-		ai_chance = {
-			factor = 100
-		}
+
+		ai_chance = { factor = 100 }
+
 		create_character = {
 			random_traits = no
 			dynasty = actually_culture
@@ -130,38 +138,43 @@ character_event = {
 			culture = han
 			female = no
 			age = 34
+			add_trait = administrator
+			historical = yes
+
 			attributes = {
 				diplomacy = 5
 				stewardship = 4
 			}
-			trait = administrator
-			historical = yes
 		}
-		hidden_tooltip = {
+
+		hidden_effect = {
 			new_character = {
+				# Semi-random traits
 				random_list = {
-					10 = {
-						# semi-random traits
+					25 = {
 						add_trait = thrifty_clerk
 						add_trait = proud
 						add_trait = ambitious
 						add_trait = cynical
 					}
-					10 = {
+
+					25 = {
 						add_trait = charismatic_negotiator
 						add_trait = just
 						add_trait = gregarious
 						add_trait = envious
 						add_trait = ambitious
 					}
-					10 = {
+
+					25 = {
 						add_trait = fortune_builder
 						add_trait = greedy
 						add_trait = envious
 						add_trait = chaste
 						add_trait = shy
 					}
-					10 = {
+
+					25 = {
 						add_trait = naive_appeaser
 						add_trait = temperate
 						add_trait = patient
@@ -169,28 +182,39 @@ character_event = {
 						add_trait = craven
 					}
 				}
+
 				set_character_flag = is_chinese_envoy
 				save_event_target_as = chinese_envoy
+
 				opinion = {
 					who = ROOT
-					modifier = opinion_happy
-					months = 180
+					name = opinion_happy
+					years = 15
 				}
 			}
 		}
+
 		save_event_target_as = host
+
 		event_target:trade_province = {
+			show_scope_change = no
+
 			add_province_modifier = {
-				modifier = trade_governor
+				name = trade_governor
 				duration = -1
 			}
-			hidden_tooltip = {
-				province_event = { id = HL.5047 days = 30 }
+
+			province_event = {
+				id = HL.5047 # Clear governor modifier
+				months = 1
 			}
 		}
-		hidden_tooltip = {
-			character_event = { id = HL.5002 days = 365 } # Determine random events
+
+		character_event = {
+			id = HL.5002 # Determine random events
+			years = 1
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			add_grace_trivial_effect = yes
@@ -199,17 +223,15 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5001
-		ai_chance = {
-			factor = 0
+
+		ai_chance = { factor = 0 }
+
+		letter_event = {
+			id = HL.5048 # Emperor upset
+			days = 15
+			random = 15
 		}
-		hidden_tooltip = { # Angry Emperor
-			if = {
-				limit = { has_dlc = "Jade Dragon" }
-				offmap_china = { governor = { character_event = { id = HL.5062 days = 15 random = 15 } } }
-				break = yes
-			}
-			letter_event = { id = HL.5048 days = 15 random = 15 }
-		}
+
 		create_character = {
 			random_traits = no
 			dynasty = actually_culture
@@ -217,38 +239,43 @@ character_event = {
 			culture = han
 			female = no
 			age = 34
+			add_trait = administrator
+			historical = yes
+
 			attributes = {
 				diplomacy = 5
 				stewardship = 4
 			}
-			trait = administrator
-			historical = yes
 		}
-		hidden_tooltip = {
+
+		hidden_effect = {
 			new_character = {
+				# Semi-random traits
 				random_list = {
-					10 = {
-						# semi-random traits
+					25 = {
 						add_trait = thrifty_clerk
 						add_trait = proud
 						add_trait = ambitious
 						add_trait = cynical
 					}
-					10 = {
+
+					25 = {
 						add_trait = charismatic_negotiator
 						add_trait = just
 						add_trait = gregarious
 						add_trait = envious
 						add_trait = ambitious
 					}
-					10 = {
+
+					25 = {
 						add_trait = fortune_builder
 						add_trait = greedy
 						add_trait = envious
 						add_trait = chaste
 						add_trait = shy
 					}
-					10 = {
+
+					25 = {
 						add_trait = naive_appeaser
 						add_trait = temperate
 						add_trait = patient
@@ -256,15 +283,18 @@ character_event = {
 						add_trait = craven
 					}
 				}
+
 				prestige = -100
+
 				add_character_modifier = {
-					modifier = dung_collector
-					months = 120
+					name = dung_collector
+					years = 10
 				}
+
 				opinion = {
+					name = opinion_mocked
 					who = ROOT
-					modifier = opinion_mocked
-					months = 120
+					years = 10
 				}
 			}
 		}
@@ -272,265 +302,275 @@ character_event = {
 
 	option = {
 		name = EVTOPTC_HL_5001
-		ai_chance = {
-			factor = 0
-		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
 # Determine random events
 character_event = {
 	id = HL.5002
-	hide_window = yes
-	is_triggered_only = yes
 
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		owns = event_target:trade_province
+
+		event_target:chinese_envoy = {
+			has_character_flag = is_chinese_envoy
+			prisoner = no
+
+			OR = {
+				vassal_of = ROOT
+				host = { character = ROOT }
+			}
+		}
+	}
+
+	fail_trigger_effect = {
+		event_target:chinese_envoy = {
+			clr_character_flag = is_chinese_envoy
+		}
+
+		character_event = { id = HL.5049 } # Flag-clearing
+	}
 
 	immediate = {
-		if = {
-			limit = {
-				OR = {
-					NOT = {
-						event_target:chinese_envoy = {
-							OR = {
-								liege = { character = ROOT }
-								host = { character = ROOT }
-							}
-							prisoner = no
-							has_character_flag = is_chinese_envoy
-						}
-					}
-					NOT = {
-						event_target:trade_province = {
-							holder_scope = {
-								character = ROOT
-							}
-						}
-					}
-				}
-			}
-			event_target:chinese_envoy = {
-				clr_character_flag = is_chinese_envoy
-			}
-			character_event = { id = HL.5049 }
-			break = yes
-		}
 		random_list = {
 			30 = { # increase in trade
-				modifier = {
-					factor = 0
-					event_target:trade_province = { has_province_modifier = surge_of_traders }
+				trigger = {
+					event_target:trade_province = {
+						NOT = { has_province_modifier = surge_of_traders }
+					}
 				}
-				event_target:trade_province = { province_event = { id = HL.5005 } }
+
+				event_target:trade_province = {
+					province_event = { id = HL.5005 }
+				}
 			}
+
 			30 = { # gemstones
-				modifier = {
-					factor = 0
-					has_character_flag = chinese_envoy_event_1
+				trigger = {
+					NOT = { has_character_flag = chinese_envoy_event_1 }
 				}
+
 				character_event = { id = HL.5006 }
 			}
+
 			30 = { # theft of goods
-				modifier = {
-					factor = 0
-					has_character_flag = chinese_envoy_event_2
+				trigger = {
+					NOT = { has_character_flag = chinese_envoy_event_2 }
 				}
+
 				character_event = { id = HL.5007 }
 			}
+
 			30 = { # snake pet
-				modifier = {
-					factor = 0
-					has_character_flag = chinese_envoy_event_3
+				trigger = {
+					NOT = { has_character_flag = chinese_envoy_event_3 }
 				}
-				event_target:chinese_envoy = { character_event = { id = HL.5018 } }
+
+				character_event = { id = HL.5017 }
 			}
 			30 = { # snake pet escalation
-				modifier = {
-					factor = 0
-					OR = {
-						NOT = { has_character_flag = chinese_envoy_event_3 }
+				trigger = {
+					has_character_flag = chinese_envoy_event_3
+
+					NOR = {
 						has_character_flag = chinese_envoy_event_4
 						has_character_flag = chinese_envoy_snake_ban
 					}
 				}
+
 				if = {
-					limit = {
-						has_character_modifier = pet_hunting_dog
-					}
-					character_event = { id = HL.5009 }
+					limit = { has_character_modifier = pet_hunting_dog }
+					save_event_target_as = dog_owner
 				}
-				if = {
+				else_if = {
 					limit = {
-						NOT = { has_character_modifier = pet_hunting_dog }
 						any_vassal = {
-							NOT = { character = ROOT }
 							prisoner = no
 							in_command = no
-							NOR = {
-								is_incapable = yes
-								has_character_flag = do_not_disturb
-							}
+							is_incapable = no
+							is_inaccessible_trigger = no
+							NOT = { character = ROOT }
 						}
 					}
+
 					any_vassal = {
 						limit = {
-							NOT = { character = ROOT }
 							prisoner = no
 							in_command = no
-							NOR = {
-								is_incapable = yes
-								has_character_flag = do_not_disturb
-							}
+							is_incapable = no
+							is_inaccessible_trigger = no
+							NOT = { character = ROOT }
 						}
-						score_value = { #Prioritizes selecting an interesting courtier...
+
+						score_value = {
 							value = 10
 							interesting_courtier_selection_score = yes
 						}
-						character_event = { id = HL.5009 }
+
+						save_event_target_as = dog_owner
 					}
 				}
-				if = {
-					limit = {
-						NOT = { has_character_modifier = pet_hunting_dog }
-						NOT = {
-							any_vassal = {
-								NOT = { character = ROOT }
-								prisoner = no
-								in_command = no
-								NOR = {
-									is_incapable = yes
-									has_character_flag = do_not_disturb
-								}
-							}
-						}
-					}
+				else = {
 					any_courtier = {
-						score_value = { #Prioritizes selecting an interesting courtier...
+						score_value = {
 							value = 10
 							interesting_courtier_selection_score = yes
 						}
-						character_event = { id = HL.5009 }
+
+						save_event_target_as = dog_owner
 					}
 				}
+
+				character_event = { id = HL.5011 }
 			}
+
 			30 = { # request partner
-				modifier = {
-					factor = 0
-					OR = {
-						event_target:chinese_envoy = {
-							is_married = yes
-						}
-						NOT = {
-							any_courtier = {
-								is_married = no
-								is_female = yes
-								is_adult = yes
-								NOT = { age = 40 }
-								is_incapable = no
-								prisoner = no
-							}
-						}
-						has_character_flag = chinese_envoy_event_5
-					}
-				}
-				any_courtier = {
-					limit = {
-						is_married = no
+				trigger = {
+					any_courtier = {
 						is_female = yes
 						is_adult = yes
-						NOT = { age = 40 }
+						practical_age < 40
+						is_married = no
 						is_incapable = no
 						prisoner = no
 					}
-					score_value = { #Prioritizes selecting an interesting courtier...
+
+					NOT = { has_character_flag = chinese_envoy_event_5 }
+
+					event_target:chinese_envoy = {
+						is_married = no
+					}
+				}
+
+				any_courtier = {
+					limit = {
+						is_female = yes
+						is_adult = yes
+						practical_age < 40
+						is_married = no
+						is_incapable = no
+						prisoner = no
+					}
+
+					score_value = {
 						value = 10
 						interesting_courtier_selection_score = yes
 					}
-					character_event = { id = HL.5012 }
+
+					save_event_target_as = marriage_target
 				}
+
+				character_event = { id = HL.5014 }
 			}
+
 			30 = { # games of chance
-				modifier = {
-					factor = 0
-					has_character_flag = chinese_envoy_event_6
-				}
-				event_target:chinese_envoy = { character_event = { id = HL.5015 } }
-			}
-			30 = { # trade an artifact
 				trigger = {
-					has_dlc = "Jade Dragon"
+					NOT = { has_character_flag = chinese_envoy_event_6 }
 				}
-				modifier = {
+
+				character_event = { id = HL.5016 }
+			}
+
+			30 = { # trade an artifact
+				trigger = { has_dlc = "Jade Dragon" }
+
+				mult_modifier = {
 					factor = 0.1
 					any_artifact = { has_artifact_flag = chinese }
 				}
-				modifier = {
-					offmap_china = { has_status = china_unrest }
+
+				mult_modifier = {
 					factor = 0.6
+					offmap_china = { has_status = china_unrest }
 				}
-				modifier = {
+
+				mult_modifier = {
+					factor = 0.3
 					offmap_china = { has_status = china_mongol_invasion }
-					factor = 0.3
 				}
-				modifier = {
+
+				mult_modifier = {
+					factor = 0.3
 					offmap_china = { has_status = china_jurchen_invasion }
-					factor = 0.3
 				}
-				modifier = {
+
+				mult_modifier = {
+					factor = 0.3
 					offmap_china = { has_status = china_famine }
-					factor = 0.3
 				}
-				modifier = {
-					offmap_china = { has_status = china_golden_age }
+
+				mult_modifier = {
 					factor = 3
+					offmap_china = { has_status = china_golden_age }
 				}
-				modifier = {
-					offmap_china = { has_policy = china_expansionist }
+
+				mult_modifier = {
 					factor = 2
+					offmap_china = { has_policy = china_expansionist }
 				}
-				event_target:chinese_envoy = { character_event = { id = JD.60001 } }
-			}
-			10 = { # resignation
-				modifier = {
-					factor = 0
-					NOT = { had_character_flag = { flag = is_chinese_envoy days = 500 } }
-				}
-				modifier = {
-					factor = 0
-					event_target:chinese_envoy = {
-						personal_opinion = { who = ROOT value = 20 }
-					}
-				}
-				modifier = {
-					factor = 4
-					NOT = {
-						event_target:chinese_envoy = {
-							personal_opinion = { who = ROOT value = 0 }
-						}
-					}
-				}
-				modifier = {
-					factor = 4
-					NOT = {
-						event_target:chinese_envoy = {
-							personal_opinion = { who = ROOT value = -20 }
-						}
-					}
-				}
-				modifier = {
-					factor = 4
-					NOT = {
-						event_target:chinese_envoy = {
-							personal_opinion = { who = ROOT value = -50 }
-						}
-					}
-				}
+
 				event_target:chinese_envoy = {
-					character_event = { id = HL.5044 }
-					break = yes
+					character_event = { id = JD.60001 }
 				}
+			}
+
+			10 = { # resignation
+				trigger = {
+					event_target:chinese_envoy = {
+						had_character_flag = {
+							flag = is_chinese_envoy
+							days >= 500
+						}
+					}
+
+					reverse_personal_opinion = {
+						who = event_target:chinese_envoy
+						value < 20
+					}
+				}
+
+				mult_modifier = {
+					factor = 4
+
+					reverse_personal_opinion = {
+						who = event_target:chinese_envoy
+						value < 0
+					}
+				}
+
+				mult_modifier = {
+					factor = 4
+
+					reverse_personal_opinion = {
+						who = event_target:chinese_envoy
+						value < -20
+					}
+				}
+
+				mult_modifier = {
+					factor = 4
+
+					reverse_personal_opinion = {
+						who = event_target:chinese_envoy
+						value < -50
+					}
+				}
+
+				character_event = { id = HL.5045 }
+				break = yes
 			}
 		}
-		repeat_event = { id = HL.5002 days = 1095 random = 1096 }
+
+		repeat_event = {
+			id = HL.5002
+			years = 3
+			random = 1095
+		}
 	}
 }
 
@@ -545,13 +585,18 @@ province_event = {
 
 	option = {
 		name = EVTOPTA_HL_5005
+
 		add_province_modifier = {
-			modifier = surge_of_traders
-			months = 60
+			name = surge_of_traders
+			years = 5
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
-			holder_scope = {
+
+			owner = {
+				show_scope_change = no
+
 				add_grace_trivial_effect = yes
 			}
 		}
@@ -573,36 +618,28 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5006
-		if = {
-			limit = {
-				NOT = { yearly_income = 200 }
-			}
-			wealth = 40
-		}
-		if = {
-			limit = {
-				yearly_income = 200
-			}
-			scaled_wealth = 0.2
+
+		scaled_wealth = {
+			value = 0.2
+			min = 40
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HL_5006
+
 		prestige = 90
 	}
 
 	option = {
 		name = EVTOPTC_HL_5006
-		trigger = {
-			spouse = { always = yes }
-		}
-		spouse = {
-			opinion = {
-				who = ROOT
-				modifier = opinion_happy
-				months = 60
-			}
+
+		trigger = { is_married = yes }
+		
+		reverse_opinion = {
+			name = opinion_happy
+			who = spouse
+			years = 5
 		}
 	}
 }
@@ -622,26 +659,21 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5007
+
 		scaled_wealth = -0.75
-		if = {
-			limit = {
-				NOR = {
-					trait = charitable
-					trait = greedy
-				}
-			}
-			random = {
-				chance = 25
-				add_trait = charitable
-				hidden_tooltip = {
-					character_event = { id = 38273 } # Notify charitable
-				}
-			}
+
+		random = {
+			chance = 25
+			add_trait_charitable_effect = yes
 		}
-		hidden_tooltip = {
-			set_character_flag = reimbursed_trader
-			character_event = { id = HL.5008 days = 7 }
+
+		set_character_flag = reimbursed_trader
+
+		character_event = {
+			id = HL.5008
+			days = 7
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			add_grace_trivial_effect = yes
@@ -650,17 +682,24 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5007
+
 		any_vassal = {
+			show_scope_change = no
+
 			limit = { is_republic = yes }
+
 			opinion = {
-				modifier = opinion_irritated
+				name = opinion_irritated
 				who = ROOT
-				months = 36
+				years = 3
 			}
 		}
-		hidden_tooltip = {
-			character_event = { id = HL.5008 days = 7 }
+
+		character_event = {
+			id = HL.5008
+			days = 7
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_trivial_effect = yes
@@ -678,26 +717,37 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5008
+
 		if = {
 			limit = {
-				has_character_flag = reimbursed_trader
+				NOT = { trait = deceitful }
 			}
-			random = {
-				chance = 50
-				add_trait = deceitful
-				hidden_tooltip = {
-					character_event = { id = 38255 } # notify deceitful
+
+			if = {
+				limit = { has_character_flag = reimbursed_trader }
+
+				random = {
+					chance = 50
+
+					tooltip = {
+						remove_trait_silently_honest_effect = yes
+						add_trait = deceitful
+					}
+
+					hidden_effect = {
+						remove_trait_silently_honest_effect = yes
+						add_trait_deceitful_effect = yes
+					}
 				}
 			}
-		}
-		if = {
-			limit = {
-				NOT = { has_character_flag = reimbursed_trader }
+			else = {
+				remove_trait_silently_honest_effect = yes
+				add_trait = deceitful
 			}
-			add_trait = deceitful
 		}
+
 		scaled_wealth = 0.5
-		clr_character_flag = reimbursed_trader
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			add_grace_trivial_effect = yes
@@ -706,40 +756,35 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5008
-		random = {
-			chance = 50
-			add_trait = honest
-			hidden_tooltip = {
-				character_event = { id = 38262 } # Notify honest
+
+		if = {
+			limit = {
+				NOT = { trait = honest }
+			}
+
+			random = {
+				chance = 50
+
+				tooltip = {
+					remove_trait_silently_deceitful_effect = yes
+					add_trait = honest
+				}
+
+				hidden_effect = {
+					remove_trait_silently_deceitful_effect = yes
+					add_trait_honest_effect = yes
+				}
 			}
 		}
-		clr_character_flag = reimbursed_trader
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_trivial_effect = yes
 		}
 	}
-}
 
-character_event = {
-	id = HL.5009
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:chinese_envoy = { character_event = { id = HL.5010 } }
-	}
-}
-
-character_event = {
-	id = HL.5010
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROMFROM = { character_event = { id = HL.5011 } }
+	after = {
+		clr_character_flag = reimbursed_trader
 	}
 }
 
@@ -748,21 +793,18 @@ character_event = {
 	picture = GFX_evt_chinese_emissary
 	border = GFX_event_normal_frame_diplomacy
 
-	is_triggered_only = yes
-
 	desc = {
-		trigger = {
-			FROMFROM = { character = ROOT }
-		}
+		trigger = { character = event_target:dog_owner }
 		text = EVTDESC_HL_5011SELF
 	}
-
 	desc = {
 		trigger = {
-			NOT = { FROMFROM = { character = ROOT } }
+			NOT = { character = event_target:dog_owner }
 		}
 		text = EVTDESC_HL_5011OTHER
 	}
+
+	is_triggered_only = yes
 
 	immediate = {
 		set_character_flag = chinese_envoy_event_4
@@ -770,16 +812,17 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_WOL_5011
+
 		trigger = {
-			NOT = { FROMFROM = { character = ROOT } }
+			NOT = { character = event_target:dog_owner }
 		}
-		FROMFROM = {
-			opinion = {
-				who = ROOT
-				modifier = grievously_offended
-				months = 60
-			}
+
+		reverse_opinion = {
+			name = grievously_offended
+			who = event_target:dog_owner
+			years = 5
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			add_grace_trivial_effect = yes
@@ -788,16 +831,17 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_WOL_5011
+
 		trigger = {
-			NOT = { FROMFROM = { character = ROOT } }
+			NOT = { character = event_target:dog_owner }
 		}
-		FROM = {
-			opinion = {
-				who = ROOT
-				modifier = grievously_offended
-				months = 60
-			}
+
+		reverse_opinion = {
+			name = grievously_offended
+			who = event_target:dog_owner
+			years = 5
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_trivial_effect = yes
@@ -805,438 +849,53 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTC_WOL_5011_FAITHFUL
+		name = EVTOPTC_WOL_5011
+
 		trigger = {
-			has_character_flag = dog_name_faithful
-			FROMFROM = { character = ROOT }
+			character = event_target:dog_owner
+			has_character_modifier = pet_hunting_dog
 		}
+
 		set_character_flag = hunting_dog_already_killed
 		remove_character_modifier = pet_hunting_dog
 		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
+		character_event = { id = WoL.5291 }
+
 		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
+			name = grievously_offended
+			who = event_target:chinese_envoy
+			years = 5
 		}
+
 		random = {
 			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_HUNTER
-		trigger = {
-			has_character_flag = dog_name_hunter
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_TRICKY
-		trigger = {
-			has_character_flag = dog_name_tricky
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_LUCIFER
-		trigger = {
-			has_character_flag = dog_name_lucifer
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_SHAYTAN
-		trigger = {
-			has_character_flag = dog_name_shaytan
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_FENRIR
-		trigger = {
-			has_character_flag = dog_name_fenrir
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_ERLIK
-		trigger = {
-			has_character_flag = dog_name_erlik
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_VELNIAS
-		trigger = {
-			has_character_flag = dog_name_velnias
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_TUONI
-		trigger = {
-			has_character_flag = dog_name_tuoni
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_XOLOTL
-		trigger = {
-			has_character_flag = dog_name_xolotl
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_VELES
-		trigger = {
-			has_character_flag = dog_name_veles
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_GURUHI
-		trigger = {
-			has_character_flag = dog_name_guruhi
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_DARKNESS
-		trigger = {
-			has_character_flag = dog_name_darkness
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_AHRIMAN
-		trigger = {
-			has_character_flag = dog_name_ahriman
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_SATAN
-		trigger = {
-			has_character_flag = dog_name_satan
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_VINAYAKA
-		trigger = {
-			has_character_flag = dog_name_vinayaka
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_MARA
-		trigger = {
-			has_character_flag = dog_name_mara
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
-		}
-	}
-	option = {
-		name = EVTOPTC_WOL_5011_PUNISHER
-		trigger = {
-			has_character_flag = dog_name_punisher
-			FROMFROM = { character = ROOT }
-		}
-		set_character_flag = hunting_dog_already_killed
-		remove_character_modifier = pet_hunting_dog
-		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		opinion = {
-			who = FROM
-			modifier = grievously_offended
-			months = 60
-		}
-		random = {
-			chance = 70
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = { id = 38288 }
-			}
+			add_trait_depressed_effect = yes
 		}
 	}
 
 	option = {
 		name = EVTOPTD_WOL_5011
-		trigger = {
-			FROMFROM = { character = ROOT }
-		}
+
+		trigger = { character = event_target:dog_owner }
+
 		event_target:chinese_envoy = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_execution_beheading
 				killer = ROOT
 			}
 		}
+
 		remove_character_modifier = pet_hunting_dog
 		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
-		hidden_tooltip = { character_event = { id = WoL.5291 } }
-		hidden_tooltip = {
-			character_event = { id = HL.5049 } # flag-clearing
-			event_target:trade_province = { province_event = { id = HL.5047 } } # clear governor modifier
+		character_event = { id = WoL.5291 }
+		character_event = { id = HL.5049 } # Flag-clearing
+
+		event_target:trade_province = {
+			province_event = { id = HL.5047 } # Clear governor modifier
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_major_effect = yes
@@ -1245,28 +904,6 @@ character_event = {
 }
 
 # Requesting partner
-character_event = {
-	id = HL.5012
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:chinese_envoy = { character_event = { id = HL.5013 } }
-	}
-}
-
-character_event = {
-	id = HL.5013
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:host = { character_event = { id = HL.5014 } }
-	}
-}
-
 character_event = {
 	id = HL.5014
 	desc = EVTDESC_HL_5014
@@ -1281,16 +918,19 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5014
-		FROMFROM = {
-			event_target:chinese_envoy = {
-				add_spouse = PREV
-				opinion = {
-					modifier = opinion_very_disappointed
-					who = ROOT
-					months = 60
-				}
+
+		event_target:chinese_envoy = {
+			show_scope_change = no
+
+			add_spouse = event_target:marriage_target
+
+			opinion = {
+				name = opinion_very_disappointed
+				who = ROOT
+				years = 5
 			}
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			add_grace_trivial_effect = yes
@@ -1299,13 +939,20 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5014
+
 		event_target:chinese_envoy = {
+			show_scope_change = no
+
 			clr_character_flag = is_chinese_envoy
 			banish = yes
 		}
+
 		event_target:trade_province = {
+			show_scope_change = no
+
 			remove_province_modifier = trade_governor
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_medium_effect = yes
@@ -1314,19 +961,6 @@ character_event = {
 }
 
 # Games of chance
-character_event = {
-	id = HL.5015
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:host = {
-			character_event = { id = HL.5016 }
-		}
-	}
-}
-
 character_event = {
 	id = HL.5016
 	desc = EVTDESC_HL_5016
@@ -1341,7 +975,9 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5016
+
 		scaled_wealth = -0.7
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_trivial_effect = yes
@@ -1350,10 +986,10 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5016
+
 		scaled_wealth = -0.7
-		event_target:chinese_envoy = {
-			imprison = ROOT
-		}
+		reverse_imprison = event_target:chinese_envoy
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_medium_effect = yes
@@ -1375,34 +1011,27 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5017
+
 		random = {
 			chance = 5
-			add_trait = wounded
+
+			add_trait_wounded_effect = yes
+
 			if = {
-				limit = {
-					NOT = {
-						has_dlc = "Reapers"
-					}
-				}
-				add_trait = ill
-			}
-			if = {
-				limit = {
-					has_dlc = "Reapers"
-				}
+				limit = { has_dlc = "Reapers" }
 				add_symptom_effect = yes
 			}
-			hidden_tooltip = {
-				character_event = { id = 38290 }
+			else = {
+				add_trait_ill_effect = yes
 			}
 		}
-		event_target:chinese_envoy = {
-			opinion = {
-				who = ROOT
-				modifier = opinion_pleased
-				months = 24
-			}
+
+		reverse_opinion = {
+			name = opinion_pleased
+			who = event_target:chinese_envoy
+			years = 2
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			add_grace_trivial_effect = yes
@@ -1415,14 +1044,15 @@ character_event = {
 
 	option = {
 		name = EVTOPTC_HL_5017
-		event_target:chinese_envoy = {
-			opinion = {
-				who = ROOT
-				modifier = opinion_shocked
-				months = 120
-			}
+
+		reverse_opinion = {
+			name = opinion_shocked
+			who = event_target:chinese_envoy
+			years = 10
 		}
+
 		set_character_flag = chinese_envoy_snake_ban
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_trivial_effect = yes
@@ -1431,45 +1061,17 @@ character_event = {
 }
 
 character_event = {
-	id = HL.5018
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			character_event = { id = HL.5017 }
-		}
-	}
-}
-
-character_event = {
 	id = HL.5043
-	hide_window = yes
 
 	is_triggered_only = yes
+	hide_window = yes
 
 	immediate = {
-		death = {
-			death_reason = death_natural
-		}
+		death = { death_reason = death_natural }
 	}
 }
 
-# resignation
-character_event = {
-	id = HL.5044
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:host = {
-			character_event = { id = HL.5045 }
-		}
-	}
-}
-
+# Resignation
 character_event = {
 	id = HL.5045
 	desc = EVTDESC_HL_5045
@@ -1480,57 +1082,70 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5045
+
 		event_target:chinese_envoy = {
+			show_scope_change = no
+
 			opinion = {
-				modifier = opinion_hate
+				name = opinion_hate
 				who = ROOT
-				months = 1200
+				years = 100
 			}
+
 			clr_character_flag = is_chinese_envoy
 			banish = yes
-			character_event = { id = HL.5043 days = 90 random = 20 }
+
+			character_event = {
+				id = HL.5043 # Dies natural death
+				months = 3
+				random = 20
+			}
 		}
+
 		event_target:trade_province = {
+			show_scope_change = no
+
 			remove_province_modifier = trade_governor
 		}
-		hidden_tooltip = {
-			character_event = { id = HL.5049 }
-		}
+
+		character_event = { id = HL.5049 } # Flag-clearing
 	}
 }
 
-# Something happened to the chinese envoy
+# Something happened to the Chinese envoy
 province_event = {
 	id = HL.5047
-	hide_window = yes
 
 	is_triggered_only = yes
+	hide_window = yes
 
 	trigger = {
 		has_province_modifier = trade_governor
+		owned_by = event_target:host
+
+		event_target:chinese_envoy = {
+			prisoner = no
+
+			OR = {
+				vassal_of = event_target:host
+				host = { character = event_target:host }
+			}
+		}
+	}
+
+	fail_trigger_effect = {
+		remove_province_modifier = trade_governor
+
+		event_target:chinese_envoy = {
+			clr_character_flag = is_chinese_envoy
+		}
 	}
 
 	immediate = {
-		if = {
-			limit = {
-				NOT = {
-					holder_scope = {
-						character = event_target:host
-					}
-					event_target:chinese_envoy = {
-						OR = {
-							liege = { character = event_target:host }
-							host = { character = event_target:host }
-						}
-						prisoner = no
-					}
-				}
-			}
-			event_target:chinese_envoy = { clr_character_flag = is_chinese_envoy }
-			remove_province_modifier = trade_governor
-			break = yes
+		repeat_event = {
+			id = HL.5047
+			months = 1
 		}
-		repeat_event = { id = HL.5047 days = 30 }
 	}
 }
 
@@ -1538,17 +1153,22 @@ province_event = {
 letter_event = {
 	id = HL.5048
 	desc = EVTDESC_HL_5048
+	portrait = offmap_china
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_HL_5048
+
 		event_target:trade_province = {
+			show_scope_change = no
+
 			add_province_modifier = {
-				modifier = chinese_embargo
-				months = 60
+				name = chinese_embargo
+				years = 5
 			}
 		}
+
 		if = {
 			limit = { has_dlc = "Jade Dragon" }
 			detract_grace_major_effect = yes
@@ -1559,31 +1179,26 @@ letter_event = {
 # Flag-clearing
 character_event = {
 	id = HL.5049
-	hide_window = yes
 
 	is_triggered_only = yes
+	hide_window = yes
 
-	option = {
+	immediate = {
 		clr_character_flag = chinese_envoy_event_1
 		clr_character_flag = chinese_envoy_event_2
 		clr_character_flag = chinese_envoy_event_3
 		clr_character_flag = chinese_envoy_event_4
 		clr_character_flag = chinese_envoy_event_5
 		clr_character_flag = chinese_envoy_event_6
+
 		event_target:trade_province = {
 			remove_province_modifier = trade_governor
 		}
-		event_target:chinese_envoy = { clr_character_flag = is_chinese_envoy }
+
+		event_target:chinese_envoy = {
+			clr_character_flag = is_chinese_envoy
+		}
 	}
-}
-
-# Ping Emperor
-character_event = {
-	id = HL.5062
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = { FROM = { letter_event = { id = HL.5048 } } }
 }
 
 ###
@@ -1595,79 +1210,72 @@ province_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	trigger = {
-		has_trade_post = yes
 		trade_route = silk_road
-		#trade_route_active = silk_road
-		holder_scope = {
+		has_trade_post = yes
+
+		owner = {
 			is_adult = yes
 			prisoner = no
-			NOR = {
-				is_incapable = yes
-				trait = infirm
-				has_character_flag = do_not_disturb
-			}
+			is_incapable = no
+			is_inaccessible_trigger = no
+			NOT = { trait = infirm }
 		}
 	}
 
 	mean_time_to_happen = {
 		years = 130
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
 			has_province_modifier = caravan_guards
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.8
-			holder_scope = {
-				NOR = {
-					stewardship = 8
-					diplomacy = 8
-				}
+
+			owner = {
+				stewardship < 8
+				diplomacy < 8
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
-			holder_scope = {
-				NOR = {
-					stewardship = 5
-					diplomacy = 5
-				}
+
+			owner = {
+				stewardship < 5
+				diplomacy < 5
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.8
-			holder_scope = {
-				trait = greedy
-			}
+			owner = { trait = greedy }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.85
-			holder_scope = {
-				trait = arbitrary
-			}
+			owner = { trait = arbitrary }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.85
-			holder_scope = {
-				trait = cruel
-			}
+			owner = { trait = cruel }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.15
-			holder_scope = {
-				trait = just
-			}
+			owner = { trait = just }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.1
-			holder_scope = {
-				trait = kind
-			}
+			owner = { trait = kind }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.25
-			holder_scope = {
-				trait = charitable
-			}
+			owner = { trait = charitable }
 		}
 	}
 
@@ -1678,74 +1286,57 @@ province_event = {
 
 	option = {
 		name = EVTOPTA_HL_5050
-		add_province_modifier = {
-			modifier = caravan_raiders
-			months = 180
-		}
-		holder_scope = {
-			add_trait = arbitrary
+
+		owner = {
+			show_scope_change = no
+
+			if = {
+				limit = {
+					NOT = { trait = arbitrary }
+				}
+
+				remove_trait_silently_just_effect = yes
+				add_trait = arbitrary
+			}
+
 			scaled_wealth = 0.5
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HL_5050
+
 		trigger = {
-			holder_scope = {
-				job_marshal = {
-					always = yes
-				}
+			owner = {
+				job_marshal = { always = yes }
 			}
 		}
-		add_province_modifier = {
-			modifier = caravan_raiders
-			months = 180
-		}
-		holder_scope = {
+
+		owner = {
 			show_scope_change = no
+
 			job_marshal = {
-				if = {
-					limit = {
-						NOT = { combat_rating = 10 }
-					}
-					tooltip = {
-						random = {
-							chance = 20
-							death = {
-								death_reason = death_battle
-							}
+				tooltip = {
+					random = {
+						chance = 2
+
+						mult_modifier = {
+							factor = 5 # 10%
+							combat_rating < 30
+						}
+
+						mult_modifier = {
+							factor = 2 # 20%
+							combat_rating < 10
 						}
 					}
+
+					death = { death_reason = death_battle }
 				}
-				if = {
-					limit = {
-						combat_rating = 10
-						NOT = { combat_rating = 30 }
-					}
-					tooltip = {
-						random = {
-							chance = 10
-							death = {
-								death_reason = death_battle
-							}
-						}
-					}
-				}
-				if = {
-					limit = {
-						combat_rating = 30
-					}
-					tooltip = {
-						random = {
-							chance = 2
-							death = {
-								death_reason = death_battle
-							}
-						}
-					}
-				}
-				hidden_tooltip = {
-					character_event = { id = HL.5051 days = 7 }
+
+				character_event = {
+					id = HL.5051
+					days = 7
 				}
 			}
 		}
@@ -1753,14 +1344,19 @@ province_event = {
 
 	option = {
 		name = EVTOPTC_HL_5050
-		add_province_modifier = {
-			modifier = caravan_raiders
-			months = 180
-		}
-		hidden_tooltip = {
-			holder_scope = {
-				character_event = { id = HL.5056 days = 7 }
+
+		owner = {
+			character_event = {
+				id = HL.5056
+				days = 7
 			}
+		}
+	}
+
+	after = {
+		add_province_modifier = {
+			name = caravan_raiders
+			years = 15
 		}
 	}
 }
@@ -1775,51 +1371,59 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5051
-		ai_chance = {
-			factor = 30
-		}
+
+		ai_chance = { factor = 30 }
+
 		random_list = {
 			20 = {
-				modifier = {
-					factor = 0.5
-					combat_rating = 10
+				mult_modifier = {
+					factor = 0.5 # 10%
+					combat_rating >= 10
 				}
-				modifier = {
-					factor = 0.2
-					combat_rating = 30
+
+				mult_modifier = {
+					factor = 0.2 # 2%
+					combat_rating >= 30
 				}
+
 				death = {
 					death_reason = death_battle
 				}
-				hidden_tooltip = {
-					liege = {
-						character_event = { id = HL.5053 }
-					}
+
+				liege = {
+					character_event = { id = HL.5053 }
 				}
 			}
+
 			20 = {
 				if = {
-					limit = {
-						NOT = { is_maimed_trigger = yes }
-					}
-					add_trait = wounded
+					limit = { is_maimed_trigger = no }
+					add_trait_wounded_effect = yes
 				}
-				hidden_tooltip = {
-					liege = {
-						character_event = { id = HL.5055 days = 7 }
+
+				liege = {
+					character_event = {
+						id = HL.5055
+						days = 7
 					}
 				}
 			}
+
 			60 = {
 				prestige = 100
+
 				tooltip = {
 					event_target:target_province = {
+						show_scope_change = no
+
 						remove_province_modifier = caravan_raiders
 					}
 				}
-				hidden_tooltip = {
-					liege = {
-						character_event = {	id = HL.5052 days = 7 }
+
+				liege = {
+					character_event = {
+						id = HL.5052
+						days = 7
 					}
 				}
 			}
@@ -1828,21 +1432,34 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5051
+
 		ai_chance = {
 			factor = 15
-			modifier = {
+
+			trigger = {
+				NOT = { trait = brave }
+			}
+
+			mult_modifier = {
 				factor = 5
 				trait = craven
 			}
-			modifier = {
-				factor = 0
-				trait = brave
-			}
 		}
-		reverse_opinion = { who = FROM modifier = opinion_refused_order months = 36 }
-		custom_tooltip = { text = "EVTTOOLTIP_HL_5051" }
-		hidden_tooltip = {
-			liege = { character_event = { id = HL.5054 days = 7 } }
+
+		reverse_opinion = {
+			name = opinion_refused_order
+			who = liege
+			years = 3
+		}
+
+		liege = {
+			show_scope_change = no
+
+			character_event = {
+				id = HL.5054
+				days = 7
+				tooltip = EVTTOOLTIP_HL_5051
+			}
 		}
 	}
 }
@@ -1857,8 +1474,18 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5052
-		tooltip = { FROM = { prestige = 100 } }
+
+		tooltip = {
+			FROM = {
+				show_scope_change = no
+
+				prestige = 100
+			}
+		}
+
 		event_target:target_province = {
+			show_scope_change = no
+
 			remove_province_modifier = caravan_raiders
 		}
 	}
@@ -1874,53 +1501,43 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5053
-		tooltip = {
-			FROM = {
-				death = { death_reason = death_battle }
-			}
-		}
+
 		prestige = -10
+
 		if = {
-			limit = {
-				NOR = { trait = brave trait = berserker }
-			}
+			limit = { trait = brave }
+			remove_trait = brave
+		}
+		else = {
 			random = {
 				chance = 40
-				add_trait = craven
-				hidden_tooltip = { character_event = { id = 38257 } } # Notify craven
+				add_trait_craven_effect = yes
 			}
-		}
-		if = {
-			limit = {
-				trait = brave
-			}
-			remove_trait = brave
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HL_5053
-		tooltip = {
-			FROM = {
-				death = { death_reason = death_battle }
-			}
+
+		character_event = {
+			id = HL.5056
+			days = 7
 		}
-		character_event = { id = HL.5056 days = 7 }
 	}
 
 	option = {
 		name = EVTOPTC_HL_5053
-		tooltip = {
-			FROM = {
-				death = { death_reason = death_battle }
-			}
-		}
+
 		scaled_wealth = -0.5
+
 		event_target:target_province = {
+			show_scope_change = no
+
 			remove_province_modifier = caravan_raiders
+
 			add_province_modifier = {
-				modifier = caravan_guards
-				months = 120
+				name = caravan_guards
+				years = 10
 			}
 		}
 	}
@@ -1936,24 +1553,32 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5054
-		job_marshal = {
-			imprison = ROOT
-		}
+
+		reverse_imprison = job_marshal
 	}
 
 	option = {
 		name = EVTOPTB_HL_5054
-		character_event = { id = HL.5056 days = 7 }
+
+		character_event = {
+			id = HL.5056
+			days = 7
+		}
 	}
 
 	option = {
 		name = EVTOPTC_HL_5054
+
 		scaled_wealth = -0.5
+
 		event_target:target_province = {
+			show_scope_change = no
+
 			remove_province_modifier = caravan_raiders
+
 			add_province_modifier = {
-				modifier = caravan_guards
-				months = 120
+				name = caravan_guards
+				years = 10
 			}
 		}
 	}
@@ -1967,9 +1592,10 @@ character_event = {
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
 		name = EVTOPTA_HL_5055
-
 	}
 }
 
@@ -1983,30 +1609,34 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5056
-		hidden_tooltip = {
-			character_event = { id = HL.5057 }
-		}
+
+		character_event = { id = HL.5057 }
 	}
 
 	option = {
 		name = EVTOPTB_HL_5056
-		hidden_tooltip = {
+
+		hidden_effect = {
 			random_list = {
 				50 = {
-					modifier = {
+					mult_modifier = {
 						factor = 0.7
-						intrigue = 7
+						intrigue >= 7
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 0.7
-						intrigue = 10
+						intrigue >= 10
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 0.7
-						intrigue = 13
+						intrigue >= 13
 					}
+
 					character_event = { id = HL.5060 }
 				}
+
 				50 = {
 					character_event = { id = HL.5061 }
 				}
@@ -2025,38 +1655,47 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5057
+
 		random_list = {
-			30 = { #success
+			30 = { # Success
 				modifier = {
 					factor = 1.5
-					combat_rating = 20
+					combat_rating >= 20
 				}
+
 				prestige = 75
+
 				event_target:target_province = {
+					show_scope_change = no
+
 					remove_province_modifier = caravan_raiders
 				}
 			}
-			20 = { #wounded
+
+			20 = { # Wounded
+				trigger = {
+					is_maimed_trigger = no
+				}
+
 				modifier = {
 					factor = 0.5
-					combat_rating = 20
+					combat_rating >= 20
 				}
-				modifier = {
-					factor = 0
-					is_maimed_trigger = yes
-				}
-				add_trait = wounded
-				hidden_tooltip = { character_event = { id = 38280 } }
+
+				add_trait_wounded_effect = yes
 			}
-			10 = { #maimed
-				modifier = {
+
+			10 = { # Maimed
+				mult_modifier = {
 					factor = 0.5
-					combat_rating = 20
+					combat_rating >= 20
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 3
 					is_maimed_trigger = yes
 				}
+
 				add_maimed_trait_effect = yes
 			}
 		}
@@ -2064,17 +1703,20 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5057
+
 		scaled_wealth = -1.5
+
 		event_target:target_province = {
+			show_scope_change = no
+
 			remove_province_modifier = caravan_raiders
 		}
 	}
 
 	option = {
 		name = EVTOPTC_HL_5057
-		hidden_tooltip = {
-			character_event = { id = HL.5058 }
-		}
+
+		character_event = { id = HL.5058 }
 	}
 }
 
@@ -2088,6 +1730,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5058
+
 		character_event = { id = HL.5059 }
 	}
 }
@@ -2102,16 +1745,19 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5059
+
 		scaled_wealth = -1
 		prestige = -75
 	}
 
 	option = {
 		name = EVTOPTB_HL_5059
+
 		prestige = -100
+
 		add_character_modifier = {
-			modifier = publicly_humiliated
-			months = 36
+			name = publicly_humiliated
+			years = 3
 		}
 	}
 }
@@ -2126,48 +1772,56 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5060
-		ai_chance = {
-			factor = 1
-		}
+
+		ai_chance = {factor = 1 }
+
 		character_event = { id = HL.5059 }
 	}
 
 	option = {
 		name = EVTOPTB_HL_5060
-		ai_chance = {
-			factor = 0
-		}
-		trigger = {
-			trait = duelist
-		}
 		tooltip_info = duelist
+
+		trigger = { trait = duelist }
+
+		ai_chance = { factor = 0 }
+
 		random_list = {
 			80 = {
 				death = { death_reason = death_battle }
 			}
+
 			20 = {
-				modifier = {
+				mult_modifier = {
 					factor = 2
-					combat_rating = 30
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
-					combat_rating = 50
+					combat_rating >= 50
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
-					combat_rating = 70
+					combat_rating >= 70
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.1
-					NOT = { combat_rating = -10 }
+					combat_rating < -10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.1
-					NOT = { combat_rating = -40 }
+					combat_rating < -40
 				}
+
 				prestige = 75
+
 				event_target:target_province = {
+					show_scope_change = no
+
 					remove_province_modifier = caravan_raiders
 				}
 			}
@@ -2176,40 +1830,50 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HL_5060
-		ai_chance = {
-			factor = 0
-		}
+		tooltip_info = lunatic
+
 		trigger = {
 			trait = lunatic
 		}
-		tooltip_info = lunatic
+
+		ai_chance = { factor = 0 }
+
 		random_list = {
 			80 = {
 				death = { death_reason = death_battle }
 			}
+
 			20 = {
-				modifier = {
+				mult_modifier = {
 					factor = 2
-					combat_rating = 30
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
-					combat_rating = 50
+					combat_rating >= 50
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
-					combat_rating = 70
+					combat_rating >= 70
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.1
-					NOT = { combat_rating = -10 }
+					combat_rating < -10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.1
-					NOT = { combat_rating = -40 }
+					combat_rating < -40
 				}
+
 				prestige = 75
+
 				event_target:target_province = {
+					show_scope_change = no
+
 					remove_province_modifier = caravan_raiders
 				}
 			}
@@ -2227,48 +1891,59 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HL_5061
-		ai_chance = {
-			factor = 1
-		}
+
+		ai_chance = { factor = 1 }
+
 		event_target:target_province = {
+			show_scope_change = no
+
 			remove_province_modifier = caravan_raiders
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HL_5061
-		ai_chance = {
-			factor = 0
-		}
+
+		ai_chance = { factor = 0 }
+
 		random_list = {
 			80 = {
 				death = { death_reason = death_battle }
 			}
+
 			20 = {
-				modifier = {
+				mult_modifier = {
 					factor = 2
-					combat_rating = 30
+					combat_rating >= 30
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
-					combat_rating = 50
+					combat_rating >= 50
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 2
-					combat_rating = 70
+					combat_rating >= 70
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.1
-					NOT = { combat_rating = -10 }
+					combat_rating < -10
 				}
-				modifier = {
+
+				mult_modifier = {
 					factor = 0.1
-					NOT = { combat_rating = -40 }
+					combat_rating < -40
 				}
 			}
 		}
+
 		add_trait = cruel
+
 		event_target:target_province = {
+			show_scope_change = no
+
 			remove_province_modifier = caravan_raiders
 		}
 	}
