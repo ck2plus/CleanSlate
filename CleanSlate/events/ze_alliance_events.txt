@@ -9,437 +9,481 @@
 
 namespace = ZE
 
-#A friendly visit from spouse can result in non-aggression pact
+# A friendly visit from spouse can result in non-aggression pact
 character_event = {
 	id = ZE.8000
 	picture = GFX_evt_feast
 	border = GFX_event_normal_frame_diplomacy
 	desc = EVTDESC_ZE_8000
 
-	only_rulers = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	only_independent = yes
 	only_capable = yes
 	prisoner = no
-	only_independent = yes
-
-	is_triggered_only = yes
 
 	trigger = {
 		mercenary = no
+		controls_religion = no
+		holy_order = no
+		is_inaccessible_trigger = no
+
 		primary_title = {
 			is_landless_type_title = no
 		}
-		controls_religion = no
-		holy_order = no
-		NOT = { is_inaccessible_trigger = yes }
+
 		any_independent_ruler = {
+			is_married = yes
+			is_landed = yes
+			is_within_diplo_range = ROOT
+
+			spouse = {
+				is_incapable = no
+				is_inaccessible_trigger = no
+				prisoner = no
+			}
+
 			NOR = {
-				is_inaccessible_trigger = yes
-				is_incapable = yes
 				has_non_aggression_pact_with = ROOT
 				war_with = ROOT
 			}
-			primary_title = {
-				is_landless_type_title = no
-			}
+
+			is_inaccessible_trigger = no
+			is_incapable = no
 			controls_religion = no
 			holy_order = no
 			mercenary = no
-			is_landed = yes
 			prisoner = no
-			is_married = yes
-			is_within_diplo_range = ROOT
-			spouse = {
-				NOR = {
-					is_incapable = yes
-					is_inaccessible_trigger = yes
-					prisoner = yes
-				}
+
+			primary_title = {
+				is_landless_type_title = no
 			}
 		}
 	}
 
 	immediate = {
-		ROOT = { capital_scope = { save_event_target_as = capital } }
+		capital_scope = {
+			save_event_target_as = capital
+		}
+
 		random_independent_ruler = {
 			limit = {
+				is_married = yes
+				is_landed = yes
+				is_within_diplo_range = ROOT
+
+				spouse = {
+					is_incapable = no
+					is_inaccessible_trigger = no
+					prisoner = no
+				}
+
 				NOR = {
-					is_inaccessible_trigger = yes
-					is_incapable = yes
 					has_non_aggression_pact_with = ROOT
 					war_with = ROOT
 				}
 
-				primary_title = {
-					is_landless_type_title = no
-				}
+				is_inaccessible_trigger = no
+				is_incapable = no
 				controls_religion = no
 				holy_order = no
 				mercenary = no
-				is_landed = yes
 				prisoner = no
-				is_married = yes
-				is_within_diplo_range = ROOT
-				spouse = {
-					NOR = {
-						is_incapable = yes
-						is_inaccessible_trigger = yes
-						prisoner = yes
-					}
+
+				primary_title = {
+					is_landless_type_title = no
 				}
 			}
-			spouse = { save_event_target_as = target_spouse }
+
 			save_event_target_as = target_ruler
+
+			spouse = {
+				save_event_target_as = target_spouse
+			}
 		}
 	}
 
 	option = {
 		name = EVTOPTA_ZE_8000
-		ai_chance = {
-			factor = 90
-		}
-		show_portrait = event_target:target_ruler
-		custom_tooltip = {
-			text = EVTOPTA_ZE_8000_TOOLTIP
-			hidden_tooltip = {
-				event_target:target_ruler = {
-					letter_event = { id = ZE.8001 days = 3 }
-				}
+
+		ai_chance = { factor = 90 }
+
+		event_target:target_ruler = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.8001
+				days = 3
+				tooltip = EVTOPTA_ZE_8000_TOOLTIP
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPTB_ZE_8000
-		ai_chance = {
-			factor = 10
-		}
+
+		ai_chance = { factor = 10 }
 	}
 }
 
-#Suggestion to form non-aggression pact
+# Suggestion to form non-aggression pact
 letter_event = {
 	id = ZE.8001
 	desc = EVTDESC_ZE_8001
 
 	is_triggered_only = yes
 
-	#accept
+	# Accept
 	option = {
 		name = EVTOPTA_ZE_8001
-		ai_chance = {
-			factor = 70
-		}
+
+		ai_chance = { factor = 70 }
+
 		custom_tooltip = {
 			text = EVTOPTA_ZE_8001_TOOLTIP
-			hidden_tooltip = {
-				FROM = {
-					letter_event = { id = ZE.8002 days = 3 }
-				}
-			}
-			opinion = {
-				modifier = in_non_aggression_pact
-				years = 3
-				who = FROM
-				origin_description = EVTTITLE_ZE_8001
-			}
+
 			FROM = {
+				letter_event = {
+					id = ZE.8002
+					days = 3
+				}
+
 				opinion = {
-					modifier = in_non_aggression_pact
+					name = in_non_aggression_pact
 					years = 3
 					who = ROOT
 					origin_description = EVTTITLE_ZE_8001
 				}
 			}
+
+			opinion = {
+				name = in_non_aggression_pact
+				years = 3
+				who = FROM
+				origin_description = EVTTITLE_ZE_8001
+			}
 		}
 	}
-	#decline
+
+	# Decline
 	option = {
 		name = EVTOPTB_ZE_8001
-		ai_chance = {
-			factor = 30
-		}
+
+		ai_chance = { factor = 30 }
+
 		custom_tooltip = {
 			text = EVTOPTB_ZE_8001_TOOLTIP
+
 			FROM = {
-				letter_event = { id = ZE.8003 days = 3 }
+				letter_event = {
+					id = ZE.8003
+					days = 3
+				}
 			}
 		}
 	}
 }
 
-#respone that accepted the offer
+# Respone that accepted the offer
 letter_event = {
 	id = ZE.8002
 	desc = EVTDESC_ZE_8002
 
 	is_triggered_only = yes
 
-	#accept
+	ai = no
+
+	# Accept
 	option = {
 		name = EVTOPTA_ZE_8002
-		custom_tooltip = {
-			text = EVTOPTA_ZE_8002_TOOLTIP
-		}
+
+		custom_tooltip = { text = EVTOPTA_ZE_8002_TOOLTIP }
 	}
 }
 
-#respone that declined the offer
+# Respone that declined the offer
 letter_event = {
 	id = ZE.8003
 	desc = EVTDESC_ZE_8003
 
 	is_triggered_only = yes
 
-	#accept
+	ai = no
+
+	# Accept
 	option = {
 		name = EVTOPTA_ZE_8003
 	}
 }
 
-#imposter noble is behaving badly in other realm
+# Imposter noble is behaving badly in other realm
 character_event = {
 	id = ZE.8010
 	picture = GFX_evt_council
 	border = GFX_event_normal_frame_diplomacy
 	desc = EVTDESC_ZE_8010
 
-	only_rulers = yes
+	is_triggered_only = yes
+
+	only_independent = yes
 	only_capable = yes
 	prisoner = no
-	only_independent = yes
-
-	is_triggered_only = yes
 
 	trigger = {
 		mercenary = no
 		is_tributary = no
-		NOT = {
-			is_inaccessible_trigger = yes
-		}
+		is_inaccessible_trigger = no
+
 		OR = {
 			any_non_aggression_pact_character = {
-				mercenary = no
-				is_tributary = no
 				independent = yes
 				is_within_diplo_range = ROOT
+				mercenary = no
+				is_tributary = no
 			}
+
 			any_allied_character = {
-				mercenary = no
-				is_tributary = no
 				independent = yes
 				is_within_diplo_range = ROOT
+				mercenary = no
+				is_tributary = no
 			}
 		}
 	}
 
 	immediate = {
-		ROOT = { capital_scope = { save_event_target_as = capital } }
+		capital_scope = {
+			save_event_target_as = capital
+		}
+
 		if = {
 			limit = {
 				any_allied_character = {
+					independent = yes
+					is_within_diplo_range = ROOT
 					mercenary = no
 					is_tributary = no
-					is_within_diplo_range = ROOT
-					independent = yes
 				}
 			}
+
 			random_allied_character = {
 				limit = {
-					mercenary = no
-					is_within_diplo_range = ROOT
 					independent = yes
+					is_within_diplo_range = ROOT
+					mercenary = no
 					is_tributary = no
 				}
+
 				save_event_target_as = target_ruler
-				capital_scope = { save_event_target_as = target_ruler_capital }
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				any_non_aggression_pact_character = {
-					mercenary = no
-					is_tributary = no
-					is_within_diplo_range = ROOT
-					independent = yes
+
+				capital_scope = {
+					save_event_target_as = target_ruler_capital
 				}
 			}
+		}
+		else = {
 			random_non_aggression_pact_character = {
 				limit = {
-					mercenary = no
-					is_within_diplo_range = ROOT
 					independent = yes
+					is_within_diplo_range = ROOT
+					mercenary = no
 					is_tributary = no
 				}
+
 				save_event_target_as = target_ruler
-				capital_scope = { save_event_target_as = target_ruler_capital }
+
+				capital_scope = {
+					save_event_target_as = target_ruler_capital
+				}
 			}
 		}
 	}
-	#write a formal complaint to ruler
+
+	# Write a formal complaint to ruler
 	option = {
 		name = EVTOPTA_ZE_8010
-		ai_chance = {
-			factor = 90
-		}
+
+		ai_chance = {factor = 90 }
+
 		prestige = 50
-		custom_tooltip = {
-			text = EVTOPTA_ZE_8010_TOOLTIP
-			hidden_tooltip = {
-				event_target:target_ruler = {
-					letter_event = { id = ZE.8011 days = 3 }
-				}
+
+		event_target:target_ruler = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.8011
+				days = 3
+				tooltip = EVTOPTA_ZE_8010_TOOLTIP
 			}
 		}
 	}
-	#ignore your courtiers complaints
+
+	# Ignore your courtiers complaints
 	option = {
 		name = EVTOPTB_ZE_8010
-		ai_chance = {
-			factor = 10
-		}
+
+		ai_chance = { factor = 10 }
+
 		custom_tooltip = {
 			text = EVTOPTB_ZE_8010_TOOLTIP
-			hidden_tooltip = {
-				any_courtier = {
-					opinion = {
-						modifier = opinion_disappointed
-						who = ROOT
-						months = 24
-					}
+
+			any_courtier = {
+				opinion = {
+					name = opinion_disappointed
+					who = ROOT
+					years = 2
 				}
 			}
 		}
 	}
-	#take care of him
+
+	# Take care of him
 	option = {
-		trigger = {
-			intrigue = 15
-		}
 		name = EVTOPTC_ZE_8010
-		custom_tooltip = {
-			text = EVTOPTC_ZE_8010_TOOLTIP
-		}
 		tooltip_info = intrigue
+
+		trigger = { intrigue >= 15 }
+
+		custom_tooltip = { text = EVTOPTC_ZE_8010_TOOLTIP }
 	}
 }
 
-#Complaint sent to ruler where noble claim to be from
+# Complaint sent to ruler where noble claim to be from
 letter_event = {
 	id = ZE.8011
 	desc = EVTDESC_ZE_8011
 
 	is_triggered_only = yes
 
-	#explain he's not from our capital
+	# Explain he's not from our capital
 	option = {
-		trigger = {
-			diplomacy = 15
-		}
 		name = EVTOPTA_ZE_8011
-		ai_chance = {
-			factor = 70
-		}
-		custom_tooltip = {
-			text = EVTOPTA_ZE_8011_TOOLTIP
-			hidden_tooltip = {
-				FROM = { letter_event = { id = ZE.8012 days = 3 } }
+		tooltip_info = diplomacy
+
+		trigger = { diplomacy >= 15 }
+
+		ai_chance = { factor = 70 }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.8012
+				days = 3
+				tooltip = EVTOPTA_ZE_8011_TOOLTIP
 			}
 		}
-		tooltip_info = diplomacy
 	}
 
-	#take blame
+	# Take blame
 	option = {
 		name = EVTOPTB_ZE_8011
-		ai_chance = {
-			factor = 20
-		}
+
+		ai_chance = { factor = 20 }
+
 		prestige = -100
-		custom_tooltip = {
-			text = EVTOPTB_ZE_8011_TOOLTIP
-			hidden_tooltip = {
-				FROM = { letter_event = { id = ZE.8016 days = 3 } }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.8016
+				days = 3
+				tooltip = EVTOPTB_ZE_8011_TOOLTIP
 			}
 		}
 	}
 
-	#answer rudely
+	# Answer rudely
 	option = {
 		name = EVTOPTC_ZE_8011
-		ai_chance = {
-			factor = 10
-		}
+
+		ai_chance = { factor = 10 }
+
 		prestige = 100
 
-		custom_tooltip = {
-			text = EVTOPTC_ZE_8011_TOOLTIP
-			hidden_tooltip = {
-				FROM = { letter_event = { id = ZE.8013 days = 3 } }
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.8013
+				days = 3
+				tooltip = EVTOPTC_ZE_8011_TOOLTIP
 			}
 		}
 	}
 }
 
-#Explanation and word of warning about imposter
+# Explanation and word of warning about imposter
 letter_event = {
 	id = ZE.8012
 	desc = EVTDESC_ZE_8012
 
 	is_triggered_only = yes
 
-	#deal with impostor and apologize
+	# Deal with impostor and apologize
 	option = {
 		name = EVTOPTA_ZE_8012
-		ai_chance = {
-			factor = 60
-		}
+
+		ai_chance = { factor = 60 }
+
 		prestige = -100
-		custom_tooltip = {
-			text = EVTOPTA_ZE_8012_TOOLTIP
-			hidden_tooltip = {
-				FROM = { letter_event = { id = ZE.8014 days = 3 } }
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = ZE.8014
+				days = 3
+				tooltip = EVTOPTA_ZE_8012_TOOLTIP
 			}
 		}
 	}
-	#persist in accusation
-	#break pact
+
+	# Persist in accusation, break pact
 	option = {
 		name = EVTOPTB_ZE_8012
-		ai_chance = {
-			factor = 10
-		}
+
+		ai_chance = { factor = 10 }
+
 		custom_tooltip = {
 			text = EVTOPTA_ZE_8013_TOOLTIP
-			hidden_tooltip = {
-				if = {
-					limit = {
-						is_allied_with = FROM
-					}
-					break_alliance = FROM
+
+			if = {
+				limit = { is_allied_with = FROM }
+				break_alliance = FROM
+			}
+
+			remove_opinion = {
+				name = in_non_aggression_pact
+				who = FROM
+			}
+
+			FROM = {
+				letter_event = {
+					id = ZE.8015
+					days = 3
 				}
-				remove_opinion = { modifier = in_non_aggression_pact who = FROM }
-				FROM = { letter_event = { id = ZE.8015 days = 3 } }
-				opinion = {
-					modifier = broken_non_aggression_pact
-					who = FROM
-					years = 3
-				}
+			}
+
+			opinion = {
+				name = broken_non_aggression_pact
+				who = FROM
+				years = 3
 			}
 		}
 	}
-	#leave it
+
+	# Leave it
 	option = {
 		name = EVTOPTC_ZE_8012
-		ai_chance = {
-			factor = 30
-		}
-		FROM = {
-			opinion = {
-				modifier = insulted
-				who = ROOT
-				years = 3
-			}
+
+		ai_chance = { factor = 30 }
+
+		reverse_opinion = {
+			name = insulted
+			who = FROM
+			years = 3
 		}
 	}
 }
@@ -450,80 +494,91 @@ letter_event = {
 	desc = EVTDESC_ZE_8013
 
 	is_triggered_only = yes
+
 	option = {
 		name = EVTOPTA_ZE_8013
-		ai_chance = {
-			factor = 60
-		}
+
+		ai_chance = { factor = 60 }
+
 		custom_tooltip = {
 			text = EVTOPTA_ZE_8013_TOOLTIP
-			hidden_tooltip = {
-				if = {
-					limit = {
-						is_allied_with = FROM
-					}
-					break_alliance = FROM
-				}
-				remove_opinion = { modifier = in_non_aggression_pact who = FROM }
-				opinion = {
-					modifier = broken_non_aggression_pact
-					who = FROM
-					years = 3
-				}
+
+			if = {
+				limit = { is_allied_with = FROM }
+				break_alliance = FROM
+			}
+
+			remove_opinion = {
+				name = in_non_aggression_pact
+				who = FROM
+			}
+
+			opinion = {
+				name = broken_non_aggression_pact
+				who = FROM
+				years = 3
 			}
 		}
 	}
 
-	#let it slide
+	# Let it slide
 	option = {
 		name = EVTOPTB_ZE_8013
+
+		ai_chance = { factor = 40 }
+
 		prestige = -200
-		ai_chance = {
-			factor = 40
-		}
 	}
 }
 
-#apology sent by initiator
+# Apology sent by initiator
 letter_event = {
 	id = ZE.8014
 	desc = EVTDESC_ZE_8014
 
 	is_triggered_only = yes
 
-	#OK
+	# OK
 	option = {
-		prestige = 150
 		name = EVTOPTA_ZE_8014
+
+		prestige = 150
+
 		opinion = {
-			modifier = opinion_improved_relations
+			name = opinion_improved_relations
 			who = FROM
 			years = 2
 		}
 	}
 }
 
-#Rude answer by initiator
+# Rude answer by initiator
 letter_event = {
 	id = ZE.8015
 	desc = EVTDESC_ZE_8015
 
 	is_triggered_only = yes
 
-	#end non aggression/alliance
+	# End non aggression/alliance
+
 	option = {
 		name = EVTOPTA_ZE_8015
+
 		custom_tooltip = {
 			text = EVTOPTA_ZE_8013_TOOLTIP
+
 			if = {
-				limit = {
-					is_allied_with = FROM
-				}
+				limit = { is_allied_with = FROM }
 				break_alliance = FROM
 			}
-			remove_opinion = { modifier = in_non_aggression_pact who = FROM }
+
+			remove_opinion = {
+				name = in_non_aggression_pact
+				who = FROM
+			}
+
 			opinion = {
-				modifier = broken_non_aggression_pact
+				name = broken_non_aggression_pact
 				who = FROM
 				years = 3
 			}
@@ -531,18 +586,19 @@ letter_event = {
 	}
 }
 
-#taking the blame
+# Taking the blame
 letter_event = {
 	id = ZE.8016
 	desc = EVTDESC_ZE_8016
 
 	is_triggered_only = yes
 
-	#liege is pleased
+	# Liege is pleased
 	option = {
 		name = EVTOPTA_ZE_8016
+
 		opinion = {
-			modifier = opinion_improved_relations
+			name = opinion_improved_relations
 			who = FROM
 			years = 2
 		}
