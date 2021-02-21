@@ -1841,3 +1841,294 @@ check_war_effect = {
 	check_if_reconquista_finished_effect = yes
 	check_holy_order_donation_effect = yes
 }
+
+move_childrens_crusade_region_effect = {
+	if = { # If at any point during the preparation Jerusalem is no longer a valid target, or a real Crusade starts, stop everything
+		limit = {
+			OR = {
+				k_jerusalem = {
+					trigger_if = {
+						limit = { has_holder = yes }
+
+						holder_scope = {
+							religion_group = christian
+						}
+					}
+				}
+
+				c_jerusalem = {
+					holder_scope = {
+						OR = {
+							religion_group = christian
+							is_crusade_target = yes
+						}
+					}
+				}
+
+				religion_head = {
+					OR = {
+						is_preparing_crusade = yes
+
+						any_war = {
+							OR = {
+								using_cb = crusade
+								using_cb = new_crusade
+							}
+						}
+					}
+				}
+			}
+		}
+
+		any_player = {
+			limit = {
+				religion_group = christian
+				NOT = { character = ROOT }
+			}
+
+			narrative_event = {
+				id = HF.25819 # Notify everyone that the crusade has flopped
+				days = 30
+			}
+		}
+
+		primary_title = {
+			activate_title = {
+				title = THIS
+				status = no
+			}
+
+			destroy_landed_title = THIS
+		}
+
+		clr_flag = flag_childrens_crusade_leader
+		add_trait = lunatic
+		piety = -150
+		remove_trait = disinherited
+
+		set_variable = {
+			which = children_crusade_forces
+			value = 0
+		}
+
+		set_variable = {
+			which = children_crusade_morale
+			value = 0
+		}
+
+		set_variable = {
+			which = children_crusade_heavy_troops
+			value = 0
+		}
+
+		any_courtier = {
+			remove_trait = disinherited
+			clr_flag = no_court_invites
+		}
+	}
+	else_if = { # Move to Genoa first
+		limit = { has_flag = flag_children_at_beginning }
+
+		primary_title = {
+			set_preferred_capital = c_genoa # Historically traveled here
+		}
+
+		change_variable = {
+			which = children_crusade_forces
+			value = 1
+		}
+
+		change_variable = {
+			which = children_crusade_morale
+			value = -1
+		}
+
+		clr_flag = flag_children_at_beginning
+		set_flag = flag_children_at_genoa
+
+		if = {
+			limit = {
+				persistent_event_target:childrens_crusade_sponsor_per = { is_alive = no }
+			}
+
+			change_variable = {
+				which = children_crusade_morale
+				value = -2
+			}
+		}
+
+		any_player = {
+			limit = {
+				NOT = { character = ROOT }
+				religion_group = christian
+			}
+
+			narrative_event = {
+				id = HF.25815 # Notify everyone that the crusade has reached Genoa and the sea did not part before them
+				days = 30
+			}
+		}
+
+		narrative_event = {
+			id = HF.25808 # Ping back to main event to check travel progress
+			days = 50
+			random = 100
+		}
+	}
+	else_if = { # Then shipwreck to Achaia
+		limit = { has_flag = flag_children_at_genoa }
+
+		primary_title = {
+			set_preferred_capital = c_achaia
+		}
+
+		change_variable = {
+			which = children_crusade_morale
+			value = -1
+		}
+
+		clr_flag = flag_children_at_genoa
+		set_flag = flag_children_at_achaia
+
+		any_player = {
+			limit = {
+				religion_group = christian
+				NOT = { character = ROOT }
+			}
+
+			narrative_event = {
+				id = HF.25816 # Notify everyone that the crusade has shipwrecked into Achaia
+				days = 30
+			}
+		}
+
+		if = {
+			limit = {
+				persistent_event_target:childrens_crusade_sponsor_per = { is_alive = no }
+			}
+
+			random = {
+				chance = 25
+
+				change_variable = {
+					which = children_crusade_forces
+					value = -1
+				}
+			}
+		}
+
+		narrative_event = {
+			id = HF.25808 # Ping back to main event to check travel progress
+			days = 50
+			random = 100
+		}
+	}
+	else_if = { # Then crawl to Nikaea
+		limit = { has_flag = flag_children_at_achaia }
+
+		primary_title = {
+			set_preferred_capital = c_nikaea
+		}
+
+		clr_flag = flag_children_at_achaia
+		set_flag = flag_children_at_nikaea
+
+		# Base forces score is 3 = circa 15.000 poorly armed troops
+		change_variable = {
+			which = children_crusade_forces
+			value = 1
+		}
+
+		any_player = {
+			limit = {
+				religion_group = christian
+				NOT = { character = ROOT }
+			}
+
+			narrative_event = {
+				id = HF.25817 # Notify everyone that the crusade has crawled its way to Nikaea
+				days = 30
+			}
+		}
+
+		narrative_event = {
+			id = HF.25808 # Ping back to main event to check travel progress
+			days = 50
+			random = 100
+		}
+	}
+	else_if = { # We actually got there. Start the war
+		limit = { has_flag = flag_children_at_nikaea }
+
+		primary_title = {
+			set_preferred_capital = c_antiocheia # Where the troops will spawn
+		}
+
+		clr_flag = flag_children_at_nikaea
+		set_flag = flag_children_at_antioch
+
+		narrative_event = {
+			id = HF.25820 # START THE CRUSADE
+			days = 25
+		}
+
+		any_player = {
+			limit = {
+				religion_group = christian
+				NOT = { character = ROOT }
+			}
+
+			narrative_event = {
+				id = HF.25818 # Notify everyone that the crusade has actually reached Antioch and is ready to engage
+				days = 30
+			}
+		}
+	}
+	else = { # Move directly to Antioch in case something went wrong
+		primary_title = {
+			set_preferred_capital = c_antiocheia # Historically traveled here
+		}
+
+		clr_flag = flag_children_at_achaia
+		clr_flag = flag_children_at_nikaea
+		clr_flag = flag_children_at_genoa
+		set_flag = flag_children_at_antioch
+
+		change_variable = {
+			which = children_crusade_forces
+			value = 1
+		}
+		change_variable = {
+			which = children_crusade_morale
+			value = -1
+		}
+
+		if = {
+			limit = {
+				persistent_event_target:childrens_crusade_sponsor_per = { is_alive = no }
+			}
+
+			change_variable = {
+				which = children_crusade_morale
+				value = -2
+			}
+		}
+
+		narrative_event = {
+			id = HF.25820 # START THE CRUSADE
+			days = 25
+		}
+
+		any_player = {
+			limit = {
+				religion_group = christian
+				NOT = { character = ROOT }
+			}
+
+			narrative_event = {
+				id = HF.25818 # Notify everyone that the crusade has actually reached Antioch and is ready to engage
+				days = 30
+			}
+		}
+	}
+}
