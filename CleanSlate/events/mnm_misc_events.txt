@@ -2,110 +2,101 @@
 #                                         #
 # M&M MISC Events                         #
 #                                         #
-# ID MNM.10000 - 10001     	              #
+# ID MNM.10000 - 10043                    #
 #                                         #
 ###########################################
 
 namespace = MNM
 
-###RANKING UP EVENTS####
+### RANKING UP EVENTS ####
 
-# Hidden start: Send the rank-up request to the current Grandmaster (delayed event on self, from decision to rank up)
-character_event = {
-	id = MNM.10002
-
-	hide_window = yes
-
-	trigger = {
-		has_character_flag = has_sent_request_to_rank_up
-	}
-
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = { is_in_society = yes }
-			random_society_member = {
-				limit = {
-					is_society_grandmaster = yes
-					same_society_as = ROOT
-				}
-				character_event = { id = MNM.10000 } # send request to Grand Master. Relic rewards also handled by this event
-			}
-		}
-		if = {
-			limit = { is_in_society = no }
-			clr_character_flag = has_sent_request_to_rank_up
-		}
-	}
-}
-
-# Grandmaster gets the rank-up request
-character_event = {
-	id = MNM.10000
-
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:rank_up_target = { letter_event = { id = MNM.10001 } }
-
-		FROM = {
-			if = {
-				limit = {
-					society_rank == 2
-					is_christian_monastic_member_trigger = yes
-				}
-
-				random = {
-					chance = 20
-					modifier = {
-						ai = no
-						factor = 5
-					}
-					letter_event = { id = MNM.4431 days = 30 random = 15 } #Gives saint's fingerbone
-				}
-			}
-		}
-	}
-}
-
-#Grand master approves my request
+# Grand master approves my request (delayed event on self, from decision to rank up)
 letter_event = {
-	id = MNM.10001
-	desc = EVTDESC_MNM_10001_A
+	id = MNM.10000
+	desc = EVTDESC_MNM_10000
 	border = GFX_event_letter_frame_intrigue
-
-	trigger = {
-		society_rank < 4
-		has_character_flag = has_sent_request_to_rank_up
-	}
+	portrait = event_target:my_grandmaster
 
 	is_triggered_only = yes
 
-	#Yes
-	option = {
-		name = {
-			text = EVTOPTA_10001
+	is_in_society = yes
+	has_character_flag = has_sent_request_to_rank_up
+
+	trigger = { society_rank < 4 }
+
+	fail_trigger_effect = {
+		clr_character_flag = has_sent_request_to_rank_up
+	}
+
+	immediate = {
+		society = {
+			leader = {
+				save_event_target_as = my_grandmaster
+			}
 		}
-		if = { limit = { society_rank < 4 } #Reminder: Remember you can rankup to 4 in some societies
+		if = {
+			limit = {
+				society_rank == 2
+				is_christian_monastic_member_trigger = yes
+			}
+
+			random = {
+				chance = 20
+				mult_modifier = {
+					ai = no
+					factor = 5
+				}
+				# Gives saint's fingerbone
+				letter_event = {
+					id = MNM.4431
+					days = 30
+					random = 15
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_MNM_10000
+
+		if = {
+			limit = { society_rank < 4 }
 			society_rank_up = 1
 		}
+
 		clr_character_flag = has_sent_request_to_rank_up
 	}
 }
 
-
-#Back up event for showing interest
+### Become Society Grand Master (any society)###
 character_event = {
-	id = MNM.10010
-	hide_window = yes
+	id = MNM.1750
+	desc = EVTDESC_MNM_1750
+	picture = GFX_evt_society_joining
+	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_character_society_rank_up
+
+	ai = no
 
 	trigger = {
-		is_in_society = no
+		is_society_grandmaster = yes
+		days_in_society > 0
+	}
+
+	option = { name = EVTOPTA_MNM_1750 }
+}
+
+# Back up event for showing interest
+character_event = {
+	id = MNM.10010
+
+	hide_window = yes
+	is_triggered_only = yes # on_character_switch_society_interest
+
+	is_in_society = no
+
+	trigger = {
 		OR = {
 			interested_in_society = the_assassins
 			interested_in_society = the_satanists
@@ -120,18 +111,23 @@ character_event = {
 	}
 
 	immediate = {
-		character_event = { id = MNM.10011 days = 90 random = 640 }
+		character_event = {
+			id = MNM.10011
+			months = 3
+			random = 640
+		}
 	}
 }
 
 character_event = {
 	id = MNM.10011
-	hide_window = yes
 
+	hide_window = yes
 	is_triggered_only = yes
 
+	is_in_society = no
+
 	trigger = {
-		is_in_society = no
 		OR = {
 			interested_in_society = the_assassins
 			interested_in_society = the_satanists
@@ -148,336 +144,205 @@ character_event = {
 	immediate = {
 		if = {
 			limit = { prisoner = yes }
-			repeat_event = { id = MNM.10011 days = 90 random = 640 }
-			break = yes
-		}
-		#Assassins
-		if = {
-			limit = {
-				interested_in_society = the_assassins
-				NOT = { has_character_flag = ongoing_recruitment }
-			}
-
-			random_society_member = {
-				limit = {
-					society_member_of = the_assassins
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = assassins_recruiter
-				character_event = { id = MNM.10012 }
+			repeat_event = {
+				id = MNM.10011
+				months = 3
+				random = 640
 			}
 		}
-		#Satanists
-		if = {
-			limit = {
-				interested_in_society = the_satanists
-				NOT = { has_character_flag = being_recruited_by_the_satanists }
-			}
-			random_society_member = {
-				limit = {
-					society_member_of = the_satanists
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = satanists_recruiter
-				character_event = { id = MNM.10013 }
-			}
-		}
-		#Trollcrafters
-		if = {
-			limit = {
-				interested_in_society = the_trollcrafters
-				NOT = { has_character_flag = being_recruited_by_the_trollcrafters }
-			}
-			random_society_member = {
-				limit = {
-					society_member_of = the_trollcrafters
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = satanists_recruiter
-				character_event = { id = MNM.10014 }
-			}
-		}
-		#Cult of Kali
-		if = {
-			limit = {
-				interested_in_society = the_cult_of_kali
-				NOT = { has_character_flag = being_recruited_by_the_cult_of_kali }
-			}
-			random_society_member = {
-				limit = {
-					society_member_of = the_cult_of_kali
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = satanists_recruiter
-				character_event = { id = MNM.10015 }
-			}
-		}
-		#Cold ones
-		if = {
-			limit = {
-				interested_in_society = the_cold_ones
-				NOT = { has_character_flag = being_recruited_by_the_cold_ones }
-			}
-			random_society_member = {
-				limit = {
-					society_member_of = the_cold_ones
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = satanists_recruiter
-				character_event = { id = MNM.10016 }
-			}
-		}
-		#Plaguebringers
-		if = {
-			limit = {
-				interested_in_society = the_plaguebringers
-				NOT = { has_character_flag = being_recruited_by_the_plaguebringers }
-			}
-			random_society_member = {
-				limit = {
-					society_member_of = the_plaguebringers
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = satanists_recruiter
-				character_event = { id = MNM.10017 }
-			}
-		}
-		#Vodunons
-		if = {
-			limit = {
-				interested_in_society = the_vodouns
-				NOT = { has_character_flag = being_recruited_by_the_vodouns }
-			}
-			random_society_member = {
-				limit = {
-					society_member_of = the_vodouns
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = satanists_recruiter
-				character_event = { id = MNM.10027 }
-			}
-		}
-		#Bacchants
-		if = {
-			limit = {
-				interested_in_society = the_bacchants
-				NOT = { has_character_flag = being_recruited_by_the_bacchants }
-			}
-			random_society_member = {
-				limit = {
-					society_member_of = the_bacchants
-					#is_within_diplo_range = ROOT
-					is_society_grandmaster = no
-				}
-				save_event_target_as = satanists_recruiter
-				character_event = { id = MNM.10026 }
-			}
-		}
-		#Secret religious society
-		if = {
-			limit = {
-				interested_in_society = secret_religious_cult
-				NOT = { has_character_modifier = secret_religions_recruitment_timer }
-				any_society_member = {
-				 	is_in_prevs_interesting_society_trigger = yes
-				}
-			}
-			add_character_modifier = {
-				name = secret_religions_recruitment_timer
-				years = 5
-				hidden = yes
-			}
-			character_event = { id = MNM.3420 }
-		}
-	}
-}
-
-character_event = {
-	id = MNM.10012
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
+		else = {
+			# Assassins
 			if = {
-				limit = { NOT = { has_character_flag = ongoing_recruitment } }
+				limit = {
+					interested_in_society = the_assassins
+					NOT = { has_character_flag = ongoing_recruitment }
+				}
+
+				random_society_member = {
+					limit = {
+						society_member_of = the_assassins
+						is_society_grandmaster = no
+					}
+					save_event_target_as = assassins_recruiter
+				}
+
 				set_character_flag = assassins_attempted_recruitment
 				set_character_flag = ongoing_recruitment
-				if = {
-					limit = { NOT = { religion = shiite } }
-					character_event = { id = MNM.6020 }
-				}
+
 				if = {
 					limit = { religion = shiite }
 					character_event = { id = MNM.6022 }
 				}
+				else = {
+					character_event = { id = MNM.6020 }
+				}
+			}
+			# Satanists
+			else_if = {
+				limit = {
+					interested_in_society = the_satanists
+					NOT = { has_character_flag = being_recruited_by_the_satanists }
+				}
+				random_society_member = {
+					limit = {
+						society_member_of = the_satanists
+						is_society_grandmaster = no
+					}
+					save_event_target_as = satanists_recruiter
+				}
+
+				set_character_flag = satanists_attempted_recruitment
+				set_character_flag = being_recruited_by_the_satanists
+				character_event = { id = MNM.7001 }
+			}
+			# Trollcrafters
+			else_if = {
+				limit = {
+					interested_in_society = the_trollcrafters
+					NOT = { has_character_flag = being_recruited_by_the_trollcrafters }
+				}
+				random_society_member = {
+					limit = {
+						society_member_of = the_trollcrafters
+						is_society_grandmaster = no
+					}
+					save_event_target_as = satanists_recruiter
+				}
+
+				set_character_flag = trollcrafters_attempted_recruitment
+				set_character_flag = being_recruited_by_the_trollcrafters
+				character_event = { id = MNM.7001 }
+			}
+			# Cult of Kali
+			else_if = {
+				limit = {
+					interested_in_society = the_cult_of_kali
+					NOT = { has_character_flag = being_recruited_by_the_cult_of_kali }
+				}
+				random_society_member = {
+					limit = {
+						society_member_of = the_cult_of_kali
+						is_society_grandmaster = no
+					}
+					save_event_target_as = satanists_recruiter
+				}
+
+				set_character_flag = cult_of_kali_attempted_recruitment
+				set_character_flag = being_recruited_by_the_cult_of_kali
+				character_event = { id = MNM.7001 }
+			}
+			# Cold ones
+			else_if = {
+				limit = {
+					interested_in_society = the_cold_ones
+					NOT = { has_character_flag = being_recruited_by_the_cold_ones }
+				}
+				random_society_member = {
+					limit = {
+						society_member_of = the_cold_ones
+						is_society_grandmaster = no
+					}
+					save_event_target_as = satanists_recruiter
+				}
+
+				set_character_flag = cold_ones_attempted_recruitment
+				set_character_flag = being_recruited_by_the_cold_ones
+				character_event = { id = MNM.7001 }
+			}
+			# Plaguebringers
+			else_if = {
+				limit = {
+					interested_in_society = the_plaguebringers
+					NOT = { has_character_flag = being_recruited_by_the_plaguebringers }
+				}
+				random_society_member = {
+					limit = {
+						society_member_of = the_plaguebringers
+						is_society_grandmaster = no
+					}
+					save_event_target_as = satanists_recruiter
+				}
+
+				set_character_flag = plaguebringers_attempted_recruitment
+				set_character_flag = being_recruited_by_the_plaguebringers
+				character_event = { id = MNM.7001 }
+			}
+			# Vodunons
+			else_if = {
+				limit = {
+					interested_in_society = the_vodouns
+					NOT = { has_character_flag = being_recruited_by_the_vodouns }
+				}
+				random_society_member = {
+					limit = {
+						society_member_of = the_vodouns
+						is_society_grandmaster = no
+					}
+					save_event_target_as = satanists_recruiter
+				}
+
+				set_character_flag = vodouns_attempted_recruitment
+				set_character_flag = being_recruited_by_the_vodouns
+				character_event = { id = MNM.7001 }
+			}
+			# Bacchants
+			else_if = {
+				limit = {
+					interested_in_society = the_bacchants
+					NOT = { has_character_flag = being_recruited_by_the_bacchants }
+				}
+				random_society_member = {
+					limit = {
+						society_member_of = the_bacchants
+						is_society_grandmaster = no
+					}
+					save_event_target_as = satanists_recruiter
+				}
+
+				set_character_flag = bacchants_attempted_recruitment
+				set_character_flag = being_recruited_by_the_bacchants
+				character_event = { id = MNM.7001 }
+			}
+			# Secret religious society
+			else_if = {
+				limit = {
+					interested_in_society = secret_religious_cult
+					NOT = { has_character_modifier = secret_religions_recruitment_timer }
+					any_society_member = {
+						is_in_prevs_interesting_society_trigger = yes
+					}
+				}
+				add_character_modifier = {
+					name = secret_religions_recruitment_timer
+					years = 5
+					hidden = yes
+				}
+				character_event = { id = MNM.3420 }
 			}
 		}
 	}
 }
 
-character_event = {
-	id = MNM.10013
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			set_character_flag = satanists_attempted_recruitment
-			set_character_flag = being_recruited_by_the_satanists
-			character_event = { id = MNM.7001 }
-		}
-	}
-}
-
-character_event = {
-	id = MNM.10014
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			set_character_flag = trollcrafters_attempted_recruitment
-			set_character_flag = being_recruited_by_the_trollcrafters
-			character_event = { id = MNM.7001 }
-		}
-	}
-}
-
-character_event = {
-	id = MNM.10015
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			set_character_flag = cult_of_kali_attempted_recruitment
-			set_character_flag = being_recruited_by_the_cult_of_kali
-			character_event = { id = MNM.7001 }
-		}
-	}
-}
-
-character_event = {
-	id = MNM.10016
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			set_character_flag = cold_ones_attempted_recruitment
-			set_character_flag = being_recruited_by_the_cold_ones
-			character_event = { id = MNM.7001 }
-		}
-	}
-}
-
-character_event = {
-	id = MNM.10017
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			set_character_flag = plaguebringers_attempted_recruitment
-			set_character_flag = being_recruited_by_the_plaguebringers
-			character_event = { id = MNM.7001 }
-		}
-	}
-}
-character_event = {
-	id = MNM.10026
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			set_character_flag = bacchants_attempted_recruitment
-			set_character_flag = being_recruited_by_the_bacchants
-			character_event = { id = MNM.7001 }
-		}
-	}
-}
-
-character_event = {
-	id = MNM.10027
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		FROM = {
-			set_character_flag = vodouns_attempted_recruitment
-			set_character_flag = being_recruited_by_the_vodouns
-			character_event = { id = MNM.7001 }
-		}
-	}
-}
-
-
-
-
-
-
-#Becoming stressed about keeping a secret
+# Becoming stressed about keeping a secret
 character_event = {
 	id = MNM.10020
 	picture = GFX_evt_uncomfortable
 	border = GFX_event_normal_frame_intrigue
 
 	desc = {
-		trigger = {
-			has_dlc = "Mystics"
-			trait = paranoid
-		}
 		text = EVTDESC_MNM_10020_A
-		picture = GFX_evt_uncomfortable
+		trigger = { trait = paranoid }
 	}
-
 	desc = {
+		text = EVTDESC_MNM_10020_B
 		trigger = {
-			NOT = { has_dlc = "Mystics" }
-			trait = paranoid
-		}
-		text = EVTDESC_MNM_10020_A
-		picture = GFX_evt_shadowy_cabal
-	}
-
-	desc = {
-		trigger = {
-			has_dlc = "Mystics"
 			NOT = { trait = paranoid }
 		}
-		text = EVTDESC_MNM_10020_B
-		picture = GFX_evt_uncomfortable
 	}
 
-	desc = {
-		trigger = {
-			NOT = { has_dlc = "Mystics" }
-			NOT = { trait = paranoid }
-		}
-		text = EVTDESC_MNM_10020_B
-		picture = GFX_evt_shadowy_cabal
-	}
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
 
 	is_in_society = yes
-
-	is_triggered_only = yes
 
 	trigger = {
 		society_is_criminal = yes
@@ -491,102 +356,36 @@ character_event = {
 	}
 }
 
-
-#Excluded from society due to breaking the limitations
-character_event = {
-	id = MNM.10021
-	hide_window = yes
-	is_triggered_only = yes
-	immediate = {
-		if = {
-			limit = { #If YOU are the grandmaster and there are others in the society...
-				OR = {
-					is_society_grandmaster = yes
-					society_rank == 4
-				}
-				any_society_member = {
-					NOT = { character = ROOT }
-					same_society_as = ROOT
-				}
-			}
-			society = {
-				random_society_member = {
-					limit = { NOT = { character = ROOT } }
-					character_event = { id = MNM.10022 } #Have some rando send the kick-out letter!
-				}
-			}
-		}
-		if = {
-			limit = { #If you are NOT the grandmaster/a leader...
-				NOT = { society_rank == 4 }
-			}
-			society = {
-				random_society_member = {
-					limit = {
-						OR = {
-							is_society_grandmaster = yes
-							society_rank == 4
-						}
-					}
-					character_event = { id = MNM.10022 } #Have the Grand Master send the kick-out letter!
-				}
-			}
-		}
-		else = { #If you are the last of your kind...
-			ROOT = {
-				leave_society = yes
-			}
-		}
-	}
-}
-
-
-character_event = {
-	id = MNM.10022
-	hide_window = yes
-	is_triggered_only = yes
-	immediate = { FROM = { letter_event = { id = MNM.10023 } } }
-}
-
-
+# Excluded from society due to breaking the limitations
 letter_event = {
-	id = MNM.10023
+	id = MNM.10021
 	border = GFX_event_letter_frame_religion
+	portrait = event_target:expeller
 
-	is_triggered_only = yes
-
-	#desc = {
-	#	trigger = { is_devil_worshiper_trigger = yes }
-	#	text = EVTDESC_MNM_10023_DW #Not written because currently there is no potential
-	# }
 	desc = {
-		trigger = { society_member_of = the_assassins }
 		text = EVTDESC_MNM_10023_ASSASSINS
+		trigger = { society_member_of = the_assassins }
 	}
 	desc = {
-		trigger = { is_monastic_member_trigger = yes }
 		text = EVTDESC_MNM_10023_MO
+		trigger = { is_monastic_member_trigger = yes }
 	}
 	desc = {
+		text = EVTDESC_MNM_10023_SR_A
 		trigger = {
 			society_member_of = secret_religious_cult
 			religion = { target = FROM target_type = secret }
 		}
-		text = EVTDESC_MNM_10023_SR_A
 	}
 	desc = {
+		text = EVTDESC_MNM_10023_SR_B
 		trigger = {
 			society_member_of = secret_religious_cult
 			NOT = { religion = { target = FROM target_type = secret } }
 		}
-		text = EVTDESC_MNM_10023_SR_B
 	}
-	desc = {
-		trigger = { always = no }
-		text = EVTDESC_MNM_10023_HERMETICS
-	}
-
-	desc = { #Generic fallback
+	desc = { # Generic fallback
+		text = EVTDESC_MNM_10023_fallback
 		trigger = {
 			NOR = {
 				society_member_of = the_assassins
@@ -594,7 +393,52 @@ letter_event = {
 				society_member_of = secret_religious_cult
 			}
 		}
-		text = EVTDESC_MNM_10023_fallback
+	}
+
+	is_triggered_only = yes # on_character_kicked_from_society
+
+	trigger = {
+		society = {
+			any_society_member = {
+				NOT = { character = ROOT }
+			}
+		}
+	}
+
+	fail_trigger_effect = {
+		# If you are the last of your kind...
+		leave_society = yes
+	}
+
+	immediate = {
+		if = {
+			limit = { # If YOU are the grandmaster and there are others in the society...
+				OR = {
+					is_society_grandmaster = yes
+					society_rank == 4
+				}
+			}
+			# Have some rando send the kick-out letter!
+			society = {
+				random_society_member = {
+					limit = {
+						NOT = { character = ROOT }
+					}
+					preferred_limit = {
+						society_rank == 4
+					}
+					save_event_target_as = expeller
+				}
+			}
+		}
+		# If you are NOT the grandmaster/a leader...
+		else = {
+			society = {
+				leader = {
+					save_event_target_as = expeller
+				}
+			}
+		}
 	}
 
 	option = {
@@ -622,13 +466,14 @@ letter_event = {
 	}
 }
 
+# Clear society interest
 character_event = {
 	id = MNM.10019
 	desc = EVTDESC_MNM_10019
 	picture = GFX_evt_society_joining
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_character_stop_showing_interest
 
 	option = {
 		name = ALAS
@@ -636,15 +481,15 @@ character_event = {
 	}
 }
 
-# Force join AI characters to societies
+# Force AI characters to join societies.
 character_event = {
 	id = MNM.10030
-	hide_window = yes
 
-	only_rulers = yes
-	is_triggered_only = yes
+	hide_window = yes
+	is_triggered_only = yes # on_five_year_pulse
 
 	has_dlc = "Mystics"
+	only_rulers = yes
 
 	immediate = {
 		if = {
@@ -656,14 +501,12 @@ character_event = {
 				society_rank < 3
 				society_can_rank_up = yes
 			}
-			random_list = {
-				75 = { }
-				25 = {
-					society_rank_up = 1
-				}
+			random = {
+				chance = 25
+				society_rank_up = 1
 			}
 		}
-		if = {
+		else_if = {
 			limit = {
 				ai = yes
 				prisoner = no
@@ -684,11 +527,9 @@ character_event = {
 				society_rank < 3
 				society_can_rank_up = yes
 			}
-			random_list = {
-				75 = { }
-				25 = {
-					society_rank_up = 1
-				}
+			random = {
+				chance = 25
+				society_rank_up = 1
 			}
 		}
 		any_courtier = {
@@ -706,22 +547,22 @@ character_event = {
 	}
 }
 
+# Choose a society to force the AI to join.
 character_event = {
 	id = MNM.10031
-	hide_window = yes
 
+	hide_window = yes
 	is_triggered_only = yes
 
 	immediate = {
 		random_list = {
-			95 = { # do nothing
-			}
+			95 = { } # do nothing
 			5 = { # try to join a society
-				modifier = {
+				mult_modifier = {
 					factor = 2
-					higher_tier_than = BARON
+					higher_real_tier_than = BARON
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 3
 					true_religion = shiite
 					can_join_society = the_assassins
@@ -733,7 +574,7 @@ character_event = {
 						trigger = {
 							can_join_society = monastic_order_benedictine
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
@@ -742,48 +583,25 @@ character_event = {
 								trait = gardener
 								trait = monk
 								trait = nun
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_benedictine = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_benedictine = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_benedictine
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_dominican
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
@@ -792,51 +610,25 @@ character_event = {
 								trait = gardener
 								trait = monk
 								trait = nun
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_dominican = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_dominican = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_dominican
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-								}
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_orthodox
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
@@ -845,48 +637,25 @@ character_event = {
 								trait = gardener
 								trait = monk
 								trait = nun
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_orthodox = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_orthodox = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_orthodox
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_nestorian
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
@@ -895,48 +664,25 @@ character_event = {
 								trait = gardener
 								trait = monk
 								trait = nun
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_nestorian = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_nestorian = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_nestorian
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_monophysite
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
@@ -945,838 +691,267 @@ character_event = {
 								trait = gardener
 								trait = monk
 								trait = nun
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_monophysite = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_monophysite = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_monophysite
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_hindu
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
 								trait = scholar
 								trait = theologian
 								trait = brahmin
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_hindu = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_hindu = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_hindu
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_buddhist
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
 								trait = scholar
 								trait = theologian
 								trait = brahmin
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_buddhist = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_buddhist = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_buddhist
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_jain
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = zealous
 								trait = scholar
 								trait = theologian
 								trait = brahmin
-								learning = 16
+								learning >= 16
 								is_priest = yes
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_jain = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_jain = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_jain
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					100 = {
 						trigger = {
 							can_join_society = monastic_order_stoics
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 3
 							OR = {
 								trait = erudite
 								trait = scholar
 								trait = theologian
 								trait = diligent
-								learning = 16
+								learning >= 16
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_stoics = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							monastic_order_stoics = { num_of_society_members < 10 }
 						}
 						join_society = monastic_order_stoics
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_catholic
 						}
 						join_society = secret_religious_society_catholic
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_orthodox
 						}
 						join_society = secret_religious_society_orthodox
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_sunni
 						}
 						join_society = secret_religious_society_sunni
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_shiite
 						}
 						join_society = secret_religious_society_shiite
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_jewish
 						}
 						join_society = secret_religious_society_jewish
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_zoroastrian
 						}
 						join_society = secret_religious_society_zoroastrian
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_hindu
 						}
 						join_society = secret_religious_society_hindu
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_buddhist
 						}
 						join_society = secret_religious_society_buddhist
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_jain
 						}
 						join_society = secret_religious_society_jain
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_norse_pagan_reformed
 						}
 						join_society = secret_religious_society_norse_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_slavic_pagan_reformed
 						}
 						join_society = secret_religious_society_slavic_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_tengri_pagan_reformed
 						}
 						join_society = secret_religious_society_tengri_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_baltic_pagan_reformed
 						}
 						join_society = secret_religious_society_baltic_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_finnish_pagan_reformed
 						}
 						join_society = secret_religious_society_finnish_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_west_african_pagan_reformed
 						}
 						join_society = secret_religious_society_west_african_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_zun_pagan_reformed
 						}
 						join_society = secret_religious_society_zun_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_bon_reformed
 						}
 						join_society = secret_religious_society_bon_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_hellenic_pagan_reformed
 						}
 						join_society = secret_religious_society_hellenic_pagan_reformed
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					200 = {
 						trigger = {
 							can_join_society = secret_religious_society_hellenic_pagan
 						}
 						join_society = secret_religious_society_hellenic_pagan
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					150 = {
 						trigger = {
 							can_join_society = hermetics
+							is_landed = yes
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							is_dumb_trigger = no
 							OR = {
-								learning = 12
+								learning >= 12
 								trait = scholar
 								trait = erudite
 								trait = genius
 								trait = mystic
 							}
 						}
-						modifier = {
-							factor = 0
-							is_landed = no
-						}
 						join_society = hermetics
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					500 = {
 						trigger = {
 							can_join_society = the_assassins
+							intrigue >= 6
+							trigger_if = {
+								limit = {
+									trait = zealous
+								}
+								true_religion = shiite
+							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 0.5
 							is_landed = no
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 0.1
 							NOR = {
 								true_religion = shiite
@@ -1787,26 +962,17 @@ character_event = {
 									OR = {
 										trait = schemer
 										trait = elusive_shadow
-										intrigue = 18
+										intrigue >= 18
 									}
 								}
 							}
 						}
-						modifier = {
-							factor = 0
-							NOT = { true_religion = shiite }
-							trait = zealous
-						}
-						modifier = {
-							factor = 0
-							NOT = { intrigue = 6 }
-						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							true_religion = shiite
 							is_landed = yes
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							true_religion = shiite
 							NOT = { trait = decadent }
@@ -1816,59 +982,34 @@ character_event = {
 								trait = elusive_shadow
 								trait = deceitful
 								trait = ambitious
-								intrigue = 18
+								intrigue >= 18
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_assassins = { num_of_society_members < 20 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_assassins = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_assassins = { num_of_society_members < 10 }
 						}
 						if = {
 							limit = {
-								NOT = {
-									religion = shiite
-								}
+								NOT = { religion = shiite }
 							}
 							set_secret_religion = shiite
 						}
 						join_society = the_assassins
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					50 = {
 						trigger = {
 							can_join_society = the_satanists
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							OR = {
 								has_impious_trait_trigger = yes
@@ -1878,44 +1019,21 @@ character_event = {
 								trait = lunatic
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_satanists = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_satanists = { num_of_society_members < 10 }
 						}
 						join_society = the_satanists
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					50 = {
 						trigger = {
 							can_join_society = the_trollcrafters
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							OR = {
 								has_impious_trait_trigger = yes
@@ -1925,44 +1043,21 @@ character_event = {
 								trait = lunatic
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_trollcrafters = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_trollcrafters = { num_of_society_members < 10 }
 						}
 						join_society = the_trollcrafters
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					50 = {
 						trigger = {
 							can_join_society = the_cult_of_kali
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							OR = {
 								has_impious_trait_trigger = yes
@@ -1972,44 +1067,21 @@ character_event = {
 								trait = lunatic
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_cult_of_kali = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_cult_of_kali = { num_of_society_members < 10 }
 						}
 						join_society = the_cult_of_kali
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					50 = {
 						trigger = {
 							can_join_society = the_cold_ones
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							OR = {
 								has_impious_trait_trigger = yes
@@ -2019,44 +1091,21 @@ character_event = {
 								trait = lunatic
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_cold_ones = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_cold_ones = { num_of_society_members < 10 }
 						}
 						join_society = the_cold_ones
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					50 = {
 						trigger = {
 							can_join_society = the_plaguebringers
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							OR = {
 								has_impious_trait_trigger = yes
@@ -2066,44 +1115,21 @@ character_event = {
 								trait = lunatic
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_plaguebringers = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_plaguebringers = { num_of_society_members < 10 }
 						}
 						join_society = the_plaguebringers
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					50 = {
 						trigger = {
 							can_join_society = the_vodouns
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							OR = {
 								has_impious_trait_trigger = yes
@@ -2113,44 +1139,21 @@ character_event = {
 								trait = lunatic
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_vodouns = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_vodouns = { num_of_society_members < 10 }
 						}
 						join_society = the_vodouns
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
-								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
 					}
 					50 = {
 						trigger = {
 							can_join_society = the_bacchants
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 5
 							OR = {
 								has_impious_trait_trigger = yes
@@ -2160,38 +1163,40 @@ character_event = {
 								trait = lunatic
 							}
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_bacchants = { num_of_society_members < 15 }
 						}
-						modifier = {
+						mult_modifier = {
 							factor = 2
 							the_bacchants = { num_of_society_members < 10 }
 						}
 						join_society = the_bacchants
-						random_list = { # Artificially increase society influence for balance purposes
-							75 = {
-								modifier = {
-									factor = 0
-									society_influence >= 30
+					}
+				}
+
+				if = {
+					limit = { is_in_society = yes }
+
+					# Artificially increase society influence for balance purposes
+					if = {
+						limit = { society_influence < 30 }
+
+						random = {
+							chance = 75
+							add_mission_succeed_influence_effect = yes
+						}
+					}
+
+					if = {
+						limit = {
+							NOT = {
+								society = {
+									leader = { always = yes }
 								}
-								add_mission_succeed_influence_effect = yes
-							}
-							25 = {
 							}
 						}
-						if = {
-							limit = {
-								NOT = {
-									society = {
-										any_society_member = {
-											is_society_grandmaster = yes
-										}
-									}
-								}
-							}
-							set_society_grandmaster = yes
-						}
+						set_society_grandmaster = yes
 					}
 				}
 			}
@@ -2199,22 +1204,51 @@ character_event = {
 	}
 }
 
-###Society relationship events###
+### Society relationship events ###
 
-#Making an enemy
+# Making an enemy. Fired from on_society_bi_yearly_pulse
 character_event = {
 	id = MNM.10040
-	hide_window = yes
-	is_triggered_only = yes
+	picture = GFX_evt_rival_rulers
+	border = GFX_event_normal_frame_war
+	portrait = event_target:potential_rival
+
+	desc = {
+		text = EVTDESC_MNM_10042
+		picture = GFX_evt_rival_rulers
+		trigger = {
+			NOR = {
+				is_devil_worshiper_trigger = yes
+				society_member_of = hermetics
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_10042
+		picture = GFX_evt_shadowy_cabal
+		trigger = { is_devil_worshiper_trigger = yes }
+	}
+	desc = {
+		text = EVTDESC_MNM_10042
+		picture = GFX_evt_gathering_of_minds
+		trigger = { society_member_of = hermetics }
+	}
+
+	is_triggered_only = yes # on_society_bi_yearly_pulse
+
 	only_capable = yes
+
 	trigger = {
 		society = {
 			any_society_member = {
-				NOT = { reverse_opinion = { who = ROOT value = -20 } }
-				NOT = { opinion = { who = ROOT value = 0 } }
-				NOT = { is_rival = ROOT }
-				NOT = { has_character_flag = ineligible_for_society_rivalry }
 				ai = yes
+				reverse_opinion = { who = ROOT value < -20 }
+				opinion = { who = ROOT value < 0 }
+
+				NOR = {
+					is_rival = ROOT
+					has_character_flag = ineligible_for_society_rivalry
+				}
 			}
 		}
 	}
@@ -2222,71 +1256,36 @@ character_event = {
 		society = {
 			random_society_member = {
 				limit = {
-					NOT = { reverse_opinion = { who = ROOT value = -20 } }
-					NOT = { opinion = { who = ROOT value = 0 } }
-					NOT = { is_rival = ROOT }
-					NOT = { has_character_flag = ineligible_for_society_rivalry }
 					ai = yes
+					reverse_opinion = { who = ROOT value < -20 }
+					opinion = { who = ROOT value < 0 }
+
+					NOR = {
+						is_rival = ROOT
+						has_character_flag = ineligible_for_society_rivalry
+					}
 				}
-				character_event = { id = MNM.10041 }
+				save_event_target_as = potential_rival
 			}
 		}
 	}
-}
 
-
-character_event = {
-	id = MNM.10041
-	hide_window = yes
-	is_triggered_only = yes
-	immediate = { FROM = { character_event = { id = MNM.10042 } } }
-}
-
-
-character_event = {
-	id = MNM.10042
-	picture = GFX_evt_rival_rulers
-	border = GFX_event_normal_frame_war
-
-	desc = {
-		trigger = {
-			NOR = {
-				is_devil_worshiper_trigger = yes
-				society_member_of = hermetics
-			}
-		}
-		text = EVTDESC_MNM_10042
-		picture = GFX_evt_rival_rulers
-	}
-	desc = {
-		trigger = { is_devil_worshiper_trigger = yes }
-		text = EVTDESC_MNM_10042
-		picture = GFX_evt_shadowy_cabal
-	}
-	desc = {
-		trigger = { society_member_of = hermetics }
-		text = EVTDESC_MNM_10042
-		picture = GFX_evt_gathering_of_minds
-	}
-
-	is_triggered_only = yes
-
-	#Make them enemy
+	# Make them an enemy
 	option = {
 		name = EVTOPTA_MNM_10042
-		add_rival = FROM
+		add_rival = event_target:potential_rival
 
 		ai_chance = {
 			factor = 90
-			modifier = {
-				has_evil_trait_trigger = yes
+
+			mult_modifier = {
 				factor = 15
+				has_evil_trait_trigger = yes
 			}
 		}
 	}
 
-
-	#Ignore them
+	# Ignore them
 	option = {
 		name = EVTOPTB_MNM_10042
 
@@ -2294,79 +1293,30 @@ character_event = {
 
 		if = {
 			limit = { ai = no }
-			FROM = { set_character_flag = ineligible_for_society_rivalry }
+			event_target:potential_rival = { set_character_flag = ineligible_for_society_rivalry }
 		}
 
 		ai_chance = {
 			factor = 10
-			modifier = {
-				has_benevolent_trait_trigger = yes
+
+			mult_modifier = {
 				factor = 15
+				has_benevolent_trait_trigger = yes
 			}
 		}
 	}
 }
 
-
-#Making a friend
+# Making a friend. Fired from on_society_bi_yearly_pulse
 character_event = {
 	id = MNM.10043
-	hide_window = yes
-	is_triggered_only = yes
-	only_capable = yes
-	trigger = {
-		society = {
-			any_society_member = {
-				reverse_opinion = { who = ROOT value = 30 }
-				opinion = { who = ROOT value = 40 }
-				NOR = {
-					is_lover = ROOT
-					is_friend = ROOT
-					is_rival = ROOT
-					is_close_relative = ROOT
-				}
-				prisoner = no
-				NOT = { has_character_flag = ineligible_for_society_friendship }
-				ai = yes
-			}
-		}
-	}
-	immediate = {
-		society = {
-			random_society_member = {
-				limit = {
-					reverse_opinion = { who = ROOT value = 30 }
-					opinion = { who = ROOT value = 40 }
-					NOR = {
-						is_lover = ROOT
-						is_friend = ROOT
-						is_rival = ROOT
-						is_close_relative = ROOT
-					}
-					prisoner = no
-					NOT = { has_character_flag = ineligible_for_society_friendship }
-					ai = yes
-				}
-				character_event = { id = MNM.10044 }
-			}
-		}
-	}
-}
-
-character_event = {
-	id = MNM.10044
-	hide_window = yes
-	is_triggered_only = yes
-	immediate = { FROM = { character_event = { id = MNM.10045 } } }
-}
-
-
-character_event = {
-	id = MNM.10045
 	picture = GFX_evt_courtiers_talking
 	border = GFX_event_normal_frame_diplomacy
+	portrait = event_target:potential_friend
 
 	desc = {
+		text = EVTDESC_MNM_10045
+		picture = GFX_evt_rival_rulers
 		trigger = {
 			NOR = {
 				is_devil_worshiper_trigger = yes
@@ -2377,177 +1327,219 @@ character_event = {
 				is_christian_monastic_member_trigger = yes
 			}
 		}
-		text = EVTDESC_MNM_10045
-		picture = GFX_evt_rival_rulers
 	}
 	desc = {
-		trigger = { is_devil_worshiper_trigger = yes }
 		text = EVTDESC_MNM_10045
 		picture = GFX_evt_magic_ritual
+		trigger = { is_devil_worshiper_trigger = yes }
 	}
 	desc = {
-		trigger = { society_member_of = hermetics }
 		text = EVTDESC_MNM_10045
 		picture = GFX_evt_experiment
+		trigger = { society_member_of = hermetics }
 	}
 	desc = {
-		trigger = { society_member_of = secret_religious_cult }
 		text = EVTDESC_MNM_10045
 		picture = GFX_evt_secret_ceremony
+		trigger = { society_member_of = secret_religious_cult }
 	}
 	desc = {
-		trigger = { society_member_of = the_assassins }
 		text = EVTDESC_MNM_10045
 		picture = GFX_evt_council_arabic
+		trigger = { society_member_of = the_assassins }
 	}
 	desc = {
-		trigger = { is_dharmic_monastic_member_trigger = yes }
 		text = EVTDESC_MNM_10045
 		picture = GFX_evt_bishop_hindu
+		trigger = { is_dharmic_monastic_member_trigger = yes }
 	}
 	desc = {
-		trigger = { is_christian_monastic_member_trigger = yes }
 		text = EVTDESC_MNM_10045
 		picture = GFX_evt_monastery_monks
+		trigger = { is_christian_monastic_member_trigger = yes }
 	}
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_society_bi_yearly_pulse
 
-	#Make them friend
-	option = {
-		name = EVTOPTA_MNM_10045
-		add_friend = FROM
+	only_capable = yes
 
-		ai_chance = {
-			factor = 75
-			modifier = {
-				has_pleasant_trait_trigger = yes
-				factor = 15
+	trigger = {
+		society = {
+			any_society_member = {
+				ai = yes
+				prisoner = no
+				reverse_opinion = { who = ROOT value >= 30 }
+				opinion = { who = ROOT value >= 40 }
+
+				NOR = {
+					is_lover = ROOT
+					is_friend = ROOT
+					is_rival = ROOT
+					is_close_relative = ROOT
+					has_character_flag = ineligible_for_society_friendship
+				}
+			}
+		}
+	}
+	immediate = {
+		society = {
+			random_society_member = {
+				limit = {
+					ai = yes
+					prisoner = no
+					reverse_opinion = { who = ROOT value >= 30 }
+					opinion = { who = ROOT value >= 40 }
+
+					NOR = {
+						is_lover = ROOT
+						is_friend = ROOT
+						is_rival = ROOT
+						is_close_relative = ROOT
+						has_character_flag = ineligible_for_society_friendship
+					}
+				}
+				save_event_target_as = potential_friend
 			}
 		}
 	}
 
-	#Love?
+	# Make them a friend
 	option = {
-		trigger = { FROM = { root_attraction_trigger = yes } }
-		name = EVTOPTC_MNM_10045
-		custom_tooltip = { text = EVTOPTB_MNM_6903_TT }
+		name = EVTOPTA_MNM_10045
+		add_friend = event_target:potential_friend
 
-		hidden_effect = { FROM = { character_event = { id = MNM.6906 days = 3 } } }
+		ai_chance = {
+			factor = 75
+
+			mult_modifier = {
+				factor = 15
+				has_pleasant_trait_trigger = yes
+			}
+		}
+	}
+
+	# Love?
+	option = {
+		name = EVTOPTC_MNM_10045
+		trigger = { event_target:potential_friend = { root_attraction_trigger = yes } }
+
+		custom_tooltip = { text = EVTOPTB_MNM_6903_TT }
+		event_target:potential_friend = {
+			character_event = { id = MNM.6906 days = 3 }
+		}
 
 		if = {
 			limit = { ai = no }
-			FROM = { set_character_flag = ineligible_for_society_friendship }
+			event_target:potential_friend = { set_character_flag = ineligible_for_society_friendship }
 		}
 
 		ai_chance = {
 			factor = 25
-			modifier = {
-				factor = 0
-				NOR = {
+
+			trigger = {
+				OR = {
 					trait = lustful
 					AND = {
-						NOT = { any_lover = { is_alive = yes } }
+						has_lover = no
 						is_married = yes
 					}
-					FROM = { has_attractive_trait_trigger = yes }
+					event_target:potential_friend = { has_attractive_trait_trigger = yes }
 				}
 			}
 		}
 	}
 
-	#Nah
+	# Nah
 	option = {
 		name = EVTOPTB_MNM_10045
 
 		if = {
 			limit = { ai = no }
-			FROM = { set_character_flag = ineligible_for_society_friendship }
+			event_target:potential_friend = { set_character_flag = ineligible_for_society_friendship }
 		}
 
 		ai_chance = {
 			factor = 25
-			modifier = {
-				has_unpleasant_trait_trigger = yes
+
+			mult_modifier = {
 				factor = 15
+				has_unpleasant_trait_trigger = yes
 			}
 		}
 	}
 }
 
-#clearing secret_societies_interference flag
+# Clearing secret_societies_interference flag
+# TODO: This flag doesn't appear to do anything?
 character_event = {
 	id = MNM.6661
 
-	is_triggered_only = yes
 	hide_window = yes
+	is_triggered_only = yes # increase_visibility(_minor)_effect
 
 	immediate = {
 		clr_character_flag = secret_societies_interference
 	}
-
-	option = {
-
-	}
 }
 
-#Suspicion modifiers
+### Suspicion modifiers ###
+
+# Add under_suspicion notification
 character_event = {
 	id = MNM.6662
 	desc = MNM.6662.d
-	picture = "GFX_evt_uncomfortable"
+	picture = GFX_evt_uncomfortable
 	border = GFX_event_normal_frame_religion
 
-	trigger = {
-		is_in_society = yes
-	}
+	ai = no
+	is_in_society = yes
 
-	is_triggered_only = yes
+	is_triggered_only = yes # increase_visibility(_minor)_effect
 
 	option = {
 		name = MNM.6662.a
 		tooltip = {
 			add_character_modifier = {
-				name = under_suspicion duration = -1
+				name = under_suspicion
+				duration = -1
 			}
 		}
 	}
 }
 
+# Add highly_suspect notification
 character_event = {
 	id = MNM.6663
 	desc = MNM.6662.d
-	picture = "GFX_evt_uncomfortable"
+	picture = GFX_evt_uncomfortable
 	border = GFX_event_normal_frame_religion
 
-	trigger = {
-		is_in_society = yes
-	}
+	ai = no
+	is_in_society = yes
 
-	is_triggered_only = yes
+	is_triggered_only = yes # increase_visibility(_minor)_effect
 
 	option = {
 		name = MNM.6662.a
 		tooltip = {
 			add_character_modifier = {
-				name = highly_suspect duration = -1
+				name = highly_suspect
+				duration = -1
 			}
 		}
 	}
 }
 
+# Remove highly_suspect notification
 character_event = {
 	id = MNM.6664
 	desc = MNM.6664.d
-	picture = "GFX_evt_dark_prayer"
+	picture = GFX_evt_dark_prayer
 	border = GFX_event_normal_frame_religion
 
-	trigger = {
-		is_in_society = yes
-		has_character_modifier = highly_suspect
-	}
+	ai = no
 
-	is_triggered_only = yes
+	is_triggered_only = yes # decrease_visibility_effect
 
 	option = {
 		name = EXCELLENT
@@ -2557,18 +1549,16 @@ character_event = {
 	}
 }
 
+# Remove under_suspicion suspicion notification
 character_event = {
 	id = MNM.6665
 	desc = MNM.6664.d
-	picture = "GFX_evt_dark_prayer"
+	picture = GFX_evt_dark_prayer
 	border = GFX_event_normal_frame_religion
 
-	trigger = {
-		is_in_society = yes
-		has_character_modifier = under_suspicion
-	}
+	ai = no
 
-	is_triggered_only = yes
+	is_triggered_only = yes # decrease_visibility_effect
 
 	option = {
 		name = EXCELLENT
@@ -2578,52 +1568,17 @@ character_event = {
 	}
 }
 
-#quest modifiers
-character_event = {
-	id = MNM.6666
-
-	hide_window = yes
-
-	trigger = {
-		is_in_society = yes
-	}
-
-	is_triggered_only = yes
-
-	option = {
-#		name = EXCELLENT
-		add_mission_succeed_influence_effect = yes
-	}
-}
-
-character_event = {
-	id = MNM.6667
-
-	hide_window = yes
-
-	trigger = {
-		is_in_society = yes
-	}
-
-	is_triggered_only = yes
-
-	option = {
-#		name = ALAS
-		add_mission_fail_influence_effect = yes
-	}
-}
-
+# Visibility increase - Exposed
 character_event = {
 	id = MNM.6668
 	desc = MNM.6668.d
-	picture = "GFX_evt_dark_prayer"
+	picture = GFX_evt_dark_prayer
 	border = GFX_event_normal_frame_religion
 
-	trigger = {
-		is_in_society = yes
-	}
 
-	is_triggered_only = yes
+	is_in_society = yes
+
+	is_triggered_only = yes # increase_visibility(_minor)_effect
 
 	option = {
 		name = CURSES
@@ -2636,10 +1591,7 @@ character_event = {
 				duration = -1
 			}
 		}
-		if = {
-			limit = {
-				is_devil_worshiper_trigger = no
-			}
+		else = {
 			add_character_modifier = {
 				name = accused_apostate
 				duration = -1
@@ -2655,18 +1607,61 @@ character_event = {
 	}
 }
 
-#Cleanup event for dead quest targets
+# Suspectometer - Yearly suspicion decrease
 character_event = {
-	id = MNM.6991
+	id = MNM.70030
+
+	is_triggered_only = yes # on_yearly_pulse
 	hide_window = yes
 
-	is_triggered_only = yes
+	immediate = {
+		decrease_visibility_effect = yes
+	}
+}
+
+# Quest success influence
+character_event = {
+	id = MNM.6666
+
+	is_in_society = yes
+
+	hide_window = yes
+	is_triggered_only = yes # on_quest_success
+
+	immediate = {
+		add_mission_succeed_influence_effect = yes
+	}
+}
+
+# Quest failure influence
+character_event = {
+	id = MNM.6667
+
+	is_in_society = yes
+
+	hide_window = yes
+	is_triggered_only = yes # on_quest_failure
+
+	immediate = {
+		add_mission_fail_influence_effect = yes
+	}
+}
+
+# Cleanup event for dead quest targets
+character_event = {
+	id = MNM.6991
+
+	hide_window = yes
+	is_triggered_only = yes # on_death
 
 	trigger = {
 		OR = {
 			is_quest_target = yes
 			any_opinion_modifier_target = {
-				reverse_has_opinion_modifier = { who = ROOT modifier = opinion_infiltration_companion }
+				reverse_has_opinion_modifier = {
+					name = opinion_infiltration_companion
+					who = ROOT
+				}
 				has_quest = quest_hermetics_infiltrate_laboratory
 			}
 		}
@@ -2675,10 +1670,16 @@ character_event = {
 	immediate = {
 		any_opinion_modifier_target = {
 			limit = {
-				reverse_has_opinion_modifier = { who = ROOT modifier = opinion_infiltration_companion }
+				reverse_has_opinion_modifier = {
+					name = opinion_infiltration_companion
+					who = ROOT
+				}
 				has_quest = quest_hermetics_infiltrate_laboratory
 			}
-			reverse_remove_opinion = { who = ROOT modifier = opinion_infiltration_companion }
+			reverse_remove_opinion = {
+				name = opinion_infiltration_companion
+				who = ROOT
+			}
 			character_event = { id = MNM.6992 days = 2 }
 		}
 		any_quester_targeting_this = {
@@ -2686,7 +1687,7 @@ character_event = {
 				has_character_flag = training_protege
 				has_quest = quest_the_assassins_protege
 			}
-			character_event = { id = MNM.6260 days = 15 } #Clears protege mission
+			character_event = { id = MNM.6260 days = 15 } # Clears protege mission
 		}
 		any_quester_targeting_this = {
 			limit = { NOT = { has_character_flag = training_protege } }
@@ -2695,23 +1696,16 @@ character_event = {
 					has_quest = quest_the_assassins_assassination
 					ROOT = { killer = { character = PREVPREV } }
 				}
-				character_event = { id = MNM.6950 days = 1 } #Completes assassination mission
+				character_event = { id = MNM.6950 days = 1 } # Completes assassination mission
 			}
-			if = {
-				limit = {
-					NAND = {
-						has_quest = quest_the_assassins_assassination
-						ROOT = { killer = { character = PREVPREV } }
-					}
-				}
-				character_event = { id = MNM.6992 days = 4 } #Fails all missions
+			else = {
+				character_event = { id = MNM.6992 days = 4 } # Fails all missions
 			}
 		}
 	}
 }
 
-
-#Notification of invalid
+# Notification of invalid quest target
 character_event = {
 	id = MNM.6992
 	desc = EVTDESC_MNM_6992
@@ -2796,28 +1790,30 @@ character_event = {
 	}
 }
 
-character_event = { # Fired from on_character_leave_society (meant to clear any society related flags and effects)
+# Clear any society related flags and effects
+character_event = {
 	id = MNM.10018
-	is_triggered_only = yes
+
 	hide_window = yes
+	is_triggered_only = yes # on_character_leave_society
 
 	immediate = {
-		clean_up_after_leaving_society_effect = yes #NOTE: update if more societies are added
+		clean_up_after_leaving_society_effect = yes # NOTE: update if more societies are added
 	}
 }
 
+# Refound society fallback
 character_event = {
 	id = MNM.10024
 	desc = EVTDESC_MNM_10024
 	picture = GFX_evt_ritual_scroll
 	border = GFX_event_normal_frame_religion
-	is_triggered_only = yes
+
+	is_triggered_only = yes # on_character_switch_society_interest, on_character_ask_to_join_society
 
 	trigger = {
-		NOT = {
-			FROM = {
-				any_society_member = { always = yes }
-			}
+		FROM = {
+			society_has_members = no
 		}
 	}
 
@@ -2828,11 +1824,13 @@ character_event = {
 		join_society = FROM
 		set_society_grandmaster = yes # Set character as Grand Master
 		add_society_currency_massive_effect = yes # Give the Grand Master a start-up capital to induct members
-		clr_character_flag = society_join_block
 	}
 
 	option = {
 		name = EVTOPTB_MNM_10024
+	}
+
+	after = {
 		clr_character_flag = society_join_block
 	}
 }
