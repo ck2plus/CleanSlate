@@ -1,3 +1,5 @@
+# IDs JD.10005, JD.31000
+
 namespace = JD
 
 ### Stuff that should probably be handled upon new dynasty for the emperor ###
@@ -10,9 +12,9 @@ namespace = JD
 #- Handle grace values
 #- Handle agreements? (Non-agression pacts break)
 
-#TEMPLATE STUFFS/Milla
-####Test events for delayed event bouncing
-#character_event = { #initial event fired (hidden)
+# TEMPLATE STUFFS/Milla
+#### Test events for delayed event bouncing
+# character_event = { # initial event fired (hidden)
 #	id = JD.10001
 #	desc = EVTDESC_JD_10001
 #	picture = GFX_evt_crusaders
@@ -35,20 +37,20 @@ namespace = JD
 #	}
 # }
 #
-#character_event = { #delayed event that sends actual event to whomever (hidden)
+# character_event = { # delayed event that sends actual event to whomever (hidden)
 #	id = JD.10002
 #	hide_window = yes
 #	is_triggered_only = yes
-#	offmap = allow #offmap = allow (MUST HAVE)
+#	offmap = allow # offmap = allow (MUST HAVE)
 #	immediate = {
 #		any_playable_ruler = {
-#			character_event = { id = JD.10003 } #send a visible event (like NEWS!)
+#			character_event = { id = JD.10003 } # send a visible event (like NEWS!)
 #		}
 #		set_character_flag = sent_event_02
 #	}
 # }
 #
-#character_event = { # Actual important and visible event for player
+# character_event = { # Actual important and visible event for player
 #	id = JD.10003
 #	desc = EVTDESC_JD_10005
 #	picture = GFX_evt_crusaders
@@ -60,7 +62,7 @@ namespace = JD
 #		name = EVTOPTA_JD_10001
 #		custom_tooltip = { text = EVTOPTA_JD_10001_TT }
 #		set_character_flag = received_event_03
-#		#character_event = { id = JD.10002 days = 15 } #potential follow-up
+#		# character_event = { id = JD.10002 days = 15 } # potential follow-up
 #	}
 # }
 
@@ -69,15 +71,15 @@ namespace = JD
 # From = Old ruler
 # FromFrom = Offmap
 
-#In case of dynasty change...  (fired from om_action: on_offmap_ruler_changed)
+# In case of dynasty change...  (fired from om_action: on_offmap_ruler_changed)
 character_event = {
 	id = JD.10005
+
 	hide_window = yes
+	is_triggered_only = yes # on_offmap_ruler_changed
+	offmap = only # alternative would be "offmap = allow" (but that'd *include* them, not be *only* for them)
 
 	has_dlc = "Jade Dragon"
-
-	is_triggered_only = yes
-	offmap = only #alternative would be "offmap = allow" (but that'd *include* them, not be *only* for them)
 
 	trigger = {
 		is_offmap_tag = offmap_china
@@ -96,37 +98,40 @@ character_event = {
 			clr_offmap_flag = china_invaded_player_dynasty
 		}
 
-		#Sack the current western governor or not...
+		# Sack the current western governor or not...
 		random_list = {
-			10 = {
-				modifier = {
-				 	factor = 10
-			 		OR = {
-				 		AND = {
-				 			culture = mongol
-					 		governor = {
-					 			NOT = { culture = mongol }
-					 		}
-					 	}
-					 	AND = {
-				 			culture = jurchen
-					 		governor = {
-					 			NOT = { culture = jurchen }
-					 		}
-					 	}
-			 		}
+			50 = {
+				mult_modifier = {
+					factor = 10
+
+					trigger_if = {
+						limit = { culture = mongol }
+
+						governor = {
+							NOT = { culture = mongol }
+						}
+					}
+					trigger_else = {
+						culture = jurchen
+
+						governor = {
+							NOT = { culture = jurchen }
+						}
+					}
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 1.5
 					has_status = china_civil_war
 				}
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					has_status = china_stable
 				}
+
 				governor = {
 					trigger_switch = {
 						on_trigger = has_character_flag
+
 						spawning_a_displaced_royal = {
 							offmap_china = {
 								set_offmap_flag = waiting_to_spawn_a_displaced_royal
@@ -143,10 +148,12 @@ character_event = {
 							}
 						}
 					}
+
 					death = { death_reason = death_went_back_to_china }
 				}
 			}
-			10 = {
+
+			50 = {
 				trigger = {
 					offmap_china = {
 						NOT = { has_offmap_tmp_flag = china_invaded_player_dynasty }
@@ -155,15 +162,18 @@ character_event = {
 			}
 		}
 
-		#Pick a new state (Emperor dynasty) name...
+		# Pick a new state (Emperor dynasty) name...
 		if = {
 			limit = { NOT = { has_offmap_flag = rename_override } }
+
 			random_list = {
-				#All cultures...
-				30 = {  #more likely, in general
+				# All cultures...
+				30 = {  # more likely, in general
 					trigger = { NOT = { has_offmap_name = "tang_china" } }
-					modifier = { #more likely to be picked by Shatuo Karluk Turks
+
+					mult_modifier = { # more likely to be picked by Shatuo Karluk Turks
 						factor = 3
+
 						OR = {
 							culture = karluk
 							culture = turkish
@@ -171,16 +181,19 @@ character_event = {
 					}
 					set_offmap_name = "tang_china"
 				}
-				30 = {  #more likely, in general
+				30 = {  # more likely, in general
 					trigger = { NOT = { has_offmap_name = "jin_china" } }
-					modifier = { #more likely to be picked by Shatuo Karluk Turks
+
+					mult_modifier = { # more likely to be picked by Shatuo Karluk Turks
 						factor = 3
+
 						OR = {
 							culture = karluk
 							culture = turkish
 						}
 					}
-					modifier = { #more likely if jurchen
+
+					mult_modifier = { # more likely if jurchen
 						factor = 3
 						culture = jurchen
 					}
@@ -194,14 +207,16 @@ character_event = {
 					trigger = { NOT = { has_offmap_name = "qi_china" } }
 					set_offmap_name = "qi_china"
 				}
-				30 = { #more likely, in general
+				30 = { # more likely, in general
 					trigger = { NOT = { has_offmap_name = "zhou_china" } }
 					set_offmap_name = "zhou_china"
 				}
-				30 = { #more likely, in general
+				30 = { # more likely, in general
 					trigger = { NOT = { has_offmap_name = "han_china" } }
-					modifier = { #more likely to be picked by Shatuo Karluk Turks
+
+					mult_modifier = { # more likely to be picked by Shatuo Karluk Turks
 						factor = 3
+
 						OR = {
 							culture = karluk
 							culture = turkish
@@ -209,11 +224,11 @@ character_event = {
 					}
 					set_offmap_name = "han_china"
 				}
-				30 = { #more likely, in general
+				30 = { # more likely, in general
 					trigger = { NOT = { has_offmap_name = "qin_china" } }
 					set_offmap_name = "qin_china"
 				}
-				30 = { #more likely, in general
+				30 = { # more likely, in general
 					trigger = { NOT = { has_offmap_name = "yan_china" } }
 					set_offmap_name = "yan_china"
 				}
@@ -222,29 +237,23 @@ character_event = {
 					set_offmap_name = "zhao_china"
 				}
 
-				#Foreign cultures...
-				20 = {
+				# Foreign cultures...
+				100 = {
 					trigger = {
 						NOT = { has_offmap_name = "liao_china" }
 						culture = khitan
 					}
-					modifier = { #more likely if khitan
-						factor = 5
-						culture = khitan
-					}
 					set_offmap_name = "liao_china"
 				}
-				20 = {
+				100 = {
 					trigger = {
 						NOT = { has_offmap_name = "yuan_china" }
 						culture = mongol
 					}
-					modifier = { #more likely if mongol
-						factor = 5
-						culture = mongol
-					}
-					modifier = { #more likely if Borjigin
+
+					mult_modifier = { # more likely if Borjigin
 						factor = 100
+
 						OR = {
 							dynasty = 11100
 							dynasty = 1051210
@@ -252,121 +261,113 @@ character_event = {
 					}
 					set_offmap_name = "yuan_china"
 				}
-				20 = {
+				100 = {
 					trigger = {
 						NOT = { has_offmap_name = "xia_china" }
+
 						OR = {
 							culture = tangut
 							culture = jurchen
 						}
 					}
-					modifier = { #more likely if tangut (and possibly jurchen)
-						factor = 5
-						OR = {
-							culture = tangut
-							culture = jurchen
-						}
-					}
+
 					set_offmap_name = "xia_china"
 				}
-				20 = {
+				60 = {
 					trigger = {
 						NOT = { has_offmap_name = "qing_china" }
 						culture = jurchen
 					}
-					modifier = { #more likely if jurchen
-						factor = 3
-						culture = jurchen
-					}
-					modifier = { #less likely to be picked early game
+
+					mult_modifier = { # less likely to be picked early game
 						factor = 0.1
-						NOT = { year = 1200 }
+						year < 1200
 					}
 					set_offmap_name = "qing_china"
 
 				}
-				10 = { #less likely, in general
+				10 = { # less likely, in general
 					trigger = { NOT = { has_offmap_name = "dai_china" } }
 					set_offmap_name = "dai_china"
 				}
-				10 = { #less likely, in general
+				10 = { # less likely, in general
 					trigger = { NOT = { has_offmap_name = "cheng_china" } }
 					set_offmap_name = "cheng_china"
 				}
 
-				#Han culture... (Picked with a lot less frequency than the above ones)
-				5 = { #less likely, in general
+				# Han culture... (Picked with a lot less frequency than the above ones)
+				5 = { # less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "liang_china" }
 						culture = han
 					}
 					set_offmap_name = "liang_china"
 				}
-				10 = {  #more likely within the category of Han, but less likely in general
+				10 = {  # more likely within the category of Han, but less likely in general
 					trigger = {
 						NOT = { has_offmap_name = "song_china" }
 						culture = han
 					}
 					set_offmap_name = "song_china"
 				}
-				5 = { #less likely, in general
+				5 = { # less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "ming_china" }
 						culture = han
 					}
-					modifier = { #less likely to be picked early game
+					mult_modifier = { # less likely to be picked early game
 						factor = 0.1
-						NOT = { year = 1200 }
+						year < 1200
 					}
 					set_offmap_name = "ming_china"
 				}
-				5 = { #less likely, in general
+				5 = { # less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "shu_china" }
 						culture = han
 					}
 					set_offmap_name = "shu_china"
 				}
-				5 = { #less likely, in general
+				5 = { # less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "wu_china" }
 						culture = han
 					}
 					set_offmap_name = "wu_china"
 				}
-				5 = { #less likely, in general
+				5 = { # less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "chu_china" }
 						culture = han
 					}
 					set_offmap_name = "chu_china"
 				}
-				5 = { #less likely, in general
+				5 = { # less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "yue_china" }
 						culture = han
 					}
-		  			set_offmap_name = "yue_china"
+					set_offmap_name = "yue_china"
 				}
-				3 = { #even less likely, in general
+				3 = { # even less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "yin_china" }
 						culture = han
 					}
 					set_offmap_name = "yin_china"
 				}
-				3 = { #even less likely, in general
+				3 = { # even less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "shun_china" }
 						culture = han
 					}
-					modifier = { #less likely to be picked early game
+					mult_modifier = { # less likely to be picked early game
 						factor = 0.1
-						NOT = { year = 1200 }
+						year < 1200
 					}
 					set_offmap_name = "shun_china"
 				}
-				3 = { #even less likely, in general
+				3 = { # even less likely, in general
 					trigger = {
 						NOT = { has_offmap_name = "qi_china" }
 						culture = han
@@ -376,21 +377,25 @@ character_event = {
 			}
 		}
 
-		#Break peace deal
+		# Break peace deal
 		any_playable_ruler = {
 			limit = {
 				has_character_modifier = peace_deal_with_china
-				OR = {
-					ai = yes
-					NOT = { has_offmap_news_enabled = FROMFROM }
-					NOT = { is_within_diplo_range = ROOT }
+
+				trigger_if = {
+					limit = { ai = no }
+
+					NAND = {
+						has_offmap_news_enabled = FROMFROM
+						is_within_diplo_range = ROOT
+					}
 				}
 			}
 			remove_character_modifier = peace_deal_with_china
 		}
 
-		#Reset Cooldowns
-		any_playable_ruler = {
+		# Reset Cooldowns
+		any_playable_ruler = { # TODO: Is the limit here just a waste?
 			limit = {
 				OR = {
 					has_character_modifier = chinese_grace_send_gift_timer
@@ -415,16 +420,16 @@ character_event = {
 			remove_character_modifier = china_raid_grace_cd
 		}
 
-		#Handle tributaries...
+		# Handle tributaries...
 		governor = {
 			any_tributary = {
 				limit = { is_tributary = { type = offmap } }
 				remove_tributary = PREV
-				set_character_flag = was_tributary_of_china #for new dynasty notification event
+				set_character_flag = was_tributary_of_china # for new dynasty notification event
 			}
 		}
 
-		#Handle Kowtow trait
+		# Handle Kowtow trait
 		any_playable_ruler = {
 			limit = {
 				OR = {
@@ -433,6 +438,7 @@ character_event = {
 					trait = kow_tow_completed_tier_3
 				}
 			}
+
 			remove_trait = kow_tow_completed_tier_1
 			remove_trait = kow_tow_completed_tier_2
 			remove_trait = kow_tow_completed_tier_3
@@ -465,39 +471,39 @@ character_event = {
 # 			}
 # 			set_government_type = confucian_bureaucracy
 # 			random_list = {
-# 				10 = {  #pretty likely
+# 				10 = {  # pretty likely
 # 					set_offmap_name = "song_china"
 # 				}
-# 				5 = { #less likely
+# 				5 = { # less likely
 # 					set_offmap_name = "liang_china"
 # 				}
-# 				5 = { #less likely
-# 					modifier = { #even less likely to be picked early game
+# 				5 = { # less likely
+# 					mult_modifier = { # even less likely to be picked early game
 # 						factor = 0.1
 # 						NOT = { year = 1200 }
 # 					}
 # 					set_offmap_name = "ming_china"
 # 				}
-# 				5 = { #less likely
+# 				5 = { # less likely
 # 					set_offmap_name = "shu_china"
 # 				}
-# 				5 = { #less likely
+# 				5 = { # less likely
 # 					set_offmap_name = "wu_china"
 # 				}
-# 				5 = { #less likely
+# 				5 = { # less likely
 # 					set_offmap_name = "chu_china"
 # 				}
-# 				5 = { #less likely
+# 				5 = { # less likely
 # 					set_offmap_name = "yue_china"
 # 				}
-# 				3 = { #even less likely
+# 				3 = { # even less likely
 # 					set_offmap_name = "yin_china"
 # 				}
-# 				3 = { #even less likely
+# 				3 = { # even less likely
 # 					set_offmap_name = "qi_china"
 # 				}
-# 				3 = { #even less likely
-# 					modifier = { #less likely to be picked early game
+# 				3 = { # even less likely
+# 					mult_modifier = { # less likely to be picked early game
 # 						factor = 0.1
 # 						NOT = { year = 1200 }
 # 					}
@@ -510,9 +516,9 @@ character_event = {
 
 character_event = {
 	id = JD.31000
-	hide_window = yes
 
-	is_triggered_only = yes
+	hide_window = yes
+	is_triggered_only = yes # on_offmap_ruler_changed
 	offmap = only
 
 	immediate = {
