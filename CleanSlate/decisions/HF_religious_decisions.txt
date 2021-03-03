@@ -47,10 +47,10 @@ targeted_decisions = {
 
 				if = {
 					limit = {
-						is_ironman = yes
-						controls_religion = yes
-						religion_openly_aztec_or_reformed_trigger = no
 						FROM = { ai = no }
+						controls_religion = yes
+						is_ironman = yes
+						religion_openly_aztec_or_reformed_trigger = no
 					}
 					FROM = { set_character_flag = achievement_holy_smoke }
 				}
@@ -116,14 +116,14 @@ targeted_decisions = {
 		}
 
 		potential = {
+			OR = {
+				character = FROM
+				vassal_of = FROM
+			}
+
 			prisoner = no
 			is_incapable = no
 			is_adult = yes
-
-			OR = {
-				character = FROM
-				liege = { character = FROM }
-			}
 		}
 
 		allow = {
@@ -135,7 +135,7 @@ targeted_decisions = {
 
 					custom_tooltip = {
 						text = tooltip_stable_attribute_improvement_cooldown
-						NOT = { has_character_modifier = stable_attribute_improvement_cooldown }
+						always = no
 					}
 				}
 			}
@@ -148,7 +148,7 @@ targeted_decisions = {
 
 					custom_tooltip = {
 						text = tooltip_attribute_improvement_target_cooldown
-						NOT = { has_character_modifier = stable_attribute_improvement_target_cooldown }
+						always = no
 					}
 				}
 
@@ -170,41 +170,12 @@ targeted_decisions = {
 					FROM = {
 						OR = {
 							character = ROOT
-
-							combat_rating_diff = {
-								who = ROOT
-								value >= 1
-							}
-
-							attribute_diff = {
-								attribute = diplomacy
-								character = ROOT
-								value >= 1
-							}
-
-							attribute_diff = {
-								attribute = martial
-								character = ROOT
-								value >= 1
-							}
-
-							attribute_diff = {
-								attribute = stewardship
-								character = ROOT
-								value >= 1
-							}
-
-							attribute_diff = {
-								attribute = intrigue
-								character = ROOT
-								value >= 1
-							}
-
-							attribute_diff = {
-								attribute = learning
-								character = ROOT
-								value >= 1
-							}
+							combat_rating > ROOT
+							diplomacy > ROOT
+							martial > ROOT
+							stewardship > ROOT
+							intrigue > ROOT
+							learning > ROOT
 						}
 					}
 				}
@@ -237,13 +208,13 @@ targeted_decisions = {
 
 					if = { # Chance for Family Bloodline
 						limit = {
-							higher_tier_than = COUNT
 							is_close_relative = ROOT
-							NOT = { character = ROOT }
+							higher_real_tier_than = COUNT
 
 							NOT = {
 								any_owned_bloodline = {
 									has_bloodline_flag = created_bloodline
+									bloodline_is_active_for = PREV
 								}
 							}
 						}
@@ -272,17 +243,18 @@ targeted_decisions = {
 					}
 					else_if = { # Chance for Benevolent Bloodline when using action on councilmembers
 						limit = {
-							higher_tier_than = COUNT
-							NOT = { character = ROOT }
+							higher_real_tier_than = COUNT
+
+							ROOT = {
+								is_councillor = yes
+								NOT = { character = PREV }
+							}
 
 							NOT = {
 								any_owned_bloodline = {
 									has_bloodline_flag = created_bloodline
+									bloodline_is_active_for = PREV
 								}
-							}
-
-							ROOT = {
-								is_councillor = yes
 							}
 						}
 
@@ -309,7 +281,8 @@ targeted_decisions = {
 						}
 					}
 				}
-				hidden_tooltip = {
+
+				hidden_effect = {
 					ROOT = {
 						# Other AI shouldn't target a recent target
 						add_character_modifier = {
@@ -346,6 +319,7 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 2
+
 				FROM = {
 					character = ROOT
 					trait = ambitious
@@ -354,6 +328,7 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 2
+
 				ROOT = {
 					is_councillor = yes
 					NOT = { character = FROM }
@@ -370,6 +345,7 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 2
+
 				ROOT = {
 					is_close_relative = FROM
 					NOT = { character = FROM }
@@ -387,6 +363,7 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 2
+
 				FROM = {
 					is_married = ROOT
 
@@ -470,7 +447,6 @@ decisions = {
 					set_character_flag = flag_picking_sympathy
 					character_event = { id = HF.23003 } # Pick sympathy trait
 				}
-
 				else = {
 					random_list = {
 						100 = {
@@ -512,6 +488,7 @@ decisions = {
 
 							mult_modifier = { # Prioritize getting a sympathy trait that is useful
 								factor = 100
+
 								OR = {
 									any_demesne_province = {
 										religion_group = christian
@@ -525,6 +502,7 @@ decisions = {
 
 							mult_modifier = { # Otherwise try to emulate your liege
 								factor = 5
+
 								NOR = {
 									any_demesne_province = {
 										religion_group = christian
@@ -586,6 +564,7 @@ decisions = {
 
 							mult_modifier = { # Prioritize getting a sympathy trait that is useful
 								factor = 100
+
 								OR = {
 									any_demesne_province = {
 										religion_group = muslim
@@ -599,6 +578,7 @@ decisions = {
 
 							mult_modifier = { # Otherwise try to emulate your liege
 								factor = 5
+
 								NOR = {
 									any_demesne_province = {
 										religion_group = muslim
@@ -660,6 +640,7 @@ decisions = {
 
 							mult_modifier = { # Prioritize getting a sympathy trait that is useful
 								factor = 100
+
 								OR = {
 									any_demesne_province = {
 										religion_group = pagan_group
@@ -673,6 +654,7 @@ decisions = {
 
 							mult_modifier = { # Otherwise try to emulate your liege
 								factor = 5
+
 								NOR = {
 									any_demesne_province = {
 										religion_group = pagan_group
@@ -734,6 +716,7 @@ decisions = {
 
 							mult_modifier = { # Prioritize getting a sympathy trait that is useful
 								factor = 100
+
 								OR = {
 									any_demesne_province = {
 										religion_group = zoroastrian_group
@@ -747,6 +730,7 @@ decisions = {
 
 							mult_modifier = { # Otherwise try to emulate your liege
 								factor = 5
+
 								NOR = {
 									any_demesne_province = {
 										religion_group = zoroastrian_group
@@ -808,6 +792,7 @@ decisions = {
 
 							mult_modifier = { # Prioritize getting a sympathy trait that is useful
 								factor = 100
+
 								OR = {
 									any_demesne_province = {
 										religion_group = jewish_group
@@ -821,6 +806,7 @@ decisions = {
 
 							mult_modifier = { # Otherwise try to emulate your liege
 								factor = 5
+
 								NOR = {
 									any_demesne_province = {
 										religion_group = jewish_group
@@ -882,6 +868,7 @@ decisions = {
 
 							mult_modifier = { # Prioritize getting a sympathy trait that is useful
 								factor = 100
+
 								OR = {
 									any_demesne_province = {
 										religion_group = indian_group
@@ -895,6 +882,7 @@ decisions = {
 
 							mult_modifier = { # Otherwise try to emulate your liege
 								factor = 5
+
 								NOR = {
 									any_demesne_province = {
 										religion_group = indian_group
@@ -961,15 +949,18 @@ decisions = {
 			}
 
 			# These are the most important reasons to gain a sympathy trait, if the AI has neither they are less likely to gain a trait
-			modifier = {
+			mult_modifier = {
 				factor = 0.25
+
 				NOR = {
 					any_demesne_province = {
 						NOT = { religion_group = ROOT }
 					}
+
 					any_vassal = {
 						NOT = { religion_group = ROOT }
 					}
+
 					any_liege = {
 						religion = ROOT
 						has_any_sympathy_trait_trigger = yes
@@ -1009,7 +1000,7 @@ decisions = {
 				character_event = { id = HF.23016 } # Pick branch trait
 
 				add_character_modifier = {
-					modifier = picked_pagan_branch_cooldown
+					name = picked_pagan_branch_cooldown
 					years = 5
 					hidden = yes
 				}
@@ -1019,7 +1010,7 @@ decisions = {
 		ai_will_do = {
 			factor = 1
 
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = zealous
 			}
@@ -1066,9 +1057,7 @@ decisions = {
 			}
 		}
 
-		ai_will_do = {
-			factor = 0
-		}
+		ai_will_do = { factor = 0 }
 	}
 
 	determine_zodiac_sign_decision = {
@@ -1176,11 +1165,11 @@ decisions = {
 			}
 
 			# Must not have used this decision or be Hellenic already
+			is_theocracy = no
+			religion_openly_hellenic_or_reformed_trigger = no
+			religion_secretly_hellenic_or_reformed_trigger = no
+
 			NOR = {
-				is_theocracy = yes
-				religion_openly_hellenic_or_reformed_trigger = yes
-				secret_religion = hellenic_pagan
-				secret_religion = hellenic_pagan_reformed
 				has_character_modifier = caesars_insight
 				has_character_modifier = ciceros_insight
 				has_character_modifier = justinians_insight
@@ -1214,6 +1203,7 @@ decisions = {
 				character_event = { id = HF.23026 } # Pick topic
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
 
@@ -1230,8 +1220,8 @@ decisions = {
 		ai_check_interval = 120
 
 		potential = {
-			NOT = { is_title_active = d_myrmidons }
 			religion = hellenic_pagan_reformed
+			NOT = { is_title_active = d_myrmidons }
 
 			# NOT = { has_landed_title = e_roman_empire } #To activate in the event of special case being defined for Roman Emperors. (!!!!)
 
@@ -1282,22 +1272,19 @@ decisions = {
 					culture = greek
 					female = no
 					age = 33
-					trait = brilliant_strategist
-					trait = zealous
-					trait = humble
-					trait = ambitious
-					trait = strategist
-					trait = holy_warrior
+					add_trait = brilliant_strategist
+					add_trait = zealous
+					add_trait = humble
+					add_trait = ambitious
+					add_trait = strategist
+					add_trait = holy_warrior
 				}
 
 				new_character = {
 					wealth = 500
 
-					d_myrmidons = {
-						grant_title = PREV
-					}
-
-					set_government_type = feudal_government
+					grant_title = d_myrmidons
+					set_government_type = order_government
 					save_event_target_as = leader_of_myrmidons
 
 					create_character = {
@@ -1449,95 +1436,61 @@ decisions = {
 				set_society_grandmaster = yes
 				add_society_currency_massive_effect = yes
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = no
-					age = 16
-				}
-				new_character = { join_society = the_bacchants }
+				while = {
+					count = 6
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = no
-					age = 18
-				}
-				new_character = { join_society = the_bacchants }
+					create_character = {
+						random_traits = yes
+						dynasty = random
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 16
+					}
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = yes
-					age = 18
-				}
-				new_character = { join_society = the_bacchants }
+					new_character = {
+						join_society = the_bacchants
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = no
-					age = 20
+						random_list = {
+							1 = { add_age = 0 }
+							1 = { add_age = 1 }
+							1 = { add_age = 2 }
+							1 = { add_age = 3 }
+							1 = { add_age = 4 }
+							1 = { add_age = 5 }
+							1 = { add_age = 6 }
+							1 = { add_age = 7 }
+							1 = { add_age = 8 }
+							1 = { add_age = 9 }
+							1 = { add_age = 10 }
+							1 = { add_age = 11 }
+							1 = { add_age = 12 }
+						}
+					}
 				}
-				new_character = { join_society = the_bacchants }
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = no
-					age = 25
-				}
-				new_character = { join_society = the_bacchants }
+				while = {
+					count = 3
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = no
-					age = 26
-				}
-				new_character = { join_society = the_bacchants }
+					create_character = {
+						random_traits = yes
+						dynasty = random
+						religion = ROOT
+						culture = ROOT
+						female = yes
+						age = 16
+					}
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = no
-					age = 28
-				}
-				new_character = { join_society = the_bacchants }
+					new_character = {
+						join_society = the_bacchants
 
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = yes
-					age = 16
+						random_list = {
+							1 = { add_age = 0 }
+							1 = { add_age = 1 }
+							1 = { add_age = 2 }
+						}
+					}
 				}
-				new_character = { join_society = the_bacchants }
-
-				create_character = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					female = yes
-					age = 17
-				}
-				new_character = { join_society = the_bacchants }
 
 				any_vassal = {
 					limit = {
@@ -1545,6 +1498,7 @@ decisions = {
 						can_join_society = the_bacchants
 						is_within_diplo_range = ROOT
 					}
+
 					random = {
 						chance = 35
 						join_society = the_bacchants
@@ -1557,6 +1511,7 @@ decisions = {
 						can_join_society = the_bacchants
 						is_within_diplo_range = ROOT
 					}
+
 					random = {
 						chance = 35
 						join_society = the_bacchants
@@ -1571,15 +1526,13 @@ decisions = {
 							is_within_diplo_range = ROOT
 						}
 					}
+
 					narrative_event = { id = HF.23122 }
 				}
 			}
 		}
 
-
-		ai_will_do = {
-			factor = 1
-		}
+		ai_will_do = { factor = 1 }
 	}
 
 	# Create Stoics - Hellenic Monks
@@ -1592,12 +1545,19 @@ decisions = {
 		potential = {
 			has_dlc = "Mystics"
 
-			NOR = {
-				has_global_flag = flag_restored_stoic_intelligentia
+			OR = {
+				religion_openly_hellenic_or_reformed_trigger = yes
 
-				has_alternate_start_parameter = {
-					key = religion_names
-					value = random
+				AND = {
+					culture = roman
+
+					# Somewhat compatible when mixed with Roman culture
+					OR = {
+						religion_group = christian
+						religion_group = jewish_group
+						religion_openly_bon_or_reformed_trigger = yes
+						religion = buddhist
+					}
 				}
 			}
 
@@ -1618,21 +1578,11 @@ decisions = {
 			NOR = {
 				has_religion_feature = religion_dogmatic
 				trait = excommunicated
-			}
+				has_global_flag = flag_restored_stoic_intelligentia
 
-			OR = {
-				religion_openly_hellenic_or_reformed_trigger = yes
-
-				AND = {
-					culture = roman
-
-					# Somewhat compatible when mixed with Roman culture
-					OR = {
-						religion_group = christian
-						religion_group = jewish_group
-						religion_openly_bon_or_reformed_trigger = yes
-						religion = buddhist
-					}
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
 				}
 			}
 
@@ -1642,7 +1592,7 @@ decisions = {
 		}
 
 		allow = {
-			higher_tier_than = COUNT
+			higher_real_tier_than = COUNT
 			is_in_society = no
 			is_incapable = no
 			is_inaccessible_trigger = no
@@ -1670,89 +1620,49 @@ decisions = {
 				set_society_grandmaster = yes
 				add_society_currency_massive_effect = yes
 
-				create_random_priest = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					attributes = {
-						learning = 10
-					}
-					female = no
-					age = 16
-				}
-				new_character = { join_society = monastic_order_stoics }
+				while = {
+					count = 6
 
-				create_random_priest = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					attributes = {
-						learning = 10
-					}
-					female = no
-					age = 18
-				}
-				new_character = { join_society = monastic_order_stoics }
+					create_random_priest = {
+						random_traits = yes
+						dynasty = random
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 16
 
-				create_random_priest = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					attributes = {
-						learning = 10
+						attributes = {
+							learning = 10
+						}
 					}
-					female = no
-					age = 20
-				}
-				new_character = { join_society = monastic_order_stoics }
 
-				create_random_priest = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					attributes = {
-						learning = 10
-					}
-					female = no
-					age = 25
-				}
-				new_character = { join_society = monastic_order_stoics }
+					new_character = {
+						join_society = monastic_order_stoics
 
-				create_random_priest = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					attributes = {
-						learning = 10
+						random_list = {
+							1 = { add_age = 0 }
+							1 = { add_age = 1 }
+							1 = { add_age = 2 }
+							1 = { add_age = 3 }
+							1 = { add_age = 4 }
+							1 = { add_age = 5 }
+							1 = { add_age = 6 }
+							1 = { add_age = 7 }
+							1 = { add_age = 8 }
+							1 = { add_age = 9 }
+							1 = { add_age = 10 }
+							1 = { add_age = 11 }
+							1 = { add_age = 12 }
+						}
 					}
-					female = no
-					age = 26
 				}
-				new_character = { join_society = monastic_order_stoics }
-
-				create_random_priest = {
-					random_traits = yes
-					dynasty = random
-					religion = ROOT
-					culture = ROOT
-					attributes = {
-						learning = 10
-					}
-					female = no
-					age = 28
-				}
-				new_character = { join_society = monastic_order_stoics }
 
 				any_vassal = {
 					limit = {
 						ai = yes
 						can_join_society = monastic_order_stoics
 					}
+
 					join_society = monastic_order_stoics
 				}
 
@@ -1777,19 +1687,20 @@ decisions = {
 							is_within_diplo_range = ROOT
 						}
 					}
+
 					narrative_event = { id = HF.23123 }
 				}
 			}
 		}
 
-		ai_will_do = {
-			factor = 1
-		}
+		ai_will_do = { factor = 1 }
 	}
 
 	bloodthirsty_games_decision = {
 		is_high_prio = yes
 		ai_check_interval = 240
+
+		only_independent = yes
 
 		potential = {
 			has_dlc = "Holy Fury"
@@ -1827,7 +1738,7 @@ decisions = {
 
 				custom_tooltip = {
 					text = tooltip_bloodthirsty_games_cooldown
-					NOT = { has_character_modifier = bloodthirsty_games_cooldown }
+					always = no
 				}
 			}
 		}
@@ -1841,7 +1752,7 @@ decisions = {
 				character_event = { id = HF.23440 } # Send invitations
 
 				add_character_modifier = {
-					modifier = bloodthirsty_games_cooldown
+					name = bloodthirsty_games_cooldown
 					years = 5
 					hidden = yes
 				}
@@ -1855,15 +1766,15 @@ decisions = {
 				NOT = { trait = cynical }
 
 				# Enough contender to make it interesting
-				num_of_vassals = 6
+				num_of_vassals >= 6
 
 				# Enough valid free candidates
 				OR = {
 					any_realm_character = {
 						count >= 5
 
-						host = { character = ROOT }
 						prisoner = yes
+						host = { character = ROOT }
 
 						# Sex laws check
 						trigger_if = {
@@ -1874,11 +1785,12 @@ decisions = {
 							female_can_hold_minor_title_trigger = yes
 						}
 					}
+
 					any_courtier = {
 						count >= 2
 
-						is_ruler = no
 						has_minor_title = title_commander
+						is_ruler = no
 					}
 				}
 			}
@@ -1903,6 +1815,8 @@ decisions = {
 	bloodthirsty_mass_sacrifice_decision = {
 		is_high_prio = yes
 		ai_check_interval = 150
+
+		only_independent = yes
 
 		potential = {
 			has_dlc = "Holy Fury"
@@ -1931,7 +1845,6 @@ decisions = {
 
 			piety >= 200
 			war = yes
-
 			prisoner = no
 			NOT = { trait = cynical }
 
@@ -1940,7 +1853,7 @@ decisions = {
 
 				custom_tooltip = {
 					text = tooltip_bloodthirsty_mass_sacrifice_cooldown
-					NOT = { has_character_modifier = bloodthirsty_mass_sacrifice_cooldown }
+					always = no
 				}
 			}
 		}
@@ -1954,8 +1867,8 @@ decisions = {
 				character_event = { id = HF.23462 } # Decide how many people are you going to sacrifice.
 
 				add_character_modifier = {
-					modifier = bloodthirsty_mass_sacrifice_cooldown
-					years = 100 # CleanSlate: tooltip mention 'last few decades'
+					name = bloodthirsty_mass_sacrifice_cooldown
+					years = 100 # CleanSlate: tooltip mention 'last few decades', but religion modifier in event also lasts a century
 					hidden = yes
 				}
 			}
@@ -1987,6 +1900,7 @@ decisions = {
 
 			mult_modifier = { # I am losing the war, help!
 				factor = 10
+
 				any_war = {
 					defender = { character = ROOT }
 					attacker = {
@@ -2033,21 +1947,24 @@ title_decisions = {
 			}
 
 			location = {
-				NOT = { culture = FROM }
-				owner = { NOT = { culture = PREV } } # Cannot convert counties of owners' culture
+				NOR = {
+					culture = FROM
+					culture = owner # Cannot convert counties of owners' culture
+				}
 			}
 		}
 
 		effect = {
 			FROM = {
-				change_society_currency = -1000
+				show_scope_change = no
 
-				hidden_effect = {
-					character_event = { id = HF.23124 } # Notify
-				}
+				change_society_currency = -1000
+				character_event = { id = HF.23124 } # Notify
 			}
 
 			location = {
+				show_scope_change = no
+
 				culture = FROM
 
 				add_province_modifier = {
@@ -2059,18 +1976,14 @@ title_decisions = {
 			hidden_effect = {
 				holder_scope = {
 					if = { # Notify county owner
-						limit = {
-							NOT = { character = FROM }
-						}
+						limit = { NOT = { character = FROM } }
 						character_event = { id = HF.23125 }
 					}
 				}
 			}
 		}
 
-		ai_will_do = {
-			factor = 1
-		}
+		ai_will_do = { factor = 1 }
 	}
 
 	hellenic_dedicate_temple = {
@@ -2083,7 +1996,7 @@ title_decisions = {
 
 		from_potential = {
 			has_dlc = "Holy Fury"
-			higher_tier_than = BARON
+			higher_real_tier_than = BARON
 			religion_openly_hellenic_or_reformed_trigger = yes
 			is_tribal = no
 			is_nomadic = no
@@ -2127,8 +2040,7 @@ title_decisions = {
 
 					custom_tooltip = {
 						text = tooltip_not_dedicated_temple_recently
-
-						NOT = { has_character_modifier = recently_dedicated_temple_cooldown }
+						always = no
 					}
 				}
 			}
@@ -2139,7 +2051,7 @@ title_decisions = {
 				text = tooltip_temple_must_have_priest
 
 				# Temple must have an Hellenic priest
-				owner = {
+				holder_scope = {
 					is_theocracy = yes
 					religion = FROM
 				}
@@ -2180,16 +2092,14 @@ settlement_decisions = {
 		ai_target_filter = owned
 		is_high_prio = yes
 
-		only_playable = yes
+		only_independent = yes
 
 		from_potential = {
 			has_dlc = "Holy Fury"
 			independent = yes
 			is_tribal = yes
-			higher_tier_than = COUNT
-			religion_group = pagan_group
-			is_reformed_religion = no
-
+			higher_real_tier_than = COUNT
+			is_unreformed_pagan_trigger = yes
 
 			# Only one Pillar of your own religion per realm. So, the more neighbors you subjugate, the less pillars are going to be built
 			trigger_if = {
@@ -2235,29 +2145,12 @@ settlement_decisions = {
 		}
 
 		potential = {
-			holder = FROM
+			FROM = {
+				is_capital = PREV
+			}
+
 			holding_type = tribal
 			is_capital = yes
-
-			capital_scope = {
-				location = {
-					province = ROOT
-				}
-			}
-
-			dejure_liege_title = {
-				holder_scope = {
-					character = FROM
-				}
-			}
-
-			location = {
-				FROM = {
-					capital_scope = {
-						province = PREVPREV
-					}
-				}
-			}
 		}
 
 		allow = {
@@ -2303,10 +2196,9 @@ settlement_decisions = {
 				wealth = -350
 				piety = -150
 
-				custom_tooltip = {
-					text = tooltip_celebrate_new_great_pillar
-
-					character_event = { id = HF.23470 }
+				character_event = {
+					id = HF.23470
+					tooltip = tooltip_celebrate_new_great_pillar
 				}
 			}
 
@@ -2414,35 +2306,26 @@ settlement_decisions = {
 			}
 		}
 
-
 		ai_will_do = {
 			factor = 1
 
 			trigger = {
-				FROM = {
-					NOT = { trait = cynical }
-				}
+				FROM = { NOT = { trait = cynical } }
 			}
 
 			mult_modifier = {
 				factor = 2
-				FROM = {
-					trait = zealous
-				}
+				FROM = { trait = zealous }
 			}
 
 			mult_modifier = {
 				factor = 0.25
-				FROM = {
-					trait = greedy
-				}
+				FROM = { trait = greedy }
 			}
 
 			mult_modifier = {
 				factor = 0.5
-				FROM = {
-					lower_tier_than = KING
-				}
+				FROM = { lower_real_tier_than = KING }
 			}
 		}
 	}
@@ -2459,11 +2342,7 @@ settlement_decisions = {
 			has_dlc = "Holy Fury"
 			is_tribal = no
 			is_nomadic = no
-
-			trigger_if = {
-				limit = { religion_group = pagan_group }
-				is_reformed_religion = yes
-			}
+			is_not_unreformed_pagan_trigger = yes
 		}
 
 		potential = {
@@ -2496,9 +2375,6 @@ settlement_decisions = {
 			}
 		}
 
-		allow = {
-		}
-
 		effect = {
 			FROM = {
 				show_scope_change = no
@@ -2512,22 +2388,25 @@ settlement_decisions = {
 					tiered_piety_negative_effect = yes
 				}
 
-				custom_tooltip = {
-					text = tooltip_celebrate_destroyed_great_pillar
-					character_event = { id = HF.23476 } # Notify
+				character_event = {
+					id = HF.23476 # Notify
+					tooltip = tooltip_celebrate_destroyed_great_pillar
 				}
 			}
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_norse_irminsul } }
 
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_norse_irminsul
-					}
-					any_realm_character = {
-						limit = { religion = norse_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+				location = {
+					clr_province_flag = flag_great_pillar_norse_irminsul
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = norse_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2535,7 +2414,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2543,13 +2422,16 @@ settlement_decisions = {
 			else_if = {
 				limit = { location = { has_province_flag = flag_great_pillar_norse } }
 
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_norse
-					}
-					any_realm_character = {
-						limit = { religion = norse_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+				location = {
+					clr_province_flag = flag_great_pillar_norse
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = norse_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2557,7 +2439,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2565,13 +2447,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_tengri } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_tengri
-					}
-					any_realm_character = {
-						limit = { religion = tengri_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_tengri
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = tengri_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2579,7 +2465,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2587,13 +2473,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_slavic } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_slavic
-					}
-					any_realm_character = {
-						limit = { religion = slavic_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_slavic
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = slavic_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2601,7 +2491,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2609,13 +2499,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_baltic } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_baltic
-					}
-					any_realm_character = {
-						limit = { religion = baltic_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_baltic
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = baltic_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2623,7 +2517,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2631,13 +2525,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_finnish } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_finnish
-					}
-					any_realm_character = {
-						limit = { religion = finnish_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_finnish
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = finnish_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2645,7 +2543,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2653,13 +2551,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_west_african } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_west_african
-					}
-					any_realm_character = {
-						limit = { religion = west_african_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_west_african
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = west_african_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2667,7 +2569,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2675,13 +2577,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_aztec } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_aztec
-					}
-					any_realm_character = {
-						limit = { religion = aztec }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_aztec
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = aztec }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2689,7 +2595,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2697,13 +2603,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_zun } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_zun
-					}
-					any_realm_character = {
-						limit = { religion = zun_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_zun
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = zun_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2711,7 +2621,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2719,13 +2629,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_bon } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_bon
-					}
-					any_realm_character = {
-						limit = { religion = bon }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_bon
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = bon }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2733,7 +2647,7 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
@@ -2741,13 +2655,17 @@ settlement_decisions = {
 
 			if = {
 				limit = { location = { has_province_flag = flag_great_pillar_hellenic } }
-				hidden_effect = {
-					location = {
-						clr_province_flag = flag_great_pillar_hellenic
-					}
-					any_realm_character = {
-						limit = { religion = hellenic_pagan }
-						character_event = { id = HF.23477 } # Vassals react
+
+				location = {
+					clr_province_flag = flag_great_pillar_hellenic
+				}
+
+				FROM = {
+					top_liege = {
+						any_realm_character = {
+							limit = { religion = hellenic_pagan }
+							character_event = { id = HF.23477 } # Vassals react
+						}
 					}
 				}
 
@@ -2755,57 +2673,44 @@ settlement_decisions = {
 					show_scope_change = no
 
 					religion_authority = {
-						modifier = destroyed_great_pillar
+						name = destroyed_great_pillar
 						years = 10
 					}
 				}
 			}
 		}
 
-
 		ai_will_do = {
 			factor = 1
 
 			mult_modifier = {
 				factor = 5
-				FROM = {
-					has_religion_feature = religion_dogmatic
-				}
+				FROM = { has_religion_feature = religion_dogmatic }
 			}
 
 			mult_modifier = {
 				factor = 0.25
-				FROM = {
-					has_religion_feature = religion_cosmopolitan
-				}
+				FROM = { has_religion_feature = religion_cosmopolitan }
 			}
 
 			mult_modifier = {
 				factor = 2
-				FROM = {
-					trait = zealous
-				}
+				FROM = { trait = zealous }
 			}
 
 			mult_modifier = {
 				factor = 0.5
-				FROM = {
-					trait = cynical
-				}
+				FROM = { trait = cynical }
 			}
 
 			mult_modifier = {
 				factor = 0.3
-				FROM = {
-					trait = sympathy_pagans
-				}
+				FROM = { trait = sympathy_pagans }
 			}
 
 			mult_modifier = {
 				factor = 0.4
-				FROM = {
-					religion_group = pagan_group
-				}
+				FROM = { religion_group = pagan_group }
 			}
 		}
 	}
