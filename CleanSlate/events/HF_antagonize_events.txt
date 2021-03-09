@@ -2,6 +2,463 @@
 
 namespace = HF
 
+# on_five_years pulse handling the AI picking a Antagonizing target
+character_event = {
+	id = HF.21997
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	only_playable = yes
+	has_dlc = "Holy Fury"
+	ai = yes
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		is_adult = yes
+		is_landed = yes
+		is_inaccessible_trigger = no
+
+		NOT = {
+			persistent_event_target:antagonize_target = {
+				is_alive = yes
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { persistent_event_target:antagonize_target = { always = yes } }
+
+			persistent_event_target:antagonize_target = {
+				clr_character_flag = flag_character_being_antagonized
+			}
+
+			remove_special_interest = persistent_event_target:antagonize_target
+			clear_persistent_event_target = antagonize_target
+		}
+
+		random_realm_lord = {
+			limit = {
+				is_adult = yes
+				is_incapable = no
+				is_inaccessible_trigger = no
+
+				NOR = {
+					is_lover = ROOT
+					is_friend = ROOT
+					is_child_of = ROOT
+					has_character_flag = flag_character_being_swayed
+					has_character_flag = flag_character_being_antagonized
+				}
+			}
+
+			save_event_target_as = potential_antagonized
+
+			random = {
+				chance = 70
+
+				mult_modifier = {
+					factor = 5 # Liege of player more likely to pick on him
+
+					vassal_of = ROOT
+					ai = no
+
+					ROOT = {
+						OR = {
+							trait = cruel
+							trait = impaler
+							trait = deceitful
+							trait = schemer
+							trait = paranoid
+							trait = lunatic
+							trait = possessed
+						}
+					}
+				}
+
+				# Soft modifiers
+				mult_modifier = {
+					factor = 0.25 # The average liege should probably not pick on his vassals
+
+					vassal_of = ROOT
+					religion = ROOT
+
+					ROOT = {
+						NOR = {
+							trait = cruel
+							trait = impaler
+							trait = deceitful
+							trait = schemer
+							trait = paranoid
+							trait = lunatic
+							trait = possessed
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 0.25 # Zealous picking on the unbelievers
+
+					ROOT = { trait = zealous }
+
+					OR = {
+						trait = cynical
+						NOT = { religion = ROOT }
+
+						AND = {
+							trait = sympathy_christendom
+							ROOT = { NOT = { religion_group = christian } }
+						}
+
+						AND = {
+							trait = sympathy_islam
+							ROOT = { NOT = { religion_group = muslim } }
+						}
+
+						AND = {
+							trait = sympathy_pagans
+							ROOT = { NOT = { religion_group = pagan_group } }
+						}
+
+						AND = {
+							trait = sympathy_zoroastrianism
+							ROOT = { NOT = { religion_group = zoroastrian_group } }
+						}
+
+						AND = {
+							trait = sympathy_judaism
+							ROOT = { NOT = { religion_group = jewish_group } }
+						}
+
+						AND = {
+							trait = sympathy_indian
+							ROOT = { NOT = { religion_group = indian_group } }
+						}
+					}
+				}
+
+				# Trait compatibility modifiers - Already so much in common, why fight?
+				mult_modifier = {
+					factor = 0.2
+
+					calc_true_if = {
+						amount >= 4
+
+						AND = {
+							trait = lustful
+							ROOT = { trait = lustful }
+						}
+
+						AND = {
+							trait = gluttonous
+							ROOT = { trait = gluttonous }
+						}
+
+						AND = {
+							trait = greedy
+							ROOT = { trait = greedy }
+						}
+
+						AND = {
+							trait = slothful
+							ROOT = { trait = slothful }
+						}
+
+						AND = {
+							trait = wroth
+							ROOT = { trait = wroth }
+						}
+
+						AND = {
+							trait = envious
+							ROOT = { trait = envious }
+						}
+
+						AND = {
+							trait = proud
+							ROOT = { trait = proud }
+						}
+
+						AND = {
+							trait = chaste
+							ROOT = { trait = chaste }
+						}
+
+						AND = {
+							trait = temperate
+							ROOT = { trait = temperate }
+						}
+
+						AND = {
+							trait = charitable
+							ROOT = { trait = charitable }
+						}
+
+						AND = {
+							trait = diligent
+							ROOT = { trait = diligent }
+						}
+
+						AND = {
+							trait = patient
+							ROOT = { trait = patient }
+						}
+
+						AND = {
+							trait = kind
+							ROOT = { trait = kind }
+						}
+
+						AND = {
+							trait = humble
+							ROOT = { trait = humble }
+						}
+
+						AND = {
+							trait = deceitful
+							ROOT = { trait = deceitful }
+						}
+
+						AND = {
+							trait = honest
+							ROOT = { trait = honest }
+						}
+
+						AND = {
+							trait = brave
+							ROOT = { trait = brave }
+						}
+
+						AND = {
+							trait = craven
+							ROOT = { trait = craven }
+						}
+
+						AND = {
+							trait = gregarious
+							ROOT = { trait = gregarious }
+						}
+
+						AND = {
+							trait = ambitious
+							ROOT = { trait = ambitious }
+						}
+
+						AND = {
+							trait = content
+							ROOT = { trait = content }
+						}
+
+						AND = {
+							trait = arbitrary
+							ROOT = { trait = arbitrary }
+						}
+
+						AND = {
+							trait = just
+							ROOT = { trait = just }
+						}
+
+						AND = {
+							trait = cynical
+							ROOT = { trait = cynical }
+						}
+
+						AND = {
+							trait = zealous
+							ROOT = { trait = zealous }
+						}
+
+						AND = {
+							trait = paranoid
+							ROOT = { trait = paranoid }
+						}
+
+						AND = {
+							trait = trusting
+							ROOT = { trait = trusting }
+						}
+
+						AND = {
+							trait = cruel
+							ROOT = { trait = cruel }
+						}
+
+						AND = {
+							trait = erudite
+							ROOT = { trait = erudite }
+						}
+
+						AND = {
+							trait = stubborn
+							ROOT = { trait = stubborn }
+						}
+
+						AND = {
+							trait = hedonist
+							ROOT = { trait = hedonist }
+						}
+
+						AND = {
+							trait = scholar
+							ROOT = { trait = scholar }
+						}
+
+						AND = {
+							trait = gardener
+							ROOT = { trait = gardener }
+						}
+
+						AND = {
+							trait = mystic
+							ROOT = { trait = mystic }
+						}
+
+						AND = {
+							trait = impaler
+							ROOT = { trait = impaler }
+						}
+
+						AND = {
+							trait = duelist
+							ROOT = { trait = duelist }
+						}
+
+						AND = {
+							trait = hunter
+							ROOT = { trait = hunter }
+						}
+
+						AND = {
+							trait = seducer
+							ROOT = { trait = seducer }
+						}
+
+						AND = {
+							trait = seductress
+							ROOT = { trait = seductress }
+						}
+
+						AND = {
+							trait = administrator
+							ROOT = { trait = administrator }
+						}
+
+						AND = {
+							trait = architect
+							ROOT = { trait = architect }
+						}
+
+						AND = {
+							trait = strategist
+							ROOT = { trait = strategist }
+						}
+
+						AND = {
+							trait = socializer
+							ROOT = { trait = socializer }
+						}
+
+						AND = {
+							trait = schemer
+							ROOT = { trait = schemer }
+						}
+
+						AND = {
+							trait = theologian
+							religion = ROOT
+							ROOT = { trait = theologian }
+						}
+
+						AND = {
+							trait = gamer
+							ROOT = { trait = gamer }
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 0.5
+					is_married = ROOT
+				}
+
+				# Opinion modifiers
+				mult_modifier = { # I hate you, you must hate me
+					factor = 1.5
+
+					reverse_opinion = {
+						who = ROOT
+						value < 0
+					}
+
+					opinion = {
+						who = ROOT
+						value >= 20
+					}
+				}
+
+				mult_modifier = { # I hate you, you must hate me
+					factor = 1.5
+
+					reverse_opinion = {
+						who = ROOT
+						value < -20
+					}
+
+					opinion = {
+						who = ROOT
+						value >= 20
+					}
+				}
+
+				mult_modifier = { # I hate you, you must hate me
+					factor = 2
+
+					reverse_opinion = {
+						who = ROOT
+						value < -40
+					}
+
+					opinion = {
+						who = ROOT
+						value >= 20
+					}
+				}
+
+				mult_modifier = { # I hate you, you must hate me
+					factor = 2
+
+					reverse_opinion = {
+						who = ROOT
+						value < -60
+					}
+
+					opinion = {
+						who = ROOT
+						value >= 20
+					}
+				}
+
+				set_character_flag = flag_character_being_antagonized # Only used for AI weights
+
+				ROOT = {
+					save_persistent_event_target = {
+						name = antagonize_target
+						scope = event_target:potential_antagonized
+					}
+
+					add_special_interest = {
+						who = persistent_event_target:antagonize_target
+						key = antagonizing_target_key
+					}
+				}
+			}
+		}
+	}
+}
+
 character_event = {
 	id = HF.22999
 
@@ -93,7 +550,7 @@ character_event = {
 		}
 		else_if = {
 			limit = {
-				# Doesn't check for rivalry, because one event below can fire if already rivalss
+				# Doesn't check for rivalry, because one event below can fire if already rivals
 				OR = {
 					is_friend = persistent_event_target:antagonize_target
 					is_lover = persistent_event_target:antagonize_target
