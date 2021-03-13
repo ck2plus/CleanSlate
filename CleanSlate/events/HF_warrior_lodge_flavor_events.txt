@@ -1,165 +1,152 @@
 ###########################################
 #                                         #
-# Warrior Lodge flavor events		      #
+# Warrior Lodge flavor events             #
 #                                         #
-# ID HF.500-HF.  	          			  #
-# ID HF.51000-HF.51010					  #
+# ID HF.500-HF.561                        #
+# ID HF.14001-HF.HF.14009                 #
+# ID HF.51000-HF.51010                    #
+# ID HFP.14005                            #
 #                                         #
 ###########################################
 
 namespace = HF
 
+### Train other member setup
 character_event = {
 	id = HF.500
+	desc = HFP_500_DESC
 	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
-	desc = HFP_500_DESC
-	is_triggered_only = yes
-
-	is_in_society = yes
-
 	portrait = event_target:combatant_1
+
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
+
+	min_age = 16
+	war = no
+	only_capable = yes
+	prisoner = no
 
 	trigger = {
 		NOT = { has_character_flag = call_to_legend_active }
-		war = no
 		society_rank == 4
 		is_member_of_any_warrior_lodge_trigger = yes
-		is_inaccessible_or_incapable_trigger = no
-		is_adult = yes
-		any_society_member = {
-			count = 4
-			same_society_as = ROOT
-			NOR = {
-				is_inaccessible_or_incapable_trigger = yes
-				society_rank == 4
-				has_character_modifier = recent_duel_timer
-				character = ROOT
+		is_inaccessible_trigger = no
+
+		society = {
+			any_society_member = {
+				count >= 4
+
+				is_inaccessible_or_incapable_trigger = no
+				in_command = no
+				is_adult = yes
+				ai = yes
+				society_rank < 4
+
+				NOR = {
+					has_character_modifier = recent_duel_timer
+					character = ROOT
+				}
 			}
-			in_command = no
-			is_adult = yes
-			ai = yes
 		}
 	}
 
 	immediate = {
 
 		random_list = {
-			10 = {
-				sound_effect = fighting_instructions_01
-			}
-			10 = {
-				sound_effect = fighting_instructions_02
-			}
+			50 = { sound_effect = fighting_instructions_01 }
+			50 = { sound_effect = fighting_instructions_02 }
 		}
 
 		hidden_effect = {
 			save_event_target_as = hero_instigating_duel
-			random_society_member = { # Picks someone who would need some training...
-				limit = {
-					same_society_as = ROOT
-					NOR = {
-						is_inaccessible_or_incapable_trigger = yes
-						society_rank == 4
-						has_character_modifier = recent_duel_timer
-						character = ROOT
-					}
-					in_command = no
-					is_adult = yes
-					ai = yes
-				}
-				preferred_limit = {
-					NOT = {
-						combat_rating = 11
-					}
-				}
-				preferred_limit = {
-					NOT = {
-						combat_rating = 16
-					}
-				}
-				preferred_limit = {
-					NOT = {
-						combat_rating = 21
-					}
-				}
-				preferred_limit = {
-					NOT = {
-						combat_rating = 26
-					}
-				}
-				save_event_target_as = combatant_1
-			}
-			event_target:combatant_1 = {
-				any_society_member = { # Pick someone even
+
+			society = {
+				random_society_member = { # Picks someone who would need some training...
 					limit = {
-						same_society_as = ROOT
+						is_inaccessible_or_incapable_trigger = no
+						in_command = no
+						is_adult = yes
+						ai = yes
+						society_rank < 4
+
 						NOR = {
-							is_inaccessible_or_incapable_trigger = yes
-							society_rank == 4
+							has_character_modifier = recent_duel_timer
+							character = ROOT
+						}
+					}
+					preferred_limit = { combat_rating < 11 }
+					preferred_limit = { combat_rating < 16 }
+					preferred_limit = { combat_rating < 21 }
+					preferred_limit = { combat_rating < 26 }
+					save_event_target_as = combatant_1
+				}
+				event_target:combatant_1 = {
+					any_society_member = { # Pick someone even
+						limit = {
+							same_society_as = ROOT
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+							is_adult = yes
+							ai = yes
+							society_rank < 4
+
+							NOR = {
+								has_character_modifier = recent_duel_timer
+								character = ROOT
+								character = event_target:combatant_1
+							}
+						}
+						score_value = {
+							value = 10
+							matching_soldier_score = yes
+						}
+						save_event_target_as = society_practice_duelist_target_2
+					}
+				}
+
+				any_society_member = { # Pick someone bad
+					limit = {
+						is_inaccessible_or_incapable_trigger = no
+						in_command = no
+						is_adult = yes
+						ai = yes
+						society_rank < 4
+
+						NOR = {
+							has_character_modifier = recent_duel_timer
+							character = ROOT
+							character = event_target:combatant_1
+							character = event_target:society_practice_duelist_target_2
+						}
+					}
+					score_value = {
+						value = 10
+						bad_soldier_outcome_score = yes
+					}
+					save_event_target_as = society_practice_duelist_target_1
+				}
+				any_society_member = { # Pick someone awesome
+					limit = {
+						is_inaccessible_or_incapable_trigger = no
+						in_command = no
+						is_adult = yes
+						ai = yes
+						society_rank < 4
+
+						NOR = {
 							has_character_modifier = recent_duel_timer
 							character = ROOT
 							character = event_target:combatant_1
 							character = event_target:society_practice_duelist_target_1
 							character = event_target:society_practice_duelist_target_2
-							character = event_target:society_practice_duelist_target_3
 						}
-						in_command = no
-						is_adult = yes
-						ai = yes
 					}
 					score_value = {
 						value = 10
-						matching_soldier_score = yes
+						good_soldier_outcome_score = yes
 					}
-					save_event_target_as = society_practice_duelist_target_2
+					save_event_target_as = society_practice_duelist_target_3
 				}
-			}
-			any_society_member = { # Pick someone bad
-				limit = {
-					same_society_as = ROOT
-					NOR = {
-						is_inaccessible_or_incapable_trigger = yes
-						society_rank == 4
-						has_character_modifier = recent_duel_timer
-						character = ROOT
-						character = event_target:combatant_1
-						character = event_target:society_practice_duelist_target_1
-						character = event_target:society_practice_duelist_target_2
-						character = event_target:society_practice_duelist_target_3
-					}
-					in_command = no
-					is_adult = yes
-					ai = yes
-				}
-				score_value = {
-					value = 10
-					bad_soldier_outcome_score = yes
-				}
-				save_event_target_as = society_practice_duelist_target_1
-			}
-			any_society_member = { # Pick someone awesome
-				limit = {
-					same_society_as = ROOT
-					NOR = {
-						is_inaccessible_or_incapable_trigger = yes
-						society_rank == 4
-						has_character_modifier = recent_duel_timer
-						character = ROOT
-						character = event_target:combatant_1
-						character = event_target:society_practice_duelist_target_1
-						character = event_target:society_practice_duelist_target_2
-						character = event_target:society_practice_duelist_target_3
-					}
-					in_command = no
-					is_adult = yes
-					ai = yes
-				}
-				score_value = {
-					value = 10
-					good_soldier_outcome_score = yes
-				}
-				save_event_target_as = society_practice_duelist_target_3
 			}
 		}
 	}
@@ -167,6 +154,7 @@ character_event = {
 	option = { # Duel option 1
 		name = EVTOPTA_HF_500
 		show_portrait = event_target:society_practice_duelist_target_1
+		custom_tooltip = { text = easy_duel_tt }
 
 		hidden_effect = {
 			event_target:combatant_1 = {
@@ -176,20 +164,16 @@ character_event = {
 			}
 			event_target:society_practice_duelist_target_1 = {
 				save_event_target_as = combatant_2
-			}
-			event_target:combatant_2 = {
-				apply_degree_of_dishonorable_duel_effect = yes #checks a bunch of age and health statuses...
+				apply_degree_of_dishonorable_duel_effect = yes # checks a bunch of age and health statuses... # TODO: And appears to reference FROM
 				character_event = { id = HFP.10095 }
 			}
 		}
-
-		custom_tooltip = {
-			text = easy_duel_tt
-		}
 	}
+
 	option = { # Duel option 2
 		name = EVTOPTB_HF_500
 		show_portrait = event_target:society_practice_duelist_target_2
+		custom_tooltip = { text = even_duel_tt }
 
 		hidden_effect = {
 			event_target:combatant_1 = {
@@ -199,20 +183,16 @@ character_event = {
 			}
 			event_target:society_practice_duelist_target_2 = {
 				save_event_target_as = combatant_2
-			}
-			event_target:combatant_2 = {
-				apply_degree_of_dishonorable_duel_effect = yes #checks a bunch of age and health statuses...
+				apply_degree_of_dishonorable_duel_effect = yes # checks a bunch of age and health statuses... # TODO: And appears to reference FROM
 				character_event = { id = HFP.10095 }
 			}
 		}
-
-		custom_tooltip = {
-			text = even_duel_tt
-		}
 	}
+
 	option = { # Duel option 3
 		name = EVTOPTC_HF_500
 		show_portrait = event_target:society_practice_duelist_target_3
+		custom_tooltip = { text = dangerous_duel_tt }
 
 		hidden_effect = {
 			event_target:combatant_1 = {
@@ -222,304 +202,304 @@ character_event = {
 			}
 			event_target:society_practice_duelist_target_3 = {
 				save_event_target_as = combatant_2
-			}
-			event_target:combatant_2 = {
-				apply_degree_of_dishonorable_duel_effect = yes #checks a bunch of age and health statuses...
+				apply_degree_of_dishonorable_duel_effect = yes # checks a bunch of age and health statuses... # TODO: And appears to reference FROM
 				character_event = { id = HFP.10095 }
 			}
 		}
-
-		custom_tooltip = {
-			text = dangerous_duel_tt
-		}
 	}
+
 	option = { # Do not duel anyone
 		name = EVTOPTD_HF_500
+
 		detract_society_currency_trivial_effect = yes
-		ai_chance = {
-			factor = 0
-		}
+		ai_chance = { factor = 0 }
 	}
 }
 
 character_event = { # Win!
 	id = HFP.501
+	desc = HFP_501_DESC
 	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
-	desc = HFP_501_DESC
 	portrait = event_target:combatant_1
+
 	is_triggered_only = yes
+
+	trigger = {
+		event_target:combatant_1 = { is_alive = yes }
+	}
 
 	immediate = {
 		sound_effect = duel_win
+
 		event_target:combatant_1 = {
 			random_list = {
-				10 = { # I Appreciated this!
+				33 = { # I Appreciated this!
 					set_character_flag = appreciated_duel
 
-					modifier = {
+					mult_modifier = {
 						factor = 3
 						trait = trusting
 					}
 
 					# For Easy Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = greedy
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = slothful
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = envious
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 3
 						trait = proud
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = ambitious
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cruel
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = craven
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = brave
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = patient
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = kind
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = humble
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = even_duel
 					}
 
 					# For Hard Duels
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = proud
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = ambitious
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = brave
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = humble
 						has_character_flag = hard_duel
 					}
 				}
-				10 = { # This was beneath me...
+				33 = { # This was beneath me...
 					set_character_flag = beneath_me_duel
 
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = patient
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = kind
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = humble
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = just
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = brave
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = envious
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = proud
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = ambitious
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cruel
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = even_duel
 					}
 
 					# For Hard Duels
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = content
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = hard_duel
 					}
 				}
-				10 = { # I could have died!
+				33 = { # I could have died!
 					set_character_flag = feared_for_life_duel
 
-					modifier = {
-						factor = 0
-						has_character_flag = easy_duel
+					trigger = {
+						NOT = { has_character_flag = easy_duel }
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 0.25
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = proud
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = wounded
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = severely_injured
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = paranoid
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = craven
 					}
@@ -528,15 +508,10 @@ character_event = { # Win!
 		}
 	}
 
-	trigger = {
-		event_target:combatant_1 = {
-			is_alive = yes
-		}
-	}
-
 	option = {
 		name = EVTOPTA_HF_501
 		show_portrait = event_target:combatant_2
+
 		event_target:combatant_1 = {
 			show_scope_change = no
 
@@ -548,90 +523,77 @@ character_event = { # Win!
 			}
 
 			if = {
-				limit = {
-					has_character_flag = appreciated_duel
-				}
+				limit = { has_character_flag = appreciated_duel }
+
 				opinion = {
-					modifier = opinion_great_leader
+					name = opinion_great_leader
 					who = ROOT
 					years = 5
 				}
+
 				if = {
 					limit = {
-						NOT = {
-							is_friend = ROOT
-						}
+						NOT = { is_friend = ROOT }
 					}
+
 					random = {
 						chance = 5
 						add_friend = ROOT
 					}
 				}
+
 				ROOT = {
 					show_scope_change = no
 					add_society_currency_tiny_effect = yes
 				}
 			}
 			else_if = {
-				limit = {
-					OR = {
-						has_character_flag = beneath_me_duel
-						has_character_flag = poor_choice_duel
-					}
-				}
+				limit = { has_character_flag = feared_for_life_duel }
+
 				opinion = {
-					modifier = opinion_disrespects_me
+					name = opinion_tried_to_get_me_killed
 					who = ROOT
 					years = 5
 				}
+
 				if = {
 					limit = {
-						NOT = {
-							is_rival = ROOT
-						}
+						NOT = { is_rival = ROOT }
+					}
+					random = {
+						chance = 15
+						add_rival = ROOT
+					}
+
+				}
+				ROOT = {
+					show_scope_change = no
+					detract_society_currency_trivial_effect = yes
+				}
+			}
+			else = {
+				opinion = {
+					name = opinion_disrespects_me
+					who = ROOT
+					years = 5
+				}
+
+				if = {
+					limit = {
+						NOT = { is_rival = ROOT }
 					}
 					random = {
 						chance = 5
 						add_rival = ROOT
 					}
 				}
-				ROOT = {
-					show_scope_change = no
-					detract_society_currency_trivial_effect = yes
-				}
-			}
-			else_if = {
-				limit = {
-					has_character_flag = feared_for_life_duel
-				}
-				opinion = {
-					modifier = opinion_tried_to_get_me_killed
-					who = ROOT
-					years = 5
-				}
-				if = {
-					limit = {
-						NOT = {
-							is_rival = ROOT
-						}
-					}
-					random = {
-						chance = 15
-						add_rival = ROOT
-					}
-				}
-				ROOT = {
-					show_scope_change = no
-					detract_society_currency_trivial_effect = yes
-				}
-			}
-		}
-	}
 
-	after = {
-		clr_character_flag = notify_mild_injury
-		clr_character_flag = notify_severely_injured
-		event_target:combatant_1 = {
+				ROOT = {
+					show_scope_change = no
+					detract_society_currency_trivial_effect = yes
+				}
+			}
+
 			clr_character_flag = easy_duel
 			clr_character_flag = even_duel
 			clr_character_flag = hard_duel
@@ -640,216 +602,221 @@ character_event = { # Win!
 			clr_character_flag = feared_for_life_duel
 			clr_character_flag = poor_choice_duel
 		}
+
+		clr_character_flag = notify_mild_injury
+		clr_character_flag = notify_severely_injured
 	}
 }
 
 character_event = { # Lose...
 	id = HFP.502
+	desc = HFP_502_DESC
 	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
-	desc = HFP_502_DESC
 	portrait = event_target:combatant_1
+
 	is_triggered_only = yes
 
 	immediate = {
 		sound_effect = duel_lose
+
 		event_target:combatant_1 = {
 			random_list = {
-				10 = { # I Appreciated this!
+				33 = { # I Appreciated this!
 					set_character_flag = appreciated_duel
 
 					# These traits do not mind losing
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = humble
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = brave
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = patient
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = content
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = kind
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 3
 						trait = trusting
 					}
 
 					# For Easy Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = just
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = even_duel
 					}
 				}
-				10 = { # This was beneath me...
+				33 = { # This was beneath me...
 					set_character_flag = poor_choice_duel
 
 					# These traits just hate losing
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = envious
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = wroth
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = proud
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = ambitious
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cruel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 					}
 
 					# For Easy Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = greedy
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = slothful
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = craven
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = even_duel
 					}
 
 					# For Hard Duels
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = brave
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = hard_duel
 					}
 				}
-				10 = { # I could have died!
+				33 = { # I could have died!
 					set_character_flag = feared_for_life_duel
 
-					modifier = {
-						factor = 0
-						has_character_flag = easy_duel
+					trigger = {
+						NOT = { has_character_flag = easy_duel }
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 0.25
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = proud
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = wounded
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = severely_injured
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = paranoid
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = craven
 					}
@@ -859,9 +826,7 @@ character_event = { # Lose...
 	}
 
 	trigger = {
-		event_target:combatant_1 = {
-			is_alive = yes
-		}
+		event_target:combatant_1 = { is_alive = yes }
 	}
 
 	option = {
@@ -879,72 +844,41 @@ character_event = { # Lose...
 			}
 
 			if = {
-				limit = {
-					has_character_flag = appreciated_duel
-				}
+				limit = { has_character_flag = appreciated_duel }
+
 				opinion = {
-					modifier = opinion_great_leader
+					name = opinion_great_leader
 					who = ROOT
 					years = 5
 				}
+
 				if = {
 					limit = {
-						NOT = {
-							is_friend = ROOT
-						}
+						NOT = { is_friend = ROOT }
 					}
 					random = {
 						chance = 5
 						add_friend = ROOT
 					}
 				}
+
 				ROOT = {
 					show_scope_change = no
 					add_society_currency_tiny_effect = yes
 				}
 			}
 			else_if = {
-				limit = {
-					OR = {
-						has_character_flag = beneath_me_duel
-						has_character_flag = poor_choice_duel
-					}
-				}
+				limit = { has_character_flag = feared_for_life_duel }
+
 				opinion = {
-					modifier = opinion_disrespects_me
+					name = opinion_tried_to_get_me_killed
 					who = ROOT
 					years = 5
 				}
+
 				if = {
 					limit = {
-						NOT = {
-							is_rival = ROOT
-						}
-					}
-					random = {
-						chance = 5
-						add_rival = ROOT
-					}
-				}
-				ROOT = {
-					show_scope_change = no
-					detract_society_currency_trivial_effect = yes
-				}
-			}
-			else_if = {
-				limit = {
-					has_character_flag = feared_for_life_duel
-				}
-				opinion = {
-					modifier = opinion_tried_to_get_me_killed
-					who = ROOT
-					years = 5
-				}
-				if = {
-					limit = {
-						NOT = {
-							is_rival = ROOT
-						}
+						NOT = { is_rival = ROOT }
 					}
 					random = {
 						chance = 15
@@ -956,13 +890,29 @@ character_event = { # Lose...
 					detract_society_currency_trivial_effect = yes
 				}
 			}
-		}
-	}
+			else = {
+				opinion = {
+					name = opinion_disrespects_me
+					who = ROOT
+					years = 5
+				}
 
-	after = {
-		clr_character_flag = notify_mild_injury
-		clr_character_flag = notify_severely_injured
-		event_target:combatant_1 = {
+				if = {
+					limit = {
+						NOT = { is_rival = ROOT }
+					}
+					random = {
+						chance = 5
+						add_rival = ROOT
+					}
+				}
+
+				ROOT = {
+					show_scope_change = no
+					detract_society_currency_trivial_effect = yes
+				}
+			}
+
 			clr_character_flag = easy_duel
 			clr_character_flag = even_duel
 			clr_character_flag = hard_duel
@@ -971,37 +921,33 @@ character_event = { # Lose...
 			clr_character_flag = feared_for_life_duel
 			clr_character_flag = poor_choice_duel
 		}
+
+		clr_character_flag = notify_mild_injury
+		clr_character_flag = notify_severely_injured
 	}
 }
 
 character_event = { # Defender ran away!
 	id = HFP.503
+	desc = HFP_503_DESC
 	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
-	desc = HFP_503_DESC
 	portrait = event_target:combatant_1
+
 	is_triggered_only = yes
 
 	trigger = {
-		event_target:combatant_1 = {
-			is_alive = yes
-		}
+		event_target:combatant_1 = { is_alive = yes }
 	}
 
 	option = {
 		name = EVTOPTA_HF_503
 		show_portrait = event_target:combatant_2
+
 		event_target:combatant_1 = {
 			show_scope_change = no
 
 			add_society_currency_trivial_effect = yes
-		}
-	}
-
-	after = {
-		clr_character_flag = notify_mild_injury
-		clr_character_flag = notify_severely_injured
-		event_target:combatant_1 = {
 			clr_character_flag = easy_duel
 			clr_character_flag = even_duel
 			clr_character_flag = hard_duel
@@ -1010,37 +956,33 @@ character_event = { # Defender ran away!
 			clr_character_flag = feared_for_life_duel
 			clr_character_flag = poor_choice_duel
 		}
+
+		clr_character_flag = notify_mild_injury
+		clr_character_flag = notify_severely_injured
 	}
 }
 
 character_event = { # Attacker ran away...
 	id = HFP.504
+	desc = HFP_504_DESC
 	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
-	desc = HFP_504_DESC
 	portrait = event_target:combatant_1
+
 	is_triggered_only = yes
 
 	trigger = {
-		event_target:combatant_1 = {
-			is_alive = yes
-		}
+		event_target:combatant_1 = { is_alive = yes }
 	}
 
 	option = {
 		name = EVTOPTA_HF_503
 		show_portrait = event_target:combatant_2
+
 		event_target:combatant_1 = {
 			show_scope_change = no
 
 			detract_society_currency_trivial_effect = yes
-		}
-	}
-
-	after = {
-		clr_character_flag = notify_mild_injury
-		clr_character_flag = notify_severely_injured
-		event_target:combatant_1 = {
 			clr_character_flag = easy_duel
 			clr_character_flag = even_duel
 			clr_character_flag = hard_duel
@@ -1049,293 +991,296 @@ character_event = { # Attacker ran away...
 			clr_character_flag = feared_for_life_duel
 			clr_character_flag = poor_choice_duel
 		}
+
+		clr_character_flag = notify_mild_injury
+		clr_character_flag = notify_severely_injured
 	}
 }
 
 character_event = { # Won, but both wounded
 	id = HFP.505
+	desc = HFP_505_DESC
 	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
-	desc = HFP_505_DESC
 	portrait = event_target:combatant_1
+
 	is_triggered_only = yes
 
 	trigger = {
-		event_target:combatant_1 = {
-			is_alive = yes
-		}
+		event_target:combatant_1 = { is_alive = yes }
 	}
 
 	immediate = {
 		sound_effect = duel_win
+
 		event_target:combatant_1 = {
 			random_list = {
-				10 = { # I Appreciated this!
+				33 = { # I Appreciated this!
 					set_character_flag = appreciated_duel
 
-					modifier = {
+					mult_modifier = {
 						factor = 3
 						trait = trusting
 					}
 
 					# For Easy Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = greedy
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = slothful
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = envious
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 3
 						trait = proud
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = ambitious
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cruel
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = craven
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = brave
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = patient
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = kind
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = humble
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = even_duel
 					}
 
 					# For Hard Duels
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = proud
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = ambitious
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = brave
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = humble
 						has_character_flag = hard_duel
 					}
 				}
-				10 = { # This was beneath me...
+				33 = { # This was beneath me...
 					set_character_flag = beneath_me_duel
 
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = patient
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = kind
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = humble
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = just
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = brave
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = envious
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = proud
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = ambitious
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cruel
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = even_duel
 					}
 
 					# For Hard Duels
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = content
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = hard_duel
 					}
 				}
-				10 = { # I could have died!
+				33 = { # I could have died!
 					set_character_flag = feared_for_life_duel
 
-					modifier = {
-						factor = 0
-						has_character_flag = easy_duel
+					trigger = {
+						NOT = { has_character_flag = easy_duel }
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 0.25
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = proud
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = wounded
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = severely_injured
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = paranoid
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = craven
 					}
@@ -1347,6 +1292,7 @@ character_event = { # Won, but both wounded
 	option = {
 		name = EVTOPTA_HF_501
 		show_portrait = event_target:combatant_2
+
 		event_target:combatant_1 = {
 			show_scope_change = no
 
@@ -1358,90 +1304,76 @@ character_event = { # Won, but both wounded
 			}
 
 			if = {
-				limit = {
-					has_character_flag = appreciated_duel
-				}
+				limit = { has_character_flag = appreciated_duel }
+
 				opinion = {
-					modifier = opinion_great_leader
+					name = opinion_great_leader
 					who = ROOT
 					years = 5
 				}
+
 				if = {
 					limit = {
-						NOT = {
-							is_friend = ROOT
-						}
+						NOT = { is_friend = ROOT }
 					}
 					random = {
 						chance = 5
 						add_friend = ROOT
 					}
 				}
+
 				ROOT = {
 					show_scope_change = no
 					add_society_currency_tiny_effect = yes
 				}
 			}
 			else_if = {
-				limit = {
-					OR = {
-						has_character_flag = beneath_me_duel
-						has_character_flag = poor_choice_duel
-					}
-				}
+				limit = { has_character_flag = feared_for_life_duel }
+
 				opinion = {
-					modifier = opinion_disrespects_me
+					name = opinion_tried_to_get_me_killed
 					who = ROOT
 					years = 5
 				}
+
 				if = {
 					limit = {
-						NOT = {
-							is_rival = ROOT
-						}
-					}
-					random = {
-						chance = 5
-						add_rival = ROOT
-					}
-				}
-				ROOT = {
-					show_scope_change = no
-					detract_society_currency_trivial_effect = yes
-				}
-			}
-			else_if = {
-				limit = {
-					has_character_flag = feared_for_life_duel
-				}
-				opinion = {
-					modifier = opinion_tried_to_get_me_killed
-					who = ROOT
-					years = 5
-				}
-				if = {
-					limit = {
-						NOT = {
-							is_rival = ROOT
-						}
+						NOT = { is_rival = ROOT }
 					}
 					random = {
 						chance = 15
 						add_rival = ROOT
 					}
 				}
+
 				ROOT = {
 					show_scope_change = no
 					detract_society_currency_trivial_effect = yes
 				}
 			}
-		}
-	}
+			else = {
+				opinion = {
+					name = opinion_disrespects_me
+					who = ROOT
+					years = 5
+				}
 
-	after = {
-		clr_character_flag = notify_mild_injury
-		clr_character_flag = notify_severely_injured
-		event_target:combatant_1 = {
+				if = {
+					limit = {
+						NOT = { is_rival = ROOT }
+					}
+					random = {
+						chance = 5
+						add_rival = ROOT
+					}
+				}
+
+				ROOT = {
+					show_scope_change = no
+					detract_society_currency_trivial_effect = yes
+				}
+			}
+
 			clr_character_flag = easy_duel
 			clr_character_flag = even_duel
 			clr_character_flag = hard_duel
@@ -1450,217 +1382,219 @@ character_event = { # Won, but both wounded
 			clr_character_flag = feared_for_life_duel
 			clr_character_flag = poor_choice_duel
 		}
+
+		clr_character_flag = notify_mild_injury
+		clr_character_flag = notify_severely_injured
 	}
 }
 
 character_event = { # Lost, but both wounded
 	id = HFP.506
+	desc = HFP_506_DESC
 	picture = GFX_evt_melee
 	border = GFX_event_normal_frame_war
-	desc = HFP_506_DESC
 	portrait = event_target:combatant_1
+
 	is_triggered_only = yes
 
 	trigger = {
-		event_target:combatant_1 = {
-			is_alive = yes
-		}
+		event_target:combatant_1 = { is_alive = yes }
 	}
 
 	immediate = {
 		sound_effect = duel_lose
 		event_target:combatant_1 = {
 			random_list = {
-				10 = { # I Appreciated this!
+				33 = { # I Appreciated this!
 					set_character_flag = appreciated_duel
 
 					# These traits do not mind losing
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = humble
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = brave
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = patient
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = content
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = kind
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = temperate
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 3
 						trait = trusting
 					}
 
 					# For Easy Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = just
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = even_duel
 					}
 				}
-				10 = { # This was beneath me...
+				33 = { # This was beneath me...
 					set_character_flag = poor_choice_duel
 
 					# These traits just hate losing
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = envious
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = wroth
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = proud
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = ambitious
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cruel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 					}
 
 					# For Easy Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = greedy
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = slothful
 						has_character_flag = easy_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = craven
 						has_character_flag = easy_duel
 					}
 
 					# For Even Duels
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = even_duel
 					}
 
 					# For Hard Duels
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = just
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 						has_character_flag = hard_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = paranoid
 						has_character_flag = hard_duel
 					}
 				}
-				10 = { # I could have died!
+				33 = { # I could have died!
 					set_character_flag = feared_for_life_duel
 
-					modifier = {
-						factor = 0
-						has_character_flag = easy_duel
+					trigger = {
+						NOT = { has_character_flag = easy_duel }
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 0.25
 						has_character_flag = even_duel
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = stubborn
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = arbitrary
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = honest
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = proud
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = cynical
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = wounded
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						trait = severely_injured
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = paranoid
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 5
 						trait = craven
 					}
@@ -1672,6 +1606,7 @@ character_event = { # Lost, but both wounded
 	option = {
 		name = EVTOPTA_HF_501
 		show_portrait = event_target:combatant_2
+
 		event_target:combatant_1 = {
 			show_scope_change = no
 
@@ -1683,67 +1618,38 @@ character_event = { # Lost, but both wounded
 			}
 
 			if = {
-				limit = {
-					has_character_flag = appreciated_duel
-				}
+				limit = { has_character_flag = appreciated_duel }
+
 				opinion = {
-					modifier = opinion_great_leader
+					name = opinion_great_leader
 					who = ROOT
 					years = 5
 				}
+
 				if = {
 					limit = {
-						NOT = {
-							is_friend = ROOT
-						}
+						NOT = { is_friend = ROOT }
 					}
 					random = {
 						chance = 5
 						add_friend = ROOT
 					}
 				}
+
 				ROOT = {
 					show_scope_change = no
 					add_society_currency_tiny_effect = yes
 				}
 			}
 			else_if = {
-				limit = {
-					OR = {
-						has_character_flag = beneath_me_duel
-						has_character_flag = poor_choice_duel
-					}
-				}
+				limit = { has_character_flag = feared_for_life_duel }
+
 				opinion = {
-					modifier = opinion_disrespects_me
+					name = opinion_tried_to_get_me_killed
 					who = ROOT
 					years = 5
 				}
-				if = {
-					limit = {
-						NOT = {
-							is_rival = ROOT
-						}
-					}
-					random = {
-						chance = 5
-						add_rival = ROOT
-					}
-				}
-				ROOT = {
-					show_scope_change = no
-					detract_society_currency_trivial_effect = yes
-				}
-			}
-			else_if = {
-				limit = {
-					has_character_flag = feared_for_life_duel
-				}
-				opinion = {
-					modifier = opinion_tried_to_get_me_killed
-					who = ROOT
-					years = 5
-				}
+
 				if = {
 					limit = {
 						NOT = {
@@ -1755,18 +1661,35 @@ character_event = { # Lost, but both wounded
 						add_rival = ROOT
 					}
 				}
+
 				ROOT = {
 					show_scope_change = no
 					detract_society_currency_trivial_effect = yes
 				}
 			}
-		}
-	}
+			else = {
+				opinion = {
+					name = opinion_disrespects_me
+					who = ROOT
+					years = 5
+				}
 
-	after = {
-		clr_character_flag = notify_mild_injury
-		clr_character_flag = notify_severely_injured
-		event_target:combatant_1 = {
+				if = {
+					limit = {
+						NOT = { is_rival = ROOT }
+					}
+					random = {
+						chance = 5
+						add_rival = ROOT
+					}
+				}
+
+				ROOT = {
+					show_scope_change = no
+					detract_society_currency_trivial_effect = yes
+				}
+			}
+
 			clr_character_flag = easy_duel
 			clr_character_flag = even_duel
 			clr_character_flag = hard_duel
@@ -1775,21 +1698,99 @@ character_event = { # Lost, but both wounded
 			clr_character_flag = feared_for_life_duel
 			clr_character_flag = poor_choice_duel
 		}
+
+		clr_character_flag = notify_mild_injury
+		clr_character_flag = notify_severely_injured
 	}
 }
 
-character_event = { # Warrior Lodge members with high PCS might go out and duel random people to the death, symbolizes the mission
+
+### Warrior Lodge members with high PCS might go out and duel random people to the death, symbolizes the mission
+character_event = {
 	id = HF.550
+
 	hide_window = yes
-	is_triggered_only = yes
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
 
 	ai = yes
-	is_in_society = yes
+	min_age = 16
+	only_capable = yes
+	prisoner = no
+	in_command = no
+
+	trigger = {
+		NOR = {
+			has_character_flag = call_to_legend_active
+			has_character_modifier = recent_duel_timer
+			trait = shy
+		}
+
+		trigger_if = {
+			limit = { society_rank == 3 }
+			combat_rating >= 15
+		}
+		trigger_else = {
+			society_rank == 4
+			combat_rating >= 25
+		}
+
+		is_member_of_any_warrior_lodge_trigger = yes
+		is_inaccessible_trigger = no
+		has_injury_trigger = no
+		has_disease_trigger = no
+		has_symptom_trigger = no
+
+		top_liege = {
+			OR = {
+				any_neighbor_independent_ruler = {
+					any_realm_character = {
+						is_inaccessible_or_incapable_trigger = no
+						ai = yes
+						is_adult = yes
+						liege = { ai = yes }
+
+						NOR = {
+							has_character_modifier = bedridden_illness
+							has_character_modifier = severe_illness
+							is_married = ROOT
+							is_consort = ROOT
+							same_society_as = ROOT
+							religion = ROOT
+							higher_tier_than = DUKE
+							spouse = { higher_real_tier_than = DUKE }
+							father = { higher_real_tier_than = DUKE }
+							mother = { higher_real_tier_than = DUKE }
+						}
+					}
+				}
+
+				any_realm_character = {
+					is_inaccessible_or_incapable_trigger = no
+					ai = yes
+					is_adult = yes
+					liege = { ai = yes }
+
+					NOR = {
+						has_character_modifier = bedridden_illness
+						has_character_modifier = severe_illness
+						is_married = ROOT
+						is_consort = ROOT
+						same_society_as = ROOT
+						religion = ROOT
+						higher_tier_than = DUKE
+						spouse = { higher_real_tier_than = DUKE }
+						father = { higher_real_tier_than = DUKE }
+						mother = { higher_real_tier_than = DUKE }
+					}
+				}
+			}
+		}
+	}
 
 	weight_multiplier = {
 		days = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 25
 			NOT = {
 				any_kill_list_character = {
@@ -1797,162 +1798,133 @@ character_event = { # Warrior Lodge members with high PCS might go out and duel 
 				}
 			}
 		}
-		modifier = {
-			factor = 3
+		mult_modifier = {
+			factor = 1.5
 			society_rank == 4
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
-			society_rank == 3
+			combat_rating >= 50
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
-			combat_rating = 50
+			combat_rating >= 70
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
-			combat_rating = 70
+			combat_rating >= 90
 		}
-		modifier = {
-			factor = 2
-			combat_rating = 90
-		}
-		modifier = {
+		mult_modifier = {
 			factor = 3
 			trait = ambitious
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 3
 			trait = brave
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = gregarious
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = zealous
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = wroth
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = diligent
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = proud
 		}
-		modifier = {
-			factor = 0
-			trait = shy
-		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = content
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = patient
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = temperate
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = slothful
 		}
 	}
 
-	trigger = {
-		NOT = { has_character_flag = call_to_legend_active }
-		OR = {
-			combat_rating = 25
-			society_rank == 4
-			AND = {
-				society_rank == 3
-				combat_rating = 15
-			}
-		}
-		is_inaccessible_or_incapable_trigger = no
-		ai = yes
-		is_adult = yes
-		in_command = no
-		NOR = {
-			has_injury_trigger = yes
-			has_disease_trigger = yes
-			has_symptom_trigger = yes
-			has_character_modifier = recent_duel_timer
-		}
+	immediate = {
+		save_event_target_as = combatant_1
+
 		top_liege = {
-			any_neighbor_independent_ruler = {
-				any_realm_character = {
+			any_realm_character = {
+				limit = {
 					is_inaccessible_or_incapable_trigger = no
 					ai = yes
 					is_adult = yes
 					liege = { ai = yes }
+					same_sex = ROOT
+
 					NOR = {
 						has_character_modifier = bedridden_illness
 						has_character_modifier = severe_illness
-						any_spouse = { character = ROOT }
+						is_married = ROOT
+						is_consort = ROOT
 						same_society_as = ROOT
 						religion = ROOT
 						higher_tier_than = DUKE
-						spouse = { higher_tier_than = DUKE }
-						father = { higher_tier_than = DUKE }
-						mother = { higher_tier_than = DUKE }
+						spouse = { higher_real_tier_than = DUKE }
+						father = { higher_real_tier_than = DUKE }
+						mother = { higher_real_tier_than = DUKE }
 					}
 				}
+				score_value = {
+					value = 10
+					bad_soldier_outcome_score = yes
+				}
+				save_event_target_as = combatant_2
+
+				apply_degree_of_dishonorable_duel_effect = yes # checks a bunch of age and health statuses...
+				character_event = { id = HFP.10095 }
 			}
-			any_realm_character = {
-				is_inaccessible_or_incapable_trigger = no
-				ai = yes
-				is_adult = yes
-				liege = { ai = yes }
-				NOR = {
-					has_character_modifier = bedridden_illness
-					has_character_modifier = severe_illness
-					any_spouse = { character = ROOT }
-					same_society_as = ROOT
-					religion = ROOT
-					higher_tier_than = DUKE
-					spouse = { higher_tier_than = DUKE }
-					father = { higher_tier_than = DUKE }
-					mother = { higher_tier_than = DUKE }
+
+			if = {
+				limit = {
+					NOT = { event_target:combatant_2 = { always = yes } }
 				}
 			}
-		}
-	}
 
-	immediate = {
-		save_event_target_as = combatant_1
-		if = {
-			limit = {
-				top_liege = {
+			random_neighbor_independent_ruler = {
+				limit = {
 					any_realm_character = {
 						is_inaccessible_or_incapable_trigger = no
 						ai = yes
 						is_adult = yes
 						liege = { ai = yes }
 						same_sex = ROOT
+
 						NOR = {
 							has_character_modifier = bedridden_illness
 							has_character_modifier = severe_illness
-							any_spouse = { character = ROOT }
+							is_married = ROOT
+							is_consort = ROOT
 							same_society_as = ROOT
 							religion = ROOT
 							higher_tier_than = DUKE
-							spouse = { higher_tier_than = DUKE }
-							father = { higher_tier_than = DUKE }
-							mother = { higher_tier_than = DUKE }
+							spouse = { higher_real_tier_than = DUKE }
+							father = { higher_real_tier_than = DUKE }
+							mother = { higher_real_tier_than = DUKE }
 						}
 					}
 				}
-			}
-			top_liege = {
+
 				any_realm_character = {
 					limit = {
 						is_inaccessible_or_incapable_trigger = no
@@ -1960,16 +1932,18 @@ character_event = { # Warrior Lodge members with high PCS might go out and duel 
 						is_adult = yes
 						liege = { ai = yes }
 						same_sex = ROOT
+
 						NOR = {
 							has_character_modifier = bedridden_illness
 							has_character_modifier = severe_illness
-							any_spouse = { character = ROOT }
+							is_married = ROOT
+							is_consort = ROOT
 							same_society_as = ROOT
 							religion = ROOT
 							higher_tier_than = DUKE
-							spouse = { higher_tier_than = DUKE }
-							father = { higher_tier_than = DUKE }
-							mother = { higher_tier_than = DUKE }
+							spouse = { higher_real_tier_than = DUKE }
+							father = { higher_real_tier_than = DUKE }
+							mother = { higher_real_tier_than = DUKE }
 						}
 					}
 					score_value = {
@@ -1977,105 +1951,28 @@ character_event = { # Warrior Lodge members with high PCS might go out and duel 
 						bad_soldier_outcome_score = yes
 					}
 					save_event_target_as = combatant_2
+
+					apply_degree_of_dishonorable_duel_effect = yes # checks a bunch of age and health statuses...
+					character_event = { id = HFP.10095 }
 				}
-			}
-			event_target:combatant_2 = {
-				apply_degree_of_dishonorable_duel_effect = yes #checks a bunch of age and health statuses...
-				character_event = { id = HFP.10095 }
-			}
-		}
-		else_if = {
-			limit = {
-				top_liege = {
-					any_neighbor_independent_ruler = {
-						any_realm_character = {
-							is_inaccessible_or_incapable_trigger = no
-							ai = yes
-							is_adult = yes
-							liege = { ai = yes }
-							same_sex = ROOT
-							NOR = {
-								has_character_modifier = bedridden_illness
-								has_character_modifier = severe_illness
-								any_spouse = { character = ROOT }
-								same_society_as = ROOT
-								religion = ROOT
-								higher_tier_than = DUKE
-								spouse = { higher_tier_than = DUKE }
-								father = { higher_tier_than = DUKE }
-								mother = { higher_tier_than = DUKE }
-							}
-						}
-					}
-				}
-			}
-			top_liege = {
-				random_neighbor_independent_ruler = {
-					limit = {
-						any_realm_character = {
-							is_inaccessible_or_incapable_trigger = no
-							ai = yes
-							is_adult = yes
-							liege = { ai = yes }
-							same_sex = ROOT
-							NOR = {
-								has_character_modifier = bedridden_illness
-								has_character_modifier = severe_illness
-								any_spouse = { character = ROOT }
-								same_society_as = ROOT
-								religion = ROOT
-								higher_tier_than = DUKE
-								spouse = { higher_tier_than = DUKE }
-								father = { higher_tier_than = DUKE }
-								mother = { higher_tier_than = DUKE }
-							}
-						}
-					}
-					any_realm_character = {
-						limit = {
-							is_inaccessible_or_incapable_trigger = no
-							ai = yes
-							is_adult = yes
-							liege = { ai = yes }
-							same_sex = ROOT
-							NOR = {
-								has_character_modifier = bedridden_illness
-								has_character_modifier = severe_illness
-								any_spouse = { character = ROOT }
-								same_society_as = ROOT
-								religion = ROOT
-								higher_tier_than = DUKE
-								spouse = { higher_tier_than = DUKE }
-								father = { higher_tier_than = DUKE }
-								mother = { higher_tier_than = DUKE }
-							}
-						}
-						score_value = {
-							value = 10
-							bad_soldier_outcome_score = yes
-						}
-						save_event_target_as = combatant_2
-					}
-				}
-			}
-			event_target:combatant_2 = {
-				apply_degree_of_dishonorable_duel_effect = yes #checks a bunch of age and health statuses...
-				character_event = { id = HFP.10095 }
 			}
 		}
 	}
 }
 
-character_event = { # Notify when a lodge member is killed in a duel
-	id = HF.560
-	hide_window = yes
 
-	is_triggered_only = yes
+### Notify players when a lodge member is killed in a duel
+character_event = {
+	id = HF.560
+
+	hide_window = yes
+	is_triggered_only = yes # on_death
 
 	is_in_society = yes
 
 	trigger = {
 		is_member_of_any_warrior_lodge_trigger = yes
+
 		OR = {
 			death_reason = death_duel
 			death_reason = death_battle_duel
@@ -2083,25 +1980,22 @@ character_event = { # Notify when a lodge member is killed in a duel
 		}
 	}
 
-	immediate = {
-		hidden_tooltip = { # Inform players that fellow society member has been killed in a duel
-			save_event_target_as = lodge_member_killed
-			killer = {
-				save_event_target_as = lodge_member_killer
+	immediate = { # Inform players that fellow society member has been killed in a duel
+		save_event_target_as = lodge_member_killed
+		killer = {
+			save_event_target_as = lodge_member_killer
+		}
+		any_player = {
+			limit = {
+				same_society_as = ROOT
+				NOT = { character = ROOT }
 			}
-			any_player = {
-				limit = {
-					same_society_as = ROOT
-					NOT = {
-						character = ROOT
-					}
-				}
-				character_event = { id = HF.561 }
-			}
+			character_event = { id = HF.561 }
 		}
 	}
 }
 
+# Actual ntofication
 character_event = {
 	id = HF.561
 	desc = HF_561_DESC
@@ -2109,9 +2003,6 @@ character_event = {
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
-
-	is_in_society = yes
-
 	notification = yes
 
 	option = {
@@ -2122,213 +2013,14 @@ character_event = {
 
 ##### Teaching Moment #####
 
-# Hidden setup event, selecting target, etc...
-character_event = {
-	id = HF.14000
-	is_triggered_only = yes
-	hide_window = yes
-
-	trigger = {
-		has_dlc = "Holy Fury"
-		is_inaccessible_or_incapable_trigger = no
-		is_member_of_any_warrior_lodge_trigger = yes
-		NOT = { has_character_flag = do_not_disturb }
-		war = no
-		is_adult = yes
-
-		NOT = { has_character_modifier = teaching_moment_cooldown }
-
-		OR = {
-			AND = {
-				trait = brave
-				any_society_member = {
-					is_available_fellow_society_member_trigger = yes
-					NOT = { trait = brave }
-					NOT = { has_character_modifier = teaching_moment_cooldown }
-				}
-			}
-			AND = {
-				trait = ambitious
-				any_society_member = {
-					is_available_fellow_society_member_trigger = yes
-					NOT = { trait = ambitious }
-					NOT = { has_character_modifier = teaching_moment_cooldown }
-				}
-			}
-			AND = {
-				trait = patient
-				any_society_member = {
-					is_available_fellow_society_member_trigger = yes
-					NOT = { trait = patient }
-					NOT = { has_character_modifier = teaching_moment_cooldown }
-				}
-			}
-			AND = {
-				trait = diligent
-				any_society_member = {
-					is_available_fellow_society_member_trigger = yes
-					NOT = { trait = diligent }
-					NOT = { has_character_modifier = teaching_moment_cooldown }
-				}
-			}
-		}
-	}
-	immediate = {
-		save_event_target_as = teacher
-
-		add_character_modifier = { name = teaching_moment_cooldown duration = 1825 hidden = yes } #to prevent spam
-
-		random_list = { # Select a society member to teach a thing or two...
-			10 = {
-				trigger = {
-					trait = brave
-					any_society_member = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = brave }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-				}
-				modifier = { #more likely if someone is actually Craven
-					factor = 2
-					any_society_member = {
-						is_available_fellow_society_member_trigger = yes
-						trait = craven
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-				}
-				random_society_member = {
-					limit = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = brave }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-					preferred_limit = {
-						NOT = { society_rank == 4 }
-					}
-					preferred_limit = {
-						war = no
-					}
-					set_character_flag = learning_bravery@event_target:teacher
-					save_event_target_as = student
-				}
-				set_character_flag = teaching_bravery@event_target:student
-			}
-			10 = {
-				trigger = {
-					trait = ambitious
-					any_society_member = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = ambitious }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-				}
-				modifier = { #more likely if someone is actually Content
-					factor = 2
-					any_society_member = {
-						is_available_fellow_society_member_trigger = yes
-						trait = content
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-				}
-				random_society_member = {
-					limit = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = ambitious }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-					preferred_limit = {
-						NOT = { society_rank == 4 }
-					}
-					preferred_limit = {
-						war = no
-					}
-					set_character_flag = learning_ambition@event_target:teacher
-					save_event_target_as = student
-				}
-				set_character_flag = teaching_ambition@event_target:student
-			}
-			10 = {
-				trigger = {
-					trait = patient
-					any_society_member = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = patient }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-				}
-				random_society_member = {
-					limit = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = patient }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-					preferred_limit = {
-						NOT = { society_rank == 4 }
-					}
-					preferred_limit = {
-						war = no
-					}
-					set_character_flag = learning_patience@event_target:teacher
-					save_event_target_as = student
-				}
-				set_character_flag = teaching_patience@event_target:student
-			}
-			10 = {
-				trigger = {
-					trait = diligent
-					any_society_member = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = diligent }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-				}
-				modifier = { #more likely if someone is actually Slotful
-					factor = 2
-					any_society_member = {
-						is_available_fellow_society_member_trigger = yes
-						trait = slothful
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-				}
-				random_society_member = {
-					limit = {
-						is_available_fellow_society_member_trigger = yes
-						NOT = { trait = diligent }
-						NOT = { has_character_modifier = teaching_moment_cooldown }
-					}
-					preferred_limit = {
-						NOT = { society_rank == 4 }
-					}
-					preferred_limit = {
-						war = no
-					}
-					set_character_flag = learning_diligence@event_target:teacher
-					save_event_target_as = student
-				}
-				set_character_flag = teaching_diligence@event_target:student
-			}
-		}
-		event_target:student = {
-			add_character_modifier = { name = teaching_moment_cooldown duration = 1825 hidden = yes } #to prevent spam
-		}
-		character_event = { id = HF.14001 }
-	}
-}
-
 # Event for "Teacher"
 character_event = {
 	id = HF.14001
 	title = teaching_moment_lack_of_focus_title
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
-	is_triggered_only = yes
-	sound = fighting_instructions_01
-	trigger = {
-		is_alive = yes
-		event_target:student = { is_alive = yes }
-	}
-
 	portrait = event_target:student
+	sound = fighting_instructions_01
 
 	desc = {
 		text = EVTDESC_HF_14001_bravery
@@ -2345,6 +2037,299 @@ character_event = {
 	desc = {
 		text = EVTDESC_HF_14001_diligence
 		trigger = { has_character_flag = teaching_diligence@event_target:student }
+	}
+
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
+
+	has_dlc = "Holy Fury"
+	min_age = 16
+	war = no
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		is_member_of_any_warrior_lodge_trigger = yes
+		is_inaccessible_trigger = no
+		NOT = { has_character_modifier = teaching_moment_cooldown }
+
+		OR = {
+			AND = {
+				trait = brave
+
+				society = {
+					any_society_member = {
+						is_inaccessible_or_incapable_trigger = no
+						in_command = no
+
+						NOR = {
+							trait = brave
+							has_character_modifier = teaching_moment_cooldown
+						}
+					}
+				}
+			}
+			AND = {
+				trait = ambitious
+
+				society = {
+					any_society_member = {
+						is_inaccessible_or_incapable_trigger = no
+						in_command = no
+
+						NOR = {
+							trait = ambitious
+							has_character_modifier = teaching_moment_cooldown
+						}
+					}
+				}
+			}
+			AND = {
+				trait = patient
+
+				society = {
+					any_society_member = {
+						is_inaccessible_or_incapable_trigger = no
+						in_command = no
+
+						NOR = {
+							trait = patient
+							has_character_modifier = teaching_moment_cooldown
+						}
+					}
+				}
+			}
+			AND = {
+				trait = diligent
+
+				society = {
+					any_society_member = {
+						is_inaccessible_or_incapable_trigger = no
+						in_command = no
+
+						NOR = {
+							trait = diligent
+							has_character_modifier = teaching_moment_cooldown
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		save_event_target_as = teacher
+
+		add_character_modifier = { # to prevent spam
+			name = teaching_moment_cooldown
+			years = 5
+			hidden = yes
+		}
+
+		society = {
+			random_list = { # Select a society member to teach a thing or two...
+				25 = {
+					trigger = {
+						ROOT = { trait = brave }
+
+						any_society_member = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = brave
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+					}
+
+					mult_modifier = { # more likely if someone is actually Craven
+						factor = 2
+						any_society_member = {
+							trait = craven
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+							NOT = { has_character_modifier = teaching_moment_cooldown }
+						}
+					}
+
+					random_society_member = {
+						limit = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = brave
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+						preferred_limit = {
+							society_rank < 4
+							war = no
+						}
+						preferred_limit = {
+							society_rank < 4
+						}
+						preferred_limit = {
+							war = no
+						}
+						set_character_flag = learning_bravery@event_target:teacher
+						save_event_target_as = student
+					}
+
+					ROOT = { set_character_flag = teaching_bravery@event_target:student }
+				}
+				25 = {
+					trigger = {
+						ROOT = { trait = ambitious }
+
+						any_society_member = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = ambitious
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+					}
+
+					mult_modifier = { # more likely if someone is actually Content
+						factor = 2
+						any_society_member = {
+							trait = content
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+							NOT = { has_character_modifier = teaching_moment_cooldown }
+						}
+					}
+
+					random_society_member = {
+						limit = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = ambitious
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+						preferred_limit = {
+							society_rank < 4
+							war = no
+						}
+						preferred_limit = {
+							society_rank < 4
+						}
+						preferred_limit = {
+							war = no
+						}
+						set_character_flag = learning_ambition@event_target:teacher
+						save_event_target_as = student
+					}
+
+					ROOT = { set_character_flag = teaching_ambition@event_target:student }
+				}
+				25 = {
+					trigger = {
+						ROOT = { trait = patient }
+
+						any_society_member = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = patient
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+					}
+
+					random_society_member = {
+						limit = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = patient
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+						preferred_limit = {
+							society_rank < 4
+							war = no
+						}
+						preferred_limit = {
+							society_rank < 4
+						}
+						preferred_limit = {
+							war = no
+						}
+						set_character_flag = learning_patience@event_target:teacher
+						save_event_target_as = student
+					}
+
+					ROOT = { set_character_flag = teaching_patience@event_target:student }
+				}
+				25 = {
+					trigger = {
+						ROOT = { trait = diligent }
+
+						any_society_member = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = diligent
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+					}
+
+					mult_modifier = { # more likely if someone is actually Slotful
+						factor = 2
+						any_society_member = {
+							trait = slothful
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+							NOT = { has_character_modifier = teaching_moment_cooldown }
+						}
+					}
+
+					random_society_member = {
+						limit = {
+							is_inaccessible_or_incapable_trigger = no
+							in_command = no
+
+							NOR = {
+								trait = diligent
+								has_character_modifier = teaching_moment_cooldown
+							}
+						}
+						preferred_limit = {
+							society_rank < 4
+							war = no
+						}
+						preferred_limit = {
+							society_rank < 4
+						}
+						preferred_limit = {
+							war = no
+						}
+						set_character_flag = learning_diligence@event_target:teacher
+						save_event_target_as = student
+					}
+
+					ROOT = { set_character_flag = teaching_diligence@event_target:student }
+				}
+			}
+		}
+		event_target:student = {
+			add_character_modifier = { # to prevent spam
+				name = teaching_moment_cooldown
+				years = 5
+				hidden = yes
+			}
+		}
 	}
 
 	option = { # Yes, let's offer them some guidance...
@@ -2369,17 +2354,17 @@ character_event = {
 		add_society_currency_tiny_effect = yes
 		event_target:student = { character_event = { id = HF.14002 days = 1 } } # Offer guidance...
 	}
+
 	option = { # Nah/Opt out
 		name = EVTOPTB_HF_14001
 		custom_tooltip = { text = EVTOPTB_HF_14001_TT }
+
 		clr_character_flag = teaching_bravery@event_target:student
 		clr_character_flag = teaching_ambition@event_target:student
 		clr_character_flag = teaching_patience@event_target:student
 		clr_character_flag = teaching_diligence@event_target:student
 
-		ai_chance = {
-			factor = 0
-		}
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -2389,16 +2374,7 @@ character_event = {
 	title = teaching_moment_lack_of_focus_title
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
-	is_triggered_only = yes
 	sound = fighting_instructions_02
-	trigger = {
-		is_alive = yes
-		event_target:teacher = { is_alive = yes }
-	}
-
-	immediate = {
-
-	}
 
 	desc = {
 		text = EVTDESC_HF_14002_bravery
@@ -2417,48 +2393,60 @@ character_event = {
 		trigger = { has_character_flag = learning_diligence@event_target:teacher }
 	}
 
+	is_triggered_only = yes
+
+	trigger = {
+		event_target:teacher = { is_alive = yes }
+	}
+
 	option = { # Yes, I need help
 		name = EVTOPTA_HF_14002
 		custom_tooltip = { text = EVTOPTA_HF_14002_TT }
 
 		trigger_switch = {
 			on_trigger = has_character_flag
-			learning_bravery@event_target:teacher = { show_trait = brave custom_tooltip = { text = could_lead_to_brave_tt } }
-			learning_ambition@event_target:teacher = { show_trait = ambitious custom_tooltip = { text = could_lead_to_ambitious_tt } }
-			learning_patience@event_target:teacher = { show_trait = patient custom_tooltip = { text = could_lead_to_patient_tt } }
-			learning_diligence@event_target:teacher = { show_trait = diligent custom_tooltip = { text = could_lead_to_diligent_tt } }
+
+			learning_bravery@event_target:teacher =   { show_trait = brave     custom_tooltip = { text = could_lead_to_brave_tt } }
+			learning_ambition@event_target:teacher =  { show_trait = ambitious custom_tooltip = { text = could_lead_to_ambitious_tt } }
+			learning_patience@event_target:teacher =  { show_trait = patient   custom_tooltip = { text = could_lead_to_patient_tt } }
+			learning_diligence@event_target:teacher = { show_trait = diligent  custom_tooltip = { text = could_lead_to_diligent_tt } }
 		}
 
 		event_target:teacher = { character_event = { id = HF.14003 days = 3 } } # Offer accepted...
 
 		ai_chance = {
 			factor = 10
-			modifier = {
-				factor = 0
-				is_rival = FROM
+
+			trigger = {
+				NOT = { is_rival = FROM }
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				has_pleasant_personality_trigger = yes
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				is_friend = FROM
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				FROM = { ROOT_possibly_romantically_interested_trigger = yes }
 			}
 		}
 	}
+
 	option = { # No, what a rude suggestion!
 		name = EVTOPTB_HF_14002
 		custom_tooltip = { text = EVTOPTB_HF_14002_TT }
+
 		prestige = 10
+
 		event_target:teacher = {
 			set_character_flag = they_insulted_me
-			character_event = { id = HF.14004 days = 5 } #Offer rejected! How insulting!
+			character_event = { id = HF.14004 days = 5 } # Offer rejected! How insulting!
 		}
+
 		clr_character_flag = learning_bravery@event_target:teacher
 		clr_character_flag = learning_ambition@event_target:teacher
 		clr_character_flag = learning_patience@event_target:teacher
@@ -2466,19 +2454,20 @@ character_event = {
 
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			trigger = {
+				NOT = { is_friend = FROM }
+			}
+
+			mult_modifier = {
 				factor = 100
 				is_rival = FROM
 			}
-			modifier = {
-				factor = 0
-				is_friend = FROM
-			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				is_evil_trigger = yes
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				has_unpleasant_personality_trigger = yes
 			}
@@ -2488,7 +2477,9 @@ character_event = {
 	option = { # Leave me alone!
 		name = EVTOPTC_HF_14002
 		custom_tooltip = { text = EVTOPTC_HF_14002_TT }
+
 		event_target:teacher = { character_event = { id = HF.14004 days = 3 } } # Offer rejected!
+
 		clr_character_flag = learning_bravery@event_target:teacher
 		clr_character_flag = learning_ambition@event_target:teacher
 		clr_character_flag = learning_patience@event_target:teacher
@@ -2496,22 +2487,22 @@ character_event = {
 
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				trait = depressed
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				trait = stressed
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				is_pregnant = yes
 			}
 		}
 	}
 }
-
 
 # Event for "Teacher" - They accepted my help!
 character_event = {
@@ -2520,89 +2511,125 @@ character_event = {
 	desc = EVTDESC_HF_14003
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
+
 	is_triggered_only = yes
+
 	trigger = {
-		is_alive = yes
 		event_target:student = { is_alive = yes }
 	}
 
 	option = { # I'll bring my [thing]
 		name = EVTOPTA_HF_14003
 		custom_tooltip = { text = EVTOPTA_HF_14003_TT }
-		scaled_wealth = { value = -1 min = -15 }
 		prestige = 5
+
 		if = {
-			limit = { ai = no } #AIs don't have to pay
-			if = {
-				limit = { NOT = { trait = proud } }
-				random = {
-					chance = 25
-					add_trait = proud
-					hidden_effect = { character_event = { id = 38261 } } #Notify Proud
-				}
+			limit = { ai = no } # AIs don't have to pay
+			scaled_wealth = { value = -1 min = -15 }
+		}
+
+		if = {
+			limit = { NOT = { trait = proud } }
+
+			random = {
+				chance = 25
+
+				remove_trait_silently_humble_effect = yes
+				tooltip = { add_trait = proud }
+				hidden_effect = { add_trait_proud_effect = yes }
 			}
 		}
+
 		ai_chance = {
 			factor = 1
-			modifier = { #to not have AIs change traits all the time
+
+			mult_modifier = { # to not have AIs change traits all the time
 				factor = 10
 				trait = proud
 			}
 		}
 	}
+
 	option = { # Let's not get carried away
 		name = EVTOPTB_HF_14003
 		custom_tooltip = { text = EVTOPTB_HF_14003_TT }
+
 		if = {
 			limit = { NOT = { trait = humble } }
+
 			random = {
 				chance = 25
-				add_trait = humble
-				hidden_effect = { character_event = { id = 38260 } } #Notify Humble
+
+				remove_trait_silently_proud_effect = yes
+				tooltip = { add_trait = humble }
+				hidden_effect = { add_trait_humble_effect = yes }
 			}
 		}
+
 		ai_chance = {
 			factor = 1
-			modifier = { #to not have AIs change traits all the time
+
+			mult_modifier = { # to not have AIs change traits all the time
 				factor = 10
 				trait = humble
 			}
 		}
 	}
+
 	after = {
 		hidden_effect = {
 			random_list = {
-				10 = { #Great success
-					event_target:student = { character_event = { id = HF.14006 days = 10 random = 25 } } # Training result
-					modifier = {
+				10 = { # Great success
+					mult_modifier = {
 						factor = 10
-						is_benevolent_trigger = yes #Nice characters want to learn
+						is_benevolent_trigger = yes # Nice characters want to learn
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 10
-						has_pleasant_personality_trigger = yes #Friendly characters are easier to teach
+						has_pleasant_personality_trigger = yes # Friendly characters are easier to teach
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.5
-						has_pleasant_trait_trigger = yes #Unfriendly characters are hard to teach
+						has_pleasant_trait_trigger = yes # Unfriendly characters are hard to teach
+					}
+
+					event_target:student = {
+						character_event = {
+							id = HF.14006 # Training result
+							days = 10
+							random = 25
+						}
 					}
 				}
-				20 = { #Some success
-					event_target:student = { character_event = { id = HF.14007 days = 10 random = 25 } } # Training result!
+				20 = { # Some success
+					event_target:student = {
+						character_event = {
+							id = HF.14007 # Training result!
+							days = 10
+							random = 25
+						}
+					}
 				}
-				5 = { #Failure
-					event_target:student = { character_event = { id = HF.14008 days = 10 random = 25 } } # Training result!
-					modifier = {
+				5 = { # Failure
+					mult_modifier = {
 						factor = 10
-						is_evil_trigger = yes #Evil characters don't wanna learn
+						is_evil_trigger = yes # Evil characters don't wanna learn
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 10
-						has_unpleasant_personality_trigger = yes #Unfriendly characters are hard to teach
+						has_unpleasant_personality_trigger = yes # Unfriendly characters are hard to teach
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.5
-						has_unpleasant_trait_trigger = yes #Unfriendly characters are hard to teach
+						has_unpleasant_trait_trigger = yes # Unfriendly characters are hard to teach
+					}
+
+					event_target:student = {
+						character_event = {
+							id = HF.14008 # Training result!
+							days = 10
+							random = 25
+						}
 					}
 				}
 			}
@@ -2616,7 +2643,6 @@ character_event = {
 	title = teaching_moment_lack_of_focus_title
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
-	is_triggered_only = yes
 
 	desc = {
 		text = EVTDESC_HF_14004_A
@@ -2627,45 +2653,52 @@ character_event = {
 		trigger = { has_character_flag = they_insulted_me }
 	}
 
+	is_triggered_only = yes
+
 	option = { # That ungrateful little... (RIVALRY)
 		name = EVTOPTA_HF_14004
-		tooltip = { add_rival = FROM }
+		trigger = { has_character_flag = they_insulted_me }
+
 		clr_character_flag = they_insulted_me
+		tooltip = { add_rival = FROM }
 
 		event_target:student = { character_event = { id = HF.14005 days = 3 } } # Offense *taken*!
 
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				trait = wroth
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				has_unpleasant_personality_trigger = yes
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				event_target:student = { root_potentially_interested_in_rivaling_this_trigger = yes }
 			}
 		}
-
-		trigger = { has_character_flag = they_insulted_me }
 	}
+
 	option = { # I can't force progress (Let it go!)
 		name = EVTOPTB_HF_14004
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				trait = humble
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				trait = patient
 			}
 		}
 	}
+
 	after = {
 		clr_character_flag = they_insulted_me
 		clr_character_flag = teaching_bravery@event_target:student
@@ -2682,16 +2715,20 @@ character_event = {
 	desc = EVTDESC_HF_14005
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
+
 	is_triggered_only = yes
 
 
 	option = { # Some people sure are sensitive...
 		name = EVTOPTA_HF_14005
-		add_rival = FROM
+
+		add_rival = event_target:teacher
 	}
 }
 
-## ### Outcome events ### ##
+
+### Teching Outcome events ###
+
 # Great success (fires for Student)
 character_event = {
 	id = HF.14006
@@ -2699,11 +2736,6 @@ character_event = {
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
 	sound = fighting_instructions_01
-	is_triggered_only = yes
-
-	trigger = {
-		is_alive = yes
-	}
 
 	desc = {
 		text = EVTDESC_HF_14006_bravery
@@ -2722,13 +2754,17 @@ character_event = {
 		trigger = { has_character_flag = learning_diligence@event_target:teacher }
 	}
 
+	is_triggered_only = yes
 
-	option = { #It went fantastic! Adds trait immediately
+	option = { # It went fantastic! Adds trait immediately
 		name = EVTOPTA_HF_14006
+
 		prestige = 15
 		add_society_currency_trivial_effect = yes
+
 		trigger_switch = {
 			on_trigger = has_character_flag
+
 			learning_bravery@event_target:teacher = {
 				add_trait = brave
 				event_target:teacher = { set_character_flag = they_gained_brave }
@@ -2746,59 +2782,87 @@ character_event = {
 				event_target:teacher = { set_character_flag = they_gained_diligent }
 			}
 		}
-		tooltip = { add_friend = FROM } #*actually* added in the follow-up
+
+		if = {
+			limit = {
+				NOT = { is_friend = event_target:teacher }
+			}
+			tooltip = { add_friend = event_target:teacher } # *actually* added in the follow-up
+		}
+
 		ai_chance = {
 			factor = 10
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
-				event_target:teacher = { any_friend = { always = no } }
+				event_target:teacher = { num_of_friends < 1 }
 			}
 		}
 	}
 
 	option = { # Kiss them in gratitude
 		name = EVTOPTB_HF_14006
+
+		trigger = {
+			event_target:teacher = {
+				NOT = { is_lover = ROOT }
+				root_attraction_trigger = yes
+				attracted_to_root_trigger = yes
+
+				trigger_if = {
+					limit = { is_close_relative = ROOT }
+					religion_has_incest = yes
+					ROOT = { religion_has_incest = yes }
+				}
+			}
+			# for safety
+			is_adult = yes
+			NOT = { trait = celibate }
+		}
+
 		prestige = 15
 		add_society_currency_trivial_effect = yes
-		FROM = { set_character_flag = kiss_of_gratitude }
+		event_target:teacher = { set_character_flag = kiss_of_gratitude }
+
 		trigger_switch = {
 			on_trigger = has_character_flag
+
 			learning_bravery@event_target:teacher = {
+				remove_trait_silently_craven_effect = yes
 				add_trait = brave
 				event_target:teacher = { set_character_flag = they_gained_brave }
 			}
 			learning_ambition@event_target:teacher = {
+				remove_trait_silently_content_effect = yes
 				add_trait = ambitious
 				event_target:teacher = { set_character_flag = they_gained_ambitious }
 			}
 			learning_patience@event_target:teacher = {
+				remove_trait_silently_wroth_effect = yes
 				add_trait = patient
 				event_target:teacher = { set_character_flag = they_gained_patient }
 			}
 			learning_diligence@event_target:teacher = {
+				remove_trait_silently_slothful_effect = yes
 				add_trait = diligent
 				event_target:teacher = { set_character_flag = they_gained_diligent }
 			}
 		}
-		if = {
-			limit = { trait = chaste }
-			remove_trait = chaste
-		}
-		else_if = {
-			limit = { NOT = { trait = lustful } }
-			add_trait = lustful
-		}
+
+		add_trait_silently_lustful_effect = yes
+		remove_trait_silently_chaste_effect = yes
 
 		if = {
 			limit = {
 				event_target:teacher = {
 					OR = {
-						has_opinion_modifier = { who = ROOT modifier = opinion_budding_romance }
+						has_opinion_modifier = { who = ROOT name = opinion_budding_romance }
 						has_character_flag = carried_torch_for@ROOT
 						has_character_flag = carrying_torch_for@ROOT
 					}
 				}
 			}
+
 			custom_tooltip = { text = EVTOPTB_HF_14006_TT_romance }
 			tooltip = { add_lover = event_target:teacher }
 			event_target:teacher = { set_character_flag = become_lovers }
@@ -2806,106 +2870,92 @@ character_event = {
 		else_if = {
 			limit = {
 				event_target:teacher = {
-					root_attraction_trigger = yes
-					attracted_to_root_trigger = yes
-					opinion = { who = ROOT value = 15 }
-					NOT = { trait = chaste }
-					NOT = { trait = celibate }
+					opinion = { who = ROOT value >= 15 }
+
+					NOR = {
+						trait = chaste
+						trait = celibate
+					}
 				}
 			}
 			custom_tooltip = { text = EVTOPTB_HF_14006_TT_romance }
+
 			tooltip = {
 				opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
+					name = opinion_budding_romance
+					who = event_target:teacher
 					years = 10
 				}
 				reverse_opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
+					name = opinion_budding_romance
+					who = event_target:teacher
 					years = 10
 				}
 			}
 
 			event_target:teacher = { set_character_flag = both_gain_romance }
 		}
-		else_if = {
-			limit = {
-				event_target:teacher = {
-					root_attraction_trigger = yes
-				}
-			}
+		else = {
 			custom_tooltip = { text = EVTOPTB_HF_14006_TT_student_crushes }
+
 			tooltip = {
 				opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
+					name = opinion_budding_romance
+					who = event_target:teacher
 					years = 10
 				}
 			}
 			event_target:teacher = { set_character_flag = student_gains_crush }
 		}
-		else_if = {
-			limit = {
-				event_target:teacher = {
-					attracted_to_root_trigger = yes
-				}
-			}
-			custom_tooltip = { text = EVTOPTB_HF_14006_TT_teacher_crushes }
-			tooltip = {
-				reverse_opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
-					years = 10
-				}
-			}
-			event_target:teacher = { set_character_flag = teacher_gains_crush }
-		}
+		# else_if = { # CleanSlate: Will never fire
+		#	limit = {
+		#		event_target:teacher = {
+		#			attracted_to_root_trigger = yes
+		#		}
+		#	}
+		#	custom_tooltip = { text = EVTOPTB_HF_14006_TT_teacher_crushes }
+		#
+		#	tooltip = {
+		#		reverse_opinion = {
+		#			name = opinion_budding_romance
+		#			who = event_target:teacher
+		#			years = 10
+		#		}
+		#	}
+		#	event_target:teacher = { set_character_flag = teacher_gains_crush }
+		# }
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 100
 				event_target:teacher = { prev_is_lonely_this_romance_makes_sense_trigger = yes }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				event_target:teacher = { has_lover = no }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				trait = lustful
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = chaste
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = eunuch
 			}
 		}
-		trigger = {
-			event_target:teacher = {
-				NOT = { is_lover = ROOT }
-				OR = {
-					ROOT = { has_religion_feature = religion_holy_family }
-					ROOT = { religion = messalian }
-					ROOT = { religion = zoroastrian }
-					NOT = { is_close_relative = ROOT }
-				}
-				root_attraction_trigger = yes
-				attracted_to_root_trigger = yes
-			}
-			# for safety
-			NOT = { trait = celibate }
-			is_adult = yes
-			event_target:teacher = { is_adult = yes }
-		}
 	}
 
 	after = {
-		FROM = { set_character_flag = great_outcome }
-		FROM = { character_event = { id = HF.14009 } } # Notify teacher of ending...
+		event_target:teacher = {
+			set_character_flag = great_outcome
+			character_event = { id = HF.14009 } # Notify teacher of ending...
+		}
 	}
 }
 
@@ -2916,7 +2966,6 @@ character_event = {
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
 	sound = fighting_instructions_01
-	is_triggered_only = yes
 
 	desc = {
 		text = EVTDESC_HF_14007_bravery
@@ -2935,7 +2984,9 @@ character_event = {
 		trigger = { has_character_flag = learning_diligence@event_target:teacher }
 	}
 
-	option = { #Removes bad trait/adds good trait
+	is_triggered_only = yes
+
+	option = { # Removes bad trait/adds good trait
 		name = {
 			text = EVTOPTA_HF_14007_bravery
 			trigger = { has_character_flag = learning_bravery@event_target:teacher }
@@ -2957,18 +3008,20 @@ character_event = {
 
 		trigger_switch = {
 			on_trigger = has_character_flag
+
 			learning_bravery@event_target:teacher = {
 				if = {
 					limit = { trait = craven }
 
-					remove_trait_silently_craven_effect = yes
+					remove_trait = craven
 					event_target:teacher = { set_character_flag = they_lost_craven }
 				}
 				else_if = {
 					limit = {
 						NOT = { trait = brave }
 					}
-					add_trait_silently_brave_effect = yes
+
+					add_trait = brave
 					event_target:teacher = { set_character_flag = they_gained_brave }
 				}
 			}
@@ -2976,7 +3029,7 @@ character_event = {
 				if = {
 					limit = { trait = content }
 
-					remove_trait_silently_content_effect = yes
+					remove_trait = content
 					event_target:teacher = { set_character_flag = they_lost_content }
 				}
 				else_if = {
@@ -2984,12 +3037,13 @@ character_event = {
 						NOT = { trait = ambitious }
 					}
 
-					add_trait_silently_ambitious_effect = yes
+					add_trait = ambitious
 					event_target:teacher = { set_character_flag = they_gained_ambitious }
 				}
 			}
 			learning_patience@event_target:teacher = {
 				# Because Wroth isn't necessarily *bad*, compared to Patient, we skip the in-between state
+				remove_trait_silently_wroth_effect = yes
 				add_trait = patient
 				event_target:teacher = { set_character_flag = they_gained_patient }
 			}
@@ -2997,7 +3051,7 @@ character_event = {
 				if = {
 					limit = { trait = slothful }
 
-					remove_trait_silently_slothful_effect = yes
+					remove_trait = slothful
 					event_target:teacher = { set_character_flag = they_lost_slothful }
 				}
 				else_if = {
@@ -3005,41 +3059,45 @@ character_event = {
 						NOT = { trait = diligent }
 					}
 
-					add_trait_silently_diligent_effect = yes
+					add_trait = diligent
 					event_target:teacher = { set_character_flag = they_gained_diligent }
 				}
 			}
 		}
-	}
 
-	after = {
-		#Effects run here to avoid "break = yes" breaking more than it should, but still keeping the order nice and neat.
-		FROM = { set_character_flag = good_outcome }
+		event_target:teacher = { set_character_flag = good_outcome }
 
-		if = { #if you already have an opinion in place, become friends...
+		if = {
 			limit = {
-				OR = {
-					reverse_has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
-					has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+				NOT = { is_friend = event_target:teacher }
+			}
+
+			if = { # if you already have an opinion in place, become friends...
+				limit = {
+					OR = {
+						reverse_has_opinion_modifier = { who = event_target:teacher name = opinion_budding_friendship }
+						has_opinion_modifier = { who = event_target:teacher name = opinion_budding_friendship }
+					}
+				}
+				tooltip = { add_friend = event_target:teacher }
+			}
+			else = { # otherwise, add opinions... (*actually* added in follow-up)
+				tooltip = {
+					opinion = {
+						name = opinion_budding_friendship
+						who = event_target:teacher
+						years = 10
+					}
+					reverse_opinion = {
+						name = opinion_budding_friendship
+						who = event_target:teacher
+						years = 10
+					}
 				}
 			}
-			tooltip = { add_friend = FROM }
 		}
-		else = { #otherwise, add opinions... (*actually* added in follow-up)
-			tooltip = {
-				opinion = {
-					who = FROM
-					modifier = opinion_budding_friendship
-					years = 10
-				}
-				reverse_opinion = {
-					who = FROM
-					modifier = opinion_budding_friendship
-					years = 10
-				}
-			}
-		}
-		FROM = { character_event = { id = HF.14009 } } # Notify teacher of ending...
+
+		event_target:teacher = { character_event = { id = HF.14009 } } # Notify teacher of ending...
 	}
 }
 
@@ -3050,11 +3108,6 @@ character_event = {
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
 	sound = fighting_instructions_01
-	is_triggered_only = yes
-
-	trigger = {
-		is_alive = yes
-	}
 
 	desc = {
 		text = EVTDESC_HF_14008_bravery
@@ -3073,110 +3126,57 @@ character_event = {
 		trigger = { has_character_flag = learning_diligence@event_target:teacher }
 	}
 
+	is_triggered_only = yes
+
 	option = {
-		name = EVTOPTA_HF_14008 #I don't know why I don't learn
+		name = EVTOPTA_HF_14008 # I don't know why I don't learn
+
 		prestige = -15
-		trigger_switch = {
-			on_trigger = has_character_flag
-			learning_bravery@event_target:teacher = {
-				add_trait = vomiting
-				set_character_flag = disease_not_serious
-				hidden_effect = { character_event = { id = HFP.14005 days = 10 random = 30 } } #remove vomiting
-
-				if = {
-					limit = { trait = brave }
-
-					remove_trait_silently_brave_effect = yes
-					event_target:teacher = { set_character_flag = they_lost_brave }
-				}
-				else_if = {
-					limit = {
-						NOT = { trait = craven }
-					}
-					add_trait_silently_craven_effect = yes
-					event_target:teacher = { set_character_flag = they_gained_craven }
-				}
-			}
-			learning_ambition@event_target:teacher = {
-				if = {
-					limit = { trait = ambitious }
-
-					remove_trait_silently_ambitious_effect = yes
-					event_target:teacher = { set_character_flag = they_lost_ambitious }
-				}
-				else_if = {
-					limit = {
-						NOT = { trait = content }
-					}
-					add_trait_silently_content_effect = yes
-					event_target:teacher = { set_character_flag = they_gained_content }
-				}
-			}
-			learning_patience@event_target:teacher = {
-				if = {
-					limit = { NOT = { trait = wroth } }
-					add_trait = wroth
-					event_target:teacher = { set_character_flag = they_gained_wroth }
-				}
-				else_if = {
-					limit = { NOT = { trait = envious } }
-					add_trait = envious
-					event_target:teacher = { set_character_flag = they_gained_envious }
-				}
-				else_if = {
-					limit = { NOT = { trait = stubborn } }
-					add_trait = stubborn
-					event_target:teacher = { set_character_flag = they_gained_stubborn }
-				}
-			}
-			learning_diligence@event_target:teacher = {
-				if = {
-					limit = { trait = diligent }
-
-					remove_trait_silently_diligent_effect = yes
-					event_target:teacher = { set_character_flag = they_lost_diligent }
-				}
-				else_if = {
-					limit = {
-						NOT = { trait = slothful }
-					}
-
-					add_trait_silently_slothful_effect = yes
-					event_target:teacher = { set_character_flag = they_gained_slothful }
-				}
-			}
-		}
 	}
+
 	option = {
-		name = EVTOPTB_HF_14008 #It was *their* fault!
-		FROM = { set_character_flag = they_blame_me }
+		name = EVTOPTB_HF_14008 # It was *their* fault!
+
+		event_target:teacher = { set_character_flag = they_blame_me }
+
 		tooltip = {
 			opinion = {
-				who = FROM
-				modifier = opinion_lousy_teacher
+				name = opinion_lousy_teacher
+				who = event_target:teacher
 				years = 10
 			}
 			reverse_opinion = {
-				who = FROM
-				modifier = opinion_spoiled_ingrate
+				name = opinion_spoiled_ingrate
+				who = event_target:teacher
 				years = 10
 			}
 		}
+	}
+
+	after = {
 		trigger_switch = {
 			on_trigger = has_character_flag
+
 			learning_bravery@event_target:teacher = {
-				hidden_effect = { character_event = { id = HFP.14005 days = 10 random = 30 } } #remove vomiting
+				add_trait = vomiting
+				set_character_flag = disease_not_serious
+				character_event = {
+					id = HFP.14005 # remove vomiting
+					days = 10
+					random = 30
+				}
 
 				if = {
 					limit = { trait = brave }
 
-					remove_trait_silently_brave_effect = yes
+					remove_trait = brave
 					event_target:teacher = { set_character_flag = they_lost_brave }
 				}
 				else_if = {
 					limit = {
 						NOT = { trait = craven }
 					}
+
 					add_trait_silently_craven_effect = yes
 					event_target:teacher = { set_character_flag = they_gained_craven }
 				}
@@ -3185,30 +3185,42 @@ character_event = {
 				if = {
 					limit = { trait = ambitious }
 
-					remove_trait_silently_ambitious_effect = yes
+					remove_trait = ambitious
 					event_target:teacher = { set_character_flag = they_lost_ambitious }
 				}
 				else_if = {
 					limit = {
 						NOT = { trait = content }
 					}
-					add_trait_silently_content_effect = yes
+
+					add_trait = content
 					event_target:teacher = { set_character_flag = they_gained_content }
 				}
 			}
 			learning_patience@event_target:teacher = {
 				if = {
-					limit = { NOT = { trait = wroth } }
+					limit = {
+						NOT = { trait = wroth }
+					}
+
+					remove_trait_silently_patient_effect = yes
 					add_trait = wroth
 					event_target:teacher = { set_character_flag = they_gained_wroth }
 				}
 				else_if = {
-					limit = { NOT = { trait = envious } }
+					limit = {
+						NOT = { trait = envious }
+					}
+
+					remove_trait_silently_kind_effect = yes
 					add_trait = envious
 					event_target:teacher = { set_character_flag = they_gained_envious }
 				}
 				else_if = {
-					limit = { NOT = { trait = stubborn } }
+					limit = {
+						NOT = { trait = stubborn }
+					}
+
 					add_trait = stubborn
 					event_target:teacher = { set_character_flag = they_gained_stubborn }
 				}
@@ -3217,7 +3229,7 @@ character_event = {
 				if = {
 					limit = { trait = diligent }
 
-					remove_trait_silently_diligent_effect = yes
+					remove_trait = diligent
 					event_target:teacher = { set_character_flag = they_lost_diligent }
 				}
 				else_if = {
@@ -3225,16 +3237,16 @@ character_event = {
 						NOT = { trait = slothful }
 					}
 
-					add_trait_silently_slothful_effect = yes
+					add_trait = slothful
 					event_target:teacher = { set_character_flag = they_gained_slothful }
 				}
 			}
 		}
-	}
-	after = {
 
-		FROM = { set_character_flag = bad_outcome }
-		FROM = { character_event = { id = HF.14009 } } # Notify teacher of ending
+		event_target:teacher = {
+			set_character_flag = bad_outcome
+			character_event = { id = HF.14009 } # Notify teacher of ending
+		}
 
 		clr_character_flag = learning_bravery@event_target:teacher
 		clr_character_flag = learning_ambition@event_target:teacher
@@ -3243,7 +3255,6 @@ character_event = {
 	}
 }
 
-
 # Final outcome notification (fires for Teacher)
 character_event = {
 	id = HF.14009
@@ -3251,7 +3262,6 @@ character_event = {
 	picture = GFX_evt_teaching_moment
 	border = GFX_event_normal_frame_war
 	sound = fighting_instructions_02
-	is_triggered_only = yes
 
 	desc = {
 		text = EVTDESC_HF_14009_bravery
@@ -3270,191 +3280,151 @@ character_event = {
 		trigger = { has_character_flag = teaching_diligence@event_target:student }
 	}
 
-	option = {
-		name = EVTOPTA_HF_14009 #They did *so* well!
-		trigger_switch = {
-			on_trigger = has_character_flag
-			they_gained_brave = { event_target:student = { show_scope_change = no add_trait = brave } }
-			they_gained_ambitious = { event_target:student = { show_scope_change = no add_trait = ambitious } }
-			they_gained_patient = { event_target:student = { show_scope_change = no add_trait = patient } }
-			they_gained_diligent = { event_target:student = { show_scope_change = no add_trait = diligent } }
-			they_gained_craven = { event_target:student = { show_scope_change = no add_trait = craven } }
-			they_gained_content = { event_target:student = { show_scope_change = no add_trait = content } }
-			they_gained_wroth = { event_target:student = { show_scope_change = no add_trait = wroth } }
-			they_gained_slothful = { event_target:student = { show_scope_change = no add_trait = slothful } }
-			they_gained_envious = { event_target:student = { show_scope_change = no add_trait = envious } }
-			they_gained_stubborn = { event_target:student = { show_scope_change = no add_trait = stubborn } }
-			they_lost_brave = { event_target:student = { show_scope_change = no remove_trait = brave } }
-			they_lost_ambitious = { event_target:student = { show_scope_change = no remove_trait = ambitious } }
-			they_lost_patient = { event_target:student = { show_scope_change = no remove_trait = patient } }
-			they_lost_diligent = { event_target:student = { show_scope_change = no remove_trait = diligent } }
-			they_lost_craven = { event_target:student = { show_scope_change = no remove_trait = craven } }
-			they_lost_content = { event_target:student = { show_scope_change = no remove_trait = content } }
-			they_lost_slothful = { event_target:student = { show_scope_change = no remove_trait = slothful } }
-		}
+	is_triggered_only = yes
 
-		add_friend = FROM
+	option = {
+		name = EVTOPTA_HF_14009 # They did *so* well!
 
 		trigger = {
 			has_character_flag = great_outcome
 			NOT = { has_character_flag = kiss_of_gratitude }
 		}
+
+		if = {
+			limit = {
+				NOT = { is_friend = event_target:student }
+			}
+			add_friend = event_target:student
+		}
 	}
+
 	option = {
-		name = EVTOPTA_HF_14009_romance #They want to kiss me!
-		trigger_switch = {
-			on_trigger = has_character_flag
-			they_gained_brave = { event_target:student = { show_scope_change = no add_trait = brave } }
-			they_gained_ambitious = { event_target:student = { show_scope_change = no add_trait = ambitious } }
-			they_gained_patient = { event_target:student = { show_scope_change = no add_trait = patient } }
-			they_gained_diligent = { event_target:student = { show_scope_change = no add_trait = diligent } }
-			they_gained_craven = { event_target:student = { show_scope_change = no add_trait = craven } }
-			they_gained_content = { event_target:student = { show_scope_change = no add_trait = content } }
-			they_gained_wroth = { event_target:student = { show_scope_change = no add_trait = wroth } }
-			they_gained_slothful = { event_target:student = { show_scope_change = no add_trait = slothful } }
-			they_gained_envious = { event_target:student = { show_scope_change = no add_trait = envious } }
-			they_gained_stubborn = { event_target:student = { show_scope_change = no add_trait = stubborn } }
-			they_lost_brave = { event_target:student = { show_scope_change = no remove_trait = brave } }
-			they_lost_ambitious = { event_target:student = { show_scope_change = no remove_trait = ambitious } }
-			they_lost_patient = { event_target:student = { show_scope_change = no remove_trait = patient } }
-			they_lost_diligent = { event_target:student = { show_scope_change = no remove_trait = diligent } }
-			they_lost_craven = { event_target:student = { show_scope_change = no remove_trait = craven } }
-			they_lost_content = { event_target:student = { show_scope_change = no remove_trait = content } }
-			they_lost_slothful = { event_target:student = { show_scope_change = no remove_trait = slothful } }
-		}
-		trigger_switch = {
-			on_trigger = has_character_flag
-			become_lovers = {
-				add_lover = event_target:student
-			}
-			both_gain_romance = {
-				opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
-					years = 10
-				}
-				reverse_opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
-					years = 10
-				}
-			}
-			student_gains_crush = {
-				reverse_opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
-					years = 10
-				}
-			}
-			teacher_gains_crush = {
-				opinion = {
-					who = FROM
-					modifier = opinion_budding_romance
-					years = 10
-				}
-			}
-		}
+		name = EVTOPTA_HF_14009_romance # They want to kiss me!
 
 		trigger = {
 			has_character_flag = great_outcome
 			has_character_flag = kiss_of_gratitude
 		}
-	}
-	option = {
-		name = EVTOPTB_HF_14009 #They did fairly well!
 
 		trigger_switch = {
 			on_trigger = has_character_flag
-			they_gained_brave = { event_target:student = { show_scope_change = no add_trait = brave } }
-			they_gained_ambitious = { event_target:student = { show_scope_change = no add_trait = ambitious } }
-			they_gained_patient = { event_target:student = { show_scope_change = no add_trait = patient } }
-			they_gained_diligent = { event_target:student = { show_scope_change = no add_trait = diligent } }
-			they_gained_craven = { event_target:student = { show_scope_change = no add_trait = craven } }
-			they_gained_content = { event_target:student = { show_scope_change = no add_trait = content } }
-			they_gained_wroth = { event_target:student = { show_scope_change = no add_trait = wroth } }
-			they_gained_slothful = { event_target:student = { show_scope_change = no add_trait = slothful } }
-			they_gained_envious = { event_target:student = { show_scope_change = no add_trait = envious } }
-			they_gained_stubborn = { event_target:student = { show_scope_change = no add_trait = stubborn } }
-			they_lost_brave = { event_target:student = { show_scope_change = no remove_trait = brave } }
-			they_lost_ambitious = { event_target:student = { show_scope_change = no remove_trait = ambitious } }
-			they_lost_patient = { event_target:student = { show_scope_change = no remove_trait = patient } }
-			they_lost_diligent = { event_target:student = { show_scope_change = no remove_trait = diligent } }
-			they_lost_craven = { event_target:student = { show_scope_change = no remove_trait = craven } }
-			they_lost_content = { event_target:student = { show_scope_change = no remove_trait = content } }
-			they_lost_slothful = { event_target:student = { show_scope_change = no remove_trait = slothful } }
-		}
 
-		if = { #if you already have an opinion in place, become friends...
-			limit = {
-				OR = {
-					reverse_has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
-					has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+			become_lovers = {
+				add_lover = event_target:student
+			}
+			both_gain_romance = {
+				opinion = {
+					name = opinion_budding_romance
+					who = event_target:student
+					years = 10
+				}
+				reverse_opinion = {
+					name = opinion_budding_romance
+					who = event_target:student
+					years = 10
 				}
 			}
-			add_friend = FROM
-		}
-		else = { #otherwise, add opinions...
-			opinion = {
-				who = FROM
-				modifier = opinion_budding_friendship
-				years = 10
+			student_gains_crush = {
+				reverse_opinion = {
+					name = opinion_budding_romance
+					who = event_target:student
+					years = 10
+				}
 			}
-			reverse_opinion = {
-				who = FROM
-				modifier = opinion_budding_friendship
-				years = 10
-			}
+			# teacher_gains_crush = { # CleanSlate: Can never be set
+			#	opinion = {
+			#		name = opinion_budding_romance
+			#		who = event_target:student
+			#		years = 10
+			#	}
+			# }
 		}
-
-		trigger = { has_character_flag = good_outcome }
 	}
-	option = {  # They failed...
-		name = {
-			trigger = { has_character_flag = they_blame_me }
-			text = EVTOPTC_HF_14009_1
-		}
-		name = {
-			trigger = { NOT = { has_character_flag = they_blame_me } }
-			text = EVTOPTC_HF_14009_2
-		}
-		trigger_switch = {
-			on_trigger = has_character_flag
-			they_gained_brave = { event_target:student = { add_trait = brave } }
-			they_gained_ambitious = { event_target:student = { add_trait = ambitious } }
-			they_gained_patient = { event_target:student = { add_trait = patient } }
-			they_gained_diligent = { event_target:student = { add_trait = diligent } }
-			they_gained_craven = { event_target:student = { add_trait = craven } }
-			they_gained_content = { event_target:student = { add_trait = content } }
-			they_gained_wroth = { event_target:student = { add_trait = wroth } }
-			they_gained_slothful = { event_target:student = { add_trait = slothful } }
-			they_gained_envious = { event_target:student = { add_trait = envious } }
-			they_gained_stubborn = { event_target:student = { add_trait = stubborn } }
-			they_lost_brave = { event_target:student = { remove_trait = brave } }
-			they_lost_ambitious = { event_target:student = { remove_trait = ambitious } }
-			they_lost_patient = { event_target:student = { remove_trait = patient } }
-			they_lost_diligent = { event_target:student = { remove_trait = diligent } }
-			they_lost_craven = { event_target:student = { remove_trait = craven } }
-			they_lost_content = { event_target:student = { remove_trait = content } }
-			they_lost_slothful = { event_target:student = { remove_trait = slothful } }
-		}
+
+	option = {
+		name = EVTOPTB_HF_14009 # They did fairly well!
+		trigger = { has_character_flag = good_outcome }
 
 		if = {
-			limit = { has_character_flag = they_blame_me }
-			opinion = {
-				who = FROM
-				modifier = opinion_spoiled_ingrate
-				years = 10
+			limit = {
+				NOT = { is_friend = event_target:student }
 			}
-			reverse_opinion = {
-				who = FROM
-				modifier = opinion_lousy_teacher
-				years = 10
+
+			if = { # if you already have an opinion in place, become friends...
+				limit = {
+					OR = {
+						reverse_has_opinion_modifier = { who = event_target:student name = opinion_budding_friendship }
+						has_opinion_modifier = { who = event_target:student name = opinion_budding_friendship }
+					}
+				}
+				add_friend = event_target:student
 			}
+			else = { # otherwise, add opinions...
+				opinion = {
+					name = opinion_budding_friendship
+					who = event_target:student
+					years = 10
+				}
+				reverse_opinion = {
+					name = opinion_budding_friendship
+					who = event_target:student
+					years = 10
+				}
+			}
+		}
+	}
+
+	option = { # They failed...
+		name = {
+			text = EVTOPTC_HF_14009_1
+			trigger = { has_character_flag = they_blame_me }
+		}
+		name = {
+			text = EVTOPTC_HF_14009_2
+			trigger = { NOT = { has_character_flag = they_blame_me } }
 		}
 
 		trigger = { has_character_flag = bad_outcome }
+
+		if = {
+			limit = { has_character_flag = they_blame_me }
+
+			opinion = {
+				name = opinion_spoiled_ingrate
+				who = event_target:student
+				years = 10
+			}
+			reverse_opinion = {
+				name = opinion_lousy_teacher
+				who = event_target:student
+				years = 10
+			}
+		}
 	}
+
 	after = {
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			they_gained_brave =     { event_target:student = { show_scope_change = no add_trait = brave } }
+			they_gained_ambitious = { event_target:student = { show_scope_change = no add_trait = ambitious } }
+			they_gained_patient =   { event_target:student = { show_scope_change = no add_trait = patient } }
+			they_gained_diligent =  { event_target:student = { show_scope_change = no add_trait = diligent } }
+			they_gained_craven =    { event_target:student = { show_scope_change = no add_trait = craven } }
+			they_gained_content =   { event_target:student = { show_scope_change = no add_trait = content } }
+			they_gained_wroth =     { event_target:student = { show_scope_change = no add_trait = wroth } }
+			they_gained_slothful =  { event_target:student = { show_scope_change = no add_trait = slothful } }
+			they_gained_envious =   { event_target:student = { show_scope_change = no add_trait = envious } }
+			they_gained_stubborn =  { event_target:student = { show_scope_change = no add_trait = stubborn } }
+			they_lost_brave =       { event_target:student = { show_scope_change = no remove_trait = brave } }
+			they_lost_ambitious =   { event_target:student = { show_scope_change = no remove_trait = ambitious } }
+			they_lost_patient =     { event_target:student = { show_scope_change = no remove_trait = patient } }
+			they_lost_diligent =    { event_target:student = { show_scope_change = no remove_trait = diligent } }
+			they_lost_craven =      { event_target:student = { show_scope_change = no remove_trait = craven } }
+			they_lost_content =     { event_target:student = { show_scope_change = no remove_trait = content } }
+			they_lost_slothful =    { event_target:student = { show_scope_change = no remove_trait = slothful } }
+		}
+
 		clr_character_flag = great_outcome
 		clr_character_flag = good_outcome
 		clr_character_flag = bad_outcome
@@ -3488,31 +3458,35 @@ character_event = {
 	}
 }
 
-#On death, spawn crucible steel weapon chain?
+
+### Crucible steel weapon chain ###
+
+# On death, spawn crucible steel weapon chain?
 character_event = {
 	id = HF.51000
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
-	hide_window = yes
 
+	hide_window = yes
+	is_triggered_only = yes # on_death, random_events
+
+	has_dlc = "Holy Fury"
 	is_in_society = yes
+	min_age = 16
 
 	trigger = {
 		has_any_leadership_trait_trigger = yes
-		is_adult = yes
+		is_member_of_any_warrior_lodge_trigger = yes
 
-		OR =
-		{
+		OR = {
 			death_reason = death_battle
 			death_reason = death_duel
-  			death_reason = death_battle_duel
-  			death_reason = death_mission_duel
+			death_reason = death_battle_duel
+			death_reason = death_mission_duel
 		}
 
 		calc_true_if = {
-			amount = 2
+			amount >= 2
 
-			martial = 18
+			martial >= 18
 			trait = shieldmaiden
 			trait = berserker
 			has_lifestyle_martial_trigger = yes
@@ -3520,17 +3494,13 @@ character_event = {
 			has_crusade_trait_trigger = yes
 		}
 
-
-
 		OR = {
 			any_friend = {
 				same_society_as = ROOT
-				is_member_of_any_warrior_lodge_trigger = yes
 				block_general_event_trigger = no
 			}
 			any_lover = {
 				same_society_as = ROOT
-				is_member_of_any_warrior_lodge_trigger = yes
 				block_general_event_trigger = no
 			}
 		}
@@ -3540,7 +3510,6 @@ character_event = {
 		random_friend = {
 			limit = {
 				same_society_as = ROOT
-				is_member_of_any_warrior_lodge_trigger = yes
 				block_general_event_trigger = no
 			}
 			save_event_target_as = mourning_friend
@@ -3549,7 +3518,6 @@ character_event = {
 		random_lover = {
 			limit = {
 				same_society_as = ROOT
-				is_member_of_any_warrior_lodge_trigger = yes
 				block_general_event_trigger = no
 			}
 			save_event_target_as = mourning_lover
@@ -3558,35 +3526,37 @@ character_event = {
 		random_list = {
 			40 = {
 				trigger = {
-					event_target:mourning_friend = { is_alive = yes }
+					event_target:mourning_friend = { always = yes }
 				}
-				modifier = {
-					event_target:mourning_friend = {
-						num_of_artifacts = 0
-					}
+
+				mult_modifier = {
 					factor = 2
+					event_target:mourning_friend = {
+						num_of_artifacts < 1
+					}
 				}
+
 				event_target:mourning_friend = {
 					character_event = { id = HF.51001 }
 				}
 			}
 			40 = {
 				trigger = {
-					event_target:mourning_lover = { is_alive = yes }
+					event_target:mourning_lover = { always = yes }
 				}
-				modifier = {
-					event_target:mourning_lover = {
-						num_of_artifacts = 0
-					}
+
+				mult_modifier = {
 					factor = 2
+					event_target:mourning_lover = {
+						num_of_artifacts < 1
+					}
 				}
+
 				event_target:mourning_lover = {
 					character_event = { id = HF.51001 }
 				}
 			}
-			20 = {
-				#nothing happens
-			}
+			20 = { } # nothing happens
 		}
 	}
 }
@@ -3594,16 +3564,11 @@ character_event = {
 # Mourning friend/lover decides how to mourn FROM
 character_event = {
 	id = HF.51001
-	is_triggered_only = yes
+	desc = EVTDESC_HF_51001
 	border = GFX_event_normal_frame_war
 	picture = GFX_evt_died_battle
-	desc = EVTDESC_HF_51001
 
-	trigger = {
-		FROM = { is_alive = no }
-		is_member_of_any_warrior_lodge_trigger = yes
-		is_inaccessible_or_incapable_trigger = no
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		FROM = {
@@ -3611,360 +3576,11 @@ character_event = {
 		}
 	}
 
-	option = # I shall have a weapon forged [From.GetHerHis] honor!
-	{
-		trigger = {
-			any_courtier = {
-					OR = {
-						is_learned_trigger = yes
-						has_character_flag = is_court_physician
-						has_minor_title = title_court_physician
-						has_minor_title = title_teacher
-						has_minor_title = title_volva
-						has_minor_title = title_lawspeaker
-						has_minor_title = title_court_skald
-						has_minor_title = title_venerable_elder
-						learning = 18
-					}
-			}
-		}
+	# TODO: Should this option be gated by the supernatural game rule?
+	option = { # I shall have a weapon forged [From.GetHerHis] honor!
 		name = EVTOPTA_HF_51001
-		custom_tooltip = {
-			text = EVTTTA_HF_51001 #You try to find a smithy of worth to make this weapon...;;;;;;;;;;;;x
-		}
-		character_event = { id = HF.51002 days = 35 }
-	}
 
-	option = # Their techniques must continue to be taught!
-	{
-		name = EVTOPTB_HF_51001
-		trigger = { can_have_more_leadership_traits = yes }
-		add_same_commander_trait_as_FROM = yes
-	}
-	option = # A moment in calm solitude is the best way to pay respects.
-	{
-		name = EVTOPTC_HF_51001
-		custom_tooltip = { text = tooltip_HF_A_51008 }
-	   hidden_tooltip = { this_post_weight_gain_flavor_effect = yes }
-	}
-}
-
-# ROOT learns of a ritual on how to infuse a weapon with the strength of FROM
-character_event = {
-	id = HF.51002
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_armory
-	desc = EVTDESC_HF_51002
-	portrait = event_target:weapon_forger
-
-	immediate = {
-		if = {
-			limit = {
-				FROM = {
-					any_close_relative = {
-						is_alive = yes
-					}
-				}
-			}
-			save_event_target_as = potential_sacrifice
-		}
-
-		if = {
-			limit = {
-				any_courtier = {
-					OR = {
-						is_learned_trigger = yes
-						has_character_flag = is_court_physician
-						has_minor_title = title_court_physician
-						has_minor_title = title_teacher
-						has_minor_title = title_volva
-						has_minor_title = title_lawspeaker
-						has_minor_title = title_court_skald
-						has_minor_title = title_venerable_elder
-						learning = 18
-					}
-				}
-			}
-			save_event_target_as = weapon_forger
-		}
-	}
-
-	option = # Forgive me, my friend, but I require your strength.
-	{
-		name = EVTOPTA_HF_51002
-   		show_portrait = event_target:dead_warrior
-		hidden_tooltip = {
-			random_list = {
-				50 = {
-					modifier = {
-						factor = 1.5
-						trait = deceitful
-					}
-					modifier = {
-						factor = 1.1
-						trait = paranoid
-					}
-					modifier = {
-						factor = 1.4
-						trait = patient
-					}
-					modifier = {
-						factor = 1.1
-						trait = cruel
-					}
-					modifier = {
-						factor = 0.9
-						trait = wroth
-					}
-					modifier = {
-						factor = 0.9
-						trait = honest
-					}
-					modifier = {
-						factor = 0.9
-						trait = trusting
-					}
-					modifier = {
-						factor = 0.1
-						has_severe_disability_trigger = yes
-					}
-					modifier = {
-						factor = 0.5
-						has_medium_disability_trigger = yes
-					}
-					modifier = {
-						factor = 0.5
-						has_mental_disorder_trigger = yes
-					}
-					modifier = {
-						factor = 1.2
-						intrigue = 15
-					}
-					modifier = {
-						factor = 1.5
-						intrigue = 18
-					}
-					modifier = {
-						factor = 1.5
-						is_strong_trigger = yes
-					}
-					modifier = {
-						factor = 1.5
-						is_smart_trigger = yes
-					}
-					modifier = {
-						factor = 0.8
-						is_weak_trigger = yes
-					}
-					modifier = {
-						factor = 0.8
-						is_dumb_trigger = yes
-					}
-					character_event = { id = HF.51003 days = 35 } #Things go wrong
-				}
-				50 = {
-					character_event = { id = HF.51004 days = 35 } #Things go right
-				}
-			}
-		}
-
-		custom_tooltip = {
-			text = EVTTTA_HF_51002 #You decide to risk getting caught retrieving [dead_warrior.GetFirstName] remains...
-		}
-		set_character_flag = decided_to_dig_up
-	}
-
-	option = # The blood of a family member will have to do.
-	{
-		name = EVTOPTB_HF_51002
 		trigger = {
-			event_target:potential_sacrifice = {
-				is_alive = yes
-			}
-		}
-   		show_portrait = event_target:potential_sacrifice
-
-		custom_tooltip = {
-			text = EVTTTB_HF_51002 #You decide to try and kidnap [potential_sacrifice.GetFirstName]...
-		}
-
-		hidden_tooltip = {
-			random_list = {
-				50 = {
-					modifier = {
-						factor = 1.5
-						trait = deceitful
-					}
-					modifier = {
-						factor = 1.1
-						trait = paranoid
-					}
-					modifier = {
-						factor = 1.4
-						trait = patient
-					}
-					modifier = {
-						factor = 1.1
-						trait = cruel
-					}
-					modifier = {
-						factor = 0.9
-						trait = wroth
-					}
-					modifier = {
-						factor = 0.9
-						trait = honest
-					}
-					modifier = {
-						factor = 0.9
-						trait = trusting
-					}
-					modifier = {
-						factor = 0.1
-						has_severe_disability_trigger = yes
-					}
-					modifier = {
-						factor = 0.5
-						has_medium_disability_trigger = yes
-					}
-					modifier = {
-						factor = 0.5
-						has_mental_disorder_trigger = yes
-					}
-					modifier = {
-						factor = 1.2
-						intrigue = 15
-					}
-					modifier = {
-						factor = 1.5
-						intrigue = 18
-					}
-					modifier = {
-						factor = 1.5
-						is_strong_trigger = yes
-					}
-					modifier = {
-						factor = 1.5
-						is_smart_trigger = yes
-					}
-					modifier = {
-						factor = 0.8
-						is_weak_trigger = yes
-					}
-					modifier = {
-						factor = 0.8
-						is_dumb_trigger = yes
-					}
-					character_event = { id = HF.51003 days = 35 } #Things go wrong
-				}
-				50 = {
-					character_event = { id = HF.51004 days = 35 } #Things go right
-				}
-			}
-		}
-		set_character_flag = decided_to_kidnap
-	}
-	option = # No, stop this nonsense! Away with you!
-	{
-		name = EVTOPTC_HF_51002
-		event_target:weapon_forger = {
-			opinion = {
-				modifier = opinion_extremely_disappointed
-				who = ROOT
-				years = 5
-			}
-		}
-	}
-}
-
-# ROOT gets caught doing something controversial...
-character_event = {
-	id = HF.51003
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_armory
-	desc = EVTDESC_HF_51003
-
-	trigger = {
-		any_courtier = {
-			count = 2
-			block_general_event_trigger = no
-		}
-	}
-
-	fail_trigger_effect = {
-		character_event = { id = HF.51004 days = 35 } #Things go right
-	}
-
-	immediate = {
-		any_courtier = {
-			if = {
-				limit = {
-					block_general_event_trigger = no
-				}
-				save_event_target_as = witness1
-			}
-		}
-
-		any_courtier = {
-			if = {
-				limit = {
-					block_general_event_trigger = no
-					NOT = { character = event_target:witness1 }
-				}
-				save_event_target_as = witness2
-			}
-		}
-	}
-
-	option = # No! It's not what you think!
-	{
-		name = EVTOPTA_HF_51003
-
-		reverse_opinion = {
-			modifier = opinion_heretic
-			who = event_target:witness1
-			years = 5
-		}
-		reverse_opinion = {
-			modifier = opinion_heretic
-			who = event_target:witness2
-			years = 5
-		}
-	}
-
-	option = # It was [weapon_forger.GetTitledFirstName]! [weapon_forger.GetSheHeCap] told me to do this!
-	{
-		name = EVTOPTB_HF_51003
-		reverse_opinion = {
-			modifier = opinion_heretic
-			who = event_target:weapon_forger
-			years = 5
-		}
-	}
-
-	after = {
-		add_character_modifier = { name = crucible_weapon_caught_heretic duration = 1825 }
-
-		clr_character_flag = decided_to_kidnap
-		clr_character_flag = decided_to_dig_up
-	}
-}
-
-# ROOT succeeds! Time to pick a weapon...
-character_event = {
-	id = HF.51004
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_camaraderie
-	desc = EVTDESC_HF_51004
-
-	portrait = event_target:dead_warrior
-
-	trigger = {
-		OR = {
-			event_target:weapon_forger = { is_alive = yes }
 			any_courtier = {
 				OR = {
 					is_learned_trigger = yes
@@ -3975,58 +3591,394 @@ character_event = {
 					has_minor_title = title_lawspeaker
 					has_minor_title = title_court_skald
 					has_minor_title = title_venerable_elder
-					learning = 18
+					learning >= 18
+				}
+			}
+		}
+
+		custom_tooltip = { text = EVTTTA_HF_51001 } # You try to find a smithy of worth to make this weapon...;;;;;;;;;;;;x
+		character_event = { id = HF.51002 days = 35 }
+	}
+
+	option = { # Their techniques must continue to be taught!
+		name = EVTOPTB_HF_51001
+		trigger = { can_have_more_leadership_traits = yes }
+
+		add_same_commander_trait_as_FROM = yes
+	}
+
+	option = { # A moment in calm solitude is the best way to pay respects.
+		name = EVTOPTC_HF_51001
+		custom_tooltip = { text = tooltip_HF_A_51008 }
+
+		this_post_weight_gain_flavor_effect = yes
+	}
+}
+
+# ROOT learns of a ritual on how to infuse a weapon with the strength of FROM
+character_event = {
+	id = HF.51002
+	desc = EVTDESC_HF_51002
+	border = GFX_event_normal_frame_war
+	picture = GFX_evt_armory
+	portrait = event_target:weapon_forger
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = {
+			random_close_relative = {
+				save_event_target_as = potential_sacrifice
+			}
+		}
+
+		random_courtier = {
+			limit = {
+				OR = {
+					is_learned_trigger = yes
+					has_character_flag = is_court_physician
+					has_minor_title = title_court_physician
+					has_minor_title = title_teacher
+					has_minor_title = title_volva
+					has_minor_title = title_lawspeaker
+					has_minor_title = title_court_skald
+					has_minor_title = title_venerable_elder
+					learning >= 18
+				}
+			}
+			save_event_target_as = weapon_forger
+		}
+	}
+
+	option = { # Forgive me, my friend, but I require your strength.
+		name = EVTOPTA_HF_51002
+		show_portrait = event_target:dead_warrior
+		custom_tooltip = { text = EVTTTA_HF_51002 } # You decide to risk getting caught retrieving [dead_warrior.GetFirstName] remains...
+		set_character_flag = decided_to_dig_up
+
+		hidden_effect = {
+			random_list = {
+				50 = {
+					mult_modifier = {
+						factor = 1.5
+						trait = deceitful
+					}
+					mult_modifier = {
+						factor = 1.1
+						trait = paranoid
+					}
+					mult_modifier = {
+						factor = 1.4
+						trait = patient
+					}
+					mult_modifier = {
+						factor = 1.1
+						trait = cruel
+					}
+					mult_modifier = {
+						factor = 0.9
+						trait = wroth
+					}
+					mult_modifier = {
+						factor = 0.9
+						trait = honest
+					}
+					mult_modifier = {
+						factor = 0.9
+						trait = trusting
+					}
+					mult_modifier = {
+						factor = 0.1
+						has_severe_disability_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.5
+						has_medium_disability_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.5
+						has_mental_disorder_trigger = yes
+					}
+					mult_modifier = {
+						factor = 1.2
+						intrigue >= 15
+					}
+					mult_modifier = {
+						factor = 1.5
+						intrigue >= 18
+					}
+					mult_modifier = {
+						factor = 1.5
+						is_strong_trigger = yes
+					}
+					mult_modifier = {
+						factor = 1.5
+						is_smart_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.8
+						is_weak_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.8
+						is_dumb_trigger = yes
+					}
+					character_event = { id = HF.51004 days = 35 } # Things go right
+				}
+				50 = {
+					character_event = { id = HF.51003 days = 35 } # Things go wrong
+				}
+			}
+		}
+	}
+
+	option = { # The blood of a family member will have to do.
+		name = EVTOPTB_HF_51002
+		show_portrait = event_target:potential_sacrifice
+
+		trigger = {
+			event_target:potential_sacrifice = { always = yes }
+		}
+
+		custom_tooltip = { text = EVTTTB_HF_51002 } # You decide to try and kidnap [potential_sacrifice.GetFirstName]...
+		set_character_flag = decided_to_kidnap
+
+		hidden_effect = {
+			random_list = {
+				50 = {
+					mult_modifier = {
+						factor = 1.5
+						trait = deceitful
+					}
+					mult_modifier = {
+						factor = 1.1
+						trait = paranoid
+					}
+					mult_modifier = {
+						factor = 1.4
+						trait = patient
+					}
+					mult_modifier = {
+						factor = 1.1
+						trait = cruel
+					}
+					mult_modifier = {
+						factor = 0.9
+						trait = wroth
+					}
+					mult_modifier = {
+						factor = 0.9
+						trait = honest
+					}
+					mult_modifier = {
+						factor = 0.9
+						trait = trusting
+					}
+					mult_modifier = {
+						factor = 0.1
+						has_severe_disability_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.5
+						has_medium_disability_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.5
+						has_mental_disorder_trigger = yes
+					}
+					mult_modifier = {
+						factor = 1.2
+						intrigue >= 15
+					}
+					mult_modifier = {
+						factor = 1.5
+						intrigue >= 18
+					}
+					mult_modifier = {
+						factor = 1.5
+						is_strong_trigger = yes
+					}
+					mult_modifier = {
+						factor = 1.5
+						is_smart_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.8
+						is_weak_trigger = yes
+					}
+					mult_modifier = {
+						factor = 0.8
+						is_dumb_trigger = yes
+					}
+
+					character_event = { id = HF.51004 days = 35 } # Things go right
+				}
+				50 = {
+					character_event = { id = HF.51003 days = 35 } # Things go wrong
+				}
+			}
+		}
+	}
+
+	option = { # No, stop this nonsense! Away with you!
+		name = EVTOPTC_HF_51002
+
+		reverse_opinion = {
+			name = opinion_extremely_disappointed
+			who = event_target:weapon_forger
+			years = 5
+		}
+	}
+}
+
+# ROOT gets caught doing something controversial...
+character_event = {
+	id = HF.51003
+	desc = EVTDESC_HF_51003
+	picture = GFX_evt_armory
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	trigger = {
+		any_courtier = {
+			count >= 2
+			block_general_event_trigger = no
+		}
+	}
+
+	fail_trigger_effect = {
+		character_event = { id = HF.51004 days = 35 } # Things go right
+	}
+
+	immediate = {
+		random_courtier = {
+			limit = { block_general_event_trigger = no }
+			save_event_target_as = witness1
+		}
+
+		random_courtier = {
+			limit = {
+				block_general_event_trigger = no
+				NOT = { character = event_target:witness1 }
+			}
+			save_event_target_as = witness2
+		}
+	}
+
+	option = { # No! It's not what you think!
+		name = EVTOPTA_HF_51003
+
+		reverse_opinion = {
+			name = opinion_heretic
+			who = event_target:witness1
+			years = 5
+		}
+		reverse_opinion = {
+			name = opinion_heretic
+			who = event_target:witness2
+			years = 5
+		}
+	}
+
+	option = { # It was [weapon_forger.GetTitledFirstName]! [weapon_forger.GetSheHeCap] told me to do this!
+		name = EVTOPTB_HF_51003
+
+		reverse_opinion = {
+			name = opinion_heretic
+			who = event_target:weapon_forger
+			years = 5
+		}
+	}
+
+	after = {
+		add_character_modifier = {
+			name = crucible_weapon_caught_heretic
+			years = 5
+		}
+
+		clr_character_flag = decided_to_kidnap
+		clr_character_flag = decided_to_dig_up
+	}
+}
+
+# ROOT succeeds! Time to pick a weapon...
+character_event = {
+	id = HF.51004
+	desc = EVTDESC_HF_51004
+	picture = GFX_evt_camaraderie
+	border = GFX_event_normal_frame_war
+	portrait = event_target:dead_warrior
+
+	is_triggered_only = yes
+
+	trigger = {
+		trigger_if = {
+			limit = {
+				NOT = { event_target:weapon_forger = { is_alive = yes } }
+			}
+			any_courtier = {
+				OR = {
+					is_learned_trigger = yes
+					has_character_flag = is_court_physician
+					has_minor_title = title_court_physician
+					has_minor_title = title_teacher
+					has_minor_title = title_volva
+					has_minor_title = title_lawspeaker
+					has_minor_title = title_court_skald
+					has_minor_title = title_venerable_elder
+					learning >= 18
 				}
 			}
 		}
 	}
 
 	immediate = {
-		#In case the previous weapon forger is dead, get a new one
+		# In case the previous weapon forger is dead, get a new one
 		if = {
 			limit = {
-				event_target:weapon_forger = { is_alive = no }
-   			}
+				NOT = { event_target:weapon_forger = { is_alive = yes } }
+			}
 
-				any_courtier = {
-					limit = {
-						OR = {
-							is_learned_trigger = yes
-							has_character_flag = is_court_physician
-							has_minor_title = title_court_physician
-							has_minor_title = title_teacher
-							has_minor_title = title_volva
-							has_minor_title = title_lawspeaker
-							has_minor_title = title_court_skald
-							has_minor_title = title_venerable_elder
-							learning = 18
-						}
+			random_courtier = {
+				limit = {
+					OR = {
+						is_learned_trigger = yes
+						has_character_flag = is_court_physician
+						has_minor_title = title_court_physician
+						has_minor_title = title_teacher
+						has_minor_title = title_volva
+						has_minor_title = title_lawspeaker
+						has_minor_title = title_court_skald
+						has_minor_title = title_venerable_elder
+						learning >= 18
 					}
-					save_event_target_as = weapon_forger
 				}
+				save_event_target_as = weapon_forger
 			}
 		}
+	}
 
 
-	option = # An axe is the most appropriate way to honor [dead_warrior.GetFirstName].
-	{
+	option = { # An axe is the most appropriate way to honor [dead_warrior.GetFirstName].
 		name = EVTOPTA_HF_51004
+		show_portrait = event_target:weapon_forger
+
 		set_character_flag = crucible_steel_axe
-		show_portrait = event_target:weapon_forger
 	}
 
-	option = # [dead_warrior.GetFirstName] would have wanted a sword in [dead_warrior.GetHerHis] name.
-	{
+	option = { # [dead_warrior.GetFirstName] would have wanted a sword in [dead_warrior.GetHerHis] name.
 		name = EVTOPTB_HF_51004
-		set_character_flag = crucible_steel_sword
 		show_portrait = event_target:weapon_forger
+
+		set_character_flag = crucible_steel_sword
 	}
 
-	option = # A mace to crush both my and the old enemies of [dead_warrior.GetFirstName].
-	{
+	option = { # A mace to crush both my and the old enemies of [dead_warrior.GetFirstName].
 		name = EVTOPTC_HF_51004
-		set_character_flag = crucible_steel_mace
 		show_portrait = event_target:weapon_forger
+
+		set_character_flag = crucible_steel_mace
 	}
 
 	after = {
@@ -4035,35 +3987,32 @@ character_event = {
 
 		hidden_effect = {
 			random_list = {
-				20 = { #Bad stuff!
+				20 = { # Bad stuff!
 					random_list = {
-						30 = {
-							character_event = { id = HF.51005 days = 65 } #Weapon shatters on first use
+						33 = {
+							character_event = { id = HF.51005 days = 65 } # Weapon shatters on first use
 						}
-						30 = {
-							character_event = { id = HF.51006 days = 65 } #Weapon vanishes
+						33 = {
+							character_event = { id = HF.51006 days = 65 } # Weapon vanishes
 						}
-						30 = {
+						33 = {
 							trigger = {
 								any_courtier = {
 									is_adult = no
-									NOT = { is_inaccessible_or_incapable_trigger = yes }
+									is_inaccessible_or_incapable_trigger = no
 								}
 							}
-							character_event = { id = HF.51007 days = 65 } #Child accident
+							character_event = { id = HF.51007 days = 65 } # Child accident
 						}
 					}
 				}
-				80 = { #Good stuff!
+				80 = { # Good stuff!
 					random_list = {
-						30 = {
-							character_event = { id = HF.51008 days = 65 } #Good weapon
+						33 = {
+							character_event = { id = HF.51008 days = 65 } # Good weapon
 						}
-						30 = {
-							character_event = { id = HF.51009 days = 65 } #Soulbound
-						}
-						30 = {
-							character_event = { id = HF.51010 days = 65 } #Legendary weapon
+						66 = {
+							character_event = { id = HF.51009 days = 65 } # Soulbound Legendary weapon
 						}
 					}
 				}
@@ -4075,31 +4024,36 @@ character_event = {
 # Bad - Weapon shatters on first use
 character_event = {
 	id = HF.51005
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_duel_scene
 	desc = EVTDESC_HF_51005
-
+	picture = GFX_evt_duel_scene
+	border = GFX_event_normal_frame_war
 	portrait = event_target:dead_warrior
 
+	is_triggered_only = yes
+
+	only_capable = yes
+	prisoner = no
+
 	trigger = {
-		NOT = { is_inaccessible_or_incapable_trigger = yes }
+		is_inaccessible_trigger = no
 	}
+
 	fail_trigger_effect = {
-		#Try again later...
-		character_event = {
-			id = HF.51011 # random list of outcomes again
+		# Try again later...
+		repeat_event = {
+			id = HF.51005
 			days = 65
 		}
 	}
 
 	immediate = {
-		#In case the previous weapon forger is dead, get a new one
+		# In case the previous weapon forger is dead, get a new one
 		if = {
 			limit = {
 				event_target:weapon_forger = { is_alive = no }
-   			}
-			any_courtier = {
+			}
+
+			random_courtier = {
 				limit = {
 					OR = {
 						is_learned_trigger = yes
@@ -4110,38 +4064,43 @@ character_event = {
 						has_minor_title = title_lawspeaker
 						has_minor_title = title_court_skald
 						has_minor_title = title_venerable_elder
-						learning = 18
+						learning >= 18
 					}
 				}
-	   			save_event_target_as = weapon_forger
-	   		}
-	   	}
+				save_event_target_as = weapon_forger
+			}
+		}
 	}
 
-	option = # ...It was simply bad luck, nothing else.
-	{
+	option = { # ...It was simply bad luck, nothing else.
 		name = EVTOPTA_HF_51005
 
-		add_character_modifier = { name = crucible_weapon_very_bad_omen duration = 1825 }
+		add_character_modifier = {
+			name = crucible_weapon_very_bad_omen
+			years = 5
+		}
 	}
 
-	option = # This is clearly your fault!
-	{
+	option = { # This is clearly your fault!
 		name = EVTOPTB_HF_51005
 
 		reverse_opinion = {
-			modifier = opinion_horrified
+			name = opinion_horrified
 			who = event_target:weapon_forger
 			years = 5
 		}
-		add_character_modifier = { name = crucible_weapon_caught_heretic duration = 1825 }
+
+		add_character_modifier = {
+			name = crucible_weapon_caught_heretic
+			years = 5
+		}
 	}
 
-	option = # I will sacrifice your life to appease the gods.
-	{
+	option = { # I will sacrifice your life to appease the gods.
 		name = EVTOPTC_HF_51005
-		event_target:weapon_forger =
-		{
+
+		event_target:weapon_forger = {
+			show_scope_change = no
 			death = { death_reason = death_sacrificed }
 		}
 	}
@@ -4156,31 +4115,36 @@ character_event = {
 # Bad - Weapon forger mysteriously vanishes?
 character_event = {
 	id = HF.51006
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_duel_scene
 	desc = EVTDESC_HF_51006
-
+	picture = GFX_evt_duel_scene
+	border = GFX_event_normal_frame_war
 	portrait = event_target:dead_warrior
 
+	is_triggered_only = yes
+
+	only_capable = yes
+	prisoner = no
+
 	trigger = {
-		NOT = { is_inaccessible_or_incapable_trigger = yes }
+		is_inaccessible_trigger = no
 	}
+
 	fail_trigger_effect = {
-		#Try again later...
-		character_event = {
-			id = HF.51011 # random list of outcomes again
+		# Try again later...
+		repeat_event = {
+			id = HF.51006
 			days = 65
 		}
 	}
 
 	immediate = {
-		#In case the previous weapon forger is dead, get a new one
+		# In case the previous weapon forger is dead, get a new one
 		if = {
 			limit = {
 				event_target:weapon_forger = { is_alive = no }
-   			}
-			any_courtier = {
+			}
+
+			random_courtier = {
 				limit = {
 					OR = {
 						is_learned_trigger = yes
@@ -4191,89 +4155,83 @@ character_event = {
 						has_minor_title = title_lawspeaker
 						has_minor_title = title_court_skald
 						has_minor_title = title_venerable_elder
-						learning = 18
+						learning >= 18
 					}
 				}
-	   			save_event_target_as = weapon_forger
-	   		}
-	   	}
-	}
-
-	option = # Find [weapon_forger.GetHerHim] and kill [weapon_forger.GetHerHim]!
-	{
-		name = EVTOPTA_HF_51006
-
-		random_list = {
-			30 = { #They run off with good weapon!
-				event_target:weapon_forger = {
-					banish = yes
-					hidden_tooltip = {
-			  			if = {
-			  				limit = {
-			  					ROOT = { has_character_flag = crucible_steel_axe }
-			  				}
-			  				add_artifact = axe_whispering
-			  			}
-			  			if = {
-			  				limit = {
-			  					ROOT = { has_character_flag = crucible_steel_sword }
-			  				}
-			  				add_artifact = sword_whispering
-			  			}
-			  			if = {
-			  				limit = {
-			  					ROOT = { has_character_flag = crucible_steel_mace }
-			  				}
-			  				add_artifact = mace_whispering
-			  			}
-					}
-				}
-			}
-			70 = {
-				event_target:weapon_forger =
-				{
-					death = { death_reason = death_execution }
-				}
-				remove_trait_patient_effect = yes
-				add_trait_wroth_effect = yes
+				save_event_target_as = weapon_forger
 			}
 		}
 	}
 
-	option = # [weapon_forger.GetSheHeCap] is simply running late, that is all.
-	{
-		name = EVTOPTB_HF_51006
-		add_character_modifier = { name = crucible_weapon_caught_heretic duration = 1825 }
+	option = { # Find [weapon_forger.GetHerHim] and kill [weapon_forger.GetHerHim]!
+		name = EVTOPTA_HF_51006
+
 		random_list = {
-			50 = { #They run off with good weapon!
+			30 = { # They run off with good weapon!
 				event_target:weapon_forger = {
+					show_scope_change = no
+
 					banish = yes
-					hidden_tooltip = {
-			  			if = {
-			  				limit = {
-			  					ROOT = { has_character_flag = crucible_steel_axe }
-			  				}
-			  				add_artifact = axe_whispering
-			  			}
-			  			if = {
-			  				limit = {
-			  					ROOT = { has_character_flag = crucible_steel_sword }
-			  				}
-			  				add_artifact = sword_whispering
-			  			}
-			  			if = {
-			  				limit = {
-			  					ROOT = { has_character_flag = crucible_steel_mace }
-			  				}
-			  				add_artifact = mace_whispering
-			  			}
+
+					hidden_effect = {
+						ROOT = {
+							trigger_switch = {
+								on_trigger = has_character_flag
+								crucible_steel_axe =   { event_target:weapon_forger = { add_artifact = axe_whispering } }
+								crucible_steel_sword = { event_target:weapon_forger = { add_artifact = sword_whispering } }
+								crucible_steel_mace =  { event_target:weapon_forger = { add_artifact = mace_whispering } }
+							}
+						}
+					}
+				}
+			}
+			70 = {
+				event_target:weapon_forger = {
+					show_scope_change = no
+					death = { death_reason = death_execution }
+				}
+
+				if = {
+					limit = { NOT = { trait = wroth } }
+					remove_trait_patient_effect = yes
+					tooltip = { add_trait = wroth }
+					hidden_effect = { add_trait_wroth_effect = yes }
+				}
+			}
+		}
+	}
+
+	option = { # [weapon_forger.GetSheHeCap] is simply running late, that is all.
+		name = EVTOPTB_HF_51006
+
+		add_character_modifier = {
+			name = crucible_weapon_caught_heretic
+			years = 5
+		}
+
+		random_list = {
+			50 = { # They run off with good weapon!
+				event_target:weapon_forger = {
+					show_scope_change = no
+
+					banish = yes
+
+					hidden_effect = {
+						ROOT = {
+							trigger_switch = {
+								on_trigger = has_character_flag
+								crucible_steel_axe =   { event_target:weapon_forger = { add_artifact = axe_whispering } }
+								crucible_steel_sword = { event_target:weapon_forger = { add_artifact = sword_whispering } }
+								crucible_steel_mace =  { event_target:weapon_forger = { add_artifact = mace_whispering } }
+							}
+						}
 					}
 				}
 			}
 			50 = {
-				event_target:weapon_forger =
-				{
-					death = { death_reason = death_execution }
+				event_target:weapon_forger = {
+					show_scope_change = no
+					death = { death_reason = death_execution } # TODO: This seems like the wrong reason
 				}
 				add_trait_trusting_effect = yes
 				add_trait_patient_effect = yes
@@ -4291,35 +4249,41 @@ character_event = {
 # Bad - A child injures themselves
 character_event = {
 	id = HF.51007
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_child_play
 	desc = EVTDESC_HF_51007
-
+	picture = GFX_evt_child_play
+	border = GFX_event_normal_frame_war
 	portrait = event_target:dead_warrior
 
+	is_triggered_only = yes
+
+	only_capable = yes
+	prisoner = no
+
 	trigger = {
-		NOT = { is_inaccessible_or_incapable_trigger = yes }
+		is_inaccessible_trigger = no
+
 		any_courtier = {
 			is_adult = no
-			NOT = { is_inaccessible_or_incapable_trigger = yes }
+			is_inaccessible_or_incapable_trigger = no
 		}
 	}
+
 	fail_trigger_effect = {
-		#Try again later...
-		character_event = {
-			id = HF.51011 # random list of outcomes again
+		# Try again later...
+		repeat_event = {
+			id = HF.51007
 			days = 65
 		}
 	}
 
 	immediate = {
-		#In case the previous weapon forger is dead, get a new one
+		# In case the previous weapon forger is dead, get a new one
 		if = {
 			limit = {
 				event_target:weapon_forger = { is_alive = no }
-   			}
-			any_courtier = {
+			}
+
+			random_courtier = {
 				limit = {
 					OR = {
 						is_learned_trigger = yes
@@ -4330,16 +4294,17 @@ character_event = {
 						has_minor_title = title_lawspeaker
 						has_minor_title = title_court_skald
 						has_minor_title = title_venerable_elder
-						learning = 18
+						learning >= 18
 					}
 				}
-	   			save_event_target_as = weapon_forger
-	   		}
-	   	}
-	   	any_courtier = {
-	   		limit = {
+				save_event_target_as = weapon_forger
+			}
+		}
+
+		random_courtier = {
+			limit = {
 				is_adult = no
-				NOT = { is_inaccessible_or_incapable_trigger = yes }
+				is_inaccessible_or_incapable_trigger = no
 			}
 			save_event_target_as = unfortunate_child
 		}
@@ -4347,37 +4312,43 @@ character_event = {
 
 	option = { # This is a cursed weapon that thirsts for blood! Get rid of it!
 		name = EVTOPTA_HF_51007
-		event_target:unfortunate_child = { show_scope_change = no add_maimed_trait_effect = yes }
+
+		event_target:unfortunate_child = {
+			show_scope_change = no
+			add_maimed_trait_effect = yes
+		}
 	}
 
 	option = { # The weapon is not what injured the child. The blame is on [unfortunate_child.GetFirstName]
 		name = EVTOPTB_HF_51007
 
-		if = {
-		   limit = { has_character_flag = crucible_steel_axe }
-			add_artifact = axe_whispering
+		trigger_switch = {
+			on_trigger = has_character_flag
+			crucible_steel_axe =   { add_artifact = axe_whispering }
+			crucible_steel_sword = { add_artifact = sword_whispering }
+			crucible_steel_mace =  { add_artifact = mace_whispering }
 		}
-		if = {
-			limit = { has_character_flag = crucible_steel_sword }
-			add_artifact = sword_whispering
+
+		event_target:unfortunate_child = {
+			show_scope_change = no
+			add_maimed_trait_effect = yes
 		}
-		if = {
-			limit = { has_character_flag = crucible_steel_mace }
-			add_artifact = mace_whispering
-		}
-		event_target:unfortunate_child = { show_scope_change = no add_maimed_trait_effect = yes }
 
 		reverse_opinion = {
-			modifier = opinion_horrified
+			name = opinion_horrified
 			who = event_target:weapon_forger
 			years = 5
 		}
-		add_character_modifier = { name = crucible_weapon_very_bad_omen duration = 1825 }
+
+		add_character_modifier = {
+			name = crucible_weapon_very_bad_omen
+			years = 5
+		}
 	}
 
 
 	after = {
-		#event_target:unfortunate_child = { add_maimed_trait_effect = yes } #Moved into options, because "after" does not show portraits
+		# event_target:unfortunate_child = { add_maimed_trait_effect = yes } # Moved into options, because "after" does not show portraits
 
 		clr_character_flag = crucible_steel_axe
 		clr_character_flag = crucible_steel_sword
@@ -4388,31 +4359,36 @@ character_event = {
 # Good - A weapon is forged
 character_event = {
 	id = HF.51008
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_armory
 	desc = EVTDESC_HF_51008
-
+	picture = GFX_evt_armory
+	border = GFX_event_normal_frame_war
 	portrait = event_target:dead_warrior
 
+	is_triggered_only = yes
+
+	only_capable = yes
+	prisoner = no
+
 	trigger = {
-		NOT = { is_inaccessible_or_incapable_trigger = yes }
+		is_inaccessible_trigger = no
 	}
+
 	fail_trigger_effect = {
-		#Try again later...
-		character_event = {
-			id = HF.51011 # random list of outcomes again
+		# Try again later...
+		repeat_event = {
+			id = HF.51008
 			days = 65
 		}
 	}
 
 	immediate = {
-		#In case the previous weapon forger is dead, get a new one
+		# In case the previous weapon forger is dead, get a new one
 		if = {
 			limit = {
 				event_target:weapon_forger = { is_alive = no }
-   			}
-			any_courtier = {
+			}
+
+			random_courtier = {
 				limit = {
 					OR = {
 						is_learned_trigger = yes
@@ -4423,57 +4399,53 @@ character_event = {
 						has_minor_title = title_lawspeaker
 						has_minor_title = title_court_skald
 						has_minor_title = title_venerable_elder
-						learning = 18
+						learning >= 18
 					}
 				}
-	   			save_event_target_as = weapon_forger
-	   		}
-	   	}
+				save_event_target_as = weapon_forger
+			}
+		}
 	}
 
-	option = # I hope [dead_warrior.GetFirstName] is witnessing this from the afterlife.
-	{
+	option = { # I hope [dead_warrior.GetFirstName] is witnessing this from the afterlife.
 		name = EVTOPTA_HF_51008
 		custom_tooltip = { text = tooltip_HF_A_51008 }
-	   hidden_tooltip = { this_post_weight_gain_flavor_effect = yes }
+
+		this_post_weight_gain_flavor_effect = yes
 	}
 
-	option = # Well, if you say so...;;;;;;;;;;;;x
-	{
+	option = { # Well, if you say so...;;;;;;;;;;;;x
 		name = EVTOPTB_HF_51008
-		remove_trait_trusting_effect = yes
-		add_trait_cynical_effect = yes
+
+		if = {
+			limit = {
+				NOT = { trait = cynical }
+			}
+
+			remove_trait_trusting_effect = yes
+			tooltip = { add_trait = cynical }
+			hidden_effect = { add_trait_cynical_effect = yes }
+		}
 	}
 
-	option = # I do not appreciate you lying to me, [weapon_forger.GetFirstName]
-	{
+	option = { # I do not appreciate you lying to me, [weapon_forger.GetFirstName]
 		name = EVTOPTC_HF_51008
+
 		add_trait_cruel_effect = yes
 		remove_trait_kind_effect = yes
 
 		event_target:weapon_forger = {
+			show_scope_change = no
 			death = { death_reason = death_execution }
 		}
 	}
 
 	after = {
-		if = {
-		   limit = {
-			  	has_character_flag = crucible_steel_axe
-			}
-			add_artifact = axe_tier_1_new
-		}
-		if = {
-			limit = {
-			  	has_character_flag = crucible_steel_sword
-			}
-			add_artifact = sword_tier_1_new
-		}
-		if = {
-			limit = {
-			  	has_character_flag = crucible_steel_mace
-			  	}
-			add_artifact = mace_tier_1_new
+		trigger_switch = {
+			on_trigger = has_character_flag
+			crucible_steel_axe =   { add_artifact = axe_tier_1_new }
+			crucible_steel_sword = { add_artifact = sword_tier_1_new }
+			crucible_steel_mace =  { add_artifact = mace_tier_1_new }
 		}
 
 		clr_character_flag = crucible_steel_axe
@@ -4485,157 +4457,42 @@ character_event = {
 # Good - Whispering weapon
 character_event = {
 	id = HF.51009
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
 	picture = GFX_evt_duel_scene
-	desc = EVTDESC_HF_51009
-
+	border = GFX_event_normal_frame_war
 	portrait = event_target:dead_warrior
 
-	trigger = {
-		NOT = { is_inaccessible_or_incapable_trigger = yes }
-	}
-	fail_trigger_effect = {
-		#Try again later...
-		character_event = {
-			id = HF.51011 # random list of outcomes again
-			days = 65
-		}
-	}
-
-	immediate = {
-		#In case the previous weapon forger is dead, get a new one
-		if = {
-			limit = {
-				event_target:weapon_forger = { is_alive = no }
-   			}
-			any_courtier = {
-				limit = {
-					OR = {
-						is_learned_trigger = yes
-						has_character_flag = is_court_physician
-						has_minor_title = title_court_physician
-						has_minor_title = title_teacher
-						has_minor_title = title_volva
-						has_minor_title = title_lawspeaker
-						has_minor_title = title_court_skald
-						has_minor_title = title_venerable_elder
-						learning = 18
-					}
-				}
-	   			save_event_target_as = weapon_forger
-	   		}
-	   	}
-	}
-
-	option = # A part of [dead_warrior.GetFirstName] truly is in this weapon.
-	{
-		name = EVTOPTA_HF_51009
-
-		if = {
-		   limit = {
-			  	has_character_flag = crucible_steel_axe
-			}
-			add_artifact = axe_whispering
-		}
-		if = {
-			limit = {
-			  	has_character_flag = crucible_steel_sword
-			}
-			add_artifact = sword_whispering
-		}
-		if = {
-			limit = {
-			  	has_character_flag = crucible_steel_mace
-			  	}
-			add_artifact = mace_whispering
-		}
-	}
-
-	option = # No! This is a cursed weapon that thirsts for blood! Get rid of it!
-	{
-		name = EVTOPTB_HF_51009
-	}
-
-	after = {
-		clr_character_flag = crucible_steel_axe
-		clr_character_flag = crucible_steel_sword
-		clr_character_flag = crucible_steel_mace
-	}
-}
-
-# Good - Whispering weapon
-character_event = {
-	id = HF.51010
-	is_triggered_only = yes
-	border = GFX_event_normal_frame_war
-	picture = GFX_evt_duel_scene
+	desc = EVTDESC_HF_51009
 	desc = EVTDESC_HF_51010
 
-	portrait = event_target:dead_warrior
+	is_triggered_only = yes
+
+	only_capable = yes
+	prisoner = no
 
 	trigger = {
-		NOT = { is_inaccessible_or_incapable_trigger = yes }
+		is_inaccessible_trigger = no
 	}
+
 	fail_trigger_effect = {
-		#Try again later...
-		character_event = {
-			id = HF.51011 # random list of outcomes again
+		# Try again later...
+		repeat_event = {
+			id = HF.51009
 			days = 65
 		}
 	}
 
-	immediate = {
-		#In case the previous weapon forger is dead, get a new one
-		if = {
-			limit = {
-				event_target:weapon_forger = { is_alive = no }
-   			}
-			any_courtier = {
-				limit = {
-					OR = {
-						is_learned_trigger = yes
-						has_character_flag = is_court_physician
-						has_minor_title = title_court_physician
-						has_minor_title = title_teacher
-						has_minor_title = title_volva
-						has_minor_title = title_lawspeaker
-						has_minor_title = title_court_skald
-						has_minor_title = title_venerable_elder
-						learning = 18
-					}
-				}
-	   			save_event_target_as = weapon_forger
-	   		}
-	   	}
-	}
-
-	option = # A part of [dead_warrior.GetFirstName] truly is in this weapon.
-	{
+	option = { # A part of [dead_warrior.GetFirstName] truly is in this weapon.
 		name = EVTOPTA_HF_51009
 
-		if = {
-		   limit = {
-			  	has_character_flag = crucible_steel_axe
-			}
-			add_artifact = axe_whispering
-		}
-		if = {
-			limit = {
-			  	has_character_flag = crucible_steel_sword
-			}
-			add_artifact = sword_whispering
-		}
-		if = {
-			limit = {
-			  	has_character_flag = crucible_steel_mace
-			  	}
-			add_artifact = mace_whispering
+		trigger_switch = {
+			on_trigger = has_character_flag
+			crucible_steel_axe =   { add_artifact = axe_whispering }
+			crucible_steel_sword = { add_artifact = sword_whispering }
+			crucible_steel_mace =  { add_artifact = mace_whispering }
 		}
 	}
 
-	option = # No! This is a cursed weapon that thirsts for blood! Get rid of it!
-	{
+	option = { # No! This is a cursed weapon that thirsts for blood! Get rid of it!
 		name = EVTOPTB_HF_51009
 	}
 
@@ -4647,51 +4504,9 @@ character_event = {
 }
 
 
-# Fallback/Gating event for the reward, in case you failed the inaccessible trigger or are in prison...
-character_event = {
-	id = HF.51011
-	is_triggered_only = yes
-	hide_window = yes
-
-	immediate = {
-		random_list = {
-			20 = { #Bad stuff!
-				random_list = {
-					30 = {
-						character_event = { id = HF.51005 } #Weapon shatters on first use
-					}
-					30 = {
-						character_event = { id = HF.51006 } #Weapon vanishes
-					}
-					3000 = {
-						trigger = {
-							any_courtier = {
-								is_adult = no
-								NOT = { is_inaccessible_or_incapable_trigger = yes }
-							}
-						}
-						character_event = { id = HF.51007 } #Child accident
-					}
-				}
-			}
-			80 = { #Good stuff!
-				random_list = {
-					30 = {
-						character_event = { id = HF.51008 } #Good weapon
-					}
-					30 = {
-						character_event = { id = HF.51009 } #Soulbound
-					}
-					30 = {
-						character_event = { id = HF.51010 } #Legendary weapon
-					}
-				}
-			}
-		}
-	}
-}
-
+# TODO: This seems out of place
 namespace = HFP
+
 # Removing vomiting (non-dlc locked version)
 character_event = {
 	id = HFP.14005
@@ -4707,9 +4522,11 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_RIP_11001
+
 		remove_trait = vomiting
 		clr_character_flag = disease_not_serious
-		hidden_tooltip = {
+
+		hidden_effect = {
 			remove_character_modifier = symptom_treatment_1
 			remove_character_modifier = symptom_treatment_2
 			remove_character_modifier = symptom_treatment_3
