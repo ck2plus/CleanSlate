@@ -11,6 +11,7 @@
 # ere_elective_politician_titles_trigger
 # can_still_be_commander_byzantine_trigger
 # can_still_be_marshal_byzantine_trigger
+# byzantines_can_grant_commander_trigger
 
 ### Council Jobs ###
 
@@ -111,6 +112,7 @@ can_be_chancellor_trigger = {
 		limit = { NOT = { has_character_flag = special_chancellor } }
 
 		is_adult = yes
+
 		trigger_if = {
 			limit = {
 				NOT = { trait = horse }
@@ -285,6 +287,7 @@ can_be_treasurer_trigger = {
 		limit = { NOT = { has_character_flag = special_treasurer } }
 
 		is_adult = yes
+
 		trigger_if = {
 			limit = {
 				NOT = { trait = horse }
@@ -372,6 +375,7 @@ can_be_spymaster_trigger = {
 		limit = { NOT = { has_character_flag = special_spymaster } }
 
 		is_adult = yes
+
 		trigger_if = {
 			limit = {
 				NOT = { trait = horse }
@@ -675,7 +679,7 @@ can_be_councilmember_emperor_trigger = {
 	}
 }
 
-ere_elective_politician_titles_trigger = { #Used in Imperial Elective to determine AI behavior.
+ere_elective_politician_titles_trigger = { # Used in Imperial Elective to determine AI behavior.
 	OR = {
 		has_job_title = job_marshal
 		has_job_title = job_spymaster
@@ -698,7 +702,9 @@ can_still_be_commander_byzantine_trigger = {
 	}
 
 	trigger_if = {
-		limit = { is_adult = yes }
+		limit = {
+			NOT = { has_character_flag = special_marshal }
+		}
 
 		OR = {
 			male_can_hold_minor_title_trigger = yes
@@ -709,9 +715,8 @@ can_still_be_commander_byzantine_trigger = {
 			limit = { religion = hindu }
 			trait = kshatriya
 		}
-	}
-	trigger_else = {
-		has_character_flag = special_marshal
+
+		is_adult = yes
 	}
 
 	prisoner = no
@@ -741,21 +746,22 @@ can_still_be_commander_byzantine_trigger = {
 
 						primary_title = { temporary = no }
 
-						OR = {
-							AND = {
-								is_adult = yes
-
-								OR = {
-									male_can_hold_minor_title_trigger = yes
-									female_can_hold_minor_commander_title_trigger = yes
-								}
-
-								trigger_if = {
-									limit = { religion = hindu }
-									trait = kshatriya
-								}
+						trigger_if = {
+							limit = {
+								NOT = { has_character_flag = special_marshal }
 							}
-							has_character_flag = special_marshal
+
+							OR = {
+								male_can_hold_minor_title_trigger = yes
+								female_can_hold_minor_commander_title_trigger = yes
+							}
+
+							trigger_if = {
+								limit = { religion = hindu }
+								trait = kshatriya
+							}
+
+							is_adult = yes
 						}
 
 						prisoner = no
@@ -794,7 +800,9 @@ can_still_be_marshal_byzantine_trigger = {
 	}
 
 	trigger_if = {
-		limit = { is_adult = yes }
+		limit = {
+			NOT = { has_character_flag = special_chancellor }
+		}
 
 		trigger_if = {
 			limit = { is_female = yes }
@@ -853,9 +861,8 @@ can_still_be_marshal_byzantine_trigger = {
 			limit = { religion = hindu }
 			NOT = { trait = kshatriya }
 		}
-	}
-	trigger_else = {
-		has_character_flag = special_chancellor
+
+		is_adult = yes
 	}
 
 	independent = no
@@ -871,6 +878,52 @@ can_still_be_marshal_byzantine_trigger = {
 			has_opinion_modifier = {
 				who = ROOT
 				name = opinion_resigned_from_council
+			}
+		}
+	}
+}
+
+byzantines_can_grant_commander_trigger = {
+	trigger_if = {
+		limit = { has_law = succ_byzantine_elective }  # Either not Imperial...
+
+		NOT = { #...Or there are no valid vassal candidates that can be commanders
+			any_vassal = {
+				higher_real_tier_than = BARON
+				primary_title = { temporary = no }
+
+				trigger_if = {
+					limit = {
+						NOT = { has_character_flag = special_marshal }
+					}
+
+					OR = {
+						male_can_hold_minor_title_trigger = yes
+						female_can_hold_minor_commander_title_trigger = yes
+					}
+
+					trigger_if = {
+						limit = { religion = hindu }
+						trait = kshatriya
+					}
+
+					is_adult = yes
+				}
+
+				prisoner = no
+				is_incapable = no
+				is_inaccessible_trigger = no
+
+				NOR = {
+					has_job_title = job_chancellor
+					has_job_title = job_marshal
+					has_job_title = job_treasurer
+					has_job_title = job_spymaster
+					has_job_title = job_spiritual
+					has_minor_title = title_commander
+					has_character_modifier = guru
+					has_character_modifier = refusing_to_lead
+				}
 			}
 		}
 	}

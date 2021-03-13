@@ -1,9 +1,9 @@
 # join_prev_warrior_lodge_society_effect
 # give_this_warrior_lodge_religion_effect
-# warrior_lodge_pay_dice_debt_effect
-# warrior_lodge_get_dice_bet_effect
-# warrior_lodge_double_dice_bet_effect
+# warrior_lodge_dice_game_duel_winner_effect
 # warrior_lodge_dice_game_cleanup_effect
+# warrior_lodge_war_aid_cleanup_effect
+# WL_ritual_hunt_cleanup_effect
 
 join_prev_warrior_lodge_society_effect = {
 	if = {
@@ -53,177 +53,91 @@ give_this_warrior_lodge_religion_effect = { # Mostly for spawned characters
 	}
 }
 
-# TODO: rip out flag system when going through relevant events
-warrior_lodge_pay_dice_debt_effect = {
-	if = {
-		limit = { has_flag = flag_betting_money_1000 }
+warrior_lodge_dice_game_duel_winner_effect = {
+	custom_tooltip = { text = tooltip_EVTOPTYHF25230 }
 
-		wealth = -1000
+	tiered_prestige_negative_effect = yes
+	warrior_lodge_dice_game_cleanup_effect = yes
 
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 1000 }
+	# REQUIRED event targets for setting up duel evaluation!
+	hidden_effect = {
+		save_event_target_as = combatant_1 # the person issuing the duel...
+		event_target:random_society_winner = { save_event_target_as = combatant_2 } # the target of the duel...
+		
+		add_character_modifier = {
+			name = recent_duel_timer
+			years = 1
+			hidden = yes
 		}
 	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_500 }
 
-		wealth = -500
-
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 500 }
-		}
+	event_target:random_society_winner = {
+		show_scope_change = no
+		apply_degree_of_dishonorable_duel_effect = yes # checks a bunch of age and health statuses...
 	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_250 }
 
-		wealth = -250
+	pacifists_lose_piety_effect = yes
 
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 250 }
-		}
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_200 }
-
-		wealth = -200
-
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 200 }
-		}
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_100 }
-
-		wealth = -100
-
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 100 }
-		}
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_50 }
-
-		wealth = -50
-
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 50 }
-		}
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_25 }
-
-		wealth = -25
-
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 25 }
-		}
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_20 }
-
-		wealth = -20
-
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 20 }
-		}
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_10 }
-
-		wealth = -10
-
-		if = {
-			limit = { event_target:random_society_winner = { is_alive = yes } }
-			event_target:random_society_winner = { wealth = 10 }
-		}
-	}
-}
-
-warrior_lodge_get_dice_bet_effect = {
-	trigger_switch = {
-		on_trigger = has_flag
-
-		flag_betting_money_1000 = {	wealth = 1000 }
-		flag_betting_money_500 = { wealth = 500 }
-		flag_betting_money_250 = { wealth = 250 }
-		flag_betting_money_200 = { wealth = 200 }
-		lag_betting_money_100 = { wealth = 100 }
-		flag_betting_money_50 = { wealth = 50 }
-		flag_betting_money_25 = { wealth = 25 }
-		flag_betting_money_20 = { wealth = 20 }
-		flag_betting_money_10 = { wealth = 10 }
-	}
-}
-
-warrior_lodge_double_dice_bet_effect = {
-	if = {
-		limit = { has_flag = flag_betting_money_500 }
-
-		clr_flag = flag_betting_money_500
-		set_flag = flag_betting_money_1000
-		custom_tooltip = { text = tooltip_betting_1000_gold }
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_250 }
-
-		clr_flag = flag_betting_money_250
-		set_flag = flag_betting_money_500
-		custom_tooltip = { text = tooltip_betting_500_gold }
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_100 }
-
-		clr_flag = flag_betting_money_100
-		set_flag = flag_betting_money_200
-		custom_tooltip = { text = tooltip_betting_200_gold }
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_50 }
-
-		clr_flag = flag_betting_money_50
-		set_flag = flag_betting_money_100
-		custom_tooltip = { text = tooltip_betting_100_gold }
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_25 }
-
-		clr_flag = flag_betting_money_25
-		set_flag = flag_betting_money_50
-		custom_tooltip = { text = tooltip_betting_50_gold }
-	}
-	else_if = {
-		limit = { has_flag = flag_betting_money_10 }
-
-		clr_flag = flag_betting_money_10
-		set_flag = flag_betting_money_20
-		custom_tooltip = { text = tooltip_betting_20_gold }
-	}
+	event_target:random_society_winner = { character_event = { id = HFP.10095 days = 1 } } # Duel evaluation (hidden) + result event as follow-up.
 }
 
 warrior_lodge_dice_game_cleanup_effect = {
-	clr_flag = flag_betting_money_1000
-	clr_flag = flag_betting_money_500
-	clr_flag = flag_betting_money_250
-	clr_flag = flag_betting_money_200
-	clr_flag = flag_betting_money_100
-	clr_flag = flag_betting_money_50
-	clr_flag = flag_betting_money_25
-	clr_flag = flag_betting_money_20
-	clr_flag = flag_betting_money_10
-	clr_flag = flag_betting_on_krita
-	clr_flag = flag_betting_on_treta
-	clr_flag = flag_betting_on_dwapara
-	clr_flag = flag_betting_on_kali
-	clr_flag = flag_warrior_lodge_die_is_krita
-	clr_flag = flag_warrior_lodge_die_is_treta
-	clr_flag = flag_warrior_lodge_die_is_dwapara
-	clr_flag = flag_warrior_lodge_die_is_kali
+	clr_character_flag = cheat_fake_die
+	clr_character_flag = cheat_bump_table
+	clr_character_flag = won_die_roll
+	clr_character_flag = flag_betting_money_1000
+	clr_character_flag = flag_betting_money_500
+	clr_character_flag = flag_betting_money_250
+	clr_character_flag = flag_betting_money_200
+	clr_character_flag = flag_betting_money_100
+	clr_character_flag = flag_betting_money_50
+	clr_character_flag = flag_betting_money_25
+	clr_character_flag = flag_betting_money_20
+	clr_character_flag = flag_betting_money_10
+	clr_character_flag = flag_betting_on_krita
+	clr_character_flag = flag_betting_on_treta
+	clr_character_flag = flag_betting_on_dwapara
+	clr_character_flag = flag_betting_on_kali
+	clr_character_flag = flag_warrior_lodge_die_is_krita
+	clr_character_flag = flag_warrior_lodge_die_is_treta
+	clr_character_flag = flag_warrior_lodge_die_is_dwapara
+	clr_character_flag = flag_warrior_lodge_die_is_kali
+}
+
+warrior_lodge_war_aid_cleanup_effect = {
+	clr_character_flag = invited_player_to_war
+	clr_character_flag = defender_invited_player_to_war
+	clr_character_flag = accepted_war_invite_from_defender
+	clr_character_flag = accepted_war_invite_from_attacker
+	clr_character_flag = got_war_invite_from_defender
+	clr_character_flag = got_war_invite_from_attacker
+	clr_character_flag = attacker_won
+	clr_character_flag = defender_won
+	clr_character_flag = white_peace
+	clr_character_flag = negative_war_letter
+	clr_character_flag = positive_war_letter
+}
+
+WL_ritual_hunt_cleanup_effect = {
+	clr_character_flag = do_not_disturb
+
+	hidden_effect = {
+		set_variable = {
+			which = wl_ritual_hunting
+			value = 0
+		}
+	}
+
+	clr_character_flag = flag_hunting_wolf_norse
+	clr_character_flag = flag_hunting_wolf_baltic
+	clr_character_flag = flag_hunting_wolf_hellenic
+
+	clr_character_flag = flag_hunting_eagle_slavic
+	clr_character_flag = flag_hunting_eagle_tengri
+	clr_character_flag = flag_hunting_eagle_bon
+
+	clr_character_flag = flag_hunting_bear_finnish
+
+	clr_character_flag = flag_hunting_lion_west_african
+	clr_character_flag = flag_hunting_lion_zun
 }

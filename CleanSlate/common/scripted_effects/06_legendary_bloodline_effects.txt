@@ -12,20 +12,20 @@
 #	clear_delayed_event = { id = HF.12003 }
 #	clean_up_after_legendary_showdown_effect = yes
 # }
-
-restart_society_progress_effect = {
-	if = {
-		limit = {
-			any_society_member = {
-				has_character_flag = call_to_legend_active
-			}
-		}
-
-		set_society_progress = 0
-		clr_flag = block_society_progress	# So progress can resume for members...
-		clr_flag = used_legendary_gathering	# So progress can resume for members...
-	}
-}
+#
+# restart_society_progress_effect = {
+#	if = {
+#		limit = {
+#			any_society_member = {
+#				has_character_flag = call_to_legend_active
+#			}
+#		}
+#
+#		set_society_progress = 0
+#		clr_flag = block_society_progress	# So progress can resume for members...
+#		clr_flag = used_legendary_gathering	# So progress can resume for members...
+#	}
+# }
 
 clean_up_after_legendary_showdown_effect = {
 	hidden_effect = {
@@ -95,7 +95,6 @@ add_2_points_to_legendary_progress_effect = {
 	}
 }
 
-# increase_legendary_progress_effect = {
 evaluate_legendary_progress_effect = {
 	if = { # You're just starting out...
 		limit = {
@@ -212,19 +211,20 @@ save_fellow_member_effect = {
 		event_target:fellow_hero_3 = { save_event_target_as = fellow_member }
 	}
 	else = {
-		random_society_member = {
-			limit = {
-				same_society_as = ROOT
-				NOT = { character = ROOT }
-				is_inaccessible_or_incapable_trigger = no
-			}
+		society = {
+			random_society_member = {
+				limit = {
+					NOT = { character = ROOT }
+					is_inaccessible_or_incapable_trigger = no
+				}
 
-			save_event_target_as = fellow_member
+				save_event_target_as = fellow_member
+			}
 		}
 	}
 }
 
-duel_someone_effect = {
+warrior_lodge_legendary_duel_someone_effect = {
 	hidden_effect = {
 		set_character_flag = add_duel_xp
 		set_character_flag = is_legendary_duel
@@ -285,19 +285,19 @@ died_before_achieveing_greatness_effect = {
 		}
 	}
 
-	any_society_member = {
-		limit = {
-			same_society_as = PREV
-
-			NOT = {
-				character = PREV
-				is_heir = PREV
+	society = {
+		any_society_member = {
+			limit = {
+				NOR = {
+					character = PREVPREV
+					is_heir = PREVPREV
+				}
 			}
-		}
 
-		character_event = {
-			id = HF.12103 # Our fellow adventurer died (and achieved nothing)...
-			days = 1
+			character_event = {
+				id = HF.12103 # Our fellow adventurer died (and achieved nothing)...
+				days = 1
+			}
 		}
 	}
 }
@@ -334,19 +334,19 @@ died_founding_a_bloodline_effect = { # For the main heir
 		}
 	}
 
-	any_society_member = {
-		limit = {
-			same_society_as = ROOT
-
-			NOR = {
-				character = ROOT
-				is_heir = PREV
+	society = {
+		any_society_member = {
+			limit = {
+				NOR = {
+					character = ROOT
+					is_heir = PREVPREV
+				}
 			}
-		}
 
-		narrative_event = {
-			id = HF.12302 # News event to fellow society members...
-			days = 3
+			narrative_event = {
+				id = HF.12302 # News event to fellow society members...
+				days = 3
+			}
 		}
 	}
 }
@@ -356,42 +356,21 @@ stop_slow_AIs_effect = {
 		if = {
 			limit = { is_in_society = yes }
 
-			if = {
-				limit = {
-					any_society_member = {
-						same_society_as = PREV
-
-						OR = {
-							has_character_flag = call_to_legend_active
-							has_character_flag = completed_call_to_legend
-						}
-
-						check_variable = {
-							which = legendary_event_progress
-							value < 8
-						}
-
-						ai = yes
-						NOT = { character = PREV }
-					}
-				}
-
+			society = {
 				random_society_member = {
 					limit = {
-						same_society_as = PREV
-
 						OR = {
 							has_character_flag = call_to_legend_active
 							has_character_flag = completed_call_to_legend
 						}
 
-						NOT = { character = PREV }
-						ai = yes
-
 						check_variable = {
 							which = legendary_event_progress
 							value < 8
 						}
+
+						NOT = { character = PREVPREV }
+						ai = yes
 					}
 
 					clean_up_after_legendary_showdown_effect = yes
@@ -399,8 +378,6 @@ stop_slow_AIs_effect = {
 
 				random_society_member = {
 					limit = {
-						same_society_as = PREV
-
 						OR = {
 							has_character_flag = call_to_legend_active
 							has_character_flag = completed_call_to_legend
@@ -411,27 +388,28 @@ stop_slow_AIs_effect = {
 							value < 8
 						}
 
-						NOT = { character = PREV }
+						NOT = { character = PREVPREV }
 						ai = yes
 					}
 
 					clean_up_after_legendary_showdown_effect = yes
 				}
-
-				# if = {
-				#	limit = { ai = no }
-				#	character_event = { id = HF.12104 }
-				# }
 			}
+
+			# if = {
+			#	limit = { ai = no }
+			#	character_event = { id = HF.12104 }
+			# }
 
 			if = { # To make sure the progress bar properly resets.
 				limit = {
 					NOT = {
-						any_society_member = {
-							same_society_as = PREV
-							has_character_flag = call_to_legend_active
-							NOT = { character = PREV }
-							ai = yes
+						society = {
+							any_society_member = {
+								has_character_flag = call_to_legend_active
+								NOT = { character = PREVPREV }
+								ai = yes
+							}
 						}
 					}
 				}
@@ -803,7 +781,7 @@ found_a_legendary_bloodline_effect = { # For any hero
 	}
 }
 
-# TODO: detete if no longer used in events
+# TODO: delete if no longer used in events
 randomize_ABCDEF_desc_flag_effect = {
 	clr_ABCDEF_desc_flag_effect = yes
 
@@ -828,11 +806,10 @@ randomize_ABCDEF_desc_flag_effect = {
 			trigger = { NOT = { has_character_flag = had_WL_desc_E } }
 			set_character_flag = WL_desc_E
 		}
-		#10 = { set_character_flag = desc_F }
 	}
 }
 
-# TODO: detete if no longer used in events
+# TODO: delete if no longer used in events
 clr_ABCDEF_desc_flag_effect = {
 	if = {
 		limit = { has_character_flag = WL_desc_A }
@@ -882,7 +859,7 @@ clr_ABCDEF_desc_flag_effect = {
 	}
 }
 
-# TODO: detete if no longer used in events
+# TODO: delete if no longer used in events
 randomize_XYZ_desc_flag_effect = { # Can run twice. Then it messes up.
 	clr_XYZ_desc_flag_effect = yes
 
@@ -937,7 +914,7 @@ randomize_XYZ_desc_flag_effect = { # Can run twice. Then it messes up.
 	}
 }
 
-# TODO: detete if no longer used in events
+# TODO: delete if no longer used in events
 clr_XYZ_desc_flag_effect = {
 	clr_character_flag = WL_desc_X
 	clr_character_flag = WL_desc_Y
@@ -1031,37 +1008,33 @@ add_legend_progress_massive_effect = {
 }
 
 send_new_eagle_event_effect = {
-	hidden_effect = {
-		if = { # If you have a "Friend of Eagles" bloodline
-			limit = {
-				any_owned_bloodline = {
-					has_bloodline_flag = bloodline_effect_pet_eagle
-				}
+	if = { # If you have a "Friend of Eagles" bloodline
+		limit = {
+			any_owned_bloodline = {
+				has_bloodline_flag = bloodline_effect_pet_eagle
 			}
+		}
 
-			character_event = {
-				id = HF.12400 # Get a new bird!
-				days = 65
-				random = 55
-			}
+		character_event = {
+			id = HF.12400 # Get a new bird!
+			days = 65
+			random = 55
 		}
 	}
 }
 
 send_new_dog_event_effect = {
-	hidden_effect = {
-		if = { # If you have a "Friend of Eagles" bloodline
-			limit = {
-				any_owned_bloodline = {
-					has_bloodline_flag = bloodline_effect_pet_dog
-				}
+	if = { # If you have a "Friend of Eagles" bloodline
+		limit = {
+			any_owned_bloodline = {
+				has_bloodline_flag = bloodline_effect_pet_dog
 			}
+		}
 
-			character_event = {
-				id = HF.12401 # Get a new dog!
-				days = 65
-				random = 55
-			}
+		character_event = {
+			id = HF.12401 # Get a new dog!
+			days = 65
+			random = 55
 		}
 	}
 }
@@ -1145,7 +1118,7 @@ spawn_old_duelist_effect = {
 		random_list = {
 			20 = { add_trait = robust }
 			10 = { add_trait = strong }
-			5 = { health = 2 }
+			 5 = { health = 2 }
 		}
 
 		random_list = {
@@ -1333,7 +1306,7 @@ spawn_old_duelist_effect = {
 			}
 
 			random_list = {
-				5 = { add_trait = pagan_branch_1 }
+				 5 = { add_trait = pagan_branch_1 }
 				25 = { add_trait = pagan_branch_2 }
 				25 = { add_trait = pagan_branch_3 }
 				25 = { add_trait = pagan_branch_4 }
@@ -1577,7 +1550,7 @@ spawn_giant_duelist_effect = {
 			}
 
 			random_list = {
-				5  = { add_trait = pagan_branch_1 }
+				 5 = { add_trait = pagan_branch_1 }
 				25 = { add_trait = pagan_branch_2 }
 				25 = { add_trait = pagan_branch_3 }
 				25 = { add_trait = pagan_branch_4 }
@@ -1906,7 +1879,7 @@ spawn_creature_champion_effect = {
 			}
 
 			random_list = {
-				5  = { add_trait = pagan_branch_1 }
+				 5 = { add_trait = pagan_branch_1 }
 				25 = { add_trait = pagan_branch_2 }
 				25 = { add_trait = pagan_branch_3 }
 				25 = { add_trait = pagan_branch_4 }
