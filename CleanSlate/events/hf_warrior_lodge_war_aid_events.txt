@@ -1,24 +1,28 @@
 ###########################################
 #                                         #
-# Warrior Lodge War Aid events			  #
-#                       				  #
+# Warrior Lodge War Aid events            #
 #                                         #
-# ID HF.50000-HF.50107    	              #
+#                                         #
+# ID HF.50000-HF.50107                    #
 #                                         #
 ###########################################
 
 namespace = HF
 
-#Consider sending a proposal for aid in war
+# TODO: Could event logic be improved by using persistent_event_targets?
+
+# Consider sending a proposal for aid in war
 # From = Attacker, Root = Defender
 character_event = {
 	id = HF.50000
 
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
-	war = yes
-	ai = yes
 	hide_window = yes
+	is_triggered_only = yes # on_war_started
+
+	has_dlc = "Holy Fury"
+	ai = yes
+	is_in_society = yes
+	war = yes
 
 	trigger = {
 		is_member_of_any_warrior_lodge_trigger = yes
@@ -34,36 +38,31 @@ character_event = {
 
 		any_player = {
 			war = no
-			is_within_diplo_range = ROOT
 			same_society_as = ROOT
-			NOT = { vassal_of = ROOT }
-
+			is_within_diplo_range = ROOT
 			is_within_diplo_range = FROM
+
 			NOR = {
-				vassal_of = FROM
+				is_vassal_or_below_of = ROOT
+				is_vassal_or_below_of = FROM
 				has_non_aggression_pact_with = FROM
 				is_allied_with = FROM
 			}
-			NAND = { #So the player is not liege of both characters...
-				ROOT = {
-					any_liege = {
-						character = PREVPREV
-					}
-				}
-				FROM = {
-					any_liege = {
-						character = PREVPREV
-					}
-				}
+
+			NAND = { # So the player is not liege of both characters...
+				is_liege_or_above_of = ROOT
+				is_liege_or_above_of = FROM
 			}
-			NAND = {
-				is_tributary = yes
+
+			trigger_if = {
+				limit = { is_tributary = yes }
+
 				suzerain = {
-					OR = {
+					NOR = {
 						character = ROOT
 						character = FROM
-						any_liege = { character = ROOT }
-						any_liege = { character = FROM }
+						is_vassal_or_below_of = ROOT
+						is_vassal_or_below_of = FROM
 					}
 				}
 			}
@@ -81,123 +80,87 @@ character_event = {
 		random_player = {
 			limit = {
 				war = no
-				is_within_diplo_range = ROOT
 				same_society_as = ROOT
-				NOT = { vassal_of = ROOT }
-
+				is_within_diplo_range = ROOT
 				is_within_diplo_range = FROM
+
 				NOR = {
-					vassal_of = FROM
+					is_vassal_or_below_of = ROOT
+					is_vassal_or_below_of = FROM
 					has_non_aggression_pact_with = FROM
 					is_allied_with = FROM
 				}
-				NAND = { #So the player is not liege of both characters...
-					ROOT = {
-						any_liege = {
-							character = PREVPREV
-						}
-					}
-					FROM = {
-						any_liege = {
-							character = PREVPREV
-						}
-					}
+
+				NAND = { # So the player is not liege of both characters...
+					is_liege_or_above_of = ROOT
+					is_liege_or_above_of = FROM
 				}
 
-				NAND = {
-					is_tributary = yes
+				trigger_if = {
+					limit = { is_tributary = yes }
+
 					suzerain = {
-						OR = {
+						NOR = {
 							character = ROOT
 							character = FROM
-							any_liege = { character = ROOT }
-							any_liege = { character = FROM }
+							is_vassal_or_below_of = ROOT
+							is_vassal_or_below_of = FROM
 						}
 					}
 				}
 			}
 			save_event_target_as = player_target
-		}
 
-		event_target:player_target = {
-			random_list =
-			{
+			random_list = {
 				40 = {
-					modifier = {
-						event_target:player_target = {
-							is_lover = event_target:warrior_lodge_war_defender
-						}
+					mult_modifier = {
 						factor = 2
+						is_lover = event_target:warrior_lodge_war_defender
 					}
-					modifier = {
-						event_target:player_target = {
-							is_friend = event_target:warrior_lodge_war_defender
-						}
+					mult_modifier = {
 						factor = 2
+						is_friend = event_target:warrior_lodge_war_defender
 					}
-					modifier = {
-						event_target:warrior_lodge_war_defender = {
-						   opinion = { who = event_target:player_target value = 30 }
-						}
+					mult_modifier = {
 						factor = 1.1
-					}
-					modifier = {
-						event_target:warrior_lodge_war_defender = {
-						   opinion = { who = event_target:player_target value = 30 }
+
+						opinion = {
+							who = event_target:warrior_lodge_war_defender
+							value >= 30
 						}
-						factor = 1.2
 					}
+					mult_modifier = {
+						factor = 1.2
+
+						reverse_opinion = {
+							who = event_target:warrior_lodge_war_defender
+							value >= 30
+						}
+					}
+
 					letter_event = { id = HF.50002 }
 				}
-				60 = {
-					#Nothing happens
-				}
+				60 = { } # Nothing happens
 			}
 		}
 	}
 }
 
-#Can the Attacker consider sending a proposal for aid in war?
+# Can the Attacker consider sending a proposal for aid in war?
 character_event = {
 	id = HF.50001
 
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
-	war = yes
-	ai = yes
 	hide_window = yes
+	is_triggered_only = yes
+
+	has_dlc = "Holy Fury"
+	ai = yes
+	war = yes
 
 	trigger = {
 		is_member_of_any_warrior_lodge_trigger = yes
 
 		is_primary_war_attacker = yes
-
-		any_player = {
-			war = no
-			is_within_diplo_range = ROOT
-			same_society_as = ROOT
-			NOT = { vassal_of = ROOT }
-
-			is_within_diplo_range = FROM
-			NOR = {
-				vassal_of = FROM
-				has_non_aggression_pact_with = FROM
-				is_allied_with = FROM
-				same_society_as = FROM
-			}
-
-			NAND = {
-				is_tributary = yes
-				suzerain = {
-					OR = {
-						character = ROOT
-						character = FROM
-						any_liege = { character = ROOT }
-						any_liege = { character = FROM }
-					}
-				}
-			}
-		}
 	}
 
 	immediate = {
@@ -205,50 +168,69 @@ character_event = {
 			limit = {
 				war = no
 				same_society_as = ROOT
-				NOT = { same_society_as = event_target:warrior_lodge_war_defender }
-				NOT = { vassal_of = ROOT }
-				NOT = { vassal_of = event_target:warrior_lodge_war_defender }
+				is_within_diplo_range = ROOT
+				is_within_diplo_range = FROM
+
+				NOR = {
+					is_vassal_or_below_of = ROOT
+					is_vassal_or_below_of = FROM
+					has_non_aggression_pact_with = FROM
+					is_allied_with = FROM
+					same_society_as = FROM
+				}
+
+				NAND = { # So the player is not liege of both characters...
+					is_liege_or_above_of = ROOT
+					is_liege_or_above_of = FROM
+				}
+
+				trigger_if = {
+					limit = { is_tributary = yes }
+
+					suzerain = {
+						NOR = {
+							character = ROOT
+							character = FROM
+							is_vassal_or_below_of = ROOT
+							is_vassal_or_below_of = FROM
+						}
+					}
+				}
 			}
 			save_event_target_as = player_target
 		}
 
 		event_target:player_target = {
-			random_list =
-			{
+			random_list = {
 				40 = {
-					modifier = {
-						event_target:player_target = {
-							is_lover = event_target:warrior_lodge_war_attacker
-						}
+					mult_modifier = {
 						factor = 2
+						is_lover = event_target:warrior_lodge_war_attacker
 					}
-					modifier = {
-						event_target:player_target = {
-							is_friend = event_target:warrior_lodge_war_attacker
-						}
+					mult_modifier = {
 						factor = 2
+						is_friend = event_target:warrior_lodge_war_attacker
 					}
-					modifier = {
-						event_target:warrior_lodge_war_attacker = {
-						   opinion = {
-							who = event_target:player_target
-						   value = 30 }
-						}
+					mult_modifier = {
 						factor = 1.1
-					}
-					modifier = {
-						event_target:warrior_lodge_war_attacker = {
-						   opinion = {
-							who = event_target:player_target
-						   value = 50 }
+
+						reverse_opinion = {
+							who = event_target:warrior_lodge_war_attacker
+							value = 30
 						}
-						factor = 1.2
 					}
+					mult_modifier = {
+						factor = 1.2
+
+						opinion = {
+							who = event_target:warrior_lodge_war_attacker
+							value = 30
+						}
+					}
+
 					letter_event = { id = HF.50004 }
 				}
-				60 = {
-					#Nothing happens
-				}
+				60 = { } # Nothing happens
 			}
 		}
 	}
@@ -257,64 +239,61 @@ character_event = {
 # Player receives a letter asking for aid (Defender)
 letter_event = {
 	id = HF.50002
-	is_triggered_only = yes
-	ai = no
 	border = GFX_event_letter_frame_war
 	desc = EVTDESC_HF_50002
 
-	trigger = {
-		war = no
-	}
+	is_triggered_only = yes
+
 	immediate = {
 		set_character_flag = got_war_invite_from_defender
 	#	save_event_target_as = warrior_lodge_player_siding_with_defender
 	}
 
-	option = # Join war
-	{
+	option = { # Join war
 		name = EVTOPTA_HF_50002
+
 		join_defender_wars = FROM
-		FROM =
-		{
+
+		FROM = {
 			show_scope_change = no
+
+			set_character_flag = invited_player_to_war
+
 			opinion = {
-				modifier = opinion_grateful
+				name = opinion_grateful
 				who = ROOT
 				years = 5
 			}
-			set_character_flag = invited_player_to_war
 		}
+
 		clr_character_flag = got_war_invite_from_defender
 		set_character_flag = accepted_war_invite_from_defender
 
-		event_target:warrior_lodge_war_attacker =
-		{ set_character_flag = defender_invited_player_to_war }
+		event_target:warrior_lodge_war_attacker = { set_character_flag = defender_invited_player_to_war }
 	}
 
-	option = # Decline
-	{
+	option = { # Decline
 		name = EVTOPTB_HF_50002
-		FROM =
-		{
+
+		FROM = {
 			show_scope_change = no
+
 			opinion = {
-				modifier = opinion_disappointed
+				name = opinion_disappointed
 				who = ROOT
 				years = 5
 			}
 		}
 
-		if =
-		{
-			limit =
-			{
+		if = {
+			limit = {
 				event_target:warrior_lodge_war_attacker = {
 					same_society_as = ROOT
 					same_society_as = event_target:warrior_lodge_war_attacker
-					NOT = { vassal_of = ROOT }
+					NOT = { is_vassal_or_below_of = ROOT }
 				}
 			}
-			 event_target:warrior_lodge_war_attacker = { letter_event = { id = HF.50003 } }
+			event_target:warrior_lodge_war_attacker = { letter_event = { id = HF.50003 } }
 		}
 	}
 }
@@ -322,33 +301,22 @@ letter_event = {
 # ATTACKER will send letter to Player following the rejection
 letter_event = {
 	id = HF.50003
+	hide_window = yes
 	is_triggered_only = yes
+
 	has_dlc = "Holy Fury"
 	war = yes
 	ai = yes
-	hide_window = yes
 
 	trigger = {
 		is_member_of_any_warrior_lodge_trigger = yes
-
+		same_society_as = event_target:player_target
 		is_primary_war_defender = yes
-
-		any_player = {
-			war = no
-			same_society_as = ROOT
-			NOT = { vassal_of = ROOT }
-			has_character_flag = got_war_invite_from_attacker
-		}
 	}
 
 	immediate = {
-		random_player = {
-			limit = {
-				war = no
-				same_society_as = ROOT
-				has_character_flag = got_war_invite_from_defender
-			}
-			letter_event = { id = HF.50005 days = 30 }
+		event_target:player_target = {
+			letter_event = { id = HF.50005 months = 1 }
 		}
 	}
 }
@@ -356,46 +324,48 @@ letter_event = {
 # Player receives a letter asking for aid (Attacker)
 letter_event = {
 	id = HF.50004
-	is_triggered_only = yes
-	ai = no
 	border = GFX_event_letter_frame_war
 	desc = EVTDESC_HF_50004
 
+	is_triggered_only = yes
+
+	ai = no
+	war = no
+
 	trigger = {
 		is_member_of_any_warrior_lodge_trigger = yes
-		war = no
-		FROM = {
-			same_society_as = ROOT
-		}
+		same_society_as = FROM
 	}
 
-	option = # Join war
-	{
+	option = { # Join war
 		name = EVTOPTA_HF_50002
+
 		join_defender_wars = FROM
-		FROM =
-		{
+
+		FROM = {
+			show_scope_change = no
+
+			set_character_flag = invited_player_to_war
+
 			opinion = {
-				modifier = opinion_grateful
+				name = opinion_grateful
 				who = ROOT
 				years = 5
 			}
-			set_character_flag = invited_player_to_war
 		}
+
 		set_character_flag = accepted_war_invite_from_attacker
 	}
 
-	option = # Decline
-	{
+	option = { # Decline
 		name = EVTOPTB_HF_50002
-		FROM =
-		{
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 5
-			}
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = FROM
+			years = 5
 		}
+
 		clr_character_flag = got_war_invite_from_defender
 	}
 }
@@ -403,44 +373,41 @@ letter_event = {
 # Player receives a letter asking for aid (Defender) after rejecting the attacker
 letter_event = {
 	id = HF.50005
-	is_triggered_only = yes
-	ai = no
 	border = GFX_event_letter_frame_war
 	desc = EVTDESC_HF_50005
 
-	trigger = {
-		war = no
-	}
-	immediate = {
-	#	save_event_target_as = warrior_lodge_player_siding_with_defender
-	}
+	is_triggered_only = yes
 
-	option = # Join war
-	{
+	ai = no
+	war = no
+
+	option = { # Join war
 		name = EVTOPTA_HF_50002
+
 		join_defender_wars = FROM
-		FROM =
-		{
+
+		FROM = {
+			show_scope_change = no
+
+			set_character_flag = invited_player_to_war
+
 			opinion = {
-				modifier = opinion_grateful
+				name = opinion_grateful
 				who = ROOT
 				years = 5
 			}
-			set_character_flag = invited_player_to_war
 		}
+
 		set_character_flag = accepted_war_invite_from_defender
 	}
 
-	option = # Decline
-	{
+	option = { # Decline
 		name = EVTOPTB_HF_50002
-		FROM =
-		{
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 5
-			}
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = FROM
+			years = 5
 		}
 	}
 
@@ -449,17 +416,19 @@ letter_event = {
 	}
 }
 
-#Hidden event to setup the letter to the player - Attacker won the war
+# Hidden event to setup the letter to the player - Attacker won the war
 # From = Attacker, Root = Defender
 character_event = {
 	id = HF.50100
-	ai = yes
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+
+	is_triggered_only = yes # on_war_ended_victory
 	hide_window = yes
 
+	has_dlc = "Holy Fury"
+	ai = yes
+	war = no # Only after the last one.
+
 	trigger = {
-		war = no #Only after the last one.
 		OR = {
 			has_character_flag = invited_player_to_war
 			has_character_flag = defender_invited_player_to_war
@@ -472,20 +441,19 @@ character_event = {
 				has_character_flag = invited_player_to_war
 				block_general_event_trigger = yes
 			}
-			character_event = { id = HF.50107 } # cleanup of flags
+			warrior_lodge_war_aid_cleanup_effect = yes
 		}
 
 		if = {
 			limit = {
 				has_character_flag = invited_player_to_war
-				NOT = {
-					has_character_flag = defender_invited_player_to_war
-				}
+				NOT = { has_character_flag = defender_invited_player_to_war }
 			}
 			save_event_target_as = warrior_lodge_war_side
 		}
 
 		save_event_target_as = warrior_lodge_war_defender
+
 		FROM = {
 			save_event_target_as = warrior_lodge_war_attacker
 			save_event_target_as = warrior_lodge_war_victor
@@ -494,12 +462,13 @@ character_event = {
 		random_player = {
 			limit = {
 				same_society_as = ROOT
-				NOT = { vassal_of = ROOT }
+				NOT = { is_vassal_or_below_of = ROOT }
 				has_character_flag = accepted_war_invite_from_defender
 			}
-			character_event = { id = HF.50104 days = 30 }
+
 			set_character_flag = attacker_won
 			set_character_flag = negative_war_letter
+			character_event = { id = HF.50104 months = 1 }
 		}
 
 		FROM = {
@@ -509,17 +478,21 @@ character_event = {
 	}
 }
 
-#Hidden event to setup the letter to the player - White peace
+# Hidden event to setup the letter to the player - White peace
 # From = Attacker, Root = Defender
+# CleanSlate: Also triggers on_war_ended_invalid now
+# TODO: Write seperate loc for invalid?
 character_event = {
 	id = HF.50101
-	ai = yes
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+
 	hide_window = yes
+	is_triggered_only = yes # on_war_ended_whitepeace, on_war_ended_invalid
+
+	has_dlc = "Holy Fury"
+	ai = yes
+	war = no # Only after the last one.
 
 	trigger = {
-		war = no #Only after the last one.
 		OR = {
 			has_character_flag = invited_player_to_war
 			has_character_flag = defender_invited_player_to_war
@@ -527,26 +500,24 @@ character_event = {
 	}
 
 	immediate = {
-		set_character_flag = silfae_test_2
 		if = {
 			limit = {
 				has_character_flag = invited_player_to_war
 				block_general_event_trigger = yes
 			}
-			character_event = { id = HF.50107 } # cleanup of flags
+			warrior_lodge_war_aid_cleanup_effect = yes
 		}
 
 		if = {
 			limit = {
 				has_character_flag = invited_player_to_war
-				NOT = {
-					has_character_flag = defender_invited_player_to_war
-				}
+				NOT = { has_character_flag = defender_invited_player_to_war }
 			}
 			save_event_target_as = warrior_lodge_war_side
 		}
 
 		save_event_target_as = warrior_lodge_war_defender
+
 		FROM = {
 			save_event_target_as = warrior_lodge_war_attacker
 		}
@@ -554,61 +525,61 @@ character_event = {
 		random_player = {
 			limit = {
 				same_society_as = ROOT
-				NOT = { vassal_of = ROOT }
+				NOT = { is_vassal_or_below_of = ROOT }
 				has_character_flag = accepted_war_invite_from_defender
 			}
-			character_event = { id = HF.50104 days = 5 }
+
 			set_character_flag = white_peace
 			set_character_flag = positive_war_letter
+			character_event = { id = HF.50104 days = 5 }
 		}
 
 		FROM = {
-				set_character_flag = white_peace
-				character_event = { id = HF.50103 } # Setting up the right FROM for when the player gets their event
+			set_character_flag = white_peace
+			character_event = { id = HF.50103 } # Setting up the right FROM for when the player gets their event
 		}
 	}
 }
 
-#Hidden event to setup the letter to the player - Defender won
+# Hidden event to setup the letter to the player - Defender won
 # From = Attacker, Root = Defender
 character_event = {
 	id = HF.50102
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+
 	hide_window = yes
+	is_triggered_only = yes # on_war_ended_defeat
+
+	has_dlc = "Holy Fury"
 	ai = yes
+	war = no # Only after the last one.
 
 	trigger = {
-		war = no #Only after the last one.
 		OR = {
 			has_character_flag = invited_player_to_war
 			has_character_flag = defender_invited_player_to_war
 		}
-		#block_general_event_trigger = yes
 	}
 
 	immediate = {
-		set_character_flag = silfae_test_3
 		if = {
 			limit = {
 				has_character_flag = invited_player_to_war
 				block_general_event_trigger = yes
 			}
-			character_event = { id = HF.50107 } # cleanup of flags
+			warrior_lodge_war_aid_cleanup_effect = yes
 		}
 
 		if = {
 			limit = {
 				has_character_flag = invited_player_to_war
-				NOT = {
-					has_character_flag = defender_invited_player_to_war
-				}
+				NOT = { has_character_flag = defender_invited_player_to_war }
 			}
 			save_event_target_as = warrior_lodge_war_side
 		}
 
 		save_event_target_as = warrior_lodge_war_defender
 		save_event_target_as = warrior_lodge_war_victor
+
 		FROM = {
 			save_event_target_as = warrior_lodge_war_attacker
 		}
@@ -616,42 +587,40 @@ character_event = {
 		random_player = {
 			limit = {
 				same_society_as = ROOT
-				NOT = { vassal_of = ROOT }
+				NOT = { is_vassal_or_below_of = ROOT }
 				has_character_flag = accepted_war_invite_from_defender
 			}
-			character_event = { id = HF.50104 days = 5 }
+
 			set_character_flag = defender_won
 			set_character_flag = positive_war_letter
+			character_event = { id = HF.50104 days = 5 }
 		}
 
 		FROM = {
 			set_character_flag = defender_won
 			character_event = { id = HF.50103 } # Setting up the right FROM for when the player gets their event
 		}
-		if =
-		{
+
+		if = {
 			limit = {
 				NOT = { has_character_flag = invited_player_to_war }
 			}
-			character_event = { id = HF.50107 } #Clean up
+			warrior_lodge_war_aid_cleanup_effect = yes
 		}
 	}
 }
 
-#Hidden event to setup the letter to the player if they were on the attacking side
+# Hidden event to setup the letter to the player if they were on the attacking side
 character_event = {
 	id = HF.50103
 
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
 	hide_window = yes
-	ai = yes
+	is_triggered_only = yes
 
-	trigger =
-	{
-		war = no #Only after the last one.
-		has_character_flag = invited_player_to_war
-	}
+	has_dlc = "Holy Fury"
+	ai = yes
+	war = no # Only after the last one.
+	has_character_flag = invited_player_to_war
 
 	immediate = {
 		if = {
@@ -659,7 +628,7 @@ character_event = {
 				has_character_flag = invited_player_to_war
 				block_general_event_trigger = yes
 			}
-			character_event = { id = HF.50107 } # cleanup of flags
+			warrior_lodge_war_aid_cleanup_effect = yes
 		}
 
 		save_event_target_as = warrior_lodge_war_side
@@ -667,192 +636,170 @@ character_event = {
 		random_player = {
 			limit = {
 				same_society_as = ROOT
-				NOT = { vassal_of = ROOT }
+				NOT = { is_vassal_or_below_of = ROOT }
 				has_character_flag = accepted_war_invite_from_attacker
 			}
 			save_event_target_as = warrior_lodge_player
 		}
 
-		if =
-		{
-			limit = { has_character_flag = attacker_won }
-			event_target:warrior_lodge_player =
-			{
-				set_character_flag = attacker_won
-				set_character_flag = positive_war_letter
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			attacker_won = {
+				event_target:warrior_lodge_player = {
+					set_character_flag = attacker_won
+					set_character_flag = positive_war_letter
+				}
 			}
-		}
-		if =
-		{
-			limit = { has_character_flag = defender_won }
-			event_target:warrior_lodge_player =
-			{
-				set_character_flag = defender_won
-				set_character_flag = negative_war_letter
+			defender_won = {
+				event_target:warrior_lodge_player = {
+					set_character_flag = defender_won
+					set_character_flag = negative_war_letter
+				}
 			}
-		}
-		if =
-		{
-			limit = { has_character_flag = white_peace }
-			event_target:warrior_lodge_player =
-			{
-				set_character_flag = white_peace
-				set_character_flag = negative_war_letter
+			white_peace = {
+				event_target:warrior_lodge_player = {
+					set_character_flag = white_peace
+					set_character_flag = negative_war_letter
+				}
 			}
 		}
 
-		event_target:warrior_lodge_player =
-		{
+		event_target:warrior_lodge_player = {
 			character_event = { id = HF.50104 days = 5 }
 		}
 	}
 }
 
-
-#Player gets letter
+# Player gets letter
 character_event = {
 	id = HF.50104
+	border = GFX_event_normal_frame_diplomacy
+
+	desc = {
+		text = EVTDESC_HF_50104_attacker_won
+		trigger = { has_character_flag = attacker_won }
+	}
+	desc = {
+		text = EVTDESC_HF_50104_white_peace
+		trigger = { has_character_flag = white_peace }
+	}
+	desc = {
+		text = EVTDESC_HF_50104_defender_won
+		trigger = { has_character_flag = defender_won }
+	}
+
+	picture = {
+		picture = GFX_evt_pleasing_letter
+		trigger = { has_character_flag = positive_war_letter }
+	}
+	picture = {
+		picture = GFX_evt_upsetting_letter
+		trigger = { has_character_flag = negative_war_letter }
+	}
 
 	is_triggered_only = yes
+
 	has_dlc = "Holy Fury"
-	border = GFX_event_normal_frame_diplomacy
 	ai = no
-
-	picture = {
-		trigger = {
-			has_character_flag = positive_war_letter
-		}
-		picture = GFX_evt_pleasing_letter
-	}
-
-	picture = {
-		trigger = {
-			has_character_flag = negative_war_letter
-		}
-		picture = GFX_evt_upsetting_letter
-	}
-
-	desc = {
-		trigger = {
-			has_character_flag = attacker_won
-		}
-		text = EVTDESC_HF_50104_attacker_won
-	}
-	desc = {
-		trigger = {
-			has_character_flag = white_peace
-		}
-		text = EVTDESC_HF_50104_white_peace
-	}
-	desc = {
-		trigger = {
-			has_character_flag = defender_won
-		}
-		text = EVTDESC_HF_50104_defender_won
-	}
-
-	#trigger = {
-	#    event_target:warrior_lodge_player = { block_general_event_trigger = yes }
-	#    event_target:warrior_lodge_war_side = { block_general_event_trigger = yes }
-	# }
 
 	option = {
 		name = EVTOPTA_HF_50104 # I am pleased to hear this.
-		trigger = {
-			has_character_flag = positive_war_letter
-		}
+		trigger = { has_character_flag = positive_war_letter }
+
 		add_society_currency_major_effect = yes
-		character_event = { id = HF.50105 days = 5 }
+		character_event = { id = HF.50105 days = 5 } # Celebrations
 	}
 
 	option = {
 		name = EVTOPTB_HF_50104 # Is that all? I expected more...
-		 trigger = {
-			has_character_flag = positive_war_letter
-		}
+		 trigger = { has_character_flag = positive_war_letter }
+
 		add_society_currency_major_effect = yes
 		wealth = 50
+
 		opinion = {
-			modifier = opinion_very_disappointed
+			name = opinion_very_disappointed
 			who = FROM
 			years = 5
 		}
-		hidden_tooltip = {
+
+		hidden_effect = {
 			event_target:warrior_lodge_war_side = {
 				if = {
-					limit = {
-						wealth <= 50
-					}
+					limit = { wealth <= 50 }
 					wealth = -50
 				}
 			}
-			random =
-			{
+			random = {
 				chance = 50
-				character_event = { id = HF.50105 days = 30 }
+				character_event = { id = HF.50105 months = 1 } # Celebrations
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPTC_HF_50104 # The nerve of this brazen fool!
-		 trigger = {
-			has_character_flag = negative_war_letter
-		}
-		character_event = { id = HF.50107 }
-		event_target:warrior_lodge_war_side = { character_event = { id = HF.50107 } }
+		trigger = { has_character_flag = negative_war_letter }
 	}
 
 	option = {
 		name = EVTOPTD_HF_50104 # What should I have done differently...?
-		 trigger = {
-			has_character_flag = negative_war_letter
-		}
-		character_event = { id = HF.50107 }
-		event_target:warrior_lodge_war_side = { character_event = { id = HF.50107 } }
+		trigger = { has_character_flag = negative_war_letter }
 	}
 
 	option = {
 		name = EVTOPTE_HF_50104 # There is truth in his harsh words. I must abandon my craven ways.
-		 trigger = {
+		tooltip_info = craven
+
+		trigger = {
 			has_character_flag = negative_war_letter
 			trait = craven
 		}
+
 		remove_trait_craven_effect = yes
-		character_event = { id = HF.50107 }
-		event_target:warrior_lodge_war_side = { character_event = { id = HF.50107 } }
+	}
+
+	after = {
+		if = {
+			limit = { has_character_flag = negative_war_letter }
+		}
+
+		warrior_lodge_war_aid_cleanup_effect = yes
+
+		hidden_effect = {
+			event_target:warrior_lodge_war_side = {
+				warrior_lodge_war_aid_cleanup_effect = yes
+			}
+		}
 	}
 }
-
 
 # Player receives a letter inviting them for a fun activity
 character_event = {
 	id = HF.50105
-	is_triggered_only = yes
 	border = GFX_event_normal_frame_diplomacy
 	picture = GFX_evt_pleasing_letter
 	desc = EVTDESC_HF_50105
+
+	is_triggered_only = yes
 
 	trigger = {
 		event_target:warrior_lodge_war_side = { is_alive = yes }
 	}
 
-	option = # I happily accept! What a joyous occasion to share with [warrior_lodge_war_side.GetFirstName]
-	{
+	option = { # I happily accept! What a joyous occasion to share with [warrior_lodge_war_side.GetFirstName]
 		name = EVTOPTA_HF_50105
 
-		event_target:warrior_lodge_war_side =
-		{
-			opinion = {
-				modifier = common_interests_opinion
-				who = ROOT
-				years = 5
-			}
+		reverse_opinion = {
+			name = common_interests_opinion
+			who = event_target:warrior_lodge_war_side
+			years = 5
 		}
-		hidden_tooltip =
-		{
+
+		hidden_effect = {
 			opinion = {
-				modifier = common_interests_opinion
+				name = common_interests_opinion
 				who = event_target:warrior_lodge_war_side
 				years = 5
 			}
@@ -870,48 +817,45 @@ character_event = {
 			}
 
 			random_list = {
-				50 = { #success
-					modifier = {
+				50 = { # success
+					mult_modifier = {
+						factor = 2
 						trait = falconer
-						factor = 2
 					}
-					modifier = {
+					mult_modifier = {
+						factor = 2
 						trait = hunter
-						factor = 2
 					}
-					modifier = {
+					mult_modifier = {
+						factor = 2
 						is_strong_trigger = yes
-						factor = 2
 					}
-					modifier = {
-						martial = 16
+					mult_modifier = {
 						factor = 2
+						martial >= 16
 					}
+
+					# TODO: Nothing at all? Some fun...
 				}
-				50 = { #failure
-					modifier = {
+				50 = { # failure
+					mult_modifier = {
+						factor = 2
 						is_weak_trigger = yes
-						factor = 2
 					}
-					modifier = {
+					mult_modifier = {
+						factor = 2
 						has_disability_trigger = yes
-						factor = 2
 					}
+
 					add_maimed_trait_effect = yes
 				}
 			}
 		}
 
-		if = {
+		else_if = {
 			limit = {
 				event_target:warrior_lodge_war_side = {
-					NAND = {
-						has_focus = focus_hunting
-						trait = falconer
-						trait = hunter
-					}
-					OR =
-					{
+					OR = {
 						trait = trickster
 						trait = gamer
 						trait = strategist
@@ -920,168 +864,154 @@ character_event = {
 			}
 
 			random_list = {
-				50 = { #success
-					modifier = {
-						trait = trickster
+				50 = { # success
+					mult_modifier = {
 						factor = 2
-					}
-					modifier = {
-						trait = gamer
-						factor = 2
-					}
-					modifier = {
 						is_smart_trigger = yes
-						factor = 2
 					}
-					modifier = {
+					mult_modifier = {
+						factor = 2
+						trait = trickster
+					}
+					mult_modifier = {
+						factor = 2
+						trait = gamer
+					}
+					mult_modifier = {
+						factor = 2
 						trait = strategist
-						factor = 2
 					}
-					modifier = {
+					mult_modifier = {
+						factor = 2
 						trait = patient
-						factor = 2
 					}
-					add_trait = organizer
-				}
-				25 = { #failure
-					modifier = {
-						is_dumb_trigger = yes
-						factor = 2
-					}
-					add_trait_depressed_effect = yes
-				}
-				25 = { #failure
-					modifier = {
-						is_dumb_trigger = yes
-						factor = 2
-					}
-					add_trait_wroth_effect = yes
-				}
-			}
-		}
-
-		if = {
-			limit = {
-				event_target:warrior_lodge_war_side = {
-					NAND = {
-						has_focus = focus_hunting
-						trait = falconer
-						trait = hunter
-						trait = trickster
-						trait = gamer
-						trait = strategist
-					}
-					OR =
-					{
-						trait = scholar
-						trait = mystic
-						trait = erudite
-						learning = 18
-						trait = physician
-					}
-				}
-			}
-
-			random_list = {
-				50 = { #success
-					modifier = {
-						trait = scholar
-						factor = 2
-					}
-					modifier = {
-						trait = mystic
-						factor = 2
-					}
-					modifier = {
-						is_smart_trigger = yes
-						factor = 2
-					}
-					modifier = {
-						trait = erudite
-						factor = 2
-					}
-					modifier = {
-						trait = physician
-						factor = 2
-					}
-					add_trait = organizer
-				}
-				25 = { #failure
-					modifier = {
-						is_dumb_trigger = yes
-						factor = 2
-					}
-					add_trait_depressed_effect = yes
-				}
-				25 = { #failure
-					modifier = {
-						is_dumb_trigger = yes
-						factor = 2
-					}
-					add_trait_wroth_effect = yes
-				}
-			}
-		}
-
-		if = {
-			limit = {
-				event_target:warrior_lodge_war_side = {
-					NAND = {
-						has_focus = focus_hunting
-						trait = falconer
-						trait = hunter
-						trait = trickster
-						trait = gamer
-						trait = strategist
-						trait = scholar
-						trait = mystic
-						trait = erudite
-						learning = 18
-						trait = physician
-					}
-				}
-			}
-
-			random_list = {
-				50 = { #success
-					modifier = {
-						has_pleasant_trait_trigger = yes
-						factor = 2
-					}
-					modifier = {
-						has_pleasant_personality_trigger = yes
-						factor = 2
-					}
-					remove_trait_depressed_effect = yes
-					add_trait_gregarious_effect = yes
 
 					if = {
-						limit = { trait = stressed }
-						remove_trait = stressed
+						limit = {
+							can_have_more_leadership_traits = yes
+							NOT = { trait = organizer }
+						}
+						add_trait = organizer # CleanSlate: feels like there should be a fallback here like change_martial or something
 					}
 				}
-				50 = { #failure
-					modifier = {
-						has_mental_disorder_trigger = yes
+				25 = { # failure
+					mult_modifier = {
 						factor = 2
+						is_dumb_trigger = yes
 					}
+
 					add_trait_depressed_effect = yes
-					add_trait = drunkard
+				}
+				25 = { # failure
+					mult_modifier = {
+						factor = 2
+						is_dumb_trigger = yes
+					}
+
+					add_trait_wroth_effect = yes
+				}
+			}
+		}
+
+		else_if = {
+			limit = {
+				event_target:warrior_lodge_war_side = {
+					OR = {
+						trait = scholar
+						trait = mystic
+						trait = physician
+						trait = erudite
+						learning >= 18
+					}
+				}
+			}
+
+			random_list = {
+				50 = { # success
+					mult_modifier = {
+						factor = 2
+						is_smart_trigger = yes
+					}
+					mult_modifier = {
+						factor = 2
+						trait = scholar
+					}
+					mult_modifier = {
+						factor = 2
+						trait = mystic
+					}
+					mult_modifier = {
+						factor = 2
+						trait = physician
+					}
+					mult_modifier = {
+						factor = 2
+						trait = erudite
+					}
+
+					if = {
+						limit = {
+							can_have_more_leadership_traits = yes
+							NOT = { trait = organizer }
+						}
+						add_trait = organizer # CleanSlate: This doesn't quite seem to fit with trigger. Copy/paste error?
+					}
+				}
+				25 = { # failure
+					mult_modifier = {
+						factor = 2
+						is_dumb_trigger = yes
+					}
+
+					add_trait_depressed_effect = yes
+				}
+				25 = { # failure
+					mult_modifier = {
+						factor = 2
+						is_dumb_trigger = yes
+					}
+
+					add_trait_wroth_effect = yes
+				}
+			}
+		}
+
+		else = {
+			random_list = {
+				50 = { # success
+					mult_modifier = {
+						factor = 2
+						has_pleasant_trait_trigger = yes
+					}
+					mult_modifier = {
+						factor = 2
+						has_pleasant_personality_trigger = yes
+					}
+
+					add_trait_gregarious_effect = yes
+					remove_trait_depressed_effect = yes
+					remove_trait_silently_stressed_effect = yes
+				}
+				50 = { # failure
+					mult_modifier = {
+						factor = 2
+						has_mental_disorder_trigger = yes
+					}
+
+					add_trait_depressed_effect = yes
+					add_trait_silently_drunkard_effect = yes
 				}
 			}
 		}
 	}
 
-	option = # Decline the invitation. It is not suitable to my taste.
-	{
+	option = { # Decline the invitation. It is not suitable to my taste.
 		name = EVTOPTB_HF_50105
-		event_target:warrior_lodge_war_side =
-		{
-			opinion = {
-				modifier = opinion_extremely_disappointed
-				who = ROOT
-				years = 5
-			}
+
+		reverse_opinion = {
+			name = opinion_extremely_disappointed
+			who = event_target:warrior_lodge_war_side
+			years = 5
 		}
 	}
 }
@@ -1098,17 +1028,14 @@ character_event = {
 # 		event_target:warrior_lodge_war_side = { is_alive = yes }
 # 	}
 #
-# 	option = # Time spent [warrior_lodge_war_side.GetFirstName] are precious memories I forever will cherish.
-# 	{
+# 	option = { # Time spent [warrior_lodge_war_side.GetFirstName] are precious memories I forever will cherish.
 # 		name = EVTOPTA_HF_50106
 # 		add_friend = event_target:warrior_lodge_war_side
 # 	}
 #
-# 	option = # I never thought that I could find love as a consequence of war..
-# 	{
+# 	option = { # I never thought that I could find love as a consequence of war..
 # 		name = EVTOPTB_HF_50106
-# 		trigger =
-# 		{
+# 		trigger = {
 # 			event_target:warrior_lodge_war_side = {
 # 				root_attraction_trigger = yes
 # 				attracted_to_root_trigger = yes
@@ -1116,44 +1043,19 @@ character_event = {
 # 		}
 # 		add_lover = event_target:warrior_lodge_war_side
 # 	}
-# 	option = # My letters to [warrior_lodge_war_side.GetFirstName] is nothing but formality.
-# 	{
+#
+# 	option = { # My letters to [warrior_lodge_war_side.GetFirstName] is nothing but formality.
 # 		name = EVTOPTC_HF_50106
 #
-# 		FROM =
-# 		{
-# 			opinion = {
-# 				modifier = opinion_very_disappointed
-# 				who = ROOT
-# 				years = 5
-# 			}
+# 		reverse_opinion = {
+# 			name = opinion_very_disappointed
+# 			who = FROM
+# 			years = 5
 # 		}
 # 	}
-# 	after =
-# 	{
-# 		character_event = { id = HF.50107 }
-# 		event_target:warrior_lodge_war_side = { character_event = { id = HF.50107 } }
+#
+# 	after = {
+# 		warrior_lodge_war_aid_cleanup_effect = yes
+# 		event_target:warrior_lodge_war_side = { warrior_lodge_war_aid_cleanup_effect = yes }
 # 	}
 # }
-
-#CLEANUP
-character_event = {
-	id = HF.50107
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
-	hide_window = yes
-
-	immediate = {
-		clr_character_flag = invited_player_to_war
-		clr_character_flag = defender_invited_player_to_war
-		clr_character_flag = accepted_war_invite_from_defender
-		clr_character_flag = accepted_war_invite_from_attacker
-		clr_character_flag = got_war_invite_from_defender
-		clr_character_flag = got_war_invite_from_attacker
-		clr_character_flag = attacker_won
-		clr_character_flag = defender_won
-		clr_character_flag = white_peace
-		clr_character_flag = negative_war_letter
-		clr_character_flag = positive_war_letter
-	}
-}
