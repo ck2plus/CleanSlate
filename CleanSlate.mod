@@ -73,4 +73,7 @@ replace_path = "gfx/ambitions"
 replace_path = "localisation"
 replace_path = "localisation/customizable_localisation"
 
+# replace_path = "history"
+replace_path = "history/provinces"
+
 # To replace later: gfx, history, interface, launcher, map, songs
