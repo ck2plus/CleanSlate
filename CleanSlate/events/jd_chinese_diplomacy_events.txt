@@ -422,20 +422,20 @@ character_event = {
 					mult_modifier = {
 						factor = 0.5
 
-						OR = {
-							event_target:corresponding_councilor = {
-								has_job_title = job_chancellor
+						event_target:corresponding_councilor = {
+							trigger_if = {
+								limit = { has_job_title = job_chancellor }
 								diplomacy < 8
 							}
-							event_target:corresponding_councilor = {
-								has_job_title = job_marshal
+							trigger_else_if = {
+								limit = { has_job_title = job_marshal }
 								martial < 8
 							}
-							event_target:corresponding_councilor = {
-								has_job_title = job_treasurer
+							trigger_else_if = {
+								limit = { has_job_title = job_treasurer }
 								stewardship < 8
 							}
-							event_target:corresponding_councilor = {
+							trigger_else = {
 								has_job_title = job_spiritual
 								learning < 8
 							}
@@ -498,7 +498,7 @@ character_event = {
 			}
 
 			# Clear-up event
-			character_event = { id = JD.20020 days = 90 }
+			character_event = { id = JD.20020 months = 3 }
 		}
 	}
 }
@@ -1025,7 +1025,7 @@ character_event = {
 			count >= 2
 
 			ai = yes
-			is_landed = no
+			is_ruler = no
 			is_heir = no
 			block_general_event_trigger = no
 
@@ -1068,7 +1068,7 @@ character_event = {
 		any_courtier = {
 			limit = {
 				ai = yes
-				is_landed = no
+				is_ruler = no
 				is_heir = no
 				block_general_event_trigger = no
 
@@ -1095,7 +1095,7 @@ character_event = {
 		any_courtier = {
 			limit = {
 				ai = yes
-				is_landed = no
+				is_ruler = no
 				block_general_event_trigger = no
 
 				NOR = {
@@ -1131,7 +1131,7 @@ character_event = {
 		any_courtier = {
 			limit = {
 				ai = yes
-				is_landed = no
+				is_ruler = no
 				block_general_event_trigger = no
 
 				NOR = {
@@ -1167,9 +1167,8 @@ character_event = {
 		name = EVTOPTA_JD_10011
 		custom_tooltip = { text = EVTOPTA_JD_10011_TT }
 
-
 		event_target:adventurous_spirit = {
-			# show_scope_change = no
+			show_scope_change = no
 
 			check_likes_or_dislikes_THIS_effect = yes
 
@@ -1186,7 +1185,7 @@ character_event = {
 		custom_tooltip = { text = EVTOPTB_JD_10011_TT }
 
 		event_target:back_up_target_1 = {
-			# show_scope_change = no
+			show_scope_change = no
 
 			check_likes_or_dislikes_THIS_effect = yes
 
@@ -1205,7 +1204,7 @@ character_event = {
 		custom_tooltip = { text = EVTOPTC_JD_10011_TT }
 
 		event_target:back_up_target_2 = {
-			# show_scope_change = no
+			show_scope_change = no
 
 			check_likes_or_dislikes_THIS_effect = yes
 
@@ -1860,7 +1859,7 @@ character_event = { # Special case 1 - The courtier you sent away to China has r
 		}
 
 		event_target:new_found_lover = {
-			# set_character_flag = has_to_leave
+			# set_character_flag = has_to_leave # CleanSlate: Flag appears to be unused
 			hidden_effect = { leave_court_for_china_effect = yes }
 		}
 	}
@@ -1917,9 +1916,9 @@ character_event = { # Special case 2 - The courtier you sent away to China has r
 			}
 		}
 
-		if = { # Do they have family?
-			limit = {
-				FROM = {
+		FROM = {
+			if = { # Do they have family?
+				limit = {
 					OR = {
 						is_married = yes
 
@@ -1929,16 +1928,14 @@ character_event = { # Special case 2 - The courtier you sent away to China has r
 						}
 					}
 				}
+
+				custom_tooltip = { text = EVTOPTA_JD_10019_TT_family } # Explains that they will take their family with them
 			}
-			custom_tooltip = { text = EVTOPTA_JD_10019_TT_family } # Explains that they will take their family with them
-		}
-		else = { # Are they single and without children?
-			custom_tooltip = { text = EVTOPTA_JD_10019_TT_solo } # Explains that they'll just go on their own
-		}
+			else = { # Are they single and without children?
+				custom_tooltip = { text = EVTOPTA_JD_10019_TT_solo } # Explains that they'll just go on their own
+			}
 
-
-		hidden_effect = {
-			FROM = {
+			hidden_effect = {
 				remove_character_modifier = out_traveling
 
 				leave_court_for_china_effect = yes
@@ -2000,7 +1997,7 @@ character_event = { # Special case 2 - The courtier you sent away to China has r
 		trigger = {
 			reverse_opinion = {
 				who = FROM
-				value = 60
+				value >= 60
 			}
 		}
 
@@ -2077,12 +2074,11 @@ letter_event = {
 		}
 
 		any_vassal = {
-			any_realm_province = {
-				NOT = { has_province_modifier = reprimanded_merchants }
+			num_of_count_titles_in_realm >= 1
 
-				any_province_holding = {
-					holding_type = city
-				}
+			any_realm_province = {
+				has_city = yes
+				NOT = { has_province_modifier = reprimanded_merchants }
 			}
 		}
 	}
@@ -2098,14 +2094,11 @@ letter_event = {
 
 		random_vassal = {
 			limit = {
-				higher_real_tier_than = BARON
+				num_of_count_titles_in_realm >= 1
 
 				any_realm_province = {
+					has_city = yes
 					NOT = { has_province_modifier = reprimanded_merchants }
-
-					any_province_holding = {
-						holding_type = city
-					}
 				}
 			}
 			save_event_target_as = target_vassal_1
@@ -2113,14 +2106,11 @@ letter_event = {
 
 		random_vassal = {
 			limit = {
-				higher_real_tier_than = BARON
+				num_of_count_titles_in_realm >= 1
 
 				any_realm_province = {
+					has_city = yes
 					NOT = { has_province_modifier = reprimanded_merchants }
-
-					any_province_holding = {
-						holding_type = city
-					}
 				}
 
 				NOT = { character = event_target:target_vassal_1 }
@@ -2130,14 +2120,11 @@ letter_event = {
 
 		random_vassal = {
 			limit = {
-				higher_real_tier_than = BARON
+				num_of_count_titles_in_realm >= 1
 
 				any_realm_province = {
+					has_city = yes
 					NOT = { has_province_modifier = reprimanded_merchants }
-
-					any_province_holding = {
-						holding_type = city
-					}
 				}
 
 				NOR = {
@@ -2182,11 +2169,8 @@ letter_event = {
 				show_scope_change = no
 
 				limit = {
+					has_city = yes
 					NOT = { has_province_modifier = reprimanded_merchants }
-
-					any_province_holding = {
-						holding_type = city
-					}
 				}
 
 				add_province_modifier = {
@@ -2205,11 +2189,8 @@ letter_event = {
 				show_scope_change = no
 
 				limit = {
+					has_city = yes
 					NOT = { has_province_modifier = reprimanded_merchants }
-
-					any_province_holding = {
-						holding_type = city
-					}
 				}
 
 				add_province_modifier = {
@@ -2228,11 +2209,8 @@ letter_event = {
 				show_scope_change = no
 
 				limit = {
+					has_city = yes
 					NOT = { has_province_modifier = reprimanded_merchants }
-
-					any_province_holding = {
-						holding_type = city
-					}
 				}
 				add_province_modifier = {
 					name = reprimanded_merchants
@@ -2263,7 +2241,7 @@ letter_event = {
 		event_target:target_marshal = {
 			show_scope_change = no
 
-			if ={
+			if = {
 				limit = { intrigue < 5 }
 
 				add_character_modifier = {
@@ -3448,200 +3426,18 @@ character_event = {
 #	has_dlc = "Jade Dragon"
 #
 #	immediate = {
-#		event_target:trade_competitor_1 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_2 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_3 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_4 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_5 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
+#		any_playable_ruler = {
+#			limit = { has_character_flag = trade_competition_accumulate_prestige }
+#
+#			score_value = {
+#				value = 0
+#				chinese_trade_prestige_score = yes # Adds prestige
+#			}
+#
+#			set_character_flag = trade_competition_halftime_winner
+#			save_event_target_as = trade_competition_halftime_winner
 #		}
 #
-#		# TODO: if we are resurrecting this event chain, probably best to convert this to a score value
-#		if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_1 = {
-#				set_character_flag = trade_competition_halftime_winner
-#				save_event_target_as = trade_competition_halftime_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_2 = {
-#				set_character_flag = trade_competition_halftime_winner
-#				save_event_target_as = trade_competition_halftime_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_3 = {
-#				set_character_flag = trade_competition_halftime_winner
-#				save_event_target_as = trade_competition_halftime_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_4 = {
-#				set_character_flag = trade_competition_halftime_winner
-#				save_event_target_as = trade_competition_halftime_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_5 = {
-#				set_character_flag = trade_competition_halftime_winner
-#				save_event_target_as = trade_competition_halftime_winner
-#			}
-#		}
-#	}
-#	after = {
 #		event_target:trade_competitor_1 = {
 #			character_event = { id = JD.40009 }
 #		}
@@ -3720,200 +3516,18 @@ character_event = {
 #	is_triggered_only = yes
 #
 #	immediate = {
-#		event_target:trade_competitor_1 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_2 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_3 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_4 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
-#		}
-#		event_target:trade_competitor_5 = {
-#			set_variable = { which = trade_competitor_prestige value = 0 }
-#			export_to_variable = { which = trade_competitor_prestige value = prestige }
+#		any_playable_ruler = {
+#			limit = { has_character_flag = trade_competition_accumulate_prestige }
+#
+#			score_value = {
+#				value = 0
+#				chinese_trade_prestige_score = yes # Adds prestige
+#			}
+#
+#			set_character_flag = trade_competition_winner
+#			save_event_target_as = trade_competition_winner
 #		}
 #
-#		# TODO: if we are resurrecting this event chain, probably best to convert this to a score value
-#		if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_1
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_1 = {
-#				set_character_flag = trade_competition_winner
-#				save_event_target_as = trade_competition_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_2
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_2 = {
-#				set_character_flag = trade_competition_winner
-#				save_event_target_as = trade_competition_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_3
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_3 = {
-#				set_character_flag = trade_competition_winner
-#				save_event_target_as = trade_competition_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#					event_target:trade_competitor_5 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_4
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_4 = {
-#				set_character_flag = trade_competition_winner
-#				save_event_target_as = trade_competition_winner
-#			}
-#		}
-#		else_if = {
-#			limit = {
-#				NOT = {
-#					event_target:trade_competitor_1 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#					event_target:trade_competitor_2 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#					event_target:trade_competitor_3 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#					event_target:trade_competitor_4 = {
-#						check_variable = {
-#							which = trade_competitor_prestige
-#							which = event_target:trade_competitor_5
-#						}
-#					}
-#				}
-#			}
-#			event_target:trade_competitor_5 = {
-#				set_character_flag = trade_competition_winner
-#				save_event_target_as = trade_competition_winner
-#			}
-#		}
-#	}
-#	after = {
 #		event_target:trade_competitor_1 = {
 #			letter_event = { id = JD.40011 }
 #		}
@@ -4439,7 +4053,7 @@ character_event = { # China Assassinates the noble
 }
 
 
-# Inform of China's response to you breaking free via decision, first ping to get Governor's portrait
+# Inform of China's response to you breaking free via decision
 letter_event = {
 	id = JD.60011
 	desc = EVTDESC_JD_60011
@@ -6010,6 +5624,8 @@ character_event = { # Accept Teacher into Court
 		}
 
 		event_target:child_to_be_taught = {
+			show_scope_change = no
+
 			change_learning = 2
 		}
 
@@ -6035,6 +5651,8 @@ character_event = { # Accept Teacher into Court
 		}
 
 		event_target:child_to_be_taught = {
+			show_scope_change = no
+
 			change_learning = 1
 			add_trait = erudite
 
@@ -6076,6 +5694,8 @@ character_event = { # Accept Teacher into Court
 		}
 
 		event_target:child_to_be_taught = {
+			show_scope_change = no
+
 			change_learning = 1
 			add_trait = poet
 		}
@@ -6100,6 +5720,8 @@ character_event = { # Accept Teacher into Court
 		}
 
 		event_target:child_to_be_taught = {
+			show_scope_change = no
+
 			change_learning = 1
 			remove_trait = dull
 		}
@@ -6180,60 +5802,58 @@ character_event = { # Radhanite Merchant
 	}
 
 	immediate = {
-		hidden_effect = {
-			create_random_steward = {
-				random_traits = yes
-				dynasty = actually_culture
-				female = no
-				age = 33
-				culture = ashkenazi
-				religion = jewish
-				flag = ai_flag_refuse_conversion
-				attributes = {
-					diplomacy = 2
-					learning = 2
-					stewardship = 14
-					intrigue = 2
-					martial = 2
+		create_random_steward = {
+			random_traits = yes
+			dynasty = actually_culture
+			female = no
+			age = 33
+			culture = ashkenazi
+			religion = jewish
+			flag = ai_flag_refuse_conversion
+			attributes = {
+				diplomacy = 2
+				learning = 2
+				stewardship = 14
+				intrigue = 2
+				martial = 2
+			}
+		}
+		new_character = {
+			remove_trait = slow
+			remove_trait = imbecile
+			remove_trait = dull
+
+			add_trait = shrewd
+
+			wealth = 50
+
+			save_event_target_as = radhanite_merchant
+		}
+		random_realm_province = {
+			limit = {
+				trade_route = silk_road
+
+				NOR = {
+					has_province_modifier = radhanite_favor
+					has_province_modifier = radhanite_favor_big
+				}
+
+				any_province_holding = {
+					holding_type = city
+					holder_scope = { tier = BARON }
 				}
 			}
-			new_character = {
-				remove_trait = slow
-				remove_trait = imbecile
-				remove_trait = dull
+			save_event_target_as = radhanite_location
 
-				add_trait = shrewd
-
-				wealth = 50
-
-				save_event_target_as = radhanite_merchant
-			}
-			random_realm_province = {
+			random_province_holding = {
 				limit = {
-					trade_route = silk_road
-
-					NOR = {
-						has_province_modifier = radhanite_favor
-						has_province_modifier = radhanite_favor_big
-					}
-
-					any_province_holding = {
-						holding_type = city
-						holder_scope = { tier = BARON }
-					}
+					holding_type = city
+					holder_scope = { tier = BARON }
 				}
-				save_event_target_as = radhanite_location
+				save_event_target_as = radhanite_location_barony
 
-				random_province_holding = {
-					limit = {
-						holding_type = city
-						holder_scope = { tier = BARON }
-					}
-					save_event_target_as = radhanite_location_barony
-
-					holder_scope = {
-						save_event_target_as = radhanite_location_barony_holder
-					}
+				holder_scope = {
+					save_event_target_as = radhanite_location_barony_holder
 				}
 			}
 		}

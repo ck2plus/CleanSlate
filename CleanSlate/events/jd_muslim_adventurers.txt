@@ -16,6 +16,7 @@ character_event = {
 	religion_group = muslim
 
 	trigger = {
+		religion_group = liege
 		is_ruler = no
 		is_ill = no
 		is_ascetic_trigger = no # CleanSlate: Not using has_inheritance_blocker presumably so disinherited characters can still become adventurers
@@ -84,7 +85,7 @@ character_event = {
 			limit = { is_female = yes }
 
 			OR = {
-				liege = { has_law = status_of_women_4 }
+				has_law = status_of_women_4
 
 				has_game_rule = {
 					name = gender
@@ -92,8 +93,6 @@ character_event = {
 				}
 			}
 		}
-
-		liege = { religion_group = muslim }
 
 		location = { # only regions in the vicinity of India launch adventurers
 			OR = {
@@ -131,7 +130,7 @@ character_event = {
 	immediate = {
 		random_list = {
 			50 = {
-				mult_modifier = { # Less random invasions of India happen when there's already a powerful muslim kingdom there
+				mult_modifier = { # Fewer random invasions of India happen when there's already a powerful muslim kingdom there
 					factor = 8
 
 					any_independent_ruler = {
@@ -268,38 +267,37 @@ character_event = {
 					}
 
 					save_event_target_as = muslim_adventure_target
-
-					ROOT = {
-						opinion = {
-							name = opinion_duchy_adventure_target
-							who = PREV
-							years = 3
-						}
-						add_character_modifier = {
-							name = planning_duchy_adventure
-							days = 731
-							hidden = yes
-						}
-						character_event = {
-							id = JD.1002 # Fire the attack
-							years = 2
-						}
-					}
-
-					opinion = {
-						name = opinion_targeted_by_adventurer
-						who = ROOT
-						years = 2
-					}
-					# character_event = { id = JD.1001 } # Warn the target # CleanSlate: AI characters don't need notifications
 				}
 
+				opinion = {
+					name = opinion_duchy_adventure_target
+					who = event_target:muslim_adventure_target
+					years = 3
+				}
+
+				reverse_opinion = {
+					name = opinion_targeted_by_adventurer
+					who = event_target:muslim_adventure_target
+					years = 2
+				}
+
+				add_character_modifier = {
+					name = planning_duchy_adventure
+					days = 731
+					hidden = yes
+				}
+
+				character_event = {
+					id = JD.1002 # Fire the attack
+					years = 2
+				}
+
+				# character_event = { id = JD.1001 } # Warn the target # CleanSlate: AI characters don't need notifications
 				end_inaccessibility_effect = yes # removes in hiding or in_seclusion
 
 				set_character_flag = was_muslim_invader
 				set_character_flag = do_not_disturb
 				set_global_flag = muslim_invader_spawned
-				character_event = { id = JD.1005 years = 2 }
 			}
 		}
 	}
@@ -334,132 +332,126 @@ character_event = {
 	hide_window = yes # Only fires for unplayable landless characters
 	is_triggered_only = yes
 
-	prisoner = no
-	only_capable = yes
-
-	trigger = {
-		is_ruler = no
-
-		NOR = {
-			any_spouse = { is_ruler = yes }
-			any_heir_title = { always = yes }
-			obedient = event_target:muslim_adventure_target
-			non_interference = event_target:muslim_adventure_target
-		}
-
-		event_target:muslim_adventure_target = {
-			ai = yes
-			is_landed = yes
-			is_tributary = no
-
-			NOR = {
-				culture = ROOT
-				religion_group = ROOT
-				is_liege_or_above_of = ROOT
-			}
-
-			any_realm_province = { region = world_india }
-
-			reverse_has_opinion_modifier = {
-				name = opinion_duchy_adventure_target
-				who = ROOT
-			}
-		}
-	}
-
 	immediate = {
-		wealth = 500
 		clr_character_flag = do_not_disturb
 
-		liege = {
-			character_event = {
-				id = JD.1003
-				days = 1
-			}
+		if = {
+			limit = {
+				prisoner = no
+				only_capable = yes
+				is_ruler = no
 
-			capital_scope = {
+				NOR = {
+					any_spouse = { is_ruler = yes }
+					any_heir_title = { always = yes }
+					obedient = event_target:muslim_adventure_target
+					non_interference = event_target:muslim_adventure_target
+				}
+
+				reverse_has_opinion_modifier = {
+					name = opinion_duchy_adventure_target
+					who = event_target:muslim_adventure_target
+				}
+
 				event_target:muslim_adventure_target = {
-					random_realm_province = {
-						limit = { region = world_india }
+					ai = yes
+					is_landed = yes
+					is_tributary = no
 
-						ROOT = {
-							set_defacto_liege = ROOT
-
-							create_title = {
-								tier = DUKE
-								landless = yes
-								temporary = yes
-								adventurer = yes
-								culture = ROOT
-								name = "CLAIMANT_ADVENTURE"
-								holder = ROOT
-							}
-
-							set_character_flag = duchy_adventurer
-
-							spawn_unit = {
-								province = PREVPREVPREV
-								home = PREVPREVPREV
-								owner = THIS
-								match_character = PREVPREV
-								match_mult = 0.50
-								match_min = 1000
-								match_max = 10000
-								reinforces = yes
-								reinforce_rate_multiplier = 0.25
-								merge = yes
-								attrition = 0.25
-							}
-							spawn_unit = {
-								province = PREVPREVPREV
-								home = PREVPREVPREV
-								owner = THIS
-								match_character = PREVPREV
-								match_mult = 0.50
-								match_min = 1000
-								match_max = 10000
-								reinforces = yes
-								reinforce_rate_multiplier = 0.25
-								merge = yes
-								attrition = 0.25
-								cannot_inherit = yes
-							}
-							spawn_unit = {
-								province = PREVPREVPREV
-								home = PREVPREVPREV
-								owner = THIS
-								match_character = PREVPREV
-								match_mult = 0.50
-								match_min = 1000
-								match_max = 10000
-								reinforces = yes
-								reinforce_rate_multiplier = 0.25
-								merge = yes
-								attrition = 0.25
-								cannot_inherit = yes
-							}
-
-							war = {
-								target = PREVPREV
-								casus_belli = kingdom_adventure
-								thirdparty_title = PREV
-								tier = KING
-							}
-
-							remove_opinion = {
-								name = opinion_duchy_adventure_target
-								who = PREVPREV
-							}
-						}
+					NOR = {
+						culture = ROOT
+						religion_group = ROOT
+						is_liege_or_above_of = ROOT
 					}
+
+					any_realm_province = { region = world_india }
 				}
 			}
-		}
 
-		# Create some decent commander characters
-		spawn_good_commander_effect = yes
-		spawn_good_commander_effect = yes
-		spawn_good_commander_effect = yes
+			wealth = 500
+
+			liege = {
+				character_event = {
+					id = JD.1003
+					days = 1
+				}
+
+				capital_scope = {
+					save_event_target_as = liege_capital
+				}
+			}
+
+			event_target:muslim_adventure_target = {
+				random_realm_province = {
+					limit = { region = world_india }
+					save_event_target_as = target_province
+				}
+			}
+
+			set_defacto_liege = ROOT
+
+			create_title = {
+				tier = DUKE
+				landless = yes
+				temporary = yes
+				adventurer = yes
+				culture = ROOT
+				name = "CLAIMANT_ADVENTURE"
+				holder = ROOT
+			}
+
+			set_character_flag = duchy_adventurer
+
+			spawn_unit = {
+				province = event_target:liege_capital
+				home = event_target:liege_capital
+				owner = ROOT
+				match_character = event_target:muslim_adventure_target
+				match_mult = 0.50
+				match_min = 1000
+				match_max = 10000
+				reinforces = yes
+				reinforce_rate_multiplier = 0.25
+				merge = yes
+				attrition = 0.25
+			}
+
+			while = {
+				count = 2
+
+				spawn_unit = {
+					province = event_target:liege_capital
+					home = event_target:liege_capital
+					owner = ROOT
+					match_character = event_target:muslim_adventure_target
+					match_mult = 0.50
+					match_min = 1000
+					match_max = 10000
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					merge = yes
+					attrition = 0.25
+					cannot_inherit = yes
+				}
+			}
+
+			war = {
+				target = event_target:muslim_adventure_target
+				casus_belli = kingdom_adventure
+				thirdparty_title = event_target:target_province
+				tier = KING
+			}
+
+			remove_opinion = {
+				name = opinion_duchy_adventure_target
+				who = event_target:muslim_adventure_target
+			}
+
+			# Create some decent commander characters
+			spawn_good_commander_effect = yes
+			spawn_good_commander_effect = yes
+			spawn_good_commander_effect = yes
+		}
 	}
 }
 
@@ -503,17 +495,5 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_TOG_1203
-	}
-}
-
-# safety clear of DND
-character_event = {
-	id = JD.1005
-
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		clr_character_flag = do_not_disturb
 	}
 }
