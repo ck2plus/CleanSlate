@@ -11,7 +11,7 @@
 namespace = LT
 
 
-# Wonder name and desc update event (fired from: on_wonder_stage_finish)
+# Wonder name update event (fired from: on_wonder_stage_finish)
 # ROOT = owner
 # FROM = wonder
 # FROMFROM = province (location of wonder)
@@ -22,37 +22,28 @@ character_event = {
 	hide_window = yes
 
 	immediate = {
-		FROM = { save_event_target_as = target_wonder }
 		FROMFROM = { save_event_target_as = target_province }
+
 		FROM = {
+			save_event_target_as = target_wonder
+			log = "[This.GetName] is the wonder, pre-saved as event-target"
+
 			original_wonder_owner = {
 				save_event_target_as = wonder_owner_original
 			}
-		}
-		if = {
-			limit = {
-				event_target:target_wonder = {
-					any_upgrade_on_wonder = {
-						is_active = yes
-					}
-				}
-			}
-			event_target:target_wonder = {
-				any_upgrade_on_wonder = {
-					limit = {
-						is_active = yes
-						NOT = { has_wonder_upgrade_flag = negative }
-					}
-					score_value = { # Prioritizes selecting a cool upgrade...
-						value = 10
-						fancy_upgrade_selection_score = yes
-					}
-					save_event_target_as = upgrade_00
-				}
-			}
-		}
 
-		log = "[From.GetName] is the wonder, pre-saved as event-target"
+			any_upgrade_on_wonder = {
+				limit = {
+					is_active = yes
+					NOT = { has_wonder_upgrade_flag = negative }
+				}
+				score_value = { # Prioritizes selecting a cool upgrade...
+					value = 10
+					fancy_upgrade_selection_score = yes
+				}
+				save_event_target_as = upgrade_00
+			}
+		}
 
 		wonder_stage_completion_sound_effect = yes
 
@@ -87,7 +78,7 @@ character_event = {
 	}
 }
 
-# Wonder desc update event (fired from: on_wonder_upgrade_finish)
+# Wonder name and desc update event (fired from: on_wonder_upgrade_finish)
 # ROOT = owner
 # FROM = upgrade
 # FROMFROM = wonder
@@ -99,6 +90,7 @@ character_event = {
 	hide_window = yes
 
 	immediate = {
+		FROMFROMFROM = { save_event_target_as = target_province }
 		FROM = { save_event_target_as = upgrade_00 }
 		FROMFROM = {
 			save_event_target_as = target_wonder
@@ -106,44 +98,34 @@ character_event = {
 			original_wonder_owner = {
 				save_event_target_as = wonder_owner_original
 			}
-		}
-		FROMFROMFROM = { save_event_target_as = target_province }
 
-		if = {
-			limit = {
-				event_target:target_wonder = {
-					any_upgrade_on_wonder = {
-						NOT = { wonder_upgrade = event_target:upgrade_00 }
+			any_upgrade_on_wonder = {
+				limit = {
+					is_active = yes
+
+					NOR = {
+						wonder_upgrade = event_target:upgrade_00
+						has_wonder_upgrade_flag = negative
 					}
 				}
-			}
-			event_target:target_wonder = {
-				any_upgrade_on_wonder = {
-					limit = {
-						is_active = yes
-
-						NOR = {
-							wonder_upgrade = event_target:upgrade_00
-							has_wonder_upgrade_flag = negative
-						}
-					}
-					score_value = { # Prioritizes selecting a cool upgrade...
-						value = 10
-						fancy_upgrade_selection_score = yes
-					}
-					save_event_target_as = upgrade_01 # CleanSlate: This doesn't appear to be used by the custom loc
+				score_value = { # Prioritizes selecting a cool upgrade...
+					value = 10
+					fancy_upgrade_selection_score = yes
 				}
+				save_event_target_as = upgrade_01 # CleanSlate: This doesn't appear to be used by the custom loc
 			}
-		}
 
-		log = "STEP 1: [upgrade_00.GetName] is the first upgrade."
-		log = "STEP 1: [upgrade_01.GetName] is the second upgrade."
-		log = "STEP 1: [target_wonder.GetName] is the wonder."
-		log = "STEP 1: [target_wonder.GetDesc] is the old desc."
 
-		event_target:target_wonder = {
+			log = "STEP 1: [upgrade_00.GetName] is the first upgrade."
+			log = "STEP 1: [upgrade_01.GetName] is the second upgrade."
+			log = "STEP 1: [target_wonder.GetName] is the wonder."
+			log = "STEP 1: [target_wonder.GetDesc] is the old desc."
+
 			if = {
 				limit = {
+					has_custom_name = no # only change the name if the player has not used the renaming button
+					NOT = { has_wonder_flag = is_historical } # Only change name if it's not a historical wonder
+
 					OR = {
 						had_flag = {
 							flag = wonder_name_1
@@ -171,13 +153,8 @@ character_event = {
 						}
 					}
 				}
-				if = {
-					limit = {
-						has_custom_name = no # only change the name if the player has not used the renaming button
-						NOT = { has_wonder_flag = is_historical } # Only change name if it's not a historical wonder
-					}
-					wonder_name_change_effect = yes
-				}
+
+				wonder_name_change_effect = yes
 			}
 
 			if = {
@@ -209,7 +186,7 @@ character_event = {
 						}
 					}
 				}
-				wonder_desc_change_effect = yes # run last, because contains breaks
+				wonder_desc_change_effect = yes
 			}
 		}
 	}
@@ -226,15 +203,14 @@ character_event = {
 	hide_window = yes
 
 	immediate = {
-		FROM = { save_event_target_as = target_wonder }
 		FROMFROM = { save_event_target_as = target_province }
 		FROM = {
+			save_event_target_as = target_wonder
+
 			original_wonder_owner = {
 				save_event_target_as = wonder_owner_original
 			}
-		}
 
-		event_target:target_wonder = {
 			# Name...
 			if = {
 				limit = {
@@ -258,7 +234,7 @@ character_event = {
 				set_description = ruined_wonder_desc_2
 			}
 
-			if = { # Have it already been renamed?
+			if = { # Has it already been renamed?
 				limit = {
 					NOT = { has_wonder_flag = was_renamed }
 				}
@@ -301,6 +277,7 @@ character_event = {
 	is_triggered_only = yes # on_startup
 
 	trigger = {
+		owns = event_target:pulse_province
 		is_save_game = no
 	}
 

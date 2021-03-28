@@ -59,7 +59,7 @@ character_event = {
 
 			wonder = {
 				save_event_target_as = wonder
-				event_target:wonder = { location = { save_event_target_as = wonder_province } }
+				location = { save_event_target_as = wonder_province }
 			}
 		}
 
@@ -459,7 +459,7 @@ character_event = {
 }
 
 
-# The Character first knows of the rumor about the lost book
+# The Character first learns of the rumor about the lost book
 character_event = {
 	id = LT.20010
 	title = evt_TITLE_LT_20010
@@ -479,113 +479,111 @@ character_event = {
 	fail_trigger_effect = {
 		repeat_event = {
 			id = LT.20010
-			days = 365
+			years = 1
 			random = 50
 		}
 	}
 
 	immediate = {
-		hidden_effect = {
-			event_target:book_province = {
-				holder_scope = {
-					# save_event_target_as = book_province_holder
+		event_target:book_province = {
+			owner = {
+				# save_event_target_as = book_province_owner
 
-					create_character = {
-						religion = THIS
-						culture = THIS
-						dynasty = none
-						age = 43
-						random_traits = yes
-						female = no
-						attributes = {
-							learning = 12
-						}
-						health = 6
-						trait = scholarly_theologian
+				create_character = {
+					religion = THIS
+					culture = THIS
+					dynasty = none
+					age = 43
+					random_traits = yes
+					female = no
+					attributes = {
+						learning = 12
 					}
-					realm = { save_event_target_as = book_province_realm }
+					health = 6
+					trait = scholarly_theologian
 				}
+				realm = { save_event_target_as = book_province_realm }
+			}
+		}
+
+		random_courtier = {
+			limit = {
+				ai = yes
+				is_ruler = no
+				prisoner = no
+				age > 20
 			}
 
-			random_courtier = {
-				limit = {
-					ai = yes
-					is_ruler = no
-					prisoner = no
-					age > 20
-				}
-
-				preferred_limit = {
-					has_job_title = no
-					trait = scholar
-				}
-				preferred_limit = {
-					has_job_title = no
-
-					OR = {
-						is_smart_trigger = yes
-						learning > 10
-					}
-				}
-				preferred_limit = {
-					has_job_title = no
-					is_dumb_trigger = no
-				}
-				preferred_limit = {
-					trait = scholar
-				}
-				preferred_limit = {
-					OR = {
-						is_smart_trigger = yes
-						learning > 10
-					}
-				}
-				preferred_limit = {
-					is_dumb_trigger = no
-				}
-
-				save_event_target_as = possible_emissary1
+			preferred_limit = {
+				has_job_title = no
+				trait = scholar
 			}
-			random_courtier = {
-				limit = {
-					ai = yes
-					is_ruler = no
-					prisoner = no
-					age > 20
-					NOT = { character = event_target:possible_emissary1 }
-				}
+			preferred_limit = {
+				has_job_title = no
 
-				preferred_limit = {
-					has_job_title = no
-					trait = scholar
+				OR = {
+					is_smart_trigger = yes
+					learning > 10
 				}
-				preferred_limit = {
-					has_job_title = no
-
-					OR = {
-						is_smart_trigger = yes
-						learning > 10
-					}
-				}
-				preferred_limit = {
-					has_job_title = no
-					is_dumb_trigger = no
-				}
-				preferred_limit = {
-					trait = scholar
-				}
-				preferred_limit = {
-					OR = {
-						is_smart_trigger = yes
-						learning > 10
-					}
-				}
-				preferred_limit = {
-					is_dumb_trigger = no
-				}
-
-				save_event_target_as = possible_emissary2
 			}
+			preferred_limit = {
+				has_job_title = no
+				is_dumb_trigger = no
+			}
+			preferred_limit = {
+				trait = scholar
+			}
+			preferred_limit = {
+				OR = {
+					is_smart_trigger = yes
+					learning > 10
+				}
+			}
+			preferred_limit = {
+				is_dumb_trigger = no
+			}
+
+			save_event_target_as = possible_emissary1
+		}
+		random_courtier = {
+			limit = {
+				ai = yes
+				is_ruler = no
+				prisoner = no
+				age > 20
+				NOT = { character = event_target:possible_emissary1 }
+			}
+
+			preferred_limit = {
+				has_job_title = no
+				trait = scholar
+			}
+			preferred_limit = {
+				has_job_title = no
+
+				OR = {
+					is_smart_trigger = yes
+					learning > 10
+				}
+			}
+			preferred_limit = {
+				has_job_title = no
+				is_dumb_trigger = no
+			}
+			preferred_limit = {
+				trait = scholar
+			}
+			preferred_limit = {
+				OR = {
+					is_smart_trigger = yes
+					learning > 10
+				}
+			}
+			preferred_limit = {
+				is_dumb_trigger = no
+			}
+
+			save_event_target_as = possible_emissary2
 		}
 	}
 
@@ -2807,18 +2805,6 @@ character_event = { # Seduction reaction
 	option = { # I want you too!
 		name = EVTOPTA_LT_20431
 
-		trigger = {
-			trigger_if = {
-				limit = { is_close_relative = FROM }
-
-				OR = {
-					FROM = { religion_has_incest = yes }
-					is_married = FROM
-					ai = no
-				}
-			}
-		}
-
 		custom_tooltip = { text = EVTOPTC_LT_20431_TT }
 
 		FROM = { character_event = { id = LT.20432 days = 1 } }
@@ -2836,7 +2822,18 @@ character_event = { # Seduction reaction
 			factor = 1
 
 			trigger = {
-				FROM = { root_attraction_trigger = yes }
+				FROM = {
+					root_attraction_trigger = yes
+
+					trigger_if = {
+						limit = { is_close_relative = ROOT }
+
+						OR = {
+							is_married = ROOT
+							religion_has_incest = yes
+						}
+					}
+				}
 				NOT = { trait = celibate }
 			}
 
@@ -2876,18 +2873,6 @@ character_event = { # Seduction reaction
 	option = { # I'm not looking for anything "serious"
 		name = EVTOPTA_LT_20431_no_love
 
-		trigger = {
-			trigger_if = {
-				limit = { is_close_relative = FROM }
-
-				OR = {
-					FROM = { religion_has_incest = yes }
-					is_married = FROM
-					ai = no
-				}
-			}
-		}
-
 		custom_tooltip = { text = EVTOPTC_LT_20431_TT_not_serious_romance }
 
 		set_character_flag = not_serious_romance
@@ -2905,9 +2890,22 @@ character_event = { # Seduction reaction
 			factor = 1
 
 			trigger = {
-				FROM = { root_attraction_trigger = yes }
+				FROM = {
+					root_attraction_trigger = yes
+
+					trigger_if = {
+						limit = { is_close_relative = ROOT }
+
+						OR = {
+							is_married = ROOT
+							religion_has_incest = yes
+						}
+					}
+				}
 				NOT = { trait = celibate }
+
 			}
+
 			mult_modifier = {
 				factor = 5
 
@@ -3326,12 +3324,14 @@ character_event = {
 		save_event_target_as = target_dead_ruler
 
 		any_realm_character = {
-			limit = { opinion = { who = ROOT value >= 20 } }
-			set_character_flag = liked_dead_ruler_@ROOT
-		}
-		any_realm_character = {
-			limit = { opinion = { who = ROOT value < -50 } }
-			set_character_flag = hated_dead_ruler_@ROOT
+			if = {
+				limit = { opinion = { who = ROOT value >= 20 } }
+				set_character_flag = liked_dead_ruler_@ROOT
+			}
+			else_if = {
+				limit = { opinion = { who = ROOT value < -50 } }
+				set_character_flag = hated_dead_ruler_@ROOT
+			}
 		}
 
 		current_heir = {
@@ -3461,21 +3461,23 @@ character_event = {
 
 		hidden_effect = {
 			any_realm_character = {
-				limit = { has_character_flag = liked_dead_ruler_@FROM }
-				clr_character_flag = liked_dead_ruler_@FROM
+				if = {
+					limit = { has_character_flag = liked_dead_ruler_@FROM }
+					clr_character_flag = liked_dead_ruler_@FROM
 
-				opinion = {
-					name = opinion_did_not_honor_the_dead
-					who = ROOT
+					opinion = {
+						name = opinion_did_not_honor_the_dead
+						who = ROOT
+					}
 				}
-			}
-			any_realm_character = {
-				limit = { has_character_flag = hated_dead_ruler_@FROM }
-				clr_character_flag = hated_dead_ruler_@FROM
+				else_if = {
+					limit = { has_character_flag = hated_dead_ruler_@FROM }
+					clr_character_flag = hated_dead_ruler_@FROM
 
-				opinion = {
-					name = opinion_did_not_honor_hated_ruler
-					who = ROOT
+					opinion = {
+						name = opinion_did_not_honor_hated_ruler
+						who = ROOT
+					}
 				}
 			}
 		}
@@ -3563,21 +3565,23 @@ character_event = {
 
 			hidden_effect = {
 				any_realm_character = {
-					limit = { has_character_flag = liked_dead_ruler_@FROMFROM }
-					clr_character_flag = liked_dead_ruler_@FROMFROM
+					if = {
+						limit = { has_character_flag = liked_dead_ruler_@FROMFROM }
+						clr_character_flag = liked_dead_ruler_@FROMFROM
 
-					opinion = {
-						name = opinion_did_honor_the_dead
-						who = ROOT
+						opinion = {
+							name = opinion_did_honor_the_dead
+							who = ROOT
+						}
 					}
-				}
-				any_realm_character = {
-					limit = { has_character_flag = hated_dead_ruler_@FROMFROM }
-					clr_character_flag = hated_dead_ruler_@FROMFROM
+					else_if = {
+						limit = { has_character_flag = hated_dead_ruler_@FROMFROM }
+						clr_character_flag = hated_dead_ruler_@FROMFROM
 
-					opinion = {
-						name = opinion_did_honor_hated_ruler
-						who = ROOT
+						opinion = {
+							name = opinion_did_honor_hated_ruler
+							who = ROOT
+						}
 					}
 				}
 			}
@@ -3590,17 +3594,19 @@ character_event = {
 
 			hidden_effect = {
 				any_realm_character = {
-					limit = { has_character_flag = liked_dead_ruler_@FROMFROM }
-					clr_character_flag = liked_dead_ruler_@FROMFROM
+					if = {
+						limit = { has_character_flag = liked_dead_ruler_@FROMFROM }
+						clr_character_flag = liked_dead_ruler_@FROMFROM
 
-					opinion = {
-						name = opinion_did_honor_the_dead
-						who = ROOT
-						years = 1
+						opinion = {
+							name = opinion_did_honor_the_dead
+							who = ROOT
+							years = 1
+						}
 					}
-				}
-				any_realm_character = {
-					clr_character_flag = hated_dead_ruler_@FROMFROM
+					else = {
+						clr_character_flag = hated_dead_ruler_@FROMFROM
+					}
 				}
 			}
 		}
@@ -3656,11 +3662,11 @@ character_event = {
 			show_scope_change = no
 
 			custom_tooltip = { text = EVTOPTA_LT_20601_TT }
-			if = { 		limit = { quality == 5 } ROOT = { piety = 500 prestige = 500 } }
-			else_if = { limit = { quality == 4 } ROOT = { piety = 400 prestige = 300 } }
-			else_if = { limit = { quality == 3 } ROOT = { piety = 300 prestige = 100 } }
-			else_if = { limit = { quality == 2 } ROOT = { piety = 200 } }
-			else = { 							 ROOT = { piety = 100 } }
+			if = { 		limit = { quality == 5 } ROOT = { show_scope_change = no piety = 500 prestige = 500 } }
+			else_if = { limit = { quality == 4 } ROOT = { show_scope_change = no piety = 400 prestige = 300 } }
+			else_if = { limit = { quality == 3 } ROOT = { show_scope_change = no piety = 300 prestige = 100 } }
+			else_if = { limit = { quality == 2 } ROOT = { show_scope_change = no piety = 200 } }
+			else = { 							 ROOT = { show_scope_change = no piety = 100 } }
 		}
 
 		hidden_effect = {
@@ -3681,11 +3687,11 @@ character_event = {
 			show_scope_change = no
 
 			custom_tooltip = { text = EVTOPTA_LT_20601_TT }
-			if = { 		limit = { quality == 5 } ROOT = { piety = 500 prestige = 500 } }
-			else_if = { limit = { quality == 4 } ROOT = { piety = 400 prestige = 300 } }
-			else_if = { limit = { quality == 3 } ROOT = { piety = 300 prestige = 100 } }
-			else_if = { limit = { quality == 2 } ROOT = { piety = 200 } }
-			else = { 							 ROOT = { piety = 100 } }
+			if = { 		limit = { quality == 5 } ROOT = { show_scope_change = no piety = 500 prestige = 500 } }
+			else_if = { limit = { quality == 4 } ROOT = { show_scope_change = no piety = 400 prestige = 300 } }
+			else_if = { limit = { quality == 3 } ROOT = { show_scope_change = no piety = 300 prestige = 100 } }
+			else_if = { limit = { quality == 2 } ROOT = { show_scope_change = no piety = 200 } }
+			else = { 							 ROOT = { show_scope_change = no piety = 100 } }
 		}
 
 		hidden_effect = {
@@ -3706,11 +3712,11 @@ character_event = {
 			show_scope_change = no
 
 			custom_tooltip = { text = EVTOPTA_LT_20601_TT }
-			if = { 		limit = { quality == 5 } ROOT = { piety = 500 prestige = 500 } }
-			else_if = { limit = { quality == 4 } ROOT = { piety = 400 prestige = 300 } }
-			else_if = { limit = { quality == 3 } ROOT = { piety = 300 prestige = 100 } }
-			else_if = { limit = { quality == 2 } ROOT = { piety = 200 } }
-			else = { 							 ROOT = { piety = 100 } }
+			if = { 		limit = { quality == 5 } ROOT = { show_scope_change = no piety = 500 prestige = 500 } }
+			else_if = { limit = { quality == 4 } ROOT = { show_scope_change = no piety = 400 prestige = 300 } }
+			else_if = { limit = { quality == 3 } ROOT = { show_scope_change = no piety = 300 prestige = 100 } }
+			else_if = { limit = { quality == 2 } ROOT = { show_scope_change = no piety = 200 } }
+			else = { 							 ROOT = { show_scope_change = no piety = 100 } }
 		}
 
 		hidden_effect = {
@@ -3743,9 +3749,25 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		if = {
+			limit = { multiplayer = yes }
+			death = { death_reason = death_murder_unknown_lightning }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_LT_20610
-		death = { death_reason = death_murder_unknown_lightning }
+
+		if = {
+			limit = { multiplayer = no }
+			death = { death_reason = death_murder_unknown_lightning }
+		}
+		else = {
+			tooltip = {
+				death = { death_reason = death_murder_unknown_lightning }
+			}
+		}
 	}
 }
 
@@ -4204,10 +4226,11 @@ character_event = {
 
 				if = {
 					limit = { has_province_flag = people_had_hagia_sophia }
-				}
-				add_province_modifier = {
-					name = religious_tension
-					years = 5
+
+					add_province_modifier = {
+						name = religious_tension
+						years = 5
+					}
 				}
 			}
 		}
@@ -4232,13 +4255,13 @@ character_event = {
 
 				if = {
 					limit = { has_province_flag = people_had_hagia_sophia }
-				}
-				add_province_modifier = {
-					name = religious_tolerance
-					years = 10
+
+					add_province_modifier = {
+						name = religious_tolerance
+						years = 10
+					}
 				}
 			}
-
 		}
 	}
 }
@@ -4297,7 +4320,7 @@ character_event = {
 
 	immediate = {
 		FROM = {
-			owner = {
+			holder_scope  = {
 				save_event_target_as = holder_target
 
 				top_liege = {
@@ -4330,6 +4353,8 @@ character_event = {
 		}
 
 		FROM = {
+			show_scope_change = no
+
 			destroy_random_building = THIS
 
 			location = {
@@ -4363,22 +4388,23 @@ character_event = {
 						years = 3
 					}
 
-					hidden_effect = {
-						any_realm_character = {
-							show_scope_change = no
+					custom_tooltip = {
+						text = EVTOPTA_LT_21000_DISHONORABLE_TT
 
-							limit = {
-								NOT = { trait = cruel }
-							}
+						hidden_effect = {
+							generate_tooltip = no
 
-							opinion = {
-								name = opinion_dishonorable
-								who = ROOT
-								years = 10
+							any_realm_character = {
+								limit = { NOT = { trait = cruel } }
+
+								opinion = {
+									name = opinion_dishonorable
+									who = ROOT
+									years = 10
+								}
 							}
 						}
 					}
-					custom_tooltip = { text = EVTOPTA_LT_21000_DISHONORABLE_TT }
 				}
 			}
 		}
@@ -4435,6 +4461,8 @@ character_event = {
 		}
 
 		FROM = {
+			show_scope_change = no
+
 			destroy_random_building = THIS
 
 			location = {
@@ -4470,23 +4498,23 @@ character_event = {
 						years = 3
 					}
 
-					hidden_effect = {
-						any_realm_character = {
-							show_scope_change = no
+					custom_tooltip = {
+						text = EVTOPTA_LT_21000_DISHONORABLE_TT
 
-							limit = {
-								NOT = { trait = cruel }
-							}
+						hidden_effect = {
+							generate_tooltip = no
 
-							opinion = {
-								name = opinion_dishonorable
-								who = ROOT
-								years = 10
+							any_realm_character = {
+								limit = { NOT = { trait = cruel } }
+
+								opinion = {
+									name = opinion_dishonorable
+									who = ROOT
+									years = 10
+								}
 							}
 						}
 					}
-
-					custom_tooltip = { text = EVTOPTA_LT_21000_DISHONORABLE_TT }
 				}
 			}
 		}
@@ -4519,6 +4547,8 @@ character_event = {
 				custom_tooltip = { text = EVTOPTC_LT_21000_CONTROL_TT }
 
 				any_controlled_unit = {
+					show_scope_change = no
+
 					limit = {
 						location = {
 							FROM = {
@@ -4546,6 +4576,8 @@ character_event = {
 				custom_tooltip = { text = EVTOPTC_LT_21000_NO_CONTROL_TT }
 
 				FROM = {
+					show_scope_change = no
+
 					destroy_random_building = THIS
 
 					location = {

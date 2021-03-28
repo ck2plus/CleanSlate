@@ -13,9 +13,15 @@ character_event = {
 		has_landed_title = d_holland
 		has_landed_title = c_holland
 		culture = dutch
-		c_holland = { culture = dutch }
-		c_westfriesland = { culture = dutch }
-		c_zeeland = { culture = dutch }
+		d_holland = {
+			NOT = {
+				any_direct_de_jure_vassal_title = {
+					location = {
+						NOT = { culture = dutch }
+					}
+				}
+			}
+		}
 		NOT = { has_global_flag = west_frisia_renamed }
 	}
 
@@ -25,18 +31,21 @@ character_event = {
 
 	option = { # Rename
 		name = EVTOPTA_LT_41000
-		
+
 		prestige = 50
 
 		d_holland = {
+			show_scope_change = no
 			set_name = "DUCHY_HOLLAND"
 			adjective = "DUCHY_HOLLAND_ADJ"
 		}
 		c_holland = {
+			show_scope_change = no
 			set_name = "COUNTY_HOLLAND"
 			adjective = "COUNTY_HOLLAND_ADJ"
 		}
 		c_westfriesland = {
+			show_scope_change = no
 			set_name = "COUNTY_WESTFRIESLAND"
 			adjective = "COUNTY_WESTFRIESLAND_ADJ"
 		}
@@ -52,11 +61,7 @@ character_event = {
 		}
 		if = {
 			limit = {
-				ROOT = {
-					NOT = {
-						has_landed_title = c_zeeland
-					}
-				}
+				NOT = { has_landed_title = c_zeeland }
 			}
 			c_zeeland = {
 				holder_scope = {
@@ -66,11 +71,7 @@ character_event = {
 		}
 		if = {
 			limit = {
-				ROOT = {
-					NOT = {
-						has_landed_title = c_westfriesland
-					}
-				}
+				NOT = { has_landed_title = c_westfriesland }
 			}
 			c_westfriesland = {
 				holder_scope = {
@@ -78,12 +79,12 @@ character_event = {
 				}
 			}
 		}
-
-		ai_chance = { factor = 100 }
 	}
 
 	option = { # Do not rename
 		name = EVTOPTB_LT_41000
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -172,25 +173,17 @@ character_event = {
 			}
 		}
 
-		OR = {
-			FROM = {
-				has_landed_title = d_gelre # They either has d_gelre (Chamavia) too,
-			}
-			NOT = {
-				d_gelre = {
-					holder_scope = {
-						always = yes # or it doesn't exist.
-					}
-				}
+		d_gelre = {
+			trigger_if = {
+				limit = { has_holder = yes }
+				holder = FROM
 			}
 		}
 
 		b_geldern = { # Geldern
 			holder_scope = { # exists
 				tier = baron # is ruled by a baron
-				any_liege = { # and is in the same realm.
-					character = ROOT
-				}
+				is_vassal_or_below_of = ROOT # and is in the same realm.
 			}
 		}
 
@@ -236,9 +229,8 @@ character_event = {
 		name = EVTOPTA_LT_41002
 
 		event_target:geldern_holder = {
-			c_gelre = {
-				grant_title = PREV
-			}
+			show_scope_change = no
+			grant_title = c_gelre
 			reverse_add_favor = ROOT
 
 			if = {
@@ -247,9 +239,7 @@ character_event = {
 						has_landed_title = d_gelre # If d_gelre is held by the defeated revolter
 					}
 				}
-				d_gelre = {
-					grant_title = PREV # it also goes to Geldern.
-				}
+				grant_title = d_gelre # it also goes to Geldern.
 			}
 			hidden_effect = { # To fix independence issue.
 				set_defacto_liege = ROOT
@@ -257,11 +247,13 @@ character_event = {
 		}
 
 		c_gelre = {
+			show_scope_change = no
 			set_name = "COUNTY_GELRE"
 			adjective = "COUNTY_GELRE_ADJ"
 		}
 		# The duchy is renamed regardless, as Geldern should clearly have all the things.
 		d_gelre = {
+			show_scope_change = no
 			set_name = "DUCHY_GELRE"
 			adjective = "DUCHY_GELRE_ADJ"
 		}
@@ -276,14 +268,14 @@ character_event = {
 		event_target:failed_revolter = {
 			narrative_event = { id = LT.41003 }
 		}
-
-		ai_chance = { factor = 100 }
 	}
 
 	option = { # Do not rename
 		name = EVTOPTB_LT_41002
 
 		prestige = 50
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -349,7 +341,7 @@ character_event = {
 		is_alternate_start = no
 		has_landed_title = c_breda
 		NOT = { has_global_flag = toxandria_renamed }
-		
+
 		FROM = {
 			title = b_breda
 			yearly_income >= 10 # Well-sized city
@@ -364,15 +356,16 @@ character_event = {
 		name = EVTOPTA_LT_41004
 
 		c_breda = {
+			show_scope_change = no
 			set_name = "COUNTY_BREDA"
 			adjective = "COUNTY_BREDA_ADJ"
 		}
-		
+
 		add_character_modifier = {
 			name = burghers_appeased
 			years = 10
 		}
-		
+
 		any_player = {
 			limit = {
 				capital_scope = {
@@ -384,14 +377,14 @@ character_event = {
 			}
 			narrative_event = { id = LT.41005 }
 		}
-
-		ai_chance = { factor = 100 }
 	}
-	
+
 	option = { # Do not rename
 		name = EVTOPTB_LT_41004
 
 		prestige = 50
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -438,7 +431,7 @@ character_event = {
 		is_alternate_start = no
 		has_landed_title = c_kleve
 		NOT = { has_global_flag = hattuaria_renamed }
-		
+
 		FROM = {
 			title = b_kleve
 			yearly_income >= 10 # Well-sized city
@@ -453,15 +446,16 @@ character_event = {
 		name = EVTOPTA_LT_41006
 
 		c_kleve = {
+			show_scope_change = no
 			set_name = "COUNTY_KLEVE"
 			adjective = "COUNTY_KLEVE_ADJ"
 		}
-		
+
 		add_character_modifier = {
 			name = burghers_appeased
 			years = 10
 		}
-		
+
 		any_player = {
 			limit = {
 				capital_scope = {
@@ -473,14 +467,14 @@ character_event = {
 			}
 			narrative_event = { id = LT.41007 }
 		}
-
-		ai_chance = { factor = 100 }
 	}
-	
+
 	option = { # Do not rename
 		name = EVTOPTB_LT_41006
-		
+
 		prestige = 50
+
+		ai_chance = { factor = 0 }
 	}
 }
 
