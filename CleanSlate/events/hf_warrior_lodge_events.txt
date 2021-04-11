@@ -94,10 +94,14 @@ character_event = {
 			limit = {
 				any_owned_bloodline = {
 					has_bloodline_flag = bloodline_legendary_warrior
+					bloodline_is_active_for = PREV
 				}
 			}
 			random_owned_bloodline = {
-				limit = { has_bloodline_flag = bloodline_legendary_warrior }
+				limit = {
+					has_bloodline_flag = bloodline_legendary_warrior
+					bloodline_is_active_for = PREV
+				}
 
 				preferred_limit = {
 					founder = { NOT = { character = ROOT } }
@@ -114,6 +118,7 @@ character_event = {
 			NOT = {
 				any_owned_bloodline = {
 					has_bloodline_flag = bloodline_legendary_warrior
+					bloodline_is_active_for = PREV
 				}
 			}
 		}
@@ -123,6 +128,7 @@ character_event = {
 		trigger = {
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_legendary_warrior
+				bloodline_is_active_for = PREV
 			}
 		}
 	}
@@ -134,6 +140,7 @@ character_event = {
 				NOT = {
 					any_owned_bloodline = {
 						has_bloodline_flag = bloodline_legendary_warrior
+						bloodline_is_active_for = PREV
 					}
 				}
 			}
@@ -143,6 +150,7 @@ character_event = {
 			trigger = {
 				any_owned_bloodline = {
 					has_bloodline_flag = bloodline_legendary_warrior
+					bloodline_is_active_for = PREV
 				}
 			}
 		}
@@ -2084,9 +2092,8 @@ character_event = {
 		}
 		else = {
 			if = {
-				limit = {
-					event_target:kinslayer_target = { is_married = ROOT }
-				}
+				limit = { is_married = event_target:kinslayer_target }
+
 				reverse_opinion = {
 					name = opinion_impressed_infatuated
 					who = event_target:kinslayer_target
@@ -2129,7 +2136,7 @@ character_event = {
 		}
 
 		if = {
-			limit = { event_target:kinslayer_target = { is_close_relative = ROOT } }
+			limit = { is_close_relative = event_target:kinslayer_target }
 
 			random = {
 				chance = 5
@@ -2280,90 +2287,82 @@ character_event = {
 	}
 
 	immediate = {
-		hidden_effect = {
-			# Play SFX...
-			if = {
-				limit = { is_female = yes }
-				random_list = {
-					33 = { sound_effect = berserk_female_01 }
-					33 = { sound_effect = berserk_female_02 }
-					33 = { sound_effect = berserk_female_03 }
-				}
+		# Play SFX...
+		if = {
+			limit = { is_female = yes }
+			random_list = {
+				33 = { sound_effect = berserk_female_01 }
+				33 = { sound_effect = berserk_female_02 }
+				33 = { sound_effect = berserk_female_03 }
 			}
-			else = {
-				random_list = {
-					33 = { sound_effect = berserk_male_01 }
-					33 = { sound_effect = berserk_male_02 }
-					33 = { sound_effect = berserk_male_03 }
-				}
+		}
+		else = {
+			random_list = {
+				33 = { sound_effect = berserk_male_01 }
+				33 = { sound_effect = berserk_male_02 }
+				33 = { sound_effect = berserk_male_03 }
 			}
+		}
 
-			random_list = { # Decide if someone else actually gets hurt...
-				50 = { set_character_flag = someone_is_hurt }
-				50 = { set_character_flag = hurt_self } # means *you* get harmed instead
-			}
+		random_list = { # Decide if someone else actually gets hurt...
+			50 = { set_character_flag = someone_is_hurt }
+			50 = { set_character_flag = hurt_self } # means *you* get harmed instead
+		}
 
-			host = { save_event_target_as = host_target }
+		host = { save_event_target_as = host_target }
 
-			random_list = { # Find someone to get caught in the crossfire...
-				100 = {
-					trigger = {
-						host = {
-							any_courtier = { # There is either another prisoner...
-								prisoner = yes
-								ai = yes
-								is_incapable = no
+		random_list = { # Find someone to get caught in the crossfire...
+			100 = {
+				trigger = {
+					any_host_courtier = { # There is either another prisoner...
+						prisoner = yes
+						ai = yes
+						is_incapable = no
 
-								NOR = {
-									character = ROOT
-									is_friend = ROOT
-								}
-							}
-						}
-					}
-					host = {
-						random_courtier = { # There is either another prisoner...
-							limit = {
-								prisoner = yes
-								ai = yes
-								is_incapable = no
-
-								NOR = {
-									character = ROOT
-									is_friend = ROOT
-								}
-							}
-							preferred_limit = {
-								is_unimportant_trigger = yes
-							}
-							save_event_target_as = crossfire_target
-							save_event_target_as = kinslayer_target
+						NOR = {
+							character = ROOT
+							is_friend = ROOT
 						}
 					}
 				}
-				10 = {
-					host = {
-						random_courtier = { # Or someone "unimportant" around...
-							limit = {
-								prisoner = no
-								ai = yes
-								is_incapable = no
+				random_host_courtier = { # There is either another prisoner...
+					limit = {
+						prisoner = yes
+						ai = yes
+						is_incapable = no
 
-								NOR = {
-									character = ROOT
-									is_friend = ROOT
-									is_lover = PREV
-									is_friend = PREV
-									is_rival = PREV
-								}
-							}
-							preferred_limit = {
-								is_unimportant_trigger = yes
-							}
-							save_event_target_as = crossfire_target
-							save_event_target_as = kinslayer_target
+						NOR = {
+							character = ROOT
+							is_friend = ROOT
 						}
 					}
+					preferred_limit = {
+						is_unimportant_trigger = yes
+					}
+					save_event_target_as = crossfire_target
+					save_event_target_as = kinslayer_target
+				}
+			}
+			10 = {
+				random_host_courtier = { # Or someone "unimportant" around...
+					limit = {
+						prisoner = no
+						ai = yes
+						is_incapable = no
+
+						NOR = {
+							character = ROOT
+							is_friend = ROOT
+							is_lover = PREV
+							is_friend = PREV
+							is_rival = PREV
+						}
+					}
+					preferred_limit = {
+						is_unimportant_trigger = yes
+					}
+					save_event_target_as = crossfire_target
+					save_event_target_as = kinslayer_target
 				}
 			}
 		}
@@ -2589,7 +2588,7 @@ character_event = {
 		}
 
 		if = {
-			limit = { event_target:kinslayer_target = { is_close_relative = ROOT } }
+			limit = { is_close_relative = event_target:kinslayer_target }
 
 			random = {
 				chance = 5
@@ -2909,12 +2908,10 @@ character_event = {
 	}
 
 	immediate = {
-		hidden_effect = {
-			add_character_modifier = {
-				name = warrior_lodge_HF_10052_cooldown
-				months = 1
-				hidden = yes
-			}
+		add_character_modifier = {
+			name = warrior_lodge_HF_10052_cooldown
+			months = 1
+			hidden = yes
 		}
 	}
 
@@ -3024,7 +3021,7 @@ character_event = {
 				}
 			}
 		}
-		 log = "The revive event fired for [From.GetName]."
+		log = "The revive event fired for [From.GetName]."
 	}
 }
 
@@ -3223,12 +3220,10 @@ letter_event = {
 		clr_character_flag = has_sent_request_to_rank_up
 		clr_character_flag = fighting_to_rank_up
 
-		hidden_effect = {
-			add_character_modifier = {
-				name = lost_rank_up_duel_cooldown
-				months = 20
-				hidden = yes
-			}
+		add_character_modifier = {
+			name = lost_rank_up_duel_cooldown
+			months = 20
+			hidden = yes
 		}
 	}
 }
@@ -3247,7 +3242,7 @@ character_event = {
 	id = HFP.19000
 
 	hide_window = yes
-	is_triggered_only = yes
+	is_triggered_only = yes # on_host/employer_change
 
 	has_dlc = "Reapers"
 
