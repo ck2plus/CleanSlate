@@ -143,7 +143,7 @@ leave_court_for_china_effect = {
 	custom_tooltip = {
 		text = will_leave_for_china_tt
 
-		set_flag = ignore_refund
+		set_character_flag = ignore_refund
 		death = { death_reason = death_went_to_china }
 	}
 }
@@ -153,12 +153,12 @@ return_to_china_effect = {
 	custom_tooltip = {
 		text = will_return_to_china_tt
 
-		set_flag = ignore_refund
+		set_character_flag = ignore_refund
 		death = { death_reason = death_went_back_to_china }
 	}
 }
 
-# Utilizes china_war_minimum_commander_martial variable on the current scope to spawn characters with at least that amount of martial skill
+# Utilizes local_china_war_minimum_commander_martial variable to spawn characters with at least that amount of martial skill
 china_spawn_commander_effect = {
 	create_random_soldier = {
 		random_traits = yes
@@ -170,11 +170,6 @@ china_spawn_commander_effect = {
 	}
 	new_character = {
 		unsafe_give_minor_title = title_commander
-
-		set_variable = {
-			which = china_war_minimum_commander_martial
-			which = PREV
-		}
 
 		if = {
 			limit = {
@@ -188,49 +183,49 @@ china_spawn_commander_effect = {
 		}
 
 		# Give a chance to get Chinese commander traits
-		random_list = {
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = master_of_flame }
+		if = {
+			limit = { can_have_more_leadership_traits = yes }
+
+			random_list = {
+				30 = {
+					trigger = {
+						NOT = { trait = master_of_flame }
+					}
+
+					add_trait = master_of_flame
 				}
 
-				add_trait = master_of_flame
-			}
+				30 = {
+					trigger = {
+						NOT = { trait = logistics_expert }
+					}
 
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = logistics_expert }
+					add_trait = logistics_expert
 				}
 
-				add_trait = logistics_expert
-			}
+				30 = {
+					trigger = {
+						NOT = { trait = levy_coordinator }
+					}
 
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = levy_coordinator }
+					add_trait = levy_coordinator
 				}
 
-				add_trait = levy_coordinator
-			}
+				30 = {
+					trigger = {
+						NOT = { trait = sapper }
+					}
 
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = sapper }
+					add_trait = sapper
 				}
 
-				add_trait = sapper
+				90 = { }
 			}
-
-			90 = { }
 		}
 
 		# Increase the martial skill with base or martial traits until the minimum is reached
 		while = {
-			limit = { martial < china_war_minimum_commander_martial }
+			limit = { martial < local_china_war_minimum_commander_martial }
 
 			random_list = {
 				40 = { change_martial = 1 }
@@ -512,20 +507,20 @@ china_war_spawn_troops_effect = {
 	while = {
 		limit = {
 			check_variable = {
-				which = china_war_troop_quantity
+				which = local_china_war_troop_quantity
 				value >= 1
 			}
 		}
 
 		change_variable = {
-			which = china_war_troop_quantity
+			which = local_china_war_troop_quantity
 			value = -1
 		}
 
 		if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value < 2
 				}
 			}
@@ -551,7 +546,7 @@ china_war_spawn_troops_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 2
 				}
 			}
@@ -577,7 +572,7 @@ china_war_spawn_troops_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 3
 				}
 			}
@@ -603,7 +598,7 @@ china_war_spawn_troops_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 4
 				}
 			}
@@ -629,7 +624,7 @@ china_war_spawn_troops_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 5
 				}
 			}
@@ -655,7 +650,7 @@ china_war_spawn_troops_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 6
 				}
 			}
@@ -709,20 +704,20 @@ china_war_spawn_troops_no_disband_effect = {
 	while = {
 		limit = {
 			check_variable = {
-				which = china_war_troop_quantity
+				which = local_china_war_troop_quantity
 				value >= 1
 			}
 		}
 
 		change_variable = {
-			which = china_war_troop_quantity
+			which = local_china_war_troop_quantity
 			value = -1
 		}
 
 		if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value < 2
 				}
 			}
@@ -748,7 +743,7 @@ china_war_spawn_troops_no_disband_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 2
 				}
 			}
@@ -774,7 +769,7 @@ china_war_spawn_troops_no_disband_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 3
 				}
 			}
@@ -800,7 +795,7 @@ china_war_spawn_troops_no_disband_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 4
 				}
 			}
@@ -826,7 +821,7 @@ china_war_spawn_troops_no_disband_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 5
 				}
 			}
@@ -852,7 +847,7 @@ china_war_spawn_troops_no_disband_effect = {
 		else_if = {
 			limit = {
 				check_variable = {
-					which = china_war_troop_quality
+					which = local_china_war_troop_quality
 					value == 6
 				}
 			}
@@ -908,26 +903,26 @@ china_war_modify_variables_by_status_effect = {
 			offmap_china = { has_status = china_stable }
 		}
 
-		change_variable = { which = china_war_troop_quality value = 1 }
-		change_variable = { which = china_war_minimum_commander_martial value = 3 }
+		change_variable = { which = local_china_war_troop_quality value = 1 }
+		change_variable = { which = local_china_war_minimum_commander_martial value = 3 }
 	}
 	else_if = {
 		limit = {
 			offmap_china = { has_status = china_unrest }
 		}
 
-		change_variable = { which = china_war_troop_quantity value = -6 }
-		change_variable = { which = china_war_target_match_mult value = -0.15 }
+		change_variable = { which = local_china_war_troop_quantity value = -6 }
+		change_variable = { which = local_china_war_target_match_mult value = -0.15 }
 	}
 	else_if = {
 		limit = {
 			offmap_china = { has_status = china_civil_war }
 		}
 
-		change_variable = { which = china_war_troop_quantity value = -6 }
-		change_variable = { which = china_war_target_match_mult value = -0.25 }
-		change_variable = { which = china_war_troop_quality value = -1 }
-		change_variable = { which = china_war_minimum_commander_martial value = -6 }
+		change_variable = { which = local_china_war_troop_quantity value = -6 }
+		change_variable = { which = local_china_war_target_match_mult value = -0.25 }
+		change_variable = { which = local_china_war_troop_quality value = -1 }
+		change_variable = { which = local_china_war_minimum_commander_martial value = -6 }
 	}
 	else_if = {
 		limit = {
@@ -939,84 +934,84 @@ china_war_modify_variables_by_status_effect = {
 			}
 		}
 
-		change_variable = { which = china_war_troop_quantity value = -7 }
-		change_variable = { which = china_war_target_match_mult value = -0.4 }
-		change_variable = { which = china_war_troop_quality value = -1 }
-		change_variable = { which = china_war_minimum_commander_martial value = -2 }
+		change_variable = { which = local_china_war_troop_quantity value = -7 }
+		change_variable = { which = local_china_war_target_match_mult value = -0.4 }
+		change_variable = { which = local_china_war_troop_quality value = -1 }
+		change_variable = { which = local_china_war_minimum_commander_martial value = -2 }
 	}
 	else_if = {
 		limit = {
 			offmap_china = { has_status = china_famine }
 		}
 
-		change_variable = { which = china_war_troop_quantity value = -4 }
-		change_variable = { which = china_war_target_match_mult value = -0.30 }
-		change_variable = { which = china_war_troop_quality value = -2 }
-		change_variable = { which = china_war_minimum_commander_martial value = -2 }
+		change_variable = { which = local_china_war_troop_quantity value = -4 }
+		change_variable = { which = local_china_war_target_match_mult value = -0.30 }
+		change_variable = { which = local_china_war_troop_quality value = -2 }
+		change_variable = { which = local_china_war_minimum_commander_martial value = -2 }
 	}
 	else_if = {
 		limit = {
 			offmap_china = { has_status = china_plague }
 		}
 
-		change_variable = { which = china_war_troop_quantity value = -6 }
-		change_variable = { which = china_war_target_match_mult value = -0.35 }
-		change_variable = { which = china_war_troop_quality value = -1 }
-		change_variable = { which = china_war_minimum_commander_martial value = -4 }
+		change_variable = { which = local_china_war_troop_quantity value = -6 }
+		change_variable = { which = local_china_war_target_match_mult value = -0.35 }
+		change_variable = { which = local_china_war_troop_quality value = -1 }
+		change_variable = { which = local_china_war_minimum_commander_martial value = -4 }
 	}
 	else_if = {
 		limit = {
 			offmap_china = { has_status = china_golden_age }
 		}
 
-		change_variable = { which = china_war_target_match_mult value = 0.65 }
-		change_variable = { which = china_war_troop_quality value = 2 }
-		change_variable = { which = china_war_minimum_commander_martial value = 5 }
+		change_variable = { which = local_china_war_target_match_mult value = 0.65 }
+		change_variable = { which = local_china_war_troop_quality value = 2 }
+		change_variable = { which = local_china_war_minimum_commander_martial value = 5 }
 	}
 }
 
 china_war_modify_variables_by_century_effect = {
 	if = {
-		limit = {
-			year >= 800
-			year < 900
+		limit = { year >= 1300 }
+
+		change_variable = {
+			which = local_china_war_troop_quantity
+			value = 8
 		}
 
 		change_variable = {
-			which = china_war_troop_quantity
-			value = 2
+			which = local_china_war_target_match_mult
+			value = 0.05
+		}
+
+		change_variable = {
+			which = local_china_war_troop_quality
+			value = 1
 		}
 	}
 	else_if = {
-		limit = {
-			year >= 900
-			year < 1000
+		limit = { year >= 1200 }
+
+		change_variable = {
+			which = local_china_war_troop_quantity
+			value = 7
 		}
 
 		change_variable = {
-			which = china_war_troop_quantity
-			value = 3
+			which = local_china_war_target_match_mult
+			value = 0.05
+		}
+
+		change_variable = {
+			which = local_china_war_troop_quality
+			value = 1
 		}
 	}
 	else_if = {
-		limit = {
-			year >= 1000
-			year < 1100
-		}
+		limit = { year >= 1100 }
 
 		change_variable = {
-			which = china_war_troop_quantity
-			value = 4
-		}
-	}
-	else_if = {
-		limit = {
-			year >= 1100
-			year < 1200
-		}
-
-		change_variable = {
-			which = china_war_troop_quantity
+			which = local_china_war_troop_quantity
 			value = 5
 		}
 
@@ -1026,42 +1021,27 @@ china_war_modify_variables_by_century_effect = {
 		}
 	}
 	else_if = {
-		limit = {
-			year >= 1200
-			year < 1300
-		}
+		limit = { year >= 1000 }
 
 		change_variable = {
-			which = china_war_troop_quantity
-			value = 7
-		}
-
-		change_variable = {
-			which = china_war_target_match_mult
-			value = 0.05
-		}
-
-		change_variable = {
-			which = china_war_troop_quality
-			value = 1
+			which = local_china_war_troop_quantity
+			value = 4
 		}
 	}
 	else_if = {
-		limit = { year >= 1300 }
+		limit = { year >= 900 }
 
 		change_variable = {
-			which = china_war_troop_quantity
-			value = 8
+			which = local_china_war_troop_quantity
+			value = 3
 		}
+	}
+	else_if = {
+		limit = { year >= 800 }
 
 		change_variable = {
-			which = china_war_target_match_mult
-			value = 0.05
-		}
-
-		change_variable = {
-			which = china_war_troop_quality
-			value = 1
+			which = local_china_war_troop_quantity
+			value = 2
 		}
 	}
 }
@@ -1070,27 +1050,14 @@ china_war_modify_variables_by_century_effect = {
 check_likes_or_dislikes_THIS_effect = {
  	if = {  # If the current Emperor LIKES target
 		limit = { is_liked_by_China_trigger = yes }
-
-		offmap_china = {
-			show_scope_change = no
-
-			custom_tooltip = { text = emperor_likes_THIS_tt }
-		}
+		custom_tooltip = { text = emperor_likes_THIS_tt }
 	}
 	else_if = { # If the current Emperor DISLIKES target
 		limit = { is_disliked_by_China_trigger = yes }
-		offmap_china = {
-			show_scope_change = no
-
-			custom_tooltip = { text = emperor_dislikes_THIS_tt }
-		}
+		custom_tooltip = { text = emperor_dislikes_THIS_tt }
 	}
-	else = { #If the current Emperor LIKES *and* DISLIKES target
-		offmap_china = {
-			show_scope_change = no
-
-			custom_tooltip = { text = emperor_has_ambiguous_feelings_of_THIS_tt }
-		}
+	else = { # If the current Emperor LIKES *and* DISLIKES target
+		custom_tooltip = { text = emperor_has_ambiguous_feelings_of_THIS_tt }
 	}
 }
 
@@ -1242,7 +1209,7 @@ return_to_travel_tombola_effect = {
 	hidden_effect = {
 		event_target:kow_tow_traveler = {
 			subtract_variable = {
-				which = china_kow_tow_travel_events
+				which = local_china_kow_tow_travel_events
 				value = 1
 			}
 
@@ -1259,7 +1226,7 @@ return_to_china_tombola_effect = {
 	hidden_effect = {
 		event_target:kow_tow_traveler = {
 			subtract_variable = {
-				which = china_kow_tow_travel_events
+				which = local_china_kow_tow_travel_events
 				value = 1
 			}
 

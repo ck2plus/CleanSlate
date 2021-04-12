@@ -150,30 +150,32 @@ offmap_submission = {
 						}
 					}
 
-					if = { # China with no land calculates what to do with nomad provinces
-						limit = {
-							is_offmap_governor = yes
-							offmap_power = { is_offmap_tag = offmap_china }
-							offmap_china = { has_offmap_tmp_flag = WP_is_not_on_map }
-							wealth < 2500 # unless already rich from tributes
-						}
-
-						set_variable = {
-							which = WP_nomad_provinces
-							value = 0
-						}
-
-						any_realm_province = {
+					hidden_effect = {
+						if = { # China with no land calculates what to do with nomad provinces
 							limit = {
-								has_province_modifier = nomad_agitation
-								has_settlement_construction = no
+								is_offmap_governor = yes
+								offmap_power = { is_offmap_tag = offmap_china }
+								offmap_china = { has_offmap_tmp_flag = WP_is_not_on_map }
+								wealth < 2500 # unless already rich from tributes
 							}
-							province_event = { id = JD.60100 } # increase counter for each nomad province
-						}
 
-						character_event = {
-							id = JD.60101 # calculate gold sent from China for building holdings
-							days = 1
+							set_variable = {
+								which = local_WP_nomad_gold_from_china
+								value = 0
+							}
+
+							any_realm_province = {
+								limit = {
+									has_province_modifier = nomad_agitation
+									has_settlement_construction = no
+								}
+								change_variable = { which = local_WP_nomad_gold_from_china value = 1 }
+							}
+
+							character_event = {
+								id = JD.60101 # calculate gold sent from China for building holdings
+								days = 1
+							}
 						}
 					}
 
@@ -1068,7 +1070,7 @@ force_open_china_cb = {
 				min = 2000
 			}
 
-			save_event_target_as = target_governor
+			save_event_target_as = the_protector_general
 
 			offmap_power = {
 				set_offmap_flag = no_policy_news
@@ -1429,6 +1431,14 @@ invasion_of_china_cb = {
 				}
 
 				offmap_china = {
+					set_offmap_flag = no_policy_news
+					set_policy = china_open
+					log = "-------------------------------------"
+					log = "China Policy Logging:"
+					log = "Chinas new Policy is now OPEN"
+					log = "-------------------------------------"
+					clr_offmap_flag = no_policy_news
+
 					governor = {
 						any_vassal = {
 							set_defacto_liege = ROOT
