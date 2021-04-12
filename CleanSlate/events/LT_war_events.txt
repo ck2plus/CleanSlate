@@ -11,19 +11,19 @@ namespace = LT
 character_event = {
 	id = LT.21100
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 	hide_window = yes
 
-	only_playable = yes
-	religion_group = christian
+	has_character_flag = is_king_henry_I
+	min_age = 16
 	only_independent = yes
 	only_capable = yes
-	min_age = 16
 	prisoner = no
+	religion_group = christian
 
 	trigger = {
-		has_character_flag = is_king_henry_I
 		is_landed = yes
+
 		NOT = {
 			any_child = {
 				is_heir = yes
@@ -34,25 +34,14 @@ character_event = {
 
 	immediate = {
 	#	save_event_target_as = dead_king_henry
-		any_child = {
-			limit = { has_character_flag = is_matilda_daughter_of_Henry_I }
-
+		c_202991 = { # Matilda
 			add_claim = k_england
 			save_event_target_as = matilda
 		}
-		any_realm_lord = {
-			limit = {
-				has_character_flag = is_stephen
-			}
-			hidden_tooltip = { narrative_event = { id = LT.21110 days = 1 } }
+		c_205851 = { # Stephen
+			narrative_event = { id = LT.21110 days = 1 }
 		}
 	}
-
-	# Hidden events need no options, certainly not with a name?
-	# Loc key is not in any .csv file anyway
-	#option = {
-	#	name = EVTOPTA_LT_21100
-	#}
 }
 
 # Stephen must decide either to support Matilda or usurp the Throne
@@ -65,16 +54,13 @@ narrative_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		has_character_flag = is_stephen
-	}
-
 	option = {
-		name = EVTOPTA_LT_21110 #Support Matilda
+		name = EVTOPTA_LT_21110 # Support Matilda
 		ai_chance = { factor = 20 }
+
 		trigger = {
 			FROM = {
-				any_child = { has_character_flag = is_matilda_daughter_of_Henry_I }
+				is_parent_of = event_target:matilda
 			}
 		}
 
@@ -88,42 +74,44 @@ narrative_event = {
 	}
 
 	option = {
-		name = EVTOPTB_LT_21110 #Usurp the throne
+		name = EVTOPTB_LT_21110 # Usurp the throne
 		ai_chance = { factor = 80 }
+
 		d_normandy = {
+			show_scope_change = no
 			if = {
-				limit = { holder_scope = { character = event_target:matilda } }
+				limit = { holder = event_target:matilda }
 				usurp_title_plus_barony_if_unlanded_and_vassals = ROOT
 			}
 		}
 		d_york = {
+			show_scope_change = no
 			if = {
-				limit = { holder_scope = { character = event_target:matilda } }
+				limit = { holder = event_target:matilda }
 				usurp_title_plus_barony_if_unlanded_and_vassals = ROOT
 			}
 		}
 		d_lancaster = {
+			show_scope_change = no
 			if = {
-				limit = { holder_scope = { character = event_target:matilda } }
+				limit = { holder = event_target:matilda }
 				usurp_title_plus_barony_if_unlanded_and_vassals = ROOT
 			}
 		}
 		vassalize_or_take_under_title = {
 			title = k_england
 			enemy = event_target:matilda
-			#same_religion = yes # Only vassalize rulers of my religion
-			#is_religious = yes
+			# same_religion = yes # Only vassalize rulers of my religion
+			# is_religious = yes
 			type = host
 		}
-		k_england = {
- 			usurp_title_plus_barony_if_unlanded_and_vassals = ROOT
-		}
-		c_middlesex = {
-			ROOT = { capital = PREV }
-		}
+		usurp_title_plus_barony_if_unlanded_and_vassals = k_england
+
+		capital = c_middlesex
+
 		c_cornwall = {
 			if = {
-				limit = { holder_scope = { character = event_target:matilda } }
+				limit = { holder = event_target:matilda }
 				usurp_title_plus_barony_if_unlanded_and_vassals = ROOT
 			}
 		}
@@ -133,6 +121,7 @@ narrative_event = {
 		hidden_effect = {
 			event_target:matilda = {
 				narrative_event = { id = LT.21130 days = 2 }
+
 				spouse = {
 					narrative_event = { id = LT.21131 days = 2 }
 					save_event_target_as = matilda_spouse
@@ -146,8 +135,7 @@ narrative_event = {
 		#		}
 		#	}
 
-		#	any_playable_ruler = {
-		#		limit = { ai = no }
+		#	any_player = {
 		#		narrative_event = { id = LT.21133 days = 10 }
 		#	}
 		}
@@ -155,7 +143,7 @@ narrative_event = {
 }
 
 
-#Matilda receives the news that Stephen and the other nobles support her
+# Matilda receives the news that Stephen and the other nobles support her
 narrative_event = {
 	id = LT.21120
 	title = EVTTITLE_LT_21110
@@ -165,26 +153,27 @@ narrative_event = {
 
 	is_triggered_only = yes
 
-
 	option = {
-		name = EVTOPTA_LT_21120 #Great!
+		name = EVTOPTA_LT_21120 # Great!
 
 		opinion = {
-					who = FROM
-					modifier = opinion_loyal_vassal
-					years = 10
-				}
-		spouse = { save_event_target_as = matilda_spouse }
-		hidden_tooltip = { #broadcasting the news to all players
-			any_playable_ruler = {
-				limit = { ai = no }
-				narrative_event = { id = LT.21121 days = 1 }
-			}
+			name = opinion_loyal_vassal
+			who = FROM
+			years = 10
+		}
+
+		hidden_effect = {
+			spouse = { save_event_target_as = matilda_spouse }
+		}
+
+		# Broadcast the news to all players
+		any_player = {
+			narrative_event = { id = LT.21121 days = 1 }
 		}
 	}
 }
 
-#News of Matilde ascension to the throne are broadcast
+# News of Matilde ascension to the throne are broadcast
 narrative_event = {
 	id = LT.21121
 	title = EVTTITLE_LT_21110
@@ -195,7 +184,7 @@ narrative_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = EVTOPTA_LT_21121 #interesting
+		name = EVTOPTA_LT_21121 # interesting
 	}
 }
 
@@ -209,8 +198,10 @@ narrative_event = {
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
-		name = EVTOPTA_LT_21130 #I will fight
+		name = EVTOPTA_LT_21130 # I will fight
 	}
 }
 
@@ -225,26 +216,24 @@ narrative_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-	}
-
-
 	option = {
-		name = EVTOPTA_LT_21131 #I will fight
-		ai_chance = { factor = 80 }
+		name = EVTOPTA_LT_21131 # I will fight
 
 		k_england = {
 			show_scope_change = no
-			reverse_war = {
-				target = event_target:matilda
+
+			reverse_unsafe_war = {
+				target = c_202991
 				casus_belli = other_claim
 				thirdparty = ROOT
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTB_LT_21131 # Not now
 		ai_chance = { factor = 20 }
+
 		prestige = -100
 	}
 }

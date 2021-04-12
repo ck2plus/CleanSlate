@@ -6,13 +6,11 @@
 #										  #
 ###########################################
 
-# Written by LinnÃ©a ThimrÃ©n
+# Written by Linnéa Thimrén
 
 namespace = LT
 
-
-
-#A town appears around the wonder
+# A town appears around the wonder
 character_event = {
 	id = LT.60001
 	title = evt_TITLE_LT_60001
@@ -20,21 +18,21 @@ character_event = {
 	picture = GFX_evt_construction_site
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_wonder_upgrade_finish
+
+	war = no
 
 	trigger = {
-		is_alive = yes
 		is_inaccessible_trigger = no
-		war = no
+
 		FROMFROM = {
-			wonder_age = 50
-			num_of_wonder_upgrades = 2
+			wonder_age >= 50
+			num_of_wonder_upgrades >= 2
 		}
+
 		FROMFROMFROM = {
-			NOR = {
-				has_province_flag = had_event_LT_60001
-				num_of_max_settlements = 7
-			}
+			num_of_max_settlements < 7
+			NOT = { has_province_flag = had_event_LT_60001 }
 		}
 	}
 
@@ -46,35 +44,40 @@ character_event = {
 		}
 	}
 
-	option = { #Cool!
+	option = { # Cool!
 		name = EVTOPTA_LT_60001
+
 		event_target:target_province = {
+			show_scope_change = no
+
 			add_holding_slot = 1
 		}
+
 		ai_chance = {
 			factor = 50
-			modifier = {
-				factor = 0
-				NOT = { wealth = 50 }
-			}
+
+			trigger = { wealth >= 50 }
 		}
 	}
 
-	option = { #Bulldoze it and take everything valuable
+	option = { # Bulldoze it and take everything valuable
 		name = EVTOPTB_LT_60001
-		treasury = 40
+
+		wealth = 40
+
 		ai_chance = {
 			factor = 30
-			modifier = {
-				trait = greedy
+
+			mult_modifier = {
 				factor = 1.5
+				trait = greedy
 			}
 		}
 	}
 }
 
 
-#Library lets you write a cooler book
+# Library lets you write a cooler book
 character_event = {
 	id = LT.60101
 	title = evt_TITLE_LT_60101
@@ -82,83 +85,80 @@ character_event = {
 	picture = GFX_evt_open_book_hf
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	only_independent = yes
+	has_character_flag = currently_working_on_a_book
+	war = no
 
 	trigger = {
-		has_character_flag = currently_working_on_a_book
 		has_wonder = wonder_library
-		is_alive = yes
 		is_inaccessible_trigger = no
-		war = no
 	}
 
 	immediate = {
 		random_realm_wonder = {
-			limit = {
-				has_wonder = wonder_library
-			}
+			limit = { has_wonder = wonder_library }
 			save_event_target_as = target_wonder
 		}
 	}
 
-	option = { #Cool!
+	option = { # Cool!
 		name = EVTOPTA_LT_60101
 		custom_tooltip = { text = EVTOPTA_TT_LT_60101 }
 		custom_tooltip = { text = higher_quality_of_book_TT }
+
 		set_higher_quality_of_book_flags_effect = yes
 	}
 }
 
 
-#Drink from the fountain of youth
+# Drink from the fountain of youth
 character_event = {
 	id = LT.60201
 	title = evt_TITLE_LT_60201
-	desc = {
-		trigger = {
-			NOT = { trait = lunatic }
-		}
-		text = EVTDESC_LT_60201_1
-	}
-	desc = {
-		trigger = {
-			trait = lunatic
-		}
-		text = EVTDESC_LT_60201_2
-	}
 	picture = GFX_evt_garden
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	desc = {
+		text = EVTDESC_LT_60201_1
+		trigger = {
+			NOT = { trait = lunatic }
+		}
+	}
+	desc = {
+		text = EVTDESC_LT_60201_2
+		trigger = { trait = lunatic }
+	}
+
+	is_triggered_only = yes # wonder_decisions.txt
 
 	immediate = {
 		random_realm_wonder = {
-			limit = {
-				has_wonder = wonder_garden
-			}
+			limit = { has_wonder = wonder_garden }
 			save_event_target_as = target_wonder
 		}
 	}
 
-	option = { #Chug!
+	option = { # Chug!
 		name = EVTOPTA_LT_60201
 		trigger = {
 			NOT = { trait = lunatic }
 		}
+
 		add_age = -2
 	}
 
-	option = { #Chug as a lunatic!
+	option = { # Chug as a lunatic!
 		name = EVTOPTB_LT_60201
-		trigger = {
-			trait = lunatic
-		}
+		trigger = { trait = lunatic }
+
 		add_age = 2
 	}
 }
 
 
-#Tavern lets you lose the "stressed" trait
+# Tavern lets you lose the "stressed" trait
 character_event = {
 	id = LT.60301
 	title = evt_TITLE_LT_60301
@@ -167,72 +167,75 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 	portrait = event_target:drinking_buddy
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	only_independent = yes
 
 	trigger = {
+		trait = stressed
+
 		any_realm_wonder = {
 			has_wonder_upgrade = upgrade_tavern
 		}
-		trait = stressed
 	}
 
 	immediate = {
 		save_drinking_character_effect = yes
+
 		random_realm_wonder = {
-			limit = {
-				has_wonder_upgrade = upgrade_tavern
-			}
+			limit = { has_wonder_upgrade = upgrade_tavern }
 			save_event_target_as = target_wonder
 		}
 	}
 
-	option = { #Let loose!
+	option = { # Let loose!
 		name = EVTOPTA_LT_60301
+
 		remove_trait = stressed
+
 		if = {
 			limit = {
 				NOT = { trait = drunkard }
 			}
+
 			custom_tooltip = {
 				text = EVTOPTA_LT_60301_TT
-				random = { #Adds Drunkard trait
+
+				random = { # Adds Drunkard trait
 					chance = 5
-					character_event = { id = LT.60302 days = 15 random = 30 }
+
+					character_event = {
+						id = LT.60302
+						days = 15
+						random = 30
+					}
 				}
 			}
 		}
 	}
 
-	option = { #Be a party-pooper
+	option = { # Be a party-pooper
 		name = EVTOPTB_LT_60301
+
 		if = {
-			limit = {
-				NOT = {
-					event_target:drinking_buddy = {
-						any_friend = { character = root }
-					}
-				}
-			}
-			event_target:drinking_buddy = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_budding_friendship
-				}
+			limit = { is_friend = event_target:drinking_buddy }
+
+			reverse_opinion = {
+				name = kind_pos
+				who = event_target:drinking_buddy
 			}
 		}
 		else = {
-			event_target:drinking_buddy = {
-				opinion = {
-					who = ROOT
-					modifier = kind_pos
-				}
+			reverse_opinion = {
+				name = opinion_budding_friendship
+				who = event_target:drinking_buddy
 			}
 		}
 	}
 }
 
 
-#Become drunkard from the tavern
+# Become drunkard from the tavern
 character_event = {
 	id = LT.60302
 	title = evt_TITLE_LT_60302
@@ -246,14 +249,15 @@ character_event = {
 		NOT = { trait = drunkard }
 	}
 
-	option = { #Drink up!
+	option = { # Drink up!
 		name = EVTOPTA_LT_60302
+
 		add_trait = drunkard
 	}
 }
 
 
-#Traps kills courtiers in the new court
+# Traps kills courtiers in the new court
 character_event = {
 	id = LT.60401
 	title = evt_TITLE_LT_60401
@@ -261,15 +265,15 @@ character_event = {
 	picture = GFX_evt_died_funeral
 	border = GFX_event_normal_frame_intrigue
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_wonder_owner_change
 
 	trigger = {
-		FROM = {
-			has_wonder_upgrade = upgrade_traps
-		}
+		FROM = { has_wonder_upgrade = upgrade_traps }
+
 		any_courtier = {
-			prisoner = no
 			count = 2
+
+			prisoner = no
 		}
 	}
 
@@ -279,54 +283,50 @@ character_event = {
 			save_event_target_as = old_owner
 		}
 		random_realm_wonder = {
-			limit = {
-				has_wonder_upgrade = upgrade_traps
-			}
+			limit = { has_wonder_upgrade = upgrade_traps }
 			save_event_target_as = target_wonder
 		}
 		any_courtier = {
-			limit = {
-				prisoner = no
-			}
-			score_value = { #Select someone that matters more!
+			limit = { prisoner = no }
+
+			score_value = { # Select someone that matters more!
 				value = 2
 				beloved_target_selection_score = yes
 			}
+
 			save_event_target_as = target_courtier
 		}
 		random_courtier = {
 			limit = {
 				prisoner = no
-				NOT = {
-					character = event_target:target_courtier
-				}
+				NOT = { character = event_target:target_courtier }
 			}
+
 			save_event_target_as = target_courtier_2
 		}
 	}
 
-	option = { #Oh woe!
+	option = { # Oh woe!
 		name = EVTOPTA_LT_60401
+
 		event_target:target_courtier = {
+			show_scope_change = no
+
 			death = { death_reason = death_accident_wonder_traps }
 		}
 		event_target:target_courtier_2 = {
+			show_scope_change = no
+
 			death = { death_reason = death_accident_wonder_traps }
 		}
-		if = {
-			limit = {
-				event_target:old_owner = {
-					is_alive = yes
-				}
-			}
-			event_target:old_owner = {
-				character_event = { id = LT.60402 }
-			}
+
+		event_target:old_owner = {
+			character_event = { id = LT.60402 }
 		}
 	}
 }
 
-#Traps have killed courtiers in the new court!
+# Traps have killed courtiers in the new court!
 character_event = {
 	id = LT.60402
 	title = evt_TITLE_LT_60401
@@ -336,79 +336,83 @@ character_event = {
 
 	is_triggered_only = yes
 
-	immediate = {
+	ai = no
 
-	}
-
-	option = { #Mohaha!
+	option = { # Mohaha!
 		name = EVTOPTA_LT_60402
+
 		tooltip = {
 			event_target:target_courtier = {
+				show_scope_change = no
+
 				death = { death_reason = death_accident_wonder_traps }
 			}
 			event_target:target_courtier_2 = {
+				show_scope_change = no
+
 				death = { death_reason = death_accident_wonder_traps }
 			}
 		}
 	}
 }
 
-#Gain opinion boost from your liege if you have a wonder in your province
+# Gain opinion boost from your liege if you have a wonder in your province
 letter_event = {
 	id = LT.60501
 	desc = EVTDESC_LT_60501
 	border = GFX_event_letter_frame_diplomacy
 	portrait = event_target:target_liege
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	only_rulers = yes
 
 	trigger = {
+		independent = no
+
 		any_demesne_province = {
 			has_wonder = yes
-			holder_scope = {
-				always = yes
-				NOT = { character = ROOT }
-			}
 		}
 	}
 
 	immediate = {
 		save_event_target_as = target_vassal
+
 		random_demesne_wonder = {
 			save_event_target_as = target_wonder
+
 			wonder_owner = {
 				save_event_target_as = target_liege
 			}
 		}
 	}
 
-	option = { #Oh no, YOU have!
+	option = { # Oh no, YOU have!
 		name = EVTOPTA_LT_60501
-		if = {
-			limit = {
-				event_target:target_liege = {
-					is_alive = yes
-				}
+
+		event_target:target_liege = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_kind
+				who = ROOT
 			}
-			event_target:target_liege = {
-				opinion = {
-					modifier = opinion_kind
-					who = ROOT
-				}
-				letter_event = { id = LT.60502 days = 3 }
-			}
+
+			letter_event = { id = LT.60502 days = 3 }
 		}
-		ai_chance = {
-			factor = 100
-		}
+
+		ai_chance = { factor = 100 }
 	}
 
-	option = { #Ehehe, yeah.
+	option = { # Ehehe, yeah.
 		name = EVTOPTB_LT_60501
+
 		prestige = 50
+
 		ai_chance = {
 			factor = 25
-			modifier = {
+
+			mult_modifier = {
 				factor = 4
 				trait = proud
 			}
@@ -416,7 +420,7 @@ letter_event = {
 	}
 }
 
-#Vassal with a wonder in their province likes you better
+# Vassal with a wonder in their province likes you better
 letter_event = {
 	id = LT.60502
 	desc = EVTDESC_LT_60502
@@ -424,26 +428,18 @@ letter_event = {
 
 	is_triggered_only = yes
 
-	option = { #Oh thank you!
+	option = { # Oh thank you!
 		name = EVTOPTA_LT_60502
-		if = {
-			limit = {
-				event_target:target_vassal = {
-					is_alive = yes
-				}
-			}
-			event_target:target_vassal = {
-				opinion = {
-					modifier = opinion_kind
-					who = root
-				}
-			}
+
+		reverse_opinion = {
+			name = opinion_kind
+			who = event_target:target_vassal
 		}
 	}
 }
 
 
-#A part of your wonder has fallen off!
+# A part of your wonder has fallen off!
 character_event = {
 	id = LT.60601
 	title = evt_TITLE_LT_60601
@@ -451,48 +447,52 @@ character_event = {
 	picture = GFX_evt_leaning_tower
 	border = GFX_event_normal_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	only_independent = yes
 
 	trigger = {
 		any_realm_wonder = {
-			wonder_age = 100
+			wonder_age >= 100
 			has_wonder_flag = is_destructible
 		}
 	}
 
 	immediate = {
-		save_event_target_as = target_vassal
-		liege = {
-			save_event_target_as = target_liege
-		}
 		random_realm_wonder = {
 			limit = {
-				wonder_age = 100
+				wonder_age >= 100
 				has_wonder_flag = is_destructible
 			}
 			save_event_target_as = target_wonder
 		}
 	}
 
-	option = { #I will repair it
+	option = { # I will repair it
 		name = EVTOPTA_LT_60601
+
 		wealth = -50
 		prestige = 40
+
 		ai_chance = {
 			factor = 75
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = zealous
 			}
 		}
 	}
 
-	option = { #I will sell the pieces!
+	option = { # I will sell the pieces!
 		name = EVTOPTB_LT_60601
+
 		wealth = 100
+
 		ai_chance = {
 			factor = 25
-			modifier = {
+
+			mult_modifier = {
 				factor = 3
 				trait = greedy
 			}
@@ -501,7 +501,7 @@ character_event = {
 }
 
 
-#Periodically pick herbs (Hermetic artifact)
+# Periodically pick herbs (Hermetic artifact)
 character_event = {
 	id = LT.60701
 	title = evt_TITLE_LT_60701
@@ -509,24 +509,21 @@ character_event = {
 	picture = GFX_evt_mysterious_forest
 	border = GFX_event_normal_frame_diplomacy
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	only_independent = yes
 
 	trigger = {
 		any_realm_wonder = {
 			has_wonder_upgrade = upgrade_herb_garden
 		}
-		trigger_if = {
-			limit = {
-				any_artifact = {
-					count = 1
-				}
-			}
-			NOT = {
-				any_artifact = {
-					count = 15  #Doesn't already have a shitton of herbs
-					is_ingredient_herb_trigger = yes
-					has_artifact_flag = ingredient
-				}
+
+		NOT = {
+			any_artifact = {
+				count = 15 # Doesn't already have a shitton of herbs
+
+				is_ingredient_herb_trigger = yes
+				has_artifact_flag = ingredient
 			}
 		}
 	}
@@ -534,31 +531,31 @@ character_event = {
 	immediate = {
 	#	save_event_target_as = new_owner
 		random_realm_wonder = {
-			limit = {
-				has_wonder_upgrade = upgrade_herb_garden
-			}
+			limit = { has_wonder_upgrade = upgrade_herb_garden }
 			save_event_target_as = target_wonder
+
 			location = {
 				save_event_target_as = target_province
 			}
 		}
-		hidden_effect = { #To give some randomization to the event
+
+		hidden_effect = { # To give some randomization to the event
 			random_list = {
-				10 = {
+				33 = {
 					set_variable = {
-						which = gath_res
+						which = local_gath_res
 						value = 1
 					}
 				}
-				10 = {
+				33 = {
 					set_variable = {
-						which = gath_res
+						which = local_gath_res
 						value = 2
 					}
 				}
-				10 = {
+				33 = {
 					set_variable = {
-						which = gath_res
+						which = local_gath_res
 						value = 3
 					}
 				}
@@ -566,28 +563,35 @@ character_event = {
 		}
 	}
 
-	option = { #Herbs!
+	option = { # Herbs!
 		name = EVTOPTA_LT_60701
+
 		sound_effect = hermetic_society_acquire_seed
-		while = {
-			limit = {
-				check_variable = {
-					which = gath_res
-					value = 1
+
+		custom_tooltip = {
+			text = EVTTOOLTIP_MNM_1812
+
+			while = {
+				limit = {
+					check_variable = {
+						which = local_gath_res
+						value > 0
+					}
+				}
+
+				hermetic_add_herbal_ingredient_effect = yes
+
+				change_variable = {
+					which = local_gath_res
+					value = -1
 				}
 			}
-			hermetic_add_herbal_ingredient_effect = yes
-
-			subtract_variable = {
-				which = gath_res
-				value = 1
-			}
 		}
-		custom_tooltip = { text = EVTTOOLTIP_MNM_1812 }
 	}
 
-	option = { #Rest!
+	option = { # Rest!
 		name = EVTOPTB_LT_60701
+
 		health = 1
 	}
 }

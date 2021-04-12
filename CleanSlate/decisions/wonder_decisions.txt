@@ -8,8 +8,6 @@ decisions = {
 		only_independent = yes
 
 		potential = {
-			independent = yes
-
 			any_realm_wonder_upgrade = {
 				has_wonder_upgrade = upgrade_retinue
 				is_active = yes
@@ -115,39 +113,36 @@ decisions = {
 
 				new_character = {
 					random_list = {
-						10 = { add_artifact = lance_tier_1_new }
-						10 = { add_artifact = sword_tier_1_new }
-						10 = { add_artifact = scimitar_tier_1_new }
-						10 = { add_artifact = axe_tier_1_new }
-						10 = { add_artifact = mace_tier_1_new }
+						20 = { add_artifact = lance_tier_1_new }
+						20 = { add_artifact = sword_tier_1_new }
+						20 = { add_artifact = scimitar_tier_1_new }
+						20 = { add_artifact = axe_tier_1_new }
+						20 = { add_artifact = mace_tier_1_new }
 					}
 
 					add_trait = gladiator
 
 					random_list = {
-						10 = { add_trait = robust }
-						10 = { add_trait = duelist }
-						10 = { add_trait = impaler }
+						33 = { add_trait = robust }
+						33 = { add_trait = duelist }
+						33 = { add_trait = impaler }
 					}
 
-					remove_trait = misguided_warrior
-					remove_trait = tough_soldier
-					remove_trait = skilled_tactician
-					remove_trait = brilliant_strategist
+					clear_education_trait = yes
 
 					random_list = {
 						45 = { add_trait = misguided_warrior }
 						40 = { add_trait = tough_soldier }
 						10 = { add_trait = skilled_tactician }
-						5 = { add_trait = brilliant_strategist }
+						 5 = { add_trait = brilliant_strategist }
 					}
 
 					random_list = {
-						10 = { add_trait = aggressive_leader }
-						10 = { add_trait = defensive_leader }
-						10 = { add_trait = experimenter }
-						10 = { add_trait = unyielding_leader }
-						10 = { add_trait = flat_terrain_leader }
+						20 = { add_trait = aggressive_leader }
+						20 = { add_trait = defensive_leader }
+						20 = { add_trait = experimenter }
+						20 = { add_trait = unyielding_leader }
+						20 = { add_trait = flat_terrain_leader }
 					}
 				}
 
@@ -167,8 +162,6 @@ decisions = {
 		only_independent = yes
 
 		potential = {
-			independent = yes
-
 			any_realm_wonder_upgrade = {
 				has_wonder_upgrade = upgrade_fountain_of_youth
 				is_active = yes
@@ -200,9 +193,9 @@ decisions = {
 					years = 10
 					hidden = yes
 				}
-
-				character_event = { id = LT.60201 }
 			}
+
+			character_event = { id = LT.60201 }
 		}
 
 		ai_will_do = {
@@ -222,12 +215,10 @@ decisions = {
 		only_independent = yes
 
 		potential = {
-			independent = yes
-
 			any_realm_wonder_upgrade = {
 				has_wonder_upgrade_flag = stores_relic
-				is_active = no
 				NOT = { has_wonder_upgrade_flag = is_storing_relic }
+				is_active = no
 				is_building_wonder_upgrade = no
 
 				wonder = { is_active = yes }
@@ -252,74 +243,55 @@ decisions = {
 		}
 
 		effect = {
-			if = { # Since the decision updates every 6 month this check is to make sure you actually still have an artifact!
-				limit = { num_of_artifacts > 0 }
-
-				random_realm_wonder_upgrade = {
-					limit = {
-						has_wonder_upgrade_flag = stores_relic
-						is_active = no
-						is_building_wonder_upgrade = no
-					}
-
-					save_event_target_as = target_upgrade
-
-					wonder = {
-						save_event_target_as = target_wonder
-					}
+			random_realm_wonder_upgrade = {
+				limit = {
+					has_wonder_upgrade_flag = stores_relic
+					NOT = { has_wonder_upgrade_flag = is_storing_relic }
+					is_active = no
+					is_building_wonder_upgrade = no
 				}
 
-				# Select up to 4 random artifacts
-				random_artifact = {
-					limit = {
-						has_artifact_flag = religious
-						is_artifact_active = yes
-					}
-					set_artifact_flag = target_artifact_1
-					save_event_target_as = target_artifact_1
+				save_event_target_as = target_upgrade
+
+				wonder = {
+					save_event_target_as = target_wonder
 				}
-
-				random_artifact = {
-					limit = {
-						has_artifact_flag = religious
-						is_artifact_active = yes
-						NOT = { artifact = event_target:target_artifact_1 }
-					}
-					set_artifact_flag = target_artifact_2
-					save_event_target_as = target_artifact_2
-				}
-
-				random_artifact = {
-					limit = {
-						has_artifact_flag = religious
-						is_artifact_active = yes
-						NOT = { artifact = event_target:target_artifact_1 }
-						NOT = { artifact = event_target:target_artifact_2 }
-					}
-					set_artifact_flag = target_artifact_3
-					save_event_target_as = target_artifact_3
-				}
-
-				random_artifact = {
-					limit = {
-						has_artifact_flag = religious
-						is_artifact_active = yes
-						NOT = { artifact = event_target:target_artifact_1 }
-						NOT = { artifact = event_target:target_artifact_2 }
-						NOT = { artifact = event_target:target_artifact_3 }
-					}
-					set_artifact_flag = target_artifact_4
-					save_event_target_as = target_artifact_4
-				}
-
-				custom_tooltip = {
-					text = store_relic_TT
-
-					set_character_flag = taking_relic_decision
-				}
-
-				character_event = { id = LT.20601 } # Choose artifact to store
 			}
+
+			# Select up to 3 random artifacts
+			random_artifact = {
+				limit = {
+					has_artifact_flag = religious
+					is_artifact_active = yes
+				}
+				save_event_target_as = target_artifact_1
+			}
+
+			random_artifact = {
+				limit = {
+					has_artifact_flag = religious
+					is_artifact_active = yes
+					NOT = { artifact = event_target:target_artifact_1 }
+				}
+				save_event_target_as = target_artifact_2
+			}
+
+			random_artifact = {
+				limit = {
+					has_artifact_flag = religious
+					is_artifact_active = yes
+
+					NOR = {
+						artifact = event_target:target_artifact_1
+						artifact = event_target:target_artifact_2
+					}
+				}
+				save_event_target_as = target_artifact_3
+			}
+
+			custom_tooltip = { text = store_relic_TT }
+			set_character_flag = taking_relic_decision
+			character_event = { id = LT.20601 } # Choose artifact to store
 		}
 
 		ai_will_do = {
@@ -327,6 +299,7 @@ decisions = {
 		}
 	}
 
+	# TODO: Is this decision functional? Is there anything that adds the wonder upgrades with the repairable flag?
 	repair_wonder_decision = {
 		potential = {
 			any_realm_wonder_upgrade = {
@@ -355,7 +328,7 @@ decisions = {
 
 targeted_decisions = {
 
-	alcohol_gift_decision = { #Given Alcohol gift
+	alcohol_gift_decision = { # Give Alcohol gift
 		ai = no
 
 		from_potential = {
@@ -365,17 +338,12 @@ targeted_decisions = {
 		}
 
 		potential = {
-			is_alive = yes
 			is_within_diplo_range = FROM
-
-			NOR = {
-				character = FROM
-				has_character_modifier = recently_recieved_alcohol_gift
-			}
+			is_adult = yes
+			NOT = { has_character_modifier = recently_recieved_alcohol_gift }
 		}
 
 		allow = {
-			is_adult = yes
 			prisoner = no
 
 			custom_tooltip = {
@@ -399,25 +367,22 @@ targeted_decisions = {
 				}
 
 				opinion = {
+					name = opinion_disrespects_me
 					who = FROM
-					modifier = opinion_disrespects_me
 				}
 			}
+			else_if = {
+				limit = { trait = drunkard }
 
-			else = {
-				if = {
-					limit = { trait = drunkard }
-
-					opinion = {
-						who = FROM
-						modifier = opinion_gifted_alcohol_drunkard
-					}
+				opinion = {
+					name = opinion_gifted_alcohol_drunkard
+					who = FROM
 				}
-				else = {
-					opinion = {
-						who = FROM
-						modifier = opinion_gifted_alcohol
-					}
+			}
+			else = {
+				opinion = {
+					name = opinion_gifted_alcohol
+					who = FROM
 				}
 			}
 
@@ -454,6 +419,7 @@ targeted_decisions = {
 
 			is_adult = yes
 			is_incapable = no
+			prisoner = no
 		}
 
 		potential = {
@@ -466,12 +432,12 @@ targeted_decisions = {
 
 			NOR = {
 				has_opinion_modifier = {
-					modifier = opinion_scared_into_submission
+					name = opinion_scared_into_submission
 					who = FROM
 				}
 
 				has_opinion_modifier = {
-					modifier = opinion_threatened_me
+					name = opinion_threatened_me
 					who = FROM
 				}
 			}
@@ -488,7 +454,11 @@ targeted_decisions = {
 		}
 
 		effect = {
+			save_event_target_as = target_character
+
 			FROM = {
+				show_scope_change = no
+
 				random_realm_wonder_upgrade = {
 					limit = {
 						is_active = yes
@@ -501,25 +471,20 @@ targeted_decisions = {
 						save_event_target_as = target_wonder
 					}
 				}
-			}
 
-			save_event_target_as = target_character
-
-			custom_tooltip = {
-				text = use_scary_upgrade_tt
-
-
-				FROM = {
-					character_event = {
-						id = LT.20301
-						days = 1
-					}
+				custom_tooltip = {
+					text = use_scary_upgrade_tt
 
 					add_character_modifier = {
 						name = used_scary_upgrade_cd
 						years = 2
 						hidden = yes
 					}
+				}
+
+				character_event = {
+					id = LT.20301
+					days = 1
 				}
 			}
 		}
@@ -562,6 +527,7 @@ targeted_decisions = {
 
 			is_adult = yes
 			is_incapable = no
+			prisoner = no
 		}
 
 		potential = {
@@ -574,12 +540,12 @@ targeted_decisions = {
 
 			NOR = {
 				has_opinion_modifier = {
-					modifier = opinion_afraid
+					name = opinion_afraid
 					who = FROM
 				}
 
 				has_opinion_modifier = {
-					modifier = opinion_threatened_me
+					name = opinion_threatened_me
 					who = FROM
 				}
 			}
@@ -596,7 +562,11 @@ targeted_decisions = {
 		}
 
 		effect = {
+			save_event_target_as = target_character
+
 			FROM = {
+				show_scope_change = no
+
 				random_realm_wonder_upgrade = {
 					limit = {
 						is_active = yes
@@ -609,25 +579,21 @@ targeted_decisions = {
 						save_event_target_as = target_wonder
 					}
 				}
-			}
 
-			save_event_target_as = target_character
+				custom_tooltip = {
+					text = use_secluded_upgrade_tt
 
-			custom_tooltip = {
-				text = use_secluded_upgrade_tt
-
-				character_event = {
-					id = LT.20405 # invitation
-					days = 7
-				}
-
-				FROM = {
 					add_character_modifier = {
 						name = used_secluded_upgrade_cd
 						months = 6
 						hidden = yes
 					}
 				}
+			}
+
+			character_event = {
+				id = LT.20405 # invitation
+				days = 7
 			}
 		}
 

@@ -6,22 +6,19 @@ namespace = LT
 # Turn Yngvar/Igor Russian to simulate that the AI uses the decision at the start of the game
 character_event = {
 	id = LT.40001
+
 	hide_window = yes
-	is_triggered_only = yes
+	is_triggered_only = yes # on_startup
 
 	trigger = {
 		start_date = 936.8.7
 		is_save_game = no
-		c_600 = {
-			character = root
-		}
+		character = c_600
 	}
 
 	immediate = {
 		if = {
-			limit = {
-				ai = yes
-			}
+			limit = { ai = yes }
 			culture = russian
 
 			# Workaround for automatic usurption of theocratic characters
@@ -32,9 +29,7 @@ character_event = {
 			convert_religion_failsafe_effect = yes
 
 			any_close_relative = {
-				limit = {
-					is_alive = yes
-				}
+				limit = { is_alive = yes }
 				culture = russian
 
 				# Workaround for automatic usurption of theocratic characters
@@ -45,7 +40,7 @@ character_event = {
 				convert_religion_failsafe_effect = yes
 			}
 		}
-		character_event = { id = LT.40002 days = 2920 }
+		character_event = { id = LT.40002 years = 8 }
 	}
 }
 
@@ -75,110 +70,97 @@ character_event = {
 # Choice given to Otto about invading Lorraine
 narrative_event = {
 	id = LT.40003
-	desc = EVTDESC_LT_40003
 	title = EVTTITLE_LT_40003
+	desc = EVTDESC_LT_40003
 	picture = GFX_evt_large_army
 	border = GFX_event_narrative_frame_war
-	portrait = event_target:giselbert
-	is_triggered_only = yes
+	portrait = c_7813 # Giselbert
+
+	is_triggered_only = yes # on_yearly_pulse
+
 	has_character_flag = is_otto
 	only_playable = yes
 	prisoner = no
 	war = no
 
 	trigger = {
-		NOT = {
+		year < 950
+
+		OR = {
+			has_character_flag = otto_thankmars_rebellion_event
+			year >= 940
+		}
+
+		NOR = {
 			has_game_rule = {
 				name = otto_story
 				value = off
 			}
+
+			has_character_flag = otto_traitor_lorraine_event
 		}
-		NOT = { year = 950 }
-		OR = {
-			has_character_flag = otto_thankmars_rebellion_event
-			year = 940
+
+		d_upper_lorraine = {
+			holder_scope = {
+				NOR = {
+					character = ROOT
+					is_vassal_or_below_of = ROOT
+				}
+			}
 		}
-		NOT = { has_character_flag = otto_traitor_lorraine_event }
-		any_character = {
+
+		c_7813 = { # Giselbert
 			is_alive = yes
-			has_character_flag = is_giselbert
+
 			OR = {
 				has_landed_title = d_upper_lorraine
 				has_landed_title = d_lower_lorraine
-			}
-		}
-		NOR = {
-			has_landed_title = d_upper_lorraine
-			any_realm_lord = {
-				has_landed_title = d_upper_lorraine
 			}
 		}
 	}
 
 	immediate = {
 		set_character_flag = otto_traitor_lorraine_event
-		any_character = {
-			limit = {
-				has_character_flag = is_giselbert
-			}
-			save_event_target_as = giselbert
-		}
 	}
 
 	option = {
 		name = EVTOPTA_LT_40003
-		event_target:giselbert = {
+
+		c_7813 = { # Giselbert
 			show_scope_change = no
+
 			any_demesne_title = {
 				show_scope_change = no
-				root = {
-					show_scope_change = no
-					add_claim = PREV
-				}
+
+				add_claim = ROOT
 			}
+
 			narrative_event = { id = LT.40004 }
 		}
+
 		war = {
-			target = event_target:giselbert
+			target = c_7813 # Giselbert
 			casus_belli = claim_all
 		}
 	}
+
 	option = {
 		name = EVTOPTB_LT_40003
-		trigger = {
-			ai = no
-		}
+		ai_chance = { factor = 0 }
 	}
 }
 
 # Giselbert is informed about Otto's attack
 narrative_event = {
 	id = LT.40004
-	desc = EVTDESC_LT_40004
 	title = EVTTITLE_LT_40004
+	desc = EVTDESC_LT_40004
 	picture = GFX_evt_large_army
 	border = GFX_event_narrative_frame_war
-	portrait = event_target:otto
+
 	is_triggered_only = yes
 
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-		has_character_flag = is_giselbert
-	}
-
-	immediate = {
-		any_character = {
-			limit = {
-				has_character_flag = is_otto
-			}
-			save_event_target_as = otto
-		}
-	}
+	ai = no
 
 	option = {
 		name = EVTOPTA_LT_40004
@@ -190,54 +172,58 @@ narrative_event = {
 # Thankmar is given the chance of rebelling against Otto
 narrative_event = {
 	id = LT.40005
-	desc = EVTDESC_LT_40005
 	title = EVTTITLE_LT_40005
+	desc = EVTDESC_LT_40005
 	picture = GFX_evt_large_army
 	border = GFX_event_narrative_frame_war
-	is_triggered_only = yes
 	portrait = event_target:otto
+
+	is_triggered_only = yes # on_yearly_pulse
+
 	has_character_flag = is_thankmar
 	only_playable = yes
 	prisoner = no
 	war = no
 
 	trigger = {
-		NOT = {
+		year < 940
+
+		NOR = {
 			has_game_rule = {
 				name = otto_story
 				value = off
 			}
+
+			has_character_flag = thankmar_rebellion
 		}
-		NOT = { has_character_flag = thankmar_rebellion }
-		NOT = { year = 940 }
-		any_character = {
-			has_character_flag = is_otto
+
+		c_1282 = { # Otto
 			NOT = { has_character_flag = otto_thankmars_rebellion_event }
 		}
 	}
 
 	immediate = {
 		set_character_flag = thankmar_rebellion
-		random_character = {
-			limit = {
-				has_character_flag = is_otto
-			}
-			save_event_target_as = otto
-		}
+		save_event_target_as = thankmar
+		c_1282 = { save_event_target_as = otto }
 	}
 
 	option = {
 		name = EVTOPTA_LT_40005
+
 		unsafe_war = {
 			target = event_target:otto
 			casus_belli = thankmars_rebellion
 		}
+
 		event_target:otto = {
 			set_character_flag = otto_thankmars_rebellion_event
+
 			any_vassal = {
 				limit = {
-					higher_tier_than = BARON
-					government = feudal_government
+					higher_real_tier_than = BARON
+					is_feudal = yes
+
 					OR = {
 						de_jure_liege = k_germany
 						de_jure_liege = k_frisia
@@ -251,12 +237,12 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTB_LT_40005
-		trigger = {
-			OR = {
-				ai = no
-				event_target:otto = {
-					ai = yes
-				}
+
+		ai_chance = {
+			factor = 1
+
+			trigger = {
+				event_target:otto = { ai = yes }
 			}
 		}
 	}
@@ -265,48 +251,36 @@ narrative_event = {
 # Dukes are invited to join the rebellion
 narrative_event = {
 	id = LT.40006
-	desc = EVTDESC_LT_40006
 	title = EVTTITLE_LT_40006
+	desc = EVTDESC_LT_40006
 	picture = GFX_evt_large_army
 	border = GFX_event_narrative_frame_war
+
 	is_triggered_only = yes
+
 	only_playable = yes
 	prisoner = no
 
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-	}
-
-	immediate = {
-		random_character = {
-			limit = {
-				has_character_flag = is_thankmar
-			}
-			save_event_target_as = thankmar
-		}
-	}
-
 	option = {
 		name = EVTOPTA_LT_40006
-		set_defacto_liege = this
+
+		set_defacto_liege = THIS
 		join_attacker_wars = event_target:thankmar
+
 		ai_chance = {
 			factor = 2
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				tier = DUKE
+				real_tier = DUKE
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = ambitious
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
+
 				likes_better_than = {
 					who = event_target:thankmar
 					than = event_target:otto
@@ -316,28 +290,29 @@ narrative_event = {
 	}
 
 	option = {
-		trigger = {
-			OR = {
-				ai = no
+		name = EVTOPTB_LT_40006
+
+		ai_chance = {
+			factor = 98
+
+			trigger = {
 				NOR = {
 					has_landed_title = d_franconia
 					has_landed_title = c_ostfriesland
 				}
 			}
-		}
-		name = EVTOPTB_LT_40006
-		ai_chance = {
-			factor = 98
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				tier = COUNT
+				real_tier = COUNT
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = content
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
+
 				likes_better_than = {
 					who = event_target:otto
 					than = event_target:thankmar
@@ -350,24 +325,14 @@ narrative_event = {
 # Otto is informed of Thankmar's betrayal
 narrative_event = {
 	id = LT.40007
-	desc = EVTDESC_LT_40007
 	title = EVTTITLE_LT_40007
+	desc = EVTDESC_LT_40007
 	picture = GFX_evt_large_army
 	border = GFX_event_narrative_frame_war
+
 	is_triggered_only = yes
 
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-	}
-
-	immediate = {
-
-	}
+	ai = no
 
 	option = {
 		name = EVTOPTA_LT_40007
@@ -377,41 +342,31 @@ narrative_event = {
 # Thankmar won rebellion
 narrative_event = {
 	id = LT.40009
-	desc = EVTDESC_LT_40009
 	title = EVTTITLE_LT_40009
+	desc = EVTDESC_LT_40009
 	picture = GFX_evt_magnificent_castle
 	border = GFX_event_narrative_frame_war
-	is_triggered_only = yes
 
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-	}
+	is_triggered_only = yes # CB on_success
 
 	option = {
 		name = EVTOPTA_LT_40009
+
 		prestige = 250
 	}
 
 	option = {
 		name = EVTOPTB_LT_40009
-		trigger = {
-			ai = no
-		}
+
 		prestige = 500
 		custom_tooltip = { text = EVTOPTB_LT_40009_TT }
-		hidden_tooltip = {
-			# Narrative event
-			any_playable_ruler = {
-				limit = {
-					is_within_diplo_range = ROOT
-				}
-				narrative_event = { id = LT.40010 days = 1 }
-			}
+
+		any_player = {
+			limit = { is_within_diplo_range = ROOT }
+			narrative_event = { id = LT.40010 days = 1 }
+		}
+
+		hidden_effect = {
 			# Set De Jure Saxony
 			d_saxony = {
 				de_jure_liege = k_saxony
@@ -656,30 +611,20 @@ narrative_event = {
 			}
 			set_global_flag = hre_removed
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
 # A return to the old ways
 narrative_event = {
 	id = LT.40010
-	desc = EVTDESC_LT_40010
 	title = EVTTITLE_LT_40010
+	desc = EVTDESC_LT_40010
 	picture = GFX_evt_magnificent_castle
 	border = GFX_event_narrative_frame_war
+
 	is_triggered_only = yes
-
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-	}
-
-	immediate = {
-
-	}
 
 	option = {
 		name = INTERESTING
@@ -689,27 +634,16 @@ narrative_event = {
 # Otto won against rebellion
 narrative_event = {
 	id = LT.40011
-	desc = EVTDESC_LT_40011
 	title = EVTTITLE_LT_40011
+	desc = EVTDESC_LT_40011
 	picture = GFX_evt_magnificent_castle
 	border = GFX_event_narrative_frame_war
-	is_triggered_only = yes
 
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-	}
-
-	immediate = {
-
-	}
+	is_triggered_only = yes # CB on_reverse_demand
 
 	option = {
 		name = EVTOPTA_LT_40011
+
 		prestige = 500
 	}
 }
@@ -718,64 +652,64 @@ narrative_event = {
 # Choice given to Otto about enforcing his rights on the Italian lands
 narrative_event = {
 	id = LT.40012
-	desc = EVTDESC_LT_40012
 	title = EVTTITLE_LT_40012
+	desc = EVTDESC_LT_40012
 	picture = GFX_evt_large_army
 	border = GFX_event_narrative_frame_war
-	is_triggered_only = yes
 	portrait = event_target:italian_king
+
+	is_triggered_only = yes # on_yearly_pulse
+
 	has_character_flag = is_otto
 	only_playable = yes
 	prisoner = no
 	war = no
 
 	trigger = {
-		NOT = {
+		year >= 955
+		has_landed_title = k_germany
+		real_tier = KING
+
+		NOR = {
 			has_game_rule = {
 				name = otto_story
 				value = off
 			}
-		}
-		year = 955
-		NOT = { has_character_flag = otto_italian_campaign_event }
-		has_landed_title = k_germany
-		tier = KING
-		NOR = {
+
+			has_character_flag = otto_italian_campaign_event
 			has_landed_title = k_italy
 			has_landed_title = e_hre
 		}
+
 		k_italy = {
-			has_holder = yes
-		}
-		k_italy = {
-			holder_scope = {
-				independent = yes
-			}
+			holder_scope = { independent = yes }
 		}
 	}
 
 	immediate = {
 		set_character_flag = otto_italian_campaign_event
-		random_character = {
-			limit = {
-				has_landed_title = k_italy
+
+		k_italy = {
+			holder_scope = {
+				save_event_target_as = italian_king
 			}
-			save_event_target_as = italian_king
 		}
 	}
 
 	option = {
 		name = EVTOPTA_LT_40012
-		hidden_tooltip = {
-			add_claim = k_italy
-		}
+
+		hidden_effect = { add_claim = k_italy }
+
 		war = {
 			target = event_target:italian_king
 			casus_belli = claim
 			thirdparty_title = k_italy
 		}
+
 		event_target:italian_king = {
 			narrative_event = { id = LT.40013 days = 1 }
+
 			any_vassal = {
 				narrative_event = { id = LT.40013 }
 			}
@@ -784,43 +718,31 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTB_LT_40012
-		trigger = {
-			ai = no
-		}
+		ai_chance = { factor = 0 }
 	}
 }
 
 # Italians informed about Otto's attack
 narrative_event = {
 	id = LT.40013
-	desc = EVTDESC_LT_40013
 	title = EVTTITLE_LT_40013
+	desc = EVTDESC_LT_40013
 	picture = GFX_evt_large_army
 	border = GFX_event_narrative_frame_war
+
 	is_triggered_only = yes
 
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-	}
-
-	immediate = {
-
-	}
+	ai = no
 
 	option = {
 		name = EVTOPTA_LT_40013
-		trigger = {
-			has_landed_title = k_italy
-		}
+
+		trigger = { has_landed_title = k_italy }
 	}
 
 	option = {
 		name = INTERESTING
+
 		trigger = {
 			NOT = { has_landed_title = k_italy }
 		}
@@ -831,29 +753,33 @@ narrative_event = {
 # Pre-requisites Done
 narrative_event = {
 	id = LT.40014
-	desc = EVTDESC_LT_40014
 	title = EVTTITLE_LT_40014
+	desc = EVTDESC_LT_40014
 	picture = GFX_evt_magnificent_castle
 	border = GFX_event_narrative_frame_war
-	is_triggered_only = yes
+
+	is_triggered_only = yes # on_yearly_pulse
+
 	has_character_flag = is_otto
 	only_playable = yes
 	prisoner = no
 	war = no
 
 	trigger = {
-		NOT = {
+		year >= 960
+		real_tier = KING
+		has_landed_title = k_germany
+		has_landed_title = k_italy
+
+		NOR = {
 			has_game_rule = {
 				name = otto_story
 				value = off
 			}
+
+			has_character_flag = otto_coronation_event
+			has_landed_title = e_hre
 		}
-		NOT = { has_character_flag = otto_coronation_event }
-		year = 960
-		has_landed_title = k_germany
-		has_landed_title = k_italy
-		NOT = { has_landed_title = e_hre }
-		tier = KING
 	}
 
 	immediate = {
@@ -862,50 +788,45 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTA_LT_40014
+
 		narrative_event = { id = LT.40015 }
-		any_playable_ruler = {
-			limit = {
-				is_within_diplo_range = ROOT
-			}
+
+		any_player = {
+			limit = { is_within_diplo_range = ROOT }
 			narrative_event = { id = LT.40015 }
 		}
+
 		if = {
 			limit = { has_nickname = no }
 			give_nickname = nick_the_great
 		}
-		if = {
-			limit = {
-				has_character_flag = is_otto
-			}
-			create_bloodline = {
-				type = otto
-			}
+
+		create_bloodline = {
+			type = otto
 		}
+
 		add_artifact = crown_hre
+
 		primary_title = {
 			show_scope_change = no
+
 			e_hre = {
 				show_scope_change = no
+
 				grant_title = ROOT
 				copy_title_laws = PREV
 				add_law = succ_hre_elective
 			}
 		}
 
-		hidden_tooltip = {
+		hidden_effect = {
 			princely_elective_german_elector_setup_effect = yes
 		}
+
 		any_demesne_title = {
 			limit = {
-				OR = {
-					tier = KING
-					AND = {
-						tier = EMPEROR
-						NOT = {
-							title = e_hre
-						}
-					}
-				}
+				higher_tier_than = DUKE
+				NOT = { title = e_hre }
 			}
 			destroy_landed_title = THIS
 		}
@@ -913,39 +834,24 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTB_LT_40014
-		trigger = {
-			ai = no
-		}
+		ai_chance = { factor = 0 }
 	}
 }
 
 # Coronation
 narrative_event = {
 	id = LT.40015
-	desc = EVTDESC_LT_40015
 	title = EVTTITLE_LT_40015
+	desc = EVTDESC_LT_40015
 	picture = GFX_evt_found_hre
 	border = GFX_event_narrative_frame_war
+
 	is_triggered_only = yes
-
-	trigger = {
-		NOT = {
-			has_game_rule = {
-				name = otto_story
-				value = off
-			}
-		}
-	}
-
-	immediate = {
-
-	}
 
 	option = {
 		name = EVTOPTA_LT_40015
-		trigger = {
-			has_character_flag = is_otto
-		}
+		trigger = { has_character_flag = is_otto }
+
 		prestige = 1000
 	}
 
@@ -960,30 +866,33 @@ narrative_event = {
 ### Fatimids ###
 narrative_event = {
 	id = LT.40016
-	desc = EVTDESC_LT_40016
 	title = EVTTITLE_LT_40016
+	desc = EVTDESC_LT_40016
 	picture = GFX_evt_battle
 	border = GFX_event_narrative_frame_war
-	is_triggered_only = yes
-	portrait = event_target:sultan_egypt
+	portrait = k_egypt
+
+	is_triggered_only = yes # on_yearly_pulse
 
 	min_age = 16
 	only_playable = yes
 	prisoner = no
 	war = no
-	religion = shiite
 
 	trigger = {
-		year = 960
-		NOT = { has_global_flag = fatimid_invasion_egypt }
-		NOT = {
+		religion = shiite
+		year >= 960
+		has_landed_title = k_africa
+
+		NOR = {
 			has_game_rule = {
 				name = otto_story
 				value = off
 			}
+
+			has_global_flag = fatimid_invasion_egypt
 		}
-		has_landed_title = k_africa
-		k_egypt = { has_holder = yes }
+
 		k_egypt = {
 			holder_scope = {
 				NOT = { character = ROOT }
@@ -994,28 +903,25 @@ narrative_event = {
 
 	immediate = {
 		set_global_flag = fatimid_invasion_egypt
-		random_character = {
-			limit = {
-				has_landed_title = k_egypt
-			}
-			save_event_target_as = sultan_egypt
-		}
 	}
 
 	option = {
 		name = EVTOPTA_LT_40016
-		hidden_tooltip = {
+
+		hidden_effect = {
 			add_claim = k_egypt
 			add_claim = c_cairo
 		}
+
 		war = {
-			target = event_target:sultan_egypt
+			target = k_egypt
 			casus_belli = claim_all
 		}
 	}
 
 	option = {
 		name = EVTOPTB_LT_40016
+
 		prestige = -250
 		piety = -100
 	}
