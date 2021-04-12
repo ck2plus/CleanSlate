@@ -1,22 +1,27 @@
 namespace = HF
 
-#Written by Joachim
-#HF.43000 - HF.43999
+# Written by Joachim
+# HF.43000 - HF.43999
 
-#Catholic Zealots joining a war
+# Catholic Zealots joining a war
 character_event = {
 	id = HF.43000
 	desc = EVTDESC_HF_43000
 	picture = GFX_evt_melee
-	is_triggered_only = yes
-	min_age = 16
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
 	only_playable = yes
 	has_dlc = "Holy Fury"
+	min_age = 16
+	war = yes
 
 	trigger = {
 		any_owned_bloodline = {
 			has_bloodline_flag = defender_of_the_faith
+			bloodline_is_active_for = PREV
 		}
+
 		any_war = {
 			OR = {
 				using_cb = crusade
@@ -28,34 +33,21 @@ character_event = {
 	}
 
 	immediate = {
-		capital_scope = {
-			ROOT = {
-				spawn_unit = {
-					province = PREV
-					home = PREV
-					owner = THIS
-					match_character = THIS
-					match_mult = 0.075
-					match_min = 100
-					match_max = 2500
-					attrition = 1.0
-					earmark = catholic_zealots_sainthood
-					disband_on_peace = yes
-					can_toggle_looting = no
-				}
-				spawn_unit = {
-					province = PREV
-					home = PREV
-					owner = THIS
-					match_character = THIS
-					match_mult = 0.075
-					match_min = 100
-					match_max = 2500
-					attrition = 1.0
-					earmark = catholic_zealots_sainthood
-					disband_on_peace = yes
-					can_toggle_looting = no
-				}
+		while = {
+			count = 2
+
+			spawn_unit = {
+				province = capital_scope
+				home = capital_scope
+				owner = THIS
+				match_character = THIS
+				match_mult = 0.075
+				match_min = 100
+				match_max = 2500
+				attrition = 1.0
+				earmark = catholic_zealots_sainthood
+				disband_on_peace = yes
+				can_toggle_looting = no
 			}
 		}
 	}
@@ -65,11 +57,16 @@ character_event = {
 	}
 }
 
-#Great Theologian Event
+# Great Theologian Event
 character_event = {
-	id = HF.43200
+	id = HF.43250
+	desc = EVTDESC_HF_43250
+	picture = GFX_evt_heretic
+	portrait = new_character
+
 	is_triggered_only = yes
-	hide_window = yes
+	hide_new = yes
+
 	min_age = 16
 	only_playable = yes
 	has_dlc = "Holy Fury"
@@ -77,10 +74,10 @@ character_event = {
 	trigger = {
 		any_owned_bloodline = {
 			has_bloodline_flag = theologian_saintly_bloodline
-			founder = {
-				religion = ROOT
-			}
+			bloodline_is_active_for = PREV
+			founder = { religion = ROOT }
 		}
+
 		NOT = {
 			any_courtier = {
 				has_character_flag = saintly_bloodline_great_theologian
@@ -89,11 +86,13 @@ character_event = {
 	}
 
 	immediate = {
-
 		random_owned_bloodline = {
 			limit = {
 				has_bloodline_flag = theologian_saintly_bloodline
+				bloodline_is_active_for = PREV
+				founder = { religion = ROOT }
 			}
+
 			founder = {
 				save_event_target_as = theologian_founder
 			}
@@ -102,6 +101,7 @@ character_event = {
 		create_random_priest = {
 			random_traits = yes
 			dynasty = random
+
 			attributes = {
 				diplomacy = 8
 				learning = 15
@@ -110,6 +110,7 @@ character_event = {
 				martial = 2
 			}
 		}
+
 		new_character = {
 			remove_trait = slow
 			remove_trait = imbecile
@@ -135,63 +136,28 @@ character_event = {
 			remove_trait = scholar
 
 			random_list = { # Flavor Randomization
-				15 = {
-					change_learning = 2
-				}
-				20 = {
-					add_trait = theologian
-				}
-				5 = {
-					add_trait = scholar
-				}
-				5 = {
-					add_trait = mystic
-				}
-				10 = {
-					change_learning = 4
-				}
-				5 = {
-					change_learning = 6
-				}
-				5 = {
-					add_trait = shrewd
-				}
+				15 = { change_learning = 2 }
+				20 = { add_trait = theologian }
+				5  = { add_trait = scholar }
+				5  = { add_trait = mystic }
+				10 = { change_learning = 4 }
+				5  = { change_learning = 6 }
+				5  = { add_trait = shrewd }
 			}
 
 			set_character_flag = saintly_bloodline_great_theologian
 			save_event_target_as = great_theologian
 
 			random_list = {
-				25 = {
-					give_nickname = nick_the_holy
-				}
-				25 = {
-					give_nickname = nick_the_kind
-				}
-				25 = {
-					give_nickname = nick_the_good
-				}
-				25 = {
-					give_nickname = nick_the_merry
-				}
-				25 = {
-					give_nickname = nick_the_noble
-				}
-				25 = {
-					give_nickname = nick_the_wise
-				}
+				25 = { give_nickname = nick_the_holy }
+				25 = { give_nickname = nick_the_kind }
+				25 = { give_nickname = nick_the_good }
+				25 = { give_nickname = nick_the_merry }
+				25 = { give_nickname = nick_the_noble }
+				25 = { give_nickname = nick_the_wise }
 			}
 		}
-		character_event = { id = HF.43250 }
 	}
-}
-
-character_event = {
-	id = HF.43250
-	desc = EVTDESC_HF_43250
-	picture = GFX_evt_heretic
-	is_triggered_only = yes
-	has_dlc = "Holy Fury"
 
 	option = {
 		name = EVTOPTA_HF_43250
@@ -199,69 +165,80 @@ character_event = {
 	}
 }
 
-
-#Random event for Saintly Bloodline - Defender of the Faith, Random Zealots crashing your Capital
+# Random event for Saintly Bloodline - Defender of the Faith, Random Zealots crashing your Capital
 character_event = {
 	id = HF.43300
 	desc = EVTDESC_HF_43300
 	picture = GFX_evt_secluded_in_prayer
-	min_age = 16
-	only_playable = yes
+
 	is_triggered_only = yes
+
+	only_playable = yes
 	has_dlc = "Holy Fury"
+	min_age = 16
 
 	trigger = {
 		any_owned_bloodline = {
 			has_bloodline_flag = defender_of_the_faith
+			bloodline_is_active_for = PREV
 		}
 	}
 
 	immediate = {
-		any_owned_bloodline = {
-			if = {
-				limit = {
-					has_bloodline_flag = defender_of_the_faith
-				}
-				founder = {
-					save_event_target_as = founder_of_zealots
-				}
+		random_owned_bloodline = {
+			limit = {
+				has_bloodline_flag = defender_of_the_faith
+				bloodline_is_active_for = PREV
+			}
+
+			founder = {
+				save_event_target_as = founder_of_zealots
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPTA_HF_43300
-		trigger = {
-			trait = cynical
-		}
 		tooltip_info = cynical
+
+		trigger = { trait = cynical }
+
 		piety = -25
+
 		random_list = {
 			50 = {
-				modifier = {
+				mult_modifier = {
 					factor = 0.3
 					martial >= 10
 				}
+
 				prestige = -50
-				custom_tooltip = { text = EVTOPTA_HF_43300_CUSTOM_1 }
-				hidden_tooltip = {
+
+				custom_tooltip = {
+					text = EVTOPTA_HF_43300_CUSTOM_1
+
 					capital_scope = {
 						add_province_modifier = {
 							name = zealots_running_amok
-							duration = 1095
+							years = 3
 						}
 					}
+
 					character_event = { id = HF.43301 }
 				}
 			}
+
 			50 = {
 				prestige = 50
-				custom_tooltip = { text = EVTOPTA_HF_43300_CUSTOM_2 }
-				hidden_tooltip = {
+
+				custom_tooltip = {
+					text = EVTOPTA_HF_43300_CUSTOM_2
+
 					add_character_modifier = {
 						name = removed_zealots
-						duration = 1825
+						years = 5
 					}
+
 					character_event = { id = HF.43302 }
 				}
 			}
@@ -270,61 +247,71 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HF_43300
-		trigger = {
-			trait = zealous
-		}
 		tooltip_info = zealous
+
+		trigger = { trait = zealous }
+
 		wealth = -50
 		piety = 25
+
 		random_list = {
 			40 = {
-				prestige = -50
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					diplomacy >= 10
 				}
-				custom_tooltip = { text = EVTOPTB_HF_43300_CUSTOM_1 }
-				hidden_tooltip = {
+
+				prestige = -50
+
+				custom_tooltip = {
+					text = EVTOPTB_HF_43300_CUSTOM_1
+
 					capital_scope = {
 						add_province_modifier = {
 							name = zealots_running_amok
-							duration = 1095
+							years = 3
 						}
 					}
+
 					character_event = { id = HF.43303 }
 				}
 			}
+
 			40 = {
 				prestige = 50
-				custom_tooltip = { text = EVTOPTB_HF_43300_CUSTOM_2 }
-				hidden_tooltip = {
-					capital_scope = {
-						ROOT = {
-							spawn_unit = {
-								owner = THIS
-								province = PREV
-								home = PREV
-								troops = {
-									archers = { 200 200 }
-									light_infantry = { 500 500 }
-								}
-								attrition = 1
-								maintenance_multiplier = 0
-								can_toggle_looting = yes
-							}
+
+				custom_tooltip = {
+					text = EVTOPTB_HF_43300_CUSTOM_2
+
+					spawn_unit = {
+						owner = THIS
+						province = capital_scope
+						home = capital_scope
+						attrition = 1
+						maintenance_multiplier = 0
+						can_toggle_looting = yes
+
+						troops = {
+							archers = { 200 200 }
+							light_infantry = { 500 500 }
 						}
 					}
+
 					character_event = { id = HF.43304 }
 				}
 			}
+
 			20 = {
 				prestige = 100
-				custom_tooltip = { text = EVTOPTB_HF_43300_CUSTOM_3 }
-				hidden_tooltip = {
+
+				custom_tooltip = {
+					text = EVTOPTB_HF_43300_CUSTOM_3
+
 					create_random_soldier = {
 						random_traits = yes
 						dynasty = random
 						female = no
+
 						attributes = {
 							diplomacy = 1
 							learning = 6
@@ -333,6 +320,7 @@ character_event = {
 							martial = 10
 						}
 					}
+
 					new_character = {
 						remove_trait = slow
 						remove_trait = imbecile
@@ -358,68 +346,41 @@ character_event = {
 						remove_trait = scholar
 
 						random_list = { # Flavor Randomization
-							15 = {
-								change_martial = 1
-							}
-							20 = {
-								add_trait = duelist
-							}
-							5 = {
-								add_trait = strategist
-							}
-							5 = {
-								add_trait = theologian
-							}
-							10 = {
-								change_learning = 3
-							}
-							5 = {
-								change_learning = 5
-							}
-							5 = {
-								add_trait = shrewd
-							}
+							15 = { change_martial = 1 }
+							20 = { add_trait = duelist }
+							5  = { add_trait = strategist }
+							5  = { add_trait = theologian }
+							10 = { change_learning = 3 }
+							5  = { change_learning = 5 }
+							5  = { add_trait = shrewd }
 						}
 
 						save_event_target_as = zealot_general
 
 						random_list = {
-							25 = {
-								give_nickname = nick_the_pious
-							}
-							25 = {
-								give_nickname = nick_the_cleansing_flame
-							}
-							25 = {
-								give_nickname = nick_the_witch_hunter
-							}
-							25 = {
-								give_nickname = nick_the_purifier
-							}
-							25 = {
-								give_nickname = nick_the_fearless
-							}
-							25 = {
-								give_nickname = nick_the_ruthless
-							}
+							25 = { give_nickname = nick_the_pious }
+							25 = { give_nickname = nick_the_cleansing_flame }
+							25 = { give_nickname = nick_the_witch_hunter }
+							25 = { give_nickname = nick_the_purifier }
+							25 = { give_nickname = nick_the_fearless }
+							25 = { give_nickname = nick_the_ruthless }
 						}
 					}
-					capital_scope = {
-						ROOT = {
-							spawn_unit = {
-								owner = THIS
-								province = PREV
-								home = PREV
-								troops = {
-									archers = { 200 200 }
-									light_infantry = { 500 500 }
-								}
-								attrition = 1
-								maintenance_multiplier = 0
-								can_toggle_looting = yes
-							}
+
+					spawn_unit = {
+						owner = THIS
+						province = capital_scope
+						home = capital_scope
+						attrition = 1
+						maintenance_multiplier = 0
+						can_toggle_looting = yes
+
+						troops = {
+							archers = { 200 200 }
+							light_infantry = { 500 500 }
 						}
 					}
+
 					character_event = { id = HF.43305 }
 				}
 			}
@@ -428,37 +389,46 @@ character_event = {
 
 	option = {
 		name = EVTOPTC_HF_43300
-		trigger = {
-			learning >= 10
-		}
 		tooltip_info = learning
+
+		trigger = { learning >= 10 }
+
 		piety = 50
+
 		random_list = {
 			50 = {
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					learning >= 15
 				}
+
 				prestige = -50
-				custom_tooltip = { text = EVTOPTC_HF_43300_CUSTOM_1 }
-				hidden_tooltip = {
+
+				custom_tooltip = {
+					text = EVTOPTC_HF_43300_CUSTOM_1
+
 					capital_scope = {
 						add_province_modifier = {
 							name = zealots_running_amok
-							duration = 1095
+							years = 3
 						}
 					}
+
 					character_event = { id = HF.43306 }
 				}
 			}
+
 			50 = {
 				prestige = 50
-				custom_tooltip = { text = EVTOPTC_HF_43300_CUSTOM_2 }
-				hidden_tooltip = {
+
+				custom_tooltip = {
+					text = EVTOPTC_HF_43300_CUSTOM_2
+
 					add_character_modifier = {
 						name = removed_zealots
-						duration = 1825
+						years = 5
 					}
+
 					character_event = { id = HF.43307 }
 				}
 			}
@@ -467,23 +437,28 @@ character_event = {
 
 	option = {
 		name = EVTOPTD_HF_43300
+
 		capital_scope = {
+			show_scope_change = no
+
 			add_province_modifier = {
 				name = zealots_running_amok
-				duration = 1095
+				years = 3
 			}
 		}
 	}
 }
 
-#Notification events for the zealot responses
+# Notification events for the zealot responses
 character_event = {
 	id = HF.43301
 	desc = EVTDESC_HF_43301
 	picture = GFX_evt_large_army
-	notification = yes
+
 	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+	notification = yes
+
+	ai = no
 
 	option = {
 		name = OK
@@ -494,9 +469,11 @@ character_event = {
 	id = HF.43302
 	desc = EVTDESC_HF_43302
 	picture = GFX_evt_large_army
-	notification = yes
+
 	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+	notification = yes
+
+	ai = no
 
 	option = {
 		name = OK
@@ -507,9 +484,11 @@ character_event = {
 	id = HF.43303
 	desc = EVTDESC_HF_43303
 	picture = GFX_evt_large_army
-	notification = yes
+
 	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+	notification = yes
+
+	ai = no
 
 	option = {
 		name = OK
@@ -520,9 +499,11 @@ character_event = {
 	id = HF.43304
 	desc = EVTDESC_HF_43304
 	picture = GFX_evt_large_army
-	notification = yes
+
 	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+	notification = yes
+
+	ai = no
 
 	option = {
 		name = OK
@@ -546,9 +527,11 @@ character_event = {
 	id = HF.43306
 	desc = EVTDESC_HF_43306
 	picture = GFX_evt_large_army
-	notification = yes
+
 	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+	notification = yes
+
+	ai = no
 
 	option = {
 		name = OK
@@ -559,149 +542,117 @@ character_event = {
 	id = HF.43307
 	desc = EVTDESC_HF_43307
 	picture = GFX_evt_large_army
-	notification = yes
+
 	is_triggered_only = yes
-	has_dlc = "Holy Fury"
+	notification = yes
+
+	ai = no
 
 	option = {
 		name = OK
 	}
 }
+
 character_event = {
 	id = HF.43400
 	desc = EVTDESC_HF_43400
 	picture = GFX_evt_monk
-	is_triggered_only = yes
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
 	has_dlc = "Holy Fury"
+	has_dlc = "Mystics"
+
 	trigger = {
-		has_dlc = "Mystics"
 		any_owned_bloodline = {
 			has_bloodline_flag = monastic_saintly_bloodline
-			founder = {
-				religion = ROOT
-			}
+			bloodline_is_active_for = PREV
+			founder = { religion = ROOT }
 		}
+
 		capital_scope = {
-			NOT = {
-				has_province_modifier = monk_society_help
+			NOT = { has_province_modifier = monk_society_help }
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				religion_group = christian
+				is_in_society = no
+				is_heretic = no
+			}
+
+			if = {
+				limit = { is_catholic_branch = yes }
+
+				monastic_order_benedictine = {
+					save_event_target_as = target_society
+				}
+			}
+			else_if = {
+				limit = { is_orthodox_branch = yes }
+
+				monastic_order_orthodox = {
+					save_event_target_as = target_society
+				}
+			}
+			else_if = {
+				limit = { is_nestorian_branch = yes }
+
+				monastic_order_nestorian = {
+					save_event_target_as = target_society
+				}
+			}
+			else_if = {
+				limit = { is_miaphysite_branch = yes }
+
+				monastic_order_monophysite = {
+					save_event_target_as = target_society
+				}
 			}
 		}
 	}
 
 	option = {
 		name = EVTOPTA_HF_43400
+
 		wealth = -100
+
 		capital_scope = {
+			show_scope_change = no
+
 			add_province_modifier = {
 				name = monk_society_help
-				duration = 5475
+				years = 15
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTB_HF_43400
+
 		trigger = {
-			religion_group = christian
-			is_in_society = no
-			is_heretic = no
+			event_target:target_society = { always = yes }
 		}
-		if = {
-			limit = {
-				religion = catholic
-			}
-			join_society = monastic_order_benedictine
-			change_society_currency = {
-				society = monastic_order_benedictine
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = fraticelli
-			}
-			join_society = monastic_order_benedictine
-			change_society_currency = {
-				society = monastic_order_benedictine
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = orthodox
-			}
-			join_society = monastic_order_orthodox
-			change_society_currency = {
-				society = monastic_order_orthodox
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = monothelite
-			}
-			join_society = monastic_order_orthodox
-			change_society_currency = {
-				society = monastic_order_orthodox
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = iconoclast
-			}
-			join_society = monastic_order_orthodox
-			change_society_currency = {
-				society = monastic_order_orthodox
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = paulician
-			}
-			join_society = monastic_order_orthodox
-			change_society_currency = {
-				society = monastic_order_orthodox
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = nestorian
-			}
-			join_society = monastic_order_nestorian
-			change_society_currency = {
-				society = monastic_order_nestorian
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = miaphysite
-			}
-			join_society = monastic_order_monophysite
-			change_society_currency = {
-				society = monastic_order_monophysite
-				value = 350
-			}
-		}
-		else_if = {
-			limit = {
-				religion = monophysite
-			}
-			join_society = monastic_order_monophysite
-			change_society_currency = {
-				society = monastic_order_monophysite
-				value = 350
-			}
+
+		join_society = event_target:target_society
+
+		change_society_currency = {
+			society = event_target:target_society
+			value = 350
 		}
 	}
+
 	option = {
 		name = EVTOPTC_HF_43400
+
 		capital_scope = {
+			show_scope_change = no
+
 			add_province_modifier = {
 				name = monk_society_help
-				duration = 1825
+				years = 5
 			}
 		}
 	}

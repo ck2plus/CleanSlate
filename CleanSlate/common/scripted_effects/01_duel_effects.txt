@@ -6,14 +6,14 @@
 # Mostly chronologically used! As in, the higher up in the file,
 # the earlier in the progress of a duel chain of some kind is where it's used.
 
-# Needs to be run in the scope of the *opponent* to check things correctly
+# Needs to be run in the scope of the *opponent* (combatant_2) to check things correctly
 apply_degree_of_dishonorable_duel_effect = {
 	if = {
 		limit = { # As long as the person issuing the duel does not have a mission to duel this target...
-			NOR = {
-				is_quest_target_of = FROM
+			NAND = {
+				is_quest_target_of = event_target:combatant_1
 
-				FROM = {
+				event_target:combatant_1 = {
 					OR = {
 						has_quest = quest_warrior_lodge_duel_honor
 						has_quest = quest_warrior_lodge_duel_deadly
@@ -26,19 +26,16 @@ apply_degree_of_dishonorable_duel_effect = {
 		if = {
 			limit = {
 				OR = {
-					AND = { # Target is old (but not immortal)...
-						age >= 80
-						NOT = { trait = immortal }
+					practical_age > 80 # Target is old (but not immortal)...
+
+					AND = { # Target is a child, while attacker is adult...
+						is_adult = no
+						event_target:combatant_1 = { is_adult = yes }
 					}
 
-				   	AND = { # Target is a child, while attacker is adult...
-				   		is_adult = no
-				   		event_target:combatant_1 = { is_adult = yes }
-				   	}
-
 					AND = { # Target is less than ten years old (while attacker is not)...
-					   	age < 10
-					   	event_target:combatant_1 = { age >= 10 }
+						age < 10
+						event_target:combatant_1 = { age >= 10 }
 					}
 
 					AND = { # Target has a *serious* disease and has NOT been treated *well* for it...
@@ -85,12 +82,13 @@ apply_degree_of_dishonorable_duel_effect = {
 				event_target:combatant_1 = { # Hand out opinion malus with appropriate realm characters..
 					any_realm_character = {
 						limit = {
-							NOT = { character = event_target:combatant_1 }
 							OR = {
 								trait = honest
 								trait = kind
 								trait = just
 							}
+
+							NOT = { character = event_target:combatant_1 }
 						}
 
 						opinion = {
@@ -106,7 +104,7 @@ apply_degree_of_dishonorable_duel_effect = {
 		# Medium dishonor
 		else_if = {
 			limit = {
-		  		OR = {
+				OR = {
 					practical_age >= 60					# Target is old
 					has_medium_disability_trigger = yes # Limits the character to some extent
 					character_disease_trigger = yes		# Target has a *serious* disease (disregarding treatments)
@@ -140,13 +138,13 @@ apply_degree_of_dishonorable_duel_effect = {
 				event_target:combatant_1 = { # Hand out opinion malus with appropriate realm characters..
 					any_realm_character = {
 						limit = {
-							NOT = { character = event_target:combatant_1 }
-
 							OR = {
 								trait = honest
 								trait = kind
 								trait = just
 							}
+
+							NOT = { character = event_target:combatant_1 }
 						}
 
 						opinion = {
@@ -163,7 +161,7 @@ apply_degree_of_dishonorable_duel_effect = {
 		else_if = {
 			limit = {
 				OR = {
-					age >= 50				# Target is old...
+					practical_age >= 50		# Target is old...
 					is_maimed_trigger = yes # Has a maimed trait
 					has_bruises_trigger = yes
 				}
@@ -175,13 +173,13 @@ apply_degree_of_dishonorable_duel_effect = {
 				event_target:combatant_1 = { # Hand out opinion malus with appropriate realm characters..
 					any_realm_character = {
 						limit = {
-							NOT = { character = event_target:combatant_1 }
-
 							OR = {
 								trait = honest
 								trait = kind
 								trait = just
 							}
+
+							NOT = { character = event_target:combatant_1 }
 						}
 
 						opinion = {
@@ -315,6 +313,7 @@ apply_any_applicable_harsh_penalties_effect = {
 					name = uncivilized_dueler
 					years = 5
 				}
+
 				give_nickname = nick_priest_hater
 			}
 		}
@@ -494,7 +493,7 @@ evaluate_duel_result_score_effect = {
 	}
 	# Add attacker's combat rating to the score...
 	change_variable = {
-		which = duel_result_score #50
+		which = duel_result_score # 50
 		which = combat_rating_combatant_1 # 50 + X
 	}
 
@@ -511,6 +510,7 @@ evaluate_duel_result_score_effect = {
 	}
 }
 
+# Used in HFP.10100
 evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 	### Disclaimer:
 	#	Assumes combatant_1 is ROOT
@@ -740,27 +740,21 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 	}
 
 	if = {
-		limit = {
-			event_target:combatant_2 = { is_friend = ROOT }
-		}
+		limit = { is_friend = event_target:combatant_2 }
 
 		set_character_flag = is_friendly_fight
 		event_target:combatant_2 = { set_character_flag = is_friendly_fight }
 	}
 
 	if = {
-		limit = {
-			event_target:combatant_2 = { is_close_relative = ROOT }
-		}
+		limit = { is_close_relative = event_target:combatant_2 }
 
 		set_character_flag = is_family_fight
 		event_target:combatant_2 = { set_character_flag = is_family_fight }
 	}
 
 	if = {
-		limit = {
-			event_target:combatant_2 = { is_rival = ROOT }
-		}
+		limit = { is_rival = event_target:combatant_2 }
 
 		set_character_flag = is_rival_fight
 		event_target:combatant_2 = { set_character_flag = is_rival_fight }
@@ -771,12 +765,11 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 			event_target:combatant_2 = {
 				NOT = { is_lover = ROOT }
 
-				OR = {
-					ROOT = { has_religion_feature = religion_feature_zun }
-					ROOT = { has_religion_feature = religion_holy_family }
-					ROOT = { religion = messalian }
-					ROOT = { religion = zoroastrian }
-					NOT = { is_close_relative = ROOT }
+				trigger_if = {
+					limit = { is_close_relative = ROOT }
+
+					religion_has_incest = yes
+					ROOT = { religion_has_incest = yes }
 				}
 
 				possibly_romantically_interested_in_each_other_trigger = yes
@@ -874,14 +867,7 @@ set_potential_injury_flag_effect = {
 				set_character_flag = injury_mangled_body
 			}
 
-			10 = { # Only in case you already have ALL the other maimed traits?
-				trigger = {
-					trait = blinded
-					trait = one_handed
-					trait = one_legged
-					trait = disfigured
-					trait = mangled
-				}
+			fallback = { # Only in case you already have ALL the other maimed traits?
 				set_character_flag = injury_could_be_lethal
 			}
 		}
@@ -948,36 +934,29 @@ set_potential_injury_flag_effect = {
 					set_character_flag = injury_mangled_body
 				}
 
-				10 = { # Only in case you already have ALL the other maimed traits?
-					trigger = {
-						trait = blinded
-						trait = one_handed
-						trait = one_legged
-						trait = disfigured
-						trait = mangled
-					}
-
+				fallback = { # Only in case you already have ALL the other maimed traits?
 					set_character_flag = injury_could_be_lethal
-					# set_character_flag = injury_eunuch ?
 				}
 			}
 		}
 	}
 	else = { # Without Reapers, chance to get the old trait (unless you already have it)...
 		if = {
-			limit = { NOT = { trait = maimed } }
-			set_character_flag = injury_maimed
-		}
-		else = {
+			limit = { trait = maimed }
 			set_character_flag = injury_could_be_lethal
 		}
-
-		if = {
-			limit = { event_target:combatant_2 = { NOT = { trait = maimed } } }
-			event_target:combatant_2 = { set_character_flag = injury_maimed }
-		}
 		else = {
-			event_target:combatant_2 = { set_character_flag = injury_could_be_lethal }
+			set_character_flag = injury_maimed
+		}
+
+		event_target:combatant_2 = {
+			if = {
+				limit = { trait = maimed }
+				set_character_flag = injury_could_be_lethal
+			}
+			else = {
+				set_character_flag = injury_maimed
+			}
 		}
 	}
 }
@@ -1035,7 +1014,9 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					has_character_flag = is_battlefield_duel
 					is_member_of_any_warrior_lodge_trigger = yes
 					has_focus = focus_war
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws } # Special triggered event duels
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
 					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
@@ -1091,7 +1072,13 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 			}
 
 			character_event = { id = HFP.10101 } # Double death event (attacker)
-			event_target:combatant_2 = { character_event = { id = HFP.10102 days = 1 } } # Double death event (defender)
+
+			event_target:combatant_2 = {
+				character_event = {
+					id = HFP.10102 # Double death event (defender)
+					days = 1
+				}
+			}
 		}
 
 		5 = { # LETHAL for attacker...
@@ -1106,9 +1093,11 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					has_character_flag = is_battlefield_duel
 					is_member_of_any_warrior_lodge_trigger = yes
 					has_focus = focus_war
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws } # Special triggered event duels
+					has_character_flag = deadly_duel@event_target:combatant_2
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
 					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
-					event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
 				}
 			}
 
@@ -1172,7 +1161,11 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 
 				event_target:combatant_2 = {
 					set_character_flag = someone_died
-					character_event = { id = HFP.10103 days = 1 } # "I decapitated someone!" event sent to winner...
+
+					character_event = {
+						id = HFP.10103 # "I decapitated someone!" event sent to winner...
+						days = 1
+					}
 				}
 			}
 		}
@@ -1189,9 +1182,11 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					has_character_flag = is_battlefield_duel
 					is_member_of_any_warrior_lodge_trigger = yes
 					has_focus = focus_war
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws } #Special triggered event duels.
+					has_character_flag = deadly_duel@event_target:combatant_2
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
 					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
-					event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
 				}
 			}
 
@@ -1256,10 +1251,12 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 		10 = { # Attacker wounded someone...
 			trigger = {
 				NOR = {
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws }
-					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 					has_character_flag = is_legendary_duel
 					has_character_flag = claim_duel@event_target:combatant_2
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
+					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
 
@@ -1295,8 +1292,13 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 
 			additive_modifier = {
 				value = 20
+
 				has_character_flag = mock_duel
-				any_owned_bloodline = { has_bloodline_flag = bloodline_legendary_warrior }
+
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_legendary_warrior
+					bloodline_is_active_for = PREV
+				}
 			}
 
 			event_target:combatant_2 = {
@@ -1406,10 +1408,12 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 		10 = { # Defender wounded you...
 			trigger = {
 				NOR = {
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws }
-					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 					has_character_flag = is_legendary_duel
 					has_character_flag = claim_duel@event_target:combatant_2
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
+					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
 
@@ -1550,7 +1554,10 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 						}
 					}
 
-					any_owned_bloodline = { has_bloodline_flag = bloodline_legendary_warrior }
+					any_owned_bloodline = {
+						has_bloodline_flag = bloodline_legendary_warrior
+						bloodline_is_active_for = PREV
+					}
 				}
 			}
 
@@ -1705,10 +1712,12 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 		5 = { # Both wounded... (attacker wins?) -- "stalemates"
 			trigger = {
 				NOR = {
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws }
-					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 					has_character_flag = is_legendary_duel
 					has_character_flag = claim_duel@event_target:combatant_2
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
+					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
 
@@ -1843,10 +1852,12 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 		5 = { # Both wounded... (defender wins?) -- "stalemates"
 			trigger = {
 				NOR = {
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws }
-					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 					has_character_flag = is_legendary_duel
 					has_character_flag = claim_duel@event_target:combatant_2
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
+					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
 
@@ -1957,7 +1968,7 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 		5 = { # LETHAL/PRISON for defender (BATTLE ONLY)...
 			trigger = {
 				has_character_flag = is_battlefield_duel
-				event_target:combatant_1 = { is_landed = yes }
+				is_landed = yes
 				event_target:combatant_2 = { ai = yes }
 
 				NOR = {
@@ -1969,7 +1980,9 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 				OR = {
 					is_member_of_any_warrior_lodge_trigger = yes
 					has_focus = focus_war
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws } # Special triggered event duels
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
 					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
@@ -2015,7 +2028,9 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					has_character_flag = claim_duel@event_target:combatant_2
 					has_character_flag = mock_duel
 					has_character_flag = is_battlefield_duel
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws } # Special triggered event duels
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
 					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
@@ -2115,7 +2130,9 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					has_character_flag = claim_duel@event_target:combatant_2
 					has_character_flag = mock_duel
 					has_character_flag = is_battlefield_duel
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws } #Special triggered event duels.
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
 					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
@@ -2214,7 +2231,9 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					has_character_flag = claim_duel@event_target:combatant_2
 					has_character_flag = mock_duel
 					has_character_flag = is_battlefield_duel
-					event_target:combatant_1 = { has_character_flag = flag_duel_no_draws } # Special triggered event duels
+
+					# Special triggered event duels
+					has_character_flag = flag_duel_no_draws
 					event_target:combatant_2 = { has_character_flag = flag_duel_no_draws }
 				}
 			}
@@ -2290,11 +2309,7 @@ set_winner_flags_and_save_opponent_effect = {
 	save_event_target_as = root_character #for custom loc purposes!
 
 	if = { # This means you were the attacker...
-		limit = {
-			event_target:combatant_1 = {
-				character = ROOT
-			}
-		}
+		limit = { character = event_target:combatant_1 }
 
 		event_target:combatant_2 = {
 			save_event_target_as = other_combatant
@@ -2341,11 +2356,7 @@ set_loser_flags_and_save_opponent_effect = {
 	save_event_target_as = root_character
 
 	if = { # This means you were the attacker...
-   		limit = {
-			event_target:combatant_1 = {
-				character = ROOT
-			}
-		}
+   		limit = { character = event_target:combatant_1 }
 
 		event_target:combatant_2 = {
 			save_event_target_as = other_combatant
@@ -2723,10 +2734,7 @@ handle_claim_duel_result_effect = {
 						text = your_claim_is_lost_attacker_tt
 
 						remove_claim = event_target:target_title
-
-						event_target:target_title = {
-							add_weak_pressed_claim = PREV
-						}
+						add_weak_pressed_claim = event_target:target_title
 					}
 				}
 				else = {
@@ -2737,10 +2745,8 @@ handle_claim_duel_result_effect = {
 							any_demesne_title = {
 								limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
 
-								event_target:combatant_1 = {
-									remove_claim = PREV
-									add_weak_pressed_claim = PREV
-								}
+								remove_claim = event_target:combatant_1
+								add_weak_pressed_claim = event_target:combatant_1
 							}
 						}
 					}
@@ -2763,7 +2769,7 @@ handle_claim_duel_result_effect = {
 		###################################################
 
 		else_if = { # If you are the *defender*...
-			limit = { event_target:combatant_2 = { character = PREV } }
+			limit = { character = event_target:combatant_2 }
 
 			if = {
 				limit = {
@@ -2885,10 +2891,8 @@ handle_claim_duel_result_effect = {
 									event_target:combatant_2 = { has_strong_claim = PREV }
 								}
 
-								event_target:combatant_2 = {
-									remove_claim = PREV
-									add_weak_pressed_claim = PREV
-								}
+								remove_claim = event_target:combatant_2
+								add_weak_pressed_claim = event_target:combatant_2
 							}
 						}
 					}
@@ -2914,10 +2918,7 @@ remove_all_claims_for_combatant_1_effect = {
 			event_target:combatant_2 = {
 				any_demesne_title = {
 					limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
-
-					event_target:combatant_1 = {
-						remove_claim = PREV
-					}
+					remove_claim = event_target:combatant_1
 				}
 			}
 		}
@@ -2932,10 +2933,7 @@ remove_all_claims_for_combatant_2_effect = {
 		event_target:combatant_1 = {
 			any_demesne_title = {
 				limit = { event_target:combatant_2 = { has_strong_claim = PREV } }
-
-				event_target:combatant_2 = {
-					remove_claim = PREV
-				}
+				remove_claim = event_target:combatant_2
 			}
 		}
 	}
@@ -3140,7 +3138,7 @@ handle_poison_effect = { # Shows tooltips, etc
 		}
 		else_if = {
 			limit = {
-				OR = { #and you won
+				OR = { # and you won
 					has_character_flag = is_victorious_attacker
 					has_character_flag = is_victorious_defender
 				}
@@ -3159,7 +3157,6 @@ handle_poison_effect = { # Shows tooltips, etc
 
 # Runs for both combatant_1 and 2
 clean_up_after_duel_effect = {
-
 	handle_poison_effect = yes
 
 	if = {
@@ -3232,7 +3229,6 @@ clean_up_after_duel_effect = {
 	}
 
 	resolve_legendary_duel_effect = yes # If this was part of legendary journey (Warrior Lodge only)
-
 	rank_up_to_hero_level_effect = yes
 	clr_duel_missions_effect = yes
 	clr_duel_flags_effect = yes
@@ -3399,7 +3395,7 @@ rank_up_to_hero_level_effect = {
 			}
 		}
 		else = {
-			if = { #If the target is still alive...
+			if = { # If the target is still alive...
 				limit = { event_target:combatant_2 = { is_alive = yes } }
 
 				event_target:combatant_2 = {
@@ -3407,7 +3403,7 @@ rank_up_to_hero_level_effect = {
 				}
 			}
 			else = {
-				event_target:my_society = { #choose a hero target to deliver the news instead...
+				event_target:my_society = { # Choose a hero target to deliver the news instead...
 					any_society_member = {
 						limit = { society_rank == 4 }
 
@@ -3447,20 +3443,15 @@ send_notifications_after_champion_stand_in_effect = {
 		}
 
 		hidden_effect = {
+			event_target:home_commander = {
+				character_event = { id = HFP.11040 } # Let the original *commander* know what happened...
+			}
+
 			if = {
 				limit = { home_commander_and_liege_are_different_characters = yes }
 
-				event_target:home_commander = {
-					character_event = { id = HFP.11040 } # Let the original *commander* know what happened...
-				}
-
 				event_target:home_liege = {
 					character_event = { id = HFP.11041 } # Let the original *liege* know what happened...
-				}
-			}
-			else = {
-				event_target:home_commander = {
-					character_event = { id = HFP.11040 } # Let the original *commander* know what happened...
 				}
 			}
 		}
@@ -3469,7 +3460,7 @@ send_notifications_after_champion_stand_in_effect = {
 
 clr_duel_flags_effect = {
 	hidden_effect = {
-		#Clears all flags...
+		# Clears all flags...
 		clr_character_flag = flag_antagonizer_duel
 		clr_character_flag = mock_duel
 		clr_character_flag = deadly_duel # Not yet used?
@@ -3499,8 +3490,8 @@ clr_duel_flags_effect = {
 		clr_character_flag = injury_could_be_lethal
 		clr_character_flag = clumsy_double_KO
 		clr_character_flag = elegant_double_KO
-	   	clr_character_flag = mildly_injured
-	   	clr_character_flag = severely_injured
+		clr_character_flag = mildly_injured
+		clr_character_flag = severely_injured
 		clr_character_flag = actually_injured
 		clr_character_flag = ignore_damage
 		clr_character_flag = injury_kills
@@ -3528,7 +3519,7 @@ clr_duel_flags_effect = {
 	}
 }
 
-# increase_duel_exp_modifier_effect = {  # Modifiers gotten at end-states a duel
+# increase_duel_exp_modifier_effect = { # Modifiers gotten at end-states a duel
 #	if = {
 #		limit = { has_duel_exp_modifier_trigger = yes }
 #
@@ -3672,7 +3663,7 @@ increase_cowardly_status_effect = {
 		hidden_effect = {
 			if = {
 				limit = { trait = craven }
-		  		spread_cowardice_trait_effect = yes # Send event to random subject
+				spread_cowardice_trait_effect = yes # Send event to random subject
 			}
 		}
 	}
@@ -3686,7 +3677,7 @@ increase_cowardly_status_effect = {
 		}
 
 		hidden_effect = {
-		  	spread_cowardice_trait_effect = yes # Send event to random subject
+			spread_cowardice_trait_effect = yes # Send event to random subject
 		}
 	}
 
@@ -3694,12 +3685,12 @@ increase_cowardly_status_effect = {
 		limit = {
 			has_instances_of_character_modifier = {
 				name = duels_declined
-				amount >= 5
+				amount >= 5 # TODO: Change this number, or one of the above numbers?
 			}
 		}
 
 		hidden_effect = {
-		  	spread_cowardice_trait_effect = yes # Send event to random subject
+			spread_cowardice_trait_effect = yes # Send event to random subject
 		}
 	}
 
@@ -3707,14 +3698,14 @@ increase_cowardly_status_effect = {
 		limit = {
 			has_instances_of_character_modifier = {
 				name = duels_declined
-				amount = 10
+				amount >= 10
 			}
 		}
 
 		give_nickname = nick_the_cowardly
 
 		hidden_effect = {
-		  	spread_cowardice_trait_effect = yes # Send event to random subject
+			spread_cowardice_trait_effect = yes # Send event to random subject
 		}
 	}
 }
@@ -4245,17 +4236,17 @@ find_cannon_fodder_commander_effect = {
 		}
 
 		any_unit_leader = { # This person takes the fight for you...
-	   		limit = {
-	   			is_in_same_unit_as = ROOT
-	   			ai = yes
+			limit = {
+				is_in_same_unit_as = ROOT
+				ai = yes
 
-	   			NOR = {
+				NOR = {
 					character = ROOT
 					has_character_flag = battle_event_in_progess
 				}
-	   		}
+			}
 
-	   		score_value = {
+			score_value = {
 				value = 1
 				beloved_target_selection_score = yes
 			}
@@ -4287,19 +4278,19 @@ find_commander_to_the_rescue_effect = {
 			chance = 25
 
 			any_unit_leader = { # This person takes the fight for you...
-		   		limit = {
-		   			is_in_same_unit_as = ROOT
-		   			ai = yes
+				limit = {
+					is_in_same_unit_as = ROOT
+					ai = yes
 
-		   			NOR = {
+					NOR = {
 						character = ROOT
 						has_character_flag = battle_event_in_progess
 					}
 
-		   			# this_has_terrible_opinion_modifier_of_root_extended_trigger = no
-		   		}
+					# this_has_terrible_opinion_modifier_of_root_extended_trigger = no
+				}
 
-		   		score_value = {
+				score_value = {
 					value = 1
 					beloved_target_selection_score = yes
 				}
@@ -4448,7 +4439,7 @@ add_battle_PTSD_effect = {
 
 			character_event = {
 				id = HFP.11019 # PTSD follow up (normal version)
-				days = 365
+				years = 1
 				random = 50
 			}
 		}

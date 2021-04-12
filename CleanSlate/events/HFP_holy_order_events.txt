@@ -3,140 +3,37 @@ namespace = HFP
 # Written by Joachim
 # HFP.44000 - HFP.44999
 
-# Knights Hospitaller wants an island
-character_event = {
-	id = HFP.44000
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = {
-			has_alternate_start_parameter = { key = religion_names value = random }
-		}
-		NOR = {
-			has_landed_title = c_malta
-			any_realm_lord = {
-				has_landed_title = c_malta
-			}
-			has_landed_title = c_lesbos
-			any_realm_lord = {
-				has_landed_title = c_lesbos
-			}
-			has_landed_title = c_rhodos
-			any_realm_lord = {
-				has_landed_title = c_rhodos
-			}
-			has_landed_title = c_chios
-			any_realm_lord = {
-				has_landed_title = c_chios
-			}
-			has_landed_title = c_naxos
-			any_realm_lord = {
-				has_landed_title = c_naxos
-			}
-			d_sardinia = {
-				any_direct_de_jure_vassal_title = {
-					owner = {
-						OR = {
-							character = ROOT
-							any_liege = {
-								character = ROOT
-							}
-						}
-					}
-				}
-			}
-			d_cyprus = {
-				any_direct_de_jure_vassal_title = {
-					owner = {
-						OR = {
-							character = ROOT
-							any_liege = {
-								character = ROOT
-							}
-						}
-					}
-				}
-			}
-			d_corsica = {
-				any_direct_de_jure_vassal_title = {
-					owner = {
-						OR = {
-							character = ROOT
-							any_liege = {
-								character = ROOT
-							}
-						}
-					}
-				}
-			}
-			d_krete = {
-				any_direct_de_jure_vassal_title = {
-					owner = {
-						OR = {
-							character = ROOT
-							any_liege = {
-								character = ROOT
-							}
-						}
-					}
-				}
-			}
-			d_cephalonia = {
-				any_direct_de_jure_vassal_title = {
-					owner = {
-						OR = {
-							character = ROOT
-							any_liege = {
-								character = ROOT
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	immediate = {
-		event_target:title_owner = {
-			letter_event = { id = HFP.44001 }
-		}
-	}
-}
-
 # Knights Hospitaller asks to receive an island
 letter_event = {
 	id = HFP.44001
 	desc = EVTDESC_HFP_44001
-	is_triggered_only = yes
-	trigger = {
 
-	}
+	is_triggered_only = yes # check_holy_order_donation_effect
 
 	immediate = {
-
+		d_knights_hospitaler = {
+			holder_scope = {
+				save_event_target_as = hospitallers
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTA_HFP_44001
-		piety = 100
-		scaled_wealth = { value = 2 }
 
-		d_knights_hospitaler = {
-			show_scope_change = no
-			holder_scope = {
-				show_scope_change = no
-				opinion = {
-					who = ROOT
-					modifier = opinion_grateful
-					years = 10
-				}
-				opinion = {
-					modifier = in_non_aggression_pact
-					years = 10
-					who = ROOT
-				}
-			}
+		piety = 100
+		scaled_wealth = 2
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = event_target:hospitallers
+			years = 10
+		}
+
+		reverse_opinion = {
+			name = in_non_aggression_pact
+			who = event_target:hospitallers
+			years = 10
 		}
 
 		custom_tooltip = {
@@ -145,97 +42,65 @@ letter_event = {
 			event_target:potential_title = {
 				if = {
 					limit = {
-						owner = {
+						holder_scope = {
 							OR = {
 								character = ROOT
-								any_liege = {
-									character = ROOT
-								}
+								is_vassal_or_below_of = ROOT
 							}
 						}
-						NOT = {
-							tier = DUKE
-						}
 					}
-					grant_title_no_opinion = FROM
+
+					if = {
+						limit = { real_tier = DUKE }
+						destroy_landed_title = THIS
+					}
+					else = {
+						grant_title_no_opinion = event_target:hospitallers
+					}
 				}
-				else_if = {
+
+				any_de_jure_vassal_title = {
 					limit = {
-						owner = {
+						holder_scope = {
 							OR = {
 								character = ROOT
-								any_liege = {
-									character = ROOT
-								}
-							}
-							tier = DUKE
-						}
-					}
-					destroy_landed_title = THIS
-				}
-				any_direct_de_jure_vassal_title = {
-					limit = {
-						OR = {
-							owner = {
-								character = ROOT
-							}
-							owner = {
-								any_liege = {
-									character = ROOT
-								}
+								is_vassal_or_below_of = ROOT
 							}
 						}
 					}
-					grant_title_no_opinion = FROM
-					any_direct_de_jure_vassal_title = {
-						limit = {
-							OR = {
-								owner = {
-									character = ROOT
-								}
-								owner = {
-									any_liege = {
-										character = ROOT
-									}
-								}
-							}
-						}
-						grant_title_no_opinion = FROM
-					}
+
+					grant_title_no_opinion = event_target:hospitallers
 				}
 			}
-			FROM = {
+
+			event_target:hospitallers = {
 				any_demesne_title = {
 					limit = {
-						NOR = {
-							AND = {
-								OR = {
-									tier = BARON
-									tier = COUNT
-								}
-								holding_type = castle
-							}
-							title = d_knights_hospitaler
+						trigger_if = {
+							limit = { lower_real_tier_than = DUKE }
+							NOT = { holding_type = castle }
+						}
+						trigger_else = {
+							NOT = { title = d_knights_hospitaler }
 						}
 					}
+
 					if = {
-						limit = {
-							tier = BARON
-							holding_type = city
+						limit = { tier = BARON }
+
+						if = {
+							limit = { holding_type = city }
+
+							create_random_steward = {
+								random_traits = yes
+								dynasty = random
+							}
 						}
-						create_random_steward = {
-							random_traits = yes
-							dynasty = random
-						}
-					}
-					else_if = {
-						limit = {
-							tier = BARON
-							holding_type = temple
-						}
-						create_random_priest = {
-							random_traits = yes
-							dynasty = random
+						else = {
+							create_random_priest = {
+								random_traits = yes
+								dynasty = random
+							}
 						}
 					}
 					else = {
@@ -244,16 +109,18 @@ letter_event = {
 							dynasty = random
 						}
 					}
+
 					grant_title_no_opinion = new_character
 				}
 			}
 
 			d_knights_hospitaler = {
-				set_name = "knights_hospitaler_island_rename"
+				set_name = knights_hospitaler_island_rename
 			}
+
 			event_target:potential_title = {
 				capital_scope = {
-					FROM = {
+					event_target:hospitallers = {
 						if = {
 							limit = {
 								has_landed_title = PREV
@@ -269,43 +136,53 @@ letter_event = {
 					}
 				}
 			}
-			any_playable_ruler = {
-				limit = {
-					religion = FROM
-				}
-				narrative_event = { id = HFP.44004 }
-			}
-			ROOT = {
-				narrative_event = { id = HFP.44004 }
-			}
-			FROM = {
+
+			narrative_event = { id = HFP.44004 }
+
+			event_target:hospitallers = {
 				character_event = { id = HFP.41090 days = 1 }
 				character_event = { id = HFP.41090 days = 3 }
 			}
-		}
-
-		ai_chance = {
-			factor = 1
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HFP_44001
-		piety = -25
 
+		piety = -25
 		set_character_flag = refused_to_give_island_to_knights
 
-		ai_chance = {
-			factor = 0
-		}
+		ai_chance = { factor = 0 }
+	}
+}
+
+# Narrative event for the Knights Hospitallers
+narrative_event = {
+	id = HFP.44004
+	desc = EVTDESC_HFP_44004
+	title = EVTTITLE_HFP_44004
+	picture = GFX_evt_magnificent_castle
+	border = GFX_event_narrative_frame_religion
+
+	is_triggered_only = yes
+	major = yes
+
+	major_trigger = {
+		ai = no
+	}
+
+	option = {
+		name = EVTOPTA_HFP_44004
 	}
 }
 
 # Holy Order decides their liege is unfit to rule over them
 character_event = {
 	id = HFP.44002
+
+	is_triggered_only = yes # on_yearly_pulse
 	hide_window = yes
-	is_triggered_only = yes
+
 	ai = yes
 
 	trigger = {
@@ -321,101 +198,52 @@ character_event = {
 		if = {
 			limit = {
 				OR = {
-					NOT = {
-						opinion = {
-							who = liege
-							value = -20
-						}
+					opinion = {
+						who = liege
+						value < -20
 					}
+
 					liege = {
-						excommunicated_for = ROOT
-					}
-					liege = {
-						NOT = {
-							religion = ROOT
+						OR = {
+							excommunicated_for = ROOT
+							NOT = { religion = ROOT }
 						}
 					}
 				}
 			}
+
 			opinion = {
+				name = opinion_unfit_ruler
 				who = event_target:liege_character
-				modifier = opinion_unfit_ruler
 				years = 30
 			}
+
 			liege = {
 				letter_event = { id = HFP.44003 }
 			}
+
 			any_demesne_title = {
 				limit = {
 					holy_order = no
-					OR = {
-						county = {
-							owner = {
-								OR = {
-									character = event_target:liege_character
-									event_target:liege_character = {
-										any_vassal = {
-											NOT = {
-												character = ROOT
-											}
-											character = PREVPREV
-										}
-									}
-								}
-							}
-						}
-						duchy = {
-							owner = {
-								OR = {
-									character = event_target:liege_character
-									event_target:liege_character = {
-										any_vassal = {
-											NOT = {
-												character = ROOT
-											}
-											character = PREVPREV
-										}
-									}
-								}
-							}
-						}
-						kingdom = {
-							owner = {
-								OR = {
-									character = event_target:liege_character
-									event_target:liege_character = {
-										any_vassal = {
-											NOT = {
-												character = ROOT
-											}
-											character = PREVPREV
-										}
-									}
-								}
-							}
-						}
-						empire = {
-							owner = {
-								OR = {
-									character = event_target:liege_character
-									event_target:liege_character = {
-										any_vassal = {
-											not = {
-												character = ROOT
-											}
-											character = PREVPREV
-										}
-									}
+
+					any_dejure_liege = {
+						holder_scope = {
+							OR = {
+								character = event_target:liege_character
+
+								AND = {
+									is_vassal_or_below_of = event_target:liege_character
+									NOT = { character = ROOT }
 								}
 							}
 						}
 					}
 				}
-				event_target:liege_character = {
-					grant_title_no_opinion = PREV
-				}
+
+				grant_title_no_opinion = event_target:liege_character
 			}
-			set_defacto_liege = ROOT
+
+			set_defacto_liege = THIS
 		}
 	}
 }
@@ -425,84 +253,51 @@ letter_event = {
 	id = HFP.44003
 	desc = EVTDESC_HFP_44003
 	border = GFX_event_letter_frame_religion
+
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_HFP_44003
+
 		piety = -50
 	}
 }
 
-# Narrative event for the Knights Hospitallers
-narrative_event = {
-	id = HFP.44004
-	desc = EVTDESC_HFP_44004
-	title = EVTTITLE_HFP_44004
-	picture = GFX_evt_magnificent_castle
-	border = GFX_event_narrative_frame_religion
-	portrait = FROMFROM
-	is_triggered_only = yes
-	trigger = {
-
-	}
-
-	immediate = {
-
-	}
-
-	option = {
-		name = EVTOPTA_HFP_44004
-	}
-}
-
-# The Teutons really want to fight off the infidels
-character_event = {
-	id = HFP.44005
-	hide_window = yes
-	is_triggered_only = yes
-	trigger = {
-		year = 1150
-		NOT = {
-			has_global_flag = teutons_asked_for_land
-		}
-	}
-
-	immediate = {
-		FROM = {
-			letter_event = { id = HFP.44006 }
-		}
-		set_global_flag = teutons_asked_for_land
-	}
-}
-
-# The Teutons asks for land
+## The Teutons really want to fight off the infidels
+# The Teutons ask for land
 letter_event = {
 	id = HFP.44006
 	desc = EVTDESC_HFP_44006
 	border = GFX_event_letter_frame_religion
+
 	is_triggered_only = yes
+
+	immediate = {
+		set_global_flag = teutons_asked_for_land
+
+		d_teutonic_order = {
+			holder_scope = {
+				save_event_target_as = the_hochmeister
+			}
+		}
+	}
 
 	option = {
 		name = EVTOPTA_HFP_44006
 
 		piety = 100
-		scaled_wealth = { value = 2 }
+		scaled_wealth = 2
 
-		d_teutonic_order = {
-			show_scope_change = no
-			holder_scope = {
-				show_scope_change = no
-				opinion = {
-					who = ROOT
-					modifier = opinion_grateful
-					years = 10
-				}
-				opinion = {
-					modifier = in_non_aggression_pact
-					years = 10
-					who = ROOT
-				}
-			}
+		reverse_opinion = {
+			name = opinion_grateful
+			who = event_target:the_hochmeister
+			years = 10
+		}
+
+		opinion = {
+			name = in_non_aggression_pact
+			who = event_target:the_hochmeister
+			years = 10
 		}
 
 		custom_tooltip = {
@@ -512,94 +307,59 @@ letter_event = {
 				# Destroy the Duchy title, if there is any
 				if = {
 					limit = {
-						owner = {
+						holder_scope = {
 							OR = {
 								character = ROOT
-								any_liege = {
-									character = ROOT
-								}
+								is_vassal_or_below_of = ROOT
 							}
 						}
 					}
+
 					destroy_landed_title = THIS
 				}
+
 				# Give the Teutonics all the land you hold in the area
-				any_direct_de_jure_vassal_title = {
+				any_de_jure_vassal_title = {
 					limit = {
-						owner = {
+						holder_scope = {
 							OR = {
 								character = ROOT
-								any_liege = {
-									character = ROOT
-								}
+								is_vassal_or_below_of = ROOT
 							}
 						}
 					}
-					grant_title_no_opinion = FROM
-					any_direct_de_jure_vassal_title = {
-						limit = {
-							owner = {
-								OR = {
-									character = ROOT
-									any_liege = {
-										character = ROOT
-									}
-								}
-							}
-						}
-						grant_title_no_opinion = FROM
-					}
+
+					grant_title_no_opinion = event_target:the_hochmeister
 				}
 			}
-			# Upgrade tribal areas into proper feudal areas
-			FROM = {
-				teutonic_order_upgrade_capital_effect = yes
-			}
-			# Give out any unfit land (see cities, temples) to new vassals
-			FROM = {
-				holy_order_distribute_titles_effect = yes
-			}
-			# Refilled holdings and remove province penalties
-			FROM = {
+
+			event_target:the_hochmeister = {
+				teutonic_order_upgrade_capital_effect = yes # Upgrade tribal areas into proper feudal areas
+				holy_order_distribute_titles_effect = yes # Give out any unfit land (see cities, temples) to new vassals
+
+				# Refilled holdings and remove province penalties
 				character_event = { id = HFP.41090 days = 1 }
 				character_event = { id = HFP.41090 days = 3 }
-			}
-			# Making sure they Teutonics stay proper Holy Orderish
-			FROM = {
-				set_government_type = order_government
-			}
-			# Sending out narrative event to all Catholic rulers
-			if = {
-				limit = {
-					FROM = {
-						any_demesne_title = {
-							tier = COUNT
-						}
-					}
-				}
-				any_playable_ruler = {
-					limit = {
-						religion = FROM
-					}
-					narrative_event = { id = HFP.44007 }
-				}
-				ROOT = {
+
+				set_government_type = order_government # Making sure they Teutonics stay proper Holy Orderish
+
+				# Sending out narrative event to all Catholic rulers
+				if = {
+					limit = { num_of_count_titles >= 1 }
 					narrative_event = { id = HFP.44007 }
 				}
 			}
-		}
-		ai_chance = {
-			factor = 1
 		}
 	}
+
 	option = {
 		name = EVTOPTB_HFP_44006
 
 		set_character_flag = refused_to_give_land_to_teutonics
-		ai_chance = {
-			factor = 0
-		}
+
+		ai_chance = { factor = 0 }
 	}
+
 	after = {
 		clr_global_flag = teutons_asked_for_land
 	}
@@ -615,16 +375,16 @@ narrative_event = {
 	portrait = event_target:the_hochmeister
 
 	is_triggered_only = yes
+	major = yes
+
+	major_trigger = {
+		ai = no
+	}
 
 	immediate = {
 		event_target:holy_order_potential_title = {
 			kingdom = {
 				save_event_target_as = kingdom_title
-			}
-		}
-		d_teutonic_order = {
-			owner = {
-				save_event_target_as = the_hochmeister
 			}
 		}
 	}
@@ -637,38 +397,50 @@ narrative_event = {
 # The Livonian Order dies out
 character_event = {
 	id = HFP.44008
+
+	is_triggered_only = yes # on_unlanded
 	hide_window = yes
-	is_triggered_only = yes
+
 	trigger = {
 		has_landed_title = d_livonian_order
 	}
 
 	immediate = {
-		activate_title = { title = d_livonian_order status = no }
+		activate_title = {
+			title = d_livonian_order
+			status = no
+		}
 	}
 }
 
 # The Teutonic State reverts back to the Teutonic Order
 character_event = {
 	id = HFP.44009
+
+	is_triggered_only = yes # on_unlanded
 	hide_window = yes
-	is_triggered_only = yes
+
 	trigger = {
 		has_landed_title = k_teutonic_state
 	}
 
 	immediate = {
-		grant_title_no_opinion = d_teutonic_order
 		d_teutonic_order = {
+			grant_title_no_opinion = ROOT
 			copy_title_history = k_teutonic_state
 			copy_title_laws = k_teutonic_state
 		}
-		unsafe_destroy_landed_title = k_teutonic_state
-		activate_title = { title = k_teutonic_state status = no }
 
-		any_playable_ruler = {
-			narrative_event = { id = HFP.44010 }
+		k_teutonic_state = {
+			unsafe_destroy_landed_title = THIS
+
+			activate_title = {
+				title = THIS
+				status = no
+			}
 		}
+
+		narrative_event = { id = HFP.44010 }
 	}
 }
 
@@ -679,32 +451,32 @@ narrative_event = {
 	title = EVTTITLE_HFP_44010
 	picture = GFX_evt_western_knights_byzantine
 	border = GFX_event_narrative_frame_religion
-	is_triggered_only = yes
-	trigger = {
 
+	is_triggered_only = yes
+	major = yes
+
+	major_trigger = {
+		ai = no
 	}
 
 	option = {
 		name = EVTOPTA_HFP_44010
-		trigger = {
-			religion = FROM
-		}
+
+		trigger = { religion = FROM }
 	}
 
 	option = {
 		name = EVTOPTB_HFP_44010
+
 		trigger = {
-			NOT = {
-				religion = FROM
-			}
 			religion_group = FROM
+			NOT = { religion = FROM }
 		}
 	}
 
 	option = {
 		name = EVTOPTC_HFP_44010
-		trigger = {
-			religion_group = FROM
-		}
+
+		trigger = { religion_group = FROM }
 	}
 }

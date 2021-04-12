@@ -112,9 +112,6 @@
 # add_some_thralls_capital_effect
 # add_few_thralls_capital_effect
 
-# WL_ritual_hunt_cleanup_effect
-# WL_ritual_hunt_flavor_events_effect
-
 # stable_attribute_improvement_effect
 # landless_pope_effect
 
@@ -3921,6 +3918,7 @@ random_antagonizer_slander_effect = {
 			trigger = {
 				persistent_event_target:antagonize_target = {
 					trait = depressed
+					NOT = { trait = lunatic }
 				}
 			}
 
@@ -4177,45 +4175,6 @@ random_antagonizer_slander_effect = {
 	#			}
 	#		}
 	#	}
-	}
-}
-
-fire_haruspicy_event_effect = {
-	# Divination
-	hidden_effect = {
-		if = {
-			limit = {
-				attacker = {
-					OR = {
-						religion_openly_hellenic_or_reformed_trigger = yes
-						has_religion_feature = religion_haruspicy
-					}
-				}
-			}
-
-			attacker = {
-				character_event = {
-					id = HF.23005 # Chance to divine outcome
-				}
-			}
-		}
-
-		if = {
-			limit = {
-				defender = {
-					OR = {
-						religion_openly_hellenic_or_reformed_trigger = yes
-						has_religion_feature = religion_haruspicy
-					}
-				}
-			}
-
-			defender = {
-				character_event = {
-					id = HF.23005 # Chance to divine outcome
-				}
-			}
-		}
 	}
 }
 
@@ -5169,371 +5128,7 @@ transfer_crown_on_abdication_effect = {
 	}
 }
 
-move_childrens_crusade_region_effect = {
-	if = { # If at any point during the preparation Jerusalem is no longer a valid target, or a real Crusade starts, stop everything
-		limit = {
-			OR = {
-				k_jerusalem = {
-					trigger_if = {
-						limit = { has_holder = yes }
-
-						holder_scope = {
-							religion_group = christian
-						}
-					}
-				}
-
-				c_jerusalem = {
-					holder_scope = {
-						OR = {
-							religion_group = christian
-							is_crusade_target = yes
-						}
-					}
-				}
-
-				religion_head = {
-					OR = {
-						is_preparing_crusade = yes
-
-						any_war = {
-							OR = {
-								using_cb = crusade
-								using_cb = new_crusade
-							}
-						}
-					}
-				}
-			}
-		}
-
-		any_player = {
-			limit = {
-				religion_group = christian
-				NOT = { character = ROOT }
-			}
-
-			narrative_event = {
-				id = HF.25819 # Notify everyone that the crusade has flopped
-				days = 30
-			}
-		}
-
-		primary_title = {
-			activate_title = {
-				title = THIS
-				status = no
-			}
-
-			destroy_landed_title = THIS
-		}
-
-		clr_flag = flag_childrens_crusade_leader
-		add_trait = lunatic
-		piety = -150
-		remove_trait = disinherited
-
-		set_variable = {
-			which = children_crusade_forces
-			value = 0
-		}
-
-		set_variable = {
-			which = children_crusade_morale
-			value = 0
-		}
-
-		set_variable = {
-			which = children_crusade_heavy_troops
-			value = 0
-		}
-
-		any_courtier = {
-			remove_trait = disinherited
-			clr_flag = no_court_invites
-		}
-	}
-	else_if = { # Move to Genoa first
-		limit = { has_flag = flag_children_at_beginning }
-
-		primary_title = {
-			set_preferred_capital = c_genoa # Historically traveled here
-		}
-
-		change_variable = {
-			which = children_crusade_forces
-			value = 1
-		}
-
-		change_variable = {
-			which = children_crusade_morale
-			value = -1
-		}
-
-		clr_flag = flag_children_at_beginning
-		set_flag = flag_children_at_genoa
-
-		if = {
-			limit = {
-				persistent_event_target:childrens_crusade_sponsor_per = { is_alive = no }
-			}
-
-			change_variable = {
-				which = children_crusade_morale
-				value = -2
-			}
-		}
-
-		any_player = {
-			limit = {
-				NOT = { character = ROOT }
-				religion_group = christian
-			}
-
-			narrative_event = {
-				id = HF.25815 # Notify everyone that the crusade has reached Genoa and the sea did not part before them
-				days = 30
-			}
-		}
-
-		narrative_event = {
-			id = HF.25808 # Ping back to main event to check travel progress
-			days = 50
-			random = 100
-		}
-	}
-	else_if = { # Then shipwreck to Achaia
-		limit = { has_flag = flag_children_at_genoa }
-
-		primary_title = {
-			set_preferred_capital = c_achaia
-		}
-
-		change_variable = {
-			which = children_crusade_morale
-			value = -1
-		}
-
-		clr_flag = flag_children_at_genoa
-		set_flag = flag_children_at_achaia
-
-		any_player = {
-			limit = {
-				religion_group = christian
-				NOT = { character = ROOT }
-			}
-
-			narrative_event = {
-				id = HF.25816 # Notify everyone that the crusade has shipwrecked into Achaia
-				days = 30
-			}
-		}
-
-		if = {
-			limit = {
-				persistent_event_target:childrens_crusade_sponsor_per = { is_alive = no }
-			}
-
-			random = {
-				chance = 25
-
-				change_variable = {
-					which = children_crusade_forces
-					value = -1
-				}
-			}
-		}
-
-		narrative_event = {
-			id = HF.25808 # Ping back to main event to check travel progress
-			days = 50
-			random = 100
-		}
-	}
-	else_if = { # Then crawl to Nikaea
-		limit = { has_flag = flag_children_at_achaia }
-
-		primary_title = {
-			set_preferred_capital = c_nikaea
-		}
-
-		clr_flag = flag_children_at_achaia
-		set_flag = flag_children_at_nikaea
-
-		# Base forces score is 3 = circa 15.000 poorly armed troops
-		change_variable = {
-			which = children_crusade_forces
-			value = 1
-		}
-
-		any_player = {
-			limit = {
-				religion_group = christian
-				NOT = { character = ROOT }
-			}
-
-			narrative_event = {
-				id = HF.25817 # Notify everyone that the crusade has crawled its way to Nikaea
-				days = 30
-			}
-		}
-
-		narrative_event = {
-			id = HF.25808 # Ping back to main event to check travel progress
-			days = 50
-			random = 100
-		}
-	}
-	else_if = { # We actually got there. Start the war
-		limit = { has_flag = flag_children_at_nikaea }
-
-		primary_title = {
-			set_preferred_capital = c_antiocheia # Where the troops will spawn
-		}
-
-		clr_flag = flag_children_at_nikaea
-		set_flag = flag_children_at_antioch
-
-		narrative_event = {
-			id = HF.25820 # START THE CRUSADE
-			days = 25
-		}
-
-		any_player = {
-			limit = {
-				religion_group = christian
-				NOT = { character = ROOT }
-			}
-
-			narrative_event = {
-				id = HF.25818 # Notify everyone that the crusade has actually reached Antioch and is ready to engage
-				days = 30
-			}
-		}
-	}
-	else = { # Move directly to Antioch in case something went wrong
-		primary_title = {
-			set_preferred_capital = c_antiocheia # Historically traveled here
-		}
-
-		clr_flag = flag_children_at_achaia
-		clr_flag = flag_children_at_nikaea
-		clr_flag = flag_children_at_genoa
-		set_flag = flag_children_at_antioch
-
-		change_variable = {
-			which = children_crusade_forces
-			value = 1
-		}
-		change_variable = {
-			which = children_crusade_morale
-			value = -1
-		}
-
-		if = {
-			limit = {
-				persistent_event_target:childrens_crusade_sponsor_per = { is_alive = no }
-			}
-
-			change_variable = {
-				which = children_crusade_morale
-				value = -2
-			}
-		}
-
-		narrative_event = {
-			id = HF.25820 # START THE CRUSADE
-			days = 25
-		}
-
-		any_player = {
-			limit = {
-				religion_group = christian
-				NOT = { character = ROOT }
-			}
-
-			narrative_event = {
-				id = HF.25818 # Notify everyone that the crusade has actually reached Antioch and is ready to engage
-				days = 30
-			}
-		}
-	}
-}
-
-spawn_childrens_crusade_light_troops_effect = {
-	change_variable = {
-		which = children_crusade_forces
-		value = -1
-	}
-
-	spawn_unit = {
-		province = location
-		home = location
-		owner = THIS
-		attrition = 0.5
-		reinforces = no
-		is_looter = no
-		can_toggle_looting = no
-		cannot_inherit = yes
-		merge = yes
-		disband_on_peace = yes
-		earmark = childrens_crusade_infantry_earmark
-
-		troops = {
-			light_infantry = { 3000 3000 }
-			archers = { 100 100 }
-		}
-	}
-
-	if = {
-		limit = {
-			check_variable = {
-				which = children_crusade_forces
-				value >= 1 # Keep looping until the variable reaches 0
-			}
-		}
-
-		character_event = {
-			id = HF.25821
-		}
-	}
-}
-
-spawn_childrens_crusade_heavy_troops_effect = {
-	change_variable = {
-		which = children_crusade_heavy_troops
-		value = -1
-	}
-
-	spawn_unit = {
-		province = location
-		home = location
-		owner = THIS
-		attrition = 0.5
-		reinforces = no
-		is_looter = no
-		can_toggle_looting = no
-		cannot_inherit = yes
-		merge = yes
-
-		troops = {
-			heavy_infantry = { 500 500 }
-			light_cavalry = { 150 150 }
-		}
-	}
-
-	if = {
-		limit = {
-			check_variable = {
-				which = children_crusade_heavy_troops
-				value >= 1 # Keep looping until the variable reaches 0
-			}
-		}
-
-		character_event = { id = HF.25822 }
-	}
-}
-
+# TODO: This series of effects appear to be entirely unused.
 this_is_becoming_grand_mistress_effect = {
 	custom_tooltip = {
 		text = tooltip_becoming_grand_mistress
@@ -5990,1635 +5585,402 @@ add_few_thralls_capital_effect = {
 	}
 }
 
-WL_ritual_hunt_cleanup_effect = {
-	clr_flag = do_not_disturb
-
-	hidden_effect = {
-		set_variable = {
-			which = wl_ritual_hunting
-			value = 0
-		}
-	}
-
-	clr_flag = flag_hunting_wolf_norse
-	clr_flag = flag_hunting_wolf_baltic
-	clr_flag = flag_hunting_wolf_hellenic
-
-	clr_flag = flag_hunting_eagle_slavic
-	clr_flag = flag_hunting_eagle_tengri
-	clr_flag = flag_hunting_eagle_bon
-
-	clr_flag = flag_hunting_bear_finnish
-
-	clr_flag = flag_hunting_lion_west_african
-	clr_flag = flag_hunting_lion_zun
-}
-
-WL_ritual_hunt_flavor_events_effect = {
-	hidden_effect = {
-		#  Flavor events: (increasing/decreasing hunt variable)
-		## Character is about to fall/drown/random (might result in Friendship/Rivalry/Love)
-		## Co-hunter is about to fall/drown/random (might result in Friendship/Rivalry/Love)
-		## Characters looking for tracks (intrigue) - paranoid
-		## Characters need to examine carcass killed by target (martial) - cruel
-		## Characters reflect upon their target (learning) - scholar
-		## Characters find hermit, ask info on target (diplomacy) - charitable
-		## Characters need to interpret old map and pathways (stewardship) - administrator
-
-		## Characters see a bad omen (low piety triggers) - theologian
-		## Characters see a good omen (high piety triggers) - theologian
-
-		## Lunatic/Possessed character goes on a Wild Hunt and kills partner
-
-		random_list = {
-			15 = { # Character is in trouble
-				trigger = {
-					event_target:scoped_WL_co_hunter = {
-						is_alive = yes
-					}
-				}
-
-				character_event = {
-					id = HF.25603 # The hunter is about to fall
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					trait = craven
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					trait = dull
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					trait = slow
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					trait = imbecile
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					trait = inbred
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					trait = slothful
-				}
-			}
-
-			15 = { # Co-hunter is in trouble
-				trigger = {
-					event_target:scoped_WL_co_hunter = {
-						is_alive = yes
-					}
-				}
-
-				character_event = {
-					id = HF.25606 # The co-hunter is about to fall/drown/random etc.
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { trait = craven }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { trait = dull }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { trait = slow }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { trait = imbecile }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { trait = inbred }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { trait = slothful }
-				}
-			}
-
-			25 = { # Characters looking for tracks
-				character_event = {
-					id = HF.25608
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { intrigue >= 10 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { intrigue >= 14 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { intrigue >= 18 }
-				}
-			}
-
-			25 = { # Characters need to examine carcass
-				character_event = {
-					id = HF.25609
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { martial >= 10 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { martial >= 14 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { martial >= 18 }
-				}
-			}
-
-			25 = { # Characters reflect upon target
-				character_event = {
-					id = HF.25610
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { learning >= 10 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { learning >= 14 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { learning >= 18 }
-				}
-			}
-
-			25 = { # Characters persuade hermit for directions
-				character_event = {
-					id = HF.25611
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { diplomacy >= 10 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { diplomacy >= 14 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { diplomacy >= 18 }
-				}
-			}
-
-			25 = { # Characters need to interpret old map
-				character_event = {
-					id = HF.25612
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { stewardship >= 10 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { stewardship >= 14 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { stewardship >= 18 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					has_flag = flag_picked_ritual_co_hunter_smart
-				}
-			}
-
-			25 = { # Characters see bad omen
-				character_event = {
-					id = HF.25613
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { learning >= 10 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					piety < 50
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					piety < 100
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					piety < 150
-				}
-			}
-			5 = { # Characters see good omen
-				character_event = {
-					id = HF.25614
-					days = 10
-					random = 5
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					event_target:scoped_WL_co_hunter = { learning >= 10 }
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					piety >= 250
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					piety >= 350
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					piety >= 450
-				}
-
-				mult_modifier = {
-					factor = 1.5
-					piety >= 550
-				}
-			}
-
-			100 = { # Lunatic/Possessed ruler starts a Wild Hunt
-				trigger = {
-					OR = {
-						trait = possessed
-						trait = lunatic
-
-						AND = {
-							has_character_modifier = lycanthropy
-
-							OR = {
-								has_flag = flag_hunting_wolf_norse
-								has_flag = flag_hunting_wolf_baltic
-								has_flag = flag_hunting_wolf_hellenic
-							}
-						}
-					}
-
-					event_target:scoped_WL_co_hunter = {
-						is_alive = yes
-					}
-				}
-
-				character_event = {
-					id = HF.25615
-					days = 10
-					random = 5
-				}
-			}
-		}
-	}
-}
-
 # Chance of Education trait improvement or burnout case
 stable_attribute_improvement_effect = {
 	hidden_effect = {
-		if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_flag = flag_training_diplomacy_attribute
-				}
-			}
+		event_target:scoped_improvement_target = {
+			random_list = {
+				20 = { # Education improvement
+					trigger = {
+						has_flag = flag_training_diplomacy_attribute
 
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { # Education improvement
-						trigger = { # Education Improvement only unlocked by synergy
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-							}
-
-							OR = {
-								trait = naive_appeaser
-								trait = underhanded_rogue
-								trait = charismatic_negotiator
-							}
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
 						}
 
-						character_event = {
-							id = HF.23761
-							days = 15
-							random = 15
+						OR = {
+							trait = naive_appeaser
+							trait = underhanded_rogue
+							trait = charismatic_negotiator
 						}
+					}
 
-						mult_modifier = {
-							factor = 1.5
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
+					}
 
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
+					mult_modifier = {
+						factor = 1.5
 
-								attribute_diff = {
-									attribute = diplomacy
-									character = event_target:scoped_improvement_target
-									value >= 3
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-
-								attribute_diff = {
-									attribute = diplomacy
-									character = event_target:scoped_improvement_target
-									value >= 6
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-
-								attribute_diff = {
-									attribute = diplomacy
-									character = event_target:scoped_improvement_target
-									value >= 9
-								}
+						event_target:scoped_improvement_ruler = {
+							attribute_diff = {
+								attribute = diplomacy
+								character = event_target:scoped_improvement_target
+								value >= 3
 							}
 						}
 					}
 
-					20 = { # Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 1 # Never first time
-								}
-							}
-						}
+					mult_modifier = {
+						factor = 1.5
 
-						character_event = {
-							id = HF.23762
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 2
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 3
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 4
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 5
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 8
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 12
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
+						event_target:scoped_improvement_ruler = {
+							attribute_diff = {
+								attribute = diplomacy
+								character = event_target:scoped_improvement_target
+								value >= 6
 							}
 						}
 					}
 
-					80 = {
-						# Nothing
+					mult_modifier = {
+						factor = 1.75
+
+						event_target:scoped_improvement_ruler = {
+							attribute_diff = {
+								attribute = diplomacy
+								character = event_target:scoped_improvement_target
+								value >= 9
+							}
+						}
 					}
 				}
-			}
-		}
 
-		else_if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					OR = {
-						has_flag = flag_training_martial_attribute
-						has_flag = flag_training_combat_rating
+				20 = {
+					trigger = {
+						# Education improvement
+						OR = {
+							has_flag = flag_training_martial_attribute
+							has_flag = flag_training_combat_rating
+						}
+
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
+						}
+
+						OR = {
+							trait = misguided_warrior
+							trait = tough_soldier
+							trait = skilled_tactician
+						}
+					}
+
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_ruler
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_ruler
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_ruler
+							value <= 9
+						}
 					}
 				}
-			}
 
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { # Education improvement
-						trigger = { # Education Improvement only unlocked by synergy
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-							}
+				20 = {
+					trigger = {
+						# Education improvement
+						has_flag = flag_training_stewardship_attribute
 
-							OR = {
-								trait = misguided_warrior
-								trait = tough_soldier
-								trait = skilled_tactician
-							}
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
 						}
 
-						character_event = {
-							id = HF.23761
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-
-								attribute_diff = {
-									attribute = martial
-									character = event_target:scoped_improvement_target
-									value >= 3
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-
-								attribute_diff = {
-									attribute = martial
-									character = event_target:scoped_improvement_target
-									value >= 6
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-
-								attribute_diff = {
-									attribute = martial
-									character = event_target:scoped_improvement_target
-									value >= 9
-								}
-							}
+						OR = {
+							trait = indulgent_wastrel
+							trait = thrifty_clerk
+							trait = fortune_builder
 						}
 					}
 
-					20 = { # Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 1 # Never first time
-								}
-							}
-						}
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
+					}
 
-						character_event = {
-							id = HF.23762
-							days = 15
-							random = 15
-						}
+					mult_modifier = {
+						factor = 1.5
 
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 2
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 3
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 4
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 5
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 8
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 12
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 30
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 35
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 40
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 45
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 50
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
+						attribute_diff = {
+							attribute = stewardship
+							character = event_target:scoped_improvement_target
+							value <= 3
 						}
 					}
 
-					80 = { } # Nothing
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = stewardship
+							character = event_target:scoped_improvement_target
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = stewardship
+							character = event_target:scoped_improvement_target
+							value <= 9
+						}
+					}
 				}
-			}
-		}
 
-		else_if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_flag = flag_training_stewardship_attribute
+				20 = {
+					trigger = {
+						# Education improvement
+						has_flag = flag_training_intrigue_attribute
+
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
+						}
+
+						OR = {
+							trait = amateurish_plotter
+							trait = flamboyant_schemer
+							trait = intricate_webweaver
+						}
+					}
+
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = intrigue
+							character = event_target:scoped_improvement_target
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = intrigue
+							character = event_target:scoped_improvement_target
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = intrigue
+							character = event_target:scoped_improvement_target
+							value <= 9
+						}
+					}
 				}
-			}
 
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { # Education improvement
-						trigger = { # Education Improvement only unlocked by synergy
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-							}
+				20 = {
+					trigger = {
+						# Education improvement
+						has_flag = flag_training_learning_attribute
 
-							OR = {
-								trait = indulgent_wastrel
-								trait = thrifty_clerk
-								trait = fortune_builder
-							}
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
 						}
 
-						character_event = {
-							id = HF.23761
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							attribute_diff = {
-								attribute = stewardship
-								character = event_target:scoped_improvement_target
-								value <= 3
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							attribute_diff = {
-								attribute = stewardship
-								character = event_target:scoped_improvement_target
-								value <= 6
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							attribute_diff = {
-								attribute = stewardship
-								character = event_target:scoped_improvement_target
-								value <= 9
-							}
+						OR = {
+							trait = detached_priest
+							trait = martial_cleric
+							trait = scholarly_theologian
 						}
 					}
 
-					20 = { # Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 1 # Never first time
-								}
-							}
-						}
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
+					}
 
-						character_event = {
-							id = HF.23762
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 2
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 3
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 4
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 5
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 8
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 12
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 30
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 35
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 40
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 45
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 50
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
+					mult_modifier = {
+						factor = 1.5
+						event_target:scoped_improvement_ruler = {
+							has_religion_feature = religion_meritocratic # More pressure
 						}
 					}
 
-					80 = { } # Nothing
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = learning
+							character = event_target:scoped_improvement_target
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = learning
+							character = event_target:scoped_improvement_target
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = learning
+							character = event_target:scoped_improvement_target
+							value <= 9
+						}
+					}
 				}
-			}
-		}
 
-		else_if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_flag = flag_training_intrigue_attribute
+				20 = { # Burnout
+					trigger = {
+						check_variable = {
+							which = burnout_count
+							value >= 1 # Never first time
+						}
+					}
+
+					character_event = {
+						id = HF.23762
+						days = 15
+						random = 15
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						check_variable = {
+							which = burnout_count
+							value >= 2
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						check_variable = {
+							which = burnout_count
+							value >= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						check_variable = {
+							which = burnout_count
+							value >= 4
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						check_variable = {
+							which = burnout_count
+							value >= 5
+						}
+					}
+
+					mult_modifier = {
+						factor = 2
+
+						check_variable = {
+							which = burnout_count
+							value >= 8
+						}
+					}
+
+					mult_modifier = {
+						factor = 2
+
+						check_variable = {
+							which = burnout_count
+							value >= 12
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						trait = slothful
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						trait = stressed
+					}
+
+					mult_modifier = {
+						factor = 1.75
+						trait = depressed
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						is_ill = yes
+					}
+
+					mult_modifier = {
+						factor = 0.75
+						trait = diligent
+					}
 				}
-			}
 
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { # Education improvement
-						trigger = { # Education Improvement only unlocked by synergy
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-							}
-
-							OR = {
-								trait = amateurish_plotter
-								trait = flamboyant_schemer
-								trait = intricate_webweaver
-							}
-						}
-
-						character_event = {
-							id = HF.23761
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							attribute_diff = {
-								attribute = intrigue
-								character = event_target:scoped_improvement_target
-								value <= 3
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							attribute_diff = {
-								attribute = intrigue
-								character = event_target:scoped_improvement_target
-								value <= 6
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							attribute_diff = {
-								attribute = intrigue
-								character = event_target:scoped_improvement_target
-								value <= 9
-							}
-						}
-					}
-
-					20 = { # Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 1 # Never first time
-								}
-							}
-						}
-
-						character_event = {
-							id = HF.23762
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 2
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 3
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 4
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 5
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 8
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 12
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 30
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 35
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 40
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 45
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 50
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
-						}
-					}
-
-					80 = { } # Nothing
-				}
-			}
-		}
-
-		else_if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_flag = flag_training_learning_attribute
-				}
-			}
-
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { # Education improvement
-						trigger = { # Education Improvement only unlocked by synergy
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-							}
-
-							OR = {
-								trait = detached_priest
-								trait = martial_cleric
-								trait = scholarly_theologian
-							}
-						}
-
-						character_event = {
-							id = HF.23761
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								has_religion_feature = religion_meritocratic # More pressure
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							attribute_diff = {
-								attribute = learning
-								character = event_target:scoped_improvement_target
-								value <= 3
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							attribute_diff = {
-								attribute = learning
-								character = event_target:scoped_improvement_target
-								value <= 6
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							attribute_diff = {
-								attribute = learning
-								character = event_target:scoped_improvement_target
-								value <= 9
-							}
-						}
-					}
-
-					20 = { # Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = { # Never first time
-								check_variable = { which = burnout_count value = 1 }
-							}
-						}
-
-						character_event = {
-							id = HF.23762
-							days = 15
-							random = 15
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 2
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 3
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 4
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 5
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 8
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 2
-
-							event_target:scoped_improvement_ruler = {
-								check_variable = {
-									which = burnout_count
-									value >= 12
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 30
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 35
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 40
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 45
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								practical_age >= 50
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-
-						mult_modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
-						}
-					}
-
-					80 = { } # Nothing
+				80 = {
+					# Nothing
 				}
 			}
 		}
@@ -7634,8 +5996,20 @@ landless_pope_effect = {
 			catholic = { is_name_randomized = no }
 		}
 
-		character_event = { id = HFP.40034 } # Papal States becomes Romagna when the Pope holds no lands in Italy
-		character_event = { id = HFP.40035 } # Clean up Papal Guards
+		destroy_landed_title = k_papacy
+
+		k_papacy = {
+			any_direct_de_jure_vassal_title = {
+				de_jure_liege = k_romagna
+			}
+		}
+
+		narrative_event = { id = HFP.40037 } # Papal States becomes Romagna when the Pope holds no lands in Italy
+
+		activate_title = {
+			title = d_papal_guards
+			status = no
+		}
 	}
 }
 

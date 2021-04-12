@@ -1,22 +1,21 @@
 check_holy_order_donation_effect = {
 	hidden_effect = {
-		save_event_target_as = holy_order_potential_title
-
-		if = { # Checking if it is an island the Hospitallers could be interested in
+		if = {
 			limit = {
 				is_title_active = d_knights_hospitaler
 
-				d_knights_hospitaler = {
-					holder_scope = {
-						religion = ROOT
+				ROOT = {
+					religion = d_knights_hospitaler
+					is_heretic = no
+					NOT = { has_character_flag = refused_to_give_island_to_knights }
+
+					has_alternate_start_parameter = {
+						key = religion_names
+						value = random
 					}
 				}
 
-				ROOT = {
-					is_heretic = no
-					NOT = { has_character_flag = refused_to_give_island_to_knights }
-				}
-
+				# Checking if it is an island the Hospitallers could be interested in
 				OR = {
 					title = d_cyprus
 
@@ -99,6 +98,111 @@ check_holy_order_donation_effect = {
 					title = c_naxos
 					title = d_cephalonia
 				}
+
+				# Don't have an appropriate island yet
+				d_knights_hospitaler = {
+					holder_scope = {
+						c_malta = {
+							holder_scope = {
+								NOR = {
+									character = PREVPREV
+									is_vassal_or_below_of = PREVPREV
+								}
+							}
+						}
+
+						c_lesbos = {
+							holder_scope = {
+								NOR = {
+									character = PREVPREV
+									is_vassal_or_below_of = PREVPREV
+								}
+							}
+						}
+
+						c_rhodos = {
+							holder_scope = {
+								NOR = {
+									character = PREVPREV
+									is_vassal_or_below_of = PREVPREV
+								}
+							}
+						}
+
+						c_chios = {
+							holder_scope = {
+								NOR = {
+									character = PREVPREV
+									is_vassal_or_below_of = PREVPREV
+								}
+							}
+						}
+
+						c_naxos = {
+							holder_scope = {
+								NOR = {
+									character = PREVPREV
+									is_vassal_or_below_of = PREVPREV
+								}
+							}
+						}
+
+						d_sardinia = {
+							any_direct_de_jure_vassal_title = {
+								holder_scope = {
+									NOR = {
+										character = PREVPREVPREV
+										is_vassal_or_below_of = PREVPREVPREV
+									}
+								}
+							}
+						}
+
+						d_cyprus = {
+							any_direct_de_jure_vassal_title = {
+								holder_scope = {
+									NOR = {
+										character = PREVPREVPREV
+										is_vassal_or_below_of = PREVPREVPREV
+									}
+								}
+							}
+						}
+
+						d_corsica = {
+							any_direct_de_jure_vassal_title = {
+								holder_scope = {
+									NOR = {
+										character = PREVPREVPREV
+										is_vassal_or_below_of = PREVPREVPREV
+									}
+								}
+							}
+						}
+
+						d_krete = {
+							any_direct_de_jure_vassal_title = {
+								holder_scope = {
+									NOR = {
+										character = PREVPREVPREV
+										is_vassal_or_below_of = PREVPREVPREV
+									}
+								}
+							}
+						}
+
+						d_cephalonia = {
+							any_direct_de_jure_vassal_title = {
+								holder_scope = {
+									NOR = {
+										character = PREVPREVPREV
+										is_vassal_or_below_of = PREVPREVPREV
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 
 			if = {
@@ -126,67 +230,16 @@ check_holy_order_donation_effect = {
 				save_event_target_as = potential_title
 			}
 
-			ROOT = { save_event_target_as = title_owner }
-
-			d_knights_hospitaler = {
-				holder_scope = {
-					character_event = {
-						id = HFP.44000
-						days = 1
-					}
+			ROOT = {
+				letter_event = {
+					id = HFP.44001
+					days = 1
 				}
 			}
 		}
 
 		if = { # Checking if it is a Duchy the Teutonics could be interested in
 			limit = {
-				# Checking that ROOT owns the whole Duchy
-				ROOT = {
-					completely_controls = PREV
-				}
-
-				# Checking that the Teutonics are active
-				is_title_active = d_teutonic_order
-
-				# Checking that Root is the same religion as the Teutonics
-				d_teutonic_order = {
-					holder_scope = {
-						religion = ROOT
-					}
-				}
-
-				# Checking that ROOT don't already own the associated Kingdom of that title
-				kingdom = {
-					trigger_if = {
-						limit = { has_holder = yes }
-						NOT = { holder = ROOT }
-					}
-				}
-
-				# Checking that the Teutonics don't already have a Duchy
-				d_teutonic_order = {
-					holder_scope = {
-						is_landed = no
-					}
-				}
-
-				# Checking that the Teutonics aren't already in a Northern Crusade
-				d_teutonic_order = {
-					holder_scope = {
-						NOT = {
-							any_war = {
-								using_cb = northern_crusade_war
-							}
-						}
-					}
-				}
-
-				# Checking ROOT
-				ROOT = {
-					is_heretic = no
-					NOT = { has_character_flag = refused_to_give_land_to_teutonics }
-				}
-
 				# Duke tier
 				real_tier = DUKE
 
@@ -195,6 +248,39 @@ check_holy_order_donation_effect = {
 					region = world_europe_north
 					region = custom_eastern_baltic
 					region = custom_russia
+				}
+
+				# Checking that the Teutonics are active
+				is_title_active = d_teutonic_order
+				year >= 1150
+				NOT = { has_global_flag = teutons_asked_for_land }
+
+				d_teutonic_order = {
+					holder_scope = {
+						religion = ROOT # Checking that Root is the same religion as the Teutonics
+						is_landed = no # Checking that the Teutonics don't already have a Duchy
+
+						NOT = { # Checking that the Teutonics aren't already in a Northern Crusade
+							any_war = {
+								using_cb = northern_crusade_war
+							}
+						}
+					}
+				}
+
+				# Checking that ROOT owns the whole Duchy
+				ROOT = {
+					completely_controls = PREV
+					is_heretic = no
+					NOT = { has_character_flag = refused_to_give_land_to_teutonics }
+				}
+
+				# Checking that ROOT doesn't already own the associated Kingdom of that title
+				kingdom = {
+					trigger_if = {
+						limit = { has_holder = yes }
+						NOT = { holder = ROOT }
+					}
 				}
 
 				OR = {
@@ -219,7 +305,7 @@ check_holy_order_donation_effect = {
 								OR = {
 									religion = ROOT
 
-									owner = {
+									holder_scope = {
 										OR = {
 											religion = ROOT
 
@@ -252,12 +338,12 @@ check_holy_order_donation_effect = {
 				}
 			}
 
-			d_teutonic_order = {
-				holder_scope = {
-					character_event = {
-						id = HFP.44005
-						days = 1
-					}
+			save_event_target_as = holy_order_potential_title
+
+			ROOT = {
+				letter_event = {
+					id = HFP.44006
+					days = 1
 				}
 			}
 		}
