@@ -169,7 +169,6 @@ character_event = {
 
 		random = {
 			chance = 15
-
 			add_trait_humble_effect = yes
 		}
 
@@ -227,8 +226,7 @@ character_event = {
 		spouse = {
 			show_scope_change = no
 
-			fertility >= 0.1
-
+			fertility = 0.1
 			add_trait_silently_lustful_effect = yes
 
 			opinion = {
@@ -240,7 +238,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB73001 # That is her interests, not mine.
+		name = EVTOPTB73001 # That is her interest, not mine.
 
 		piety = 5
 
@@ -256,19 +254,15 @@ character_event = {
 			}
 		}
 	}
+
 	option = {
 		name = {
 			text = EVTOPTC73001 # These are books created by satan!
-			trigger = {
-				religion_group = christian
-			}
+			trigger = { religion_group = christian }
 		}
-
 		name = {
 			text = EVTOPTD73001 # These are books created by Shaytan!
-			trigger = {
-				religion_group = muslim
-			}
+			trigger = { religion_group = muslim }
 		}
 
 		trigger = {
@@ -278,24 +272,29 @@ character_event = {
 			}
 		}
 
-		ai_chance = {
-			factor = 1
-
-			trigger = { trait = zealous }
-		}
-
 		spouse = {
 			show_scope_change = no
 
 			if = {
 				limit = {
-					NOT = { religion_group = muslim }
+					NOR = {
+						trait = chaste
+						religion_group = muslim
+					}
 				}
+
+				remove_trait_silently_lustful_effect = yes
 				add_trait = chaste
 			}
 		}
 
 		piety = 10
+
+		ai_chance = {
+			factor = 1
+
+			trigger = { trait = zealous }
+		}
 	}
 }
 
@@ -312,10 +311,9 @@ character_event = {
 	only_playable = yes
 	min_age = 16
 	prisoner = no
+	in_command = no
 
 	trigger = {
-		in_command = no
-
 		any_vassal = {
 			is_theocracy = yes
 			tier = BARON
@@ -384,11 +382,11 @@ character_event = {
 	religion_group = christian
 	min_age = 16
 	prisoner = no
+	in_command = no
 
 	trigger = {
 		real_tier = COUNT
 		wealth >= 50
-		in_command = no
 	}
 
 	weight_multiplier = {
@@ -438,10 +436,9 @@ character_event = {
 	only_playable = yes
 	min_age = 16
 	prisoner = no
+	in_command = no
 
 	trigger = {
-		in_command = no
-
 		father_even_if_dead = {
 			is_alive = no
 			higher_real_tier_than = COUNT
@@ -473,6 +470,8 @@ character_event = {
 		name = EVTOPTB73004 # This is a waste of money
 
 		any_dynasty_member = {
+			show_scope_change = no
+
 			opinion = {
 				name = disrespects_dynasty
 				who = ROOT
@@ -493,14 +492,13 @@ character_event = {
 	only_playable = yes
 	min_age = 16
 	prisoner = no
+	in_command = no
 
 	trigger = {
 		OR = {
 			trait = fair
 			trait = ugly
 		}
-
-		in_command = no
 
 		NOR = {
 			trait = humble
@@ -635,6 +633,8 @@ character_event = {
 		piety = -5
 
 		any_courtier = {
+			show_scope_change = no
+
 			wealth = -5
 			prestige = 5
 			piety = -5
@@ -649,9 +649,11 @@ character_event = {
 
 		random = {
 			chance = 15
-			add_trait_humble_effect = yes
-		}
 
+			remove_trait_silently_proud_effect = yes
+			tooltip = { add_trait = humble }
+			hidden_effect = { add_trait_humble_effect = yes }
+		}
 	}
 }
 
@@ -711,8 +713,10 @@ character_event = {
 		name = EVTOPTA73006 # That's my boy
 
 		trigger = {
-			NOT = { trait = chaste }
-			NOT = { trait = celibate }
+			NOR = {
+				trait = chaste
+				trait = celibate
+			}
 		}
 
 		piety = -10
@@ -813,10 +817,9 @@ character_event = {
 	is_married = yes
 	min_age = 16
 	prisoner = no
+	in_command = no
 
 	trigger = {
-		in_command = no
-
 		NOR = {
 			trait = zealous
 			trait = charitable
@@ -895,12 +898,14 @@ character_event = {
 			prestige = -5
 		}
 
-		add_trait_silently_zealous_effect = yes
+		remove_trait_silently_cynical_effect = yes
+		add_trait = zealous
 
 		spouse = {
 			show_scope_change = no
 
-			add_trait_silently_zealous_effect = yes
+			remove_trait_silently_cynical_effect = yes
+			add_trait = zealous
 		}
 	}
 
@@ -913,14 +918,10 @@ character_event = {
 
 		add_trait = greedy
 
-		spouse = {
-			show_scope_change = no
-
-			opinion = {
-				name = not_feeling_apreciated
-				who = ROOT
-				years = 2
-			}
+		reverse_opinion = {
+			name = not_feeling_apreciated
+			who = spouse
+			years = 2
 		}
 	}
 }
@@ -1158,13 +1159,13 @@ character_event = {
 	desc = EVTDESC73010
 	picture = GFX_evt_library
 
+	is_triggered_only = yes # on_yearly_pulse
+
 	only_playable = yes
 	religion_group = christian
 	min_age = 55
 	prisoner = no
 	only_capable = yes
-
-	is_triggered_only = yes # on_yearly_pulse
 
 	trigger = {
 		year >= 1415
@@ -1423,6 +1424,8 @@ character_event = {
 	prisoner = no
 
 	trigger = {
+		can_hold_title = job_marshal
+		NOT = { has_character_flag = asked_for_job }
 		is_ruler = no
 		is_councillor = no
 
@@ -1435,12 +1438,10 @@ character_event = {
 			NOT = { has_character_flag = asked_marshal_petition }
 		}
 
-		can_hold_title = job_marshal
-		NOT = { has_character_flag = asked_for_job }
 	}
 
 	mean_time_to_happen = {
-		months = 120
+		years = 10
 
 		mult_modifier = {
 			factor = 0.25
@@ -1569,9 +1570,7 @@ letter_event = {
 
 		random_list = {
 			50 = { }
-
 			30 = { change_martial = 1 }
-
 			20 = { add_trait_stressed_effect = yes }
 		}
 	}
@@ -1597,13 +1596,14 @@ character_event = {
 	picture = GFX_evt_spymaster
 	border = GFX_event_normal_frame_war
 
+	is_triggered_only = yes
+
 	has_character_flag = asked_for_job
 	prisoner = no
 	only_capable = yes
 
-	is_triggered_only = yes
-
 	trigger = {
+		can_hold_title = job_marshal
 		independent = no
 		is_councillor = no
 
@@ -1613,8 +1613,6 @@ character_event = {
 				NOT = { has_minor_title = title_regent }
 			}
 		}
-
-		can_hold_title = job_marshal
 	}
 
 	option = {
@@ -1711,6 +1709,8 @@ character_event = {
 	prisoner = no
 
 	trigger = {
+		can_hold_title = job_spymaster
+		NOT = { has_character_flag = asked_for_job }
 		is_ruler = no
 		independent = no
 		is_councillor = no
@@ -1723,13 +1723,10 @@ character_event = {
 
 			NOT = { has_character_flag = asked_spymaster_petition }
 		}
-
-		can_hold_title = job_spymaster
-		NOT = { has_character_flag = asked_for_job }
 	}
 
 	mean_time_to_happen = {
-		months = 120
+		years = 10
 
 		mult_modifier = {
 			factor = 0.25
@@ -1862,9 +1859,7 @@ letter_event = {
 
 		random_list = {
 			50 = { }
-
 			30 = { change_intrigue = 1 }
-
 			20 = { add_trait_stressed_effect = yes }
 		}
 	}
@@ -1997,9 +1992,10 @@ character_event = {
 	prisoner = no
 
 	trigger = {
+		can_hold_title = job_treasurer
+		NOT = { has_character_flag = asked_for_job }
 		is_ruler = no
 		is_councillor = no
-		NOT = { has_character_flag = asked_for_job }
 
 		liege = {
 			job_treasurer = {
@@ -2009,12 +2005,10 @@ character_event = {
 
 			NOT = { has_character_flag = asked_treasurer_petition }
 		}
-
-		can_hold_title = job_treasurer
 	}
 
 	mean_time_to_happen = {
-		months = 120
+		years = 10
 
 		mult_modifier = {
 			factor = 0.25
@@ -2141,9 +2135,7 @@ letter_event = {
 
 		random_list = {
 			50 = { }
-
 			30 = { change_stewardship = 1 }
-
 			20 = { add_trait_stressed_effect = yes }
 		}
 	}
@@ -2277,6 +2269,7 @@ character_event = {
 
 	trigger = {
 		religion = liege
+		can_hold_title = job_spiritual
 		NOT = { religion_group = muslim }
 
 		trigger_if = {
@@ -2314,11 +2307,10 @@ character_event = {
 			NOT = { has_character_flag = asked_lord_spiritual_petition }
 		}
 
-		can_hold_title = job_spiritual
 	}
 
 	mean_time_to_happen = {
-		months = 120
+		years = 10
 
 		mult_modifier = {
 			factor = 0.25
@@ -2445,9 +2437,7 @@ letter_event = {
 
 		random_list = {
 			50 = { }
-
 			30 = { change_learning = 1 }
-
 			20 = { add_trait_stressed_effect = yes }
 		}
 	}
@@ -2512,8 +2502,8 @@ letter_event = {
 	is_triggered_only = yes
 
 	option = {
-
 		name = EVTOPTA73234
+
 		job_spiritual = {
 			show_scope_change = no
 
@@ -2542,6 +2532,7 @@ letter_event = {
 
 		FROM = {
 			show_scope_change = no
+
 			prestige = -10
 
 			opinion = {
@@ -2580,6 +2571,7 @@ character_event = {
 	prisoner = no
 
 	trigger = {
+		can_hold_title = job_chancellor
 		is_ruler = no
 		independent = no
 		is_councillor = no
@@ -2593,12 +2585,10 @@ character_event = {
 
 			NOT = { has_character_flag = asked_chancellor_petition }
 		}
-
-		can_hold_title = job_chancellor
 	}
 
 	mean_time_to_happen = {
-		months = 120
+		years = 10
 
 		mult_modifier = {
 			factor = 0.25
@@ -2725,9 +2715,7 @@ letter_event = {
 
 		random_list = {
 			50 = { }
-
 			30 = { change_diplomacy = 1 }
-
 			20 = { add_trait_stressed_effect = yes }
 		}
 	}

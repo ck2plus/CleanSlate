@@ -10,6 +10,7 @@ decisions = {
 			independent = yes
 			higher_real_tier_than = DUKE
 			is_nomadic = no
+			owns = location
 
 			OR = {
 				religion_group = christian
@@ -20,10 +21,6 @@ decisions = {
 			trigger_if = {
 				limit = { is_female = yes }
 				gender_equality_trigger = yes
-			}
-
-			location = {
-				owner = { character = ROOT }
 			}
 
 			NOR = {
@@ -255,16 +252,11 @@ decisions = {
 
 					save_event_target_as = vassal_wanted_title
 				}
-			}
 
-			custom_tooltip = {
-				text = demand_liege_title_tooltip
-
-				liege = {
-					letter_event = {
-						id = 63041 # "vassal_request_events.txt"
-						days = 4
-					}
+				letter_event = {
+					id = 63041 # "vassal_request_events.txt"
+					days = 4
+					tooltip = demand_liege_title_tooltip
 				}
 			}
 		}
@@ -339,14 +331,11 @@ decisions = {
 			independent = yes
 			religion_group = muslim
 			higher_real_tier_than = DUKE
+			owns = location
 
 			trigger_if = {
 				limit = { is_female = yes }
 				gender_equality_trigger = yes
-			}
-
-			location = {
-				owner = { character = ROOT }
 			}
 
 			NOR = {
@@ -492,7 +481,7 @@ decisions = {
 			is_incapable = no
 			is_heretic = no
 
-			k_papal_state = {
+			k_papacy = {
 				holder_scope = {
 					is_heretic = no # If the Pope (and thus Catholicism) is heretical, mending the schism is no longer possible
 				}
@@ -628,11 +617,7 @@ decisions = {
 		}
 
 		effect = {
-			ROOT = {
-				c_byzantion = {
-					usurp_title_plus_barony_if_unlanded_and_vassals = PREV
-				}
-			}
+			usurp_title_plus_barony_if_unlanded_and_vassals = c_byzantion
 		}
 
 		ai_will_do = {
@@ -650,7 +635,7 @@ decisions = {
 			has_landed_title = e_roman_empire
 
 			capital_scope = {
-				NOT = { province_id = 333 } # Rome
+				NOT = { province_id = c_roma } # Rome
 			}
 
 			c_roma = {
@@ -1237,8 +1222,11 @@ decisions = {
 		allow = {
 			completely_controls = c_jerusalem
 
-			774 = {
-				religion = ROOT
+			c_jerusalem = {
+				location = {
+					show_scope_change = no
+					religion = ROOT
+				}
 			}
 
 			wealth >= 1500
@@ -1250,11 +1238,13 @@ decisions = {
 				set_global_flag = building_third_temple
 				character_event = { id = SoA.100 }
 
-				774 = {
-					province_event = {
-						id = SoA.10199
-						years = 4
-						random = 50
+				c_jerusalem = {
+					location = {
+						province_event = {
+							id = SoA.10199
+							years = 4
+							random = 50
+						}
 					}
 				}
 			}
@@ -1294,8 +1284,11 @@ decisions = {
 		allow = {
 			completely_controls = c_jerusalem
 
-			774 = {
-				religion = jewish
+			c_jerusalem = {
+				location = {
+					show_scope_change = no
+					religion = jewish
+				}
 			}
 
 			piety >= 1000
@@ -1360,8 +1353,11 @@ decisions = {
 			completely_controls = d_galilee
 			completely_controls = d_oultrejourdain
 
-			774 = {
-				religion = ROOT
+			c_jerusalem = {
+				location = {
+					show_scope_change = no
+					religion = ROOT
+				}
 			}
 
 			piety >= 500
@@ -2021,7 +2017,7 @@ decisions = {
 							title = e_spain
 
 							trigger_if = {
-								limit = { tier = KING }
+								limit = { real_tier = KING }
 
 								empire = {
 									OR = {
@@ -2130,6 +2126,10 @@ decisions = {
 					title = e_hre
 					status = yes
 				}
+
+				religion_head = {
+					save_event_target_as = the_pope
+				}
 			}
 
 			if = {
@@ -2162,37 +2162,18 @@ decisions = {
 				show_scope_change = no
 
 				if = {
-					limit = { tier = KING }
+					limit = { real_tier = KING }
+
 					de_jure_liege = e_hre
+					destroy_landed_title = THIS
 				}
-			}
+				else_if = {
+					limit = { real_tier = KING }
 
-		#	hidden_effect = {
-				any_demesne_title = {
-					show_scope_change = no
+					any_direct_de_jure_vassal_title = {
+						show_scope_change = no
 
-					if = {
-						limit = {
-							tier = EMPEROR
-							NOT = { title = e_hre }
-						}
-
-						any_direct_de_jure_vassal_title = {
-							show_scope_change = no
-
-							de_jure_liege = e_hre
-						}
-					}
-				}
-		#	}
-
-			any_demesne_title = {
-				show_scope_change = no
-
-				if = {
-					limit = {
-						tier = EMPEROR
-						NOT = { title = e_hre }
+						de_jure_liege = e_hre
 					}
 
 					destroy_landed_title = THIS
@@ -2206,108 +2187,28 @@ decisions = {
 				}
 			}
 
-			any_demesne_title = {
+			# Give lands to the Pope
+			any_title_under = {
 				show_scope_change = no
 
-				if = {
-					limit = { tier = KING }
-					destroy_landed_title = THIS
-				}
-			}
-
-			# Give lands to the Pope
-			if = {
 				limit = {
-					c_roma = {
-						holder_scope = {
-							OR = {
-								ai = yes
-								num_of_count_titles > 1
-							}
+					OR = {
+						title = c_roma
+						title = c_ravenna
+						title = c_ferrara
+						title = c_urbino
+						title = c_perugia
+					}
+
+					holder_scope = {
+						trigger_if = {
+							limit = { ai = no }
+							num_of_count_titles > 1
 						}
 					}
 				}
 
-				religion_head = {
-					show_scope_change = no
-
-					grant_title = c_roma
-				}
-			}
-
-			if = {
-				limit = {
-					c_ravenna = {
-						holder_scope = {
-							OR = {
-								ai = yes
-								num_of_count_titles > 1
-							}
-						}
-					}
-				}
-
-				religion_head = {
-					show_scope_change = no
-
-					grant_title = c_ravenna
-				}
-			}
-			if = {
-				limit = {
-					c_ferrara = {
-						holder_scope = {
-							OR = {
-								ai = yes
-								num_of_count_titles > 1
-							}
-						}
-					}
-				}
-
-				religion_head = {
-					show_scope_change = no
-
-					grant_title = c_roma
-				}
-			}
-
-			if = {
-				limit = {
-					c_urbino = {
-						holder_scope = {
-							OR = {
-								ai = yes
-								num_of_count_titles > 1
-							}
-						}
-					}
-				}
-
-				religion_head = {
-					show_scope_change = no
-
-					grant_title = c_urbino
-				}
-			}
-
-			if = {
-				limit = {
-					c_perugia = {
-						holder_scope = {
-							OR = {
-								ai = yes
-								num_of_count_titles > 1
-							}
-						}
-					}
-				}
-
-				religion_head = {
-					show_scope_change = no
-
-					grant_title = c_perugia
-				}
+				grant_title = event_target:the_pope
 			}
 
 			e_byzantium = {
@@ -2322,18 +2223,10 @@ decisions = {
 						years = 100
 					}
 
-					k_papal_state = {
-						show_scope_change = no
-
-						holder_scope = {
-							show_scope_change = no
-
-							reverse_opinion = {
-								name = opinion_unhappy
-								who = PREVPREV
-								years = 100
-							}
-						}
+					opinion = {
+						name = opinion_unhappy
+						who = event_target:the_pope
+						years = 100
 					}
 				}
 			}
@@ -2453,104 +2346,91 @@ decisions = {
 
 				new_title = {
 					copy_title_history = PREV
+					save_event_target_as = new_kingdom
 				}
 
 				hidden_effect = {
 					# New kingdom becomes part of de jure empire of capital duchy
 					empire = {
-						ROOT = {
-							primary_title = {
-								de_jure_liege = PREVPREV
-							}
+						event_target:new_kingdom = {
+							de_jure_liege = PREV
 						}
 					}
 
 					ROOT = {
-						primary_title = { # New kingdom
-							holder_scope = {
-								# All held duchies of uncreated kingdoms become de jure part of the new kingdom
-								any_title_under = {
-									limit = {
-										tier = DUKE
+						# All held duchies of uncreated kingdoms become de jure part of the new kingdom
+						any_title_under = {
+							limit = {
+								real_tier = DUKE
 
-										kingdom = {
-											has_holder = no
-										}
-									}
-
-									de_jure_liege = PREVPREV # New kingdom
+								kingdom = {
+									has_holder = no
 								}
+							}
 
-								if = {
-									limit = {
-										has_alternate_start_parameter = {
-											key = dejure_kingdoms
-											value = none
-										}
-									}
+							de_jure_liege = event_target:new_kingdom
+						}
 
-									any_title_under = {
-										limit = { tier = DUKE }
-										de_jure_liege = PREVPREV # New kingdom
-									}
+						if = {
+							limit = {
+								has_alternate_start_parameter = {
+									key = dejure_kingdoms
+									value = none
 								}
+							}
 
-								# All fully controlled, unheld duchy titles of uncreated kingdoms become de jure part of the new kingdom
-								any_title_under = {
-									limit = {
-										tier = COUNT
+							any_title_under = {
+								limit = { real_tier = DUKE }
+								de_jure_liege = event_target:new_kingdom
+							}
+						}
 
-										location = {
-											duchy = {
-												kingdom = {
-													has_holder = no
-												}
+						# All fully controlled, unheld duchy titles of uncreated kingdoms become de jure part of the new kingdom
+						any_title_under = {
+							limit = {
+								real_tier = COUNT
 
-												NOT = { de_jure_liege_or_above = PREVPREVPREVPREV } # New kingdom
-
-												ROOT = {
-													completely_controls = PREV # Duchy
-												}
-											}
-										}
+								dejure_liege_title = {
+									kingdom = {
+										has_holder = no
 									}
 
-									location = {
-										duchy = {
-											de_jure_liege = PREVPREVPREVPREV # New kingdom
-										}
+									NOT = { de_jure_liege_or_above = event_target:new_kingdom }
+
+									ROOT = {
+										completely_controls = PREV # Duchy
 									}
 								}
+							}
 
-								if = {
-									limit = {
-										has_alternate_start_parameter = {
-											key = dejure_kingdoms
-											value = none
+							dejure_liege_title = {
+								de_jure_liege = event_target:new_kingdom
+							}
+						}
+
+						if = {
+							limit = {
+								has_alternate_start_parameter = {
+									key = dejure_kingdoms
+									value = none
+								}
+							}
+
+							any_title_under = {
+								limit = {
+									real_tier = COUNT
+
+									dejure_liege_title = {
+										NOT = { de_jure_liege_or_above = event_target:new_kingdom }
+
+										ROOT = {
+											completely_controls = PREV
 										}
 									}
+								}
 
-									any_title_under = {
-										limit = {
-											tier = COUNT
-
-											location = {
-												duchy = {
-													NOT = { de_jure_liege_or_above = PREVPREVPREVPREV } # New kingdom
-
-													ROOT = {
-														completely_controls = PREV
-													}
-												}
-											}
-										}
-
-										location = {
-											duchy = {
-												de_jure_liege = PREVPREVPREVPREV # New kingdom
-											}
-										}
-									}
+								dejure_liege_title = {
+									de_jure_liege = event_target:new_kingdom
 								}
 							}
 						}
@@ -2709,52 +2589,44 @@ decisions = {
 
 				new_title = {
 					copy_title_history = PREV
+					save_event_target_as = new_empire
 				}
 
 				hidden_effect = {
 					ROOT = {
-						primary_title = { # New empire
-							holder_scope = {
-								# All held kingdoms of uncreated empires become de jure part of the new empire
-								any_title_under = {
-									limit = {
-										tier = KING
+						# All held kingdoms of uncreated empires become de jure part of the new empire
+						any_title_under = {
+							limit = {
+								real_tier = KING
 
-										empire = {
-											has_holder = no
-										}
-
-									}
-
-									de_jure_liege = PREVPREV # New empire
+								empire = {
+									has_holder = no
 								}
+							}
 
-								# All fully controlled, unheld kingdoms of uncreated empires become de jure part of the new empire
-								any_title_under = {
-									limit = {
-										tier = DUKE
+							de_jure_liege = event_target:new_empire
+						}
 
-										location = {
-											kingdom = {
-												empire = {
-													has_holder = no
-												}
+						# All fully controlled, unheld kingdoms of uncreated empires become de jure part of the new empire
+						any_title_under = {
+							limit = {
+								real_tier = DUKE
 
-												NOT = { de_jure_liege_or_above = PREVPREVPREVPREV } # New empire
-
-												ROOT = {
-													completely_controls = PREV
-												}
-											}
-										}
+								kingdom = {
+									empire = {
+										has_holder = no
 									}
 
-									location = {
-										kingdom = {
-											de_jure_liege = PREVPREVPREVPREV # New empire
-										}
+									NOT = { de_jure_liege_or_above = event_target:new_empire }
+
+									ROOT = {
+										completely_controls = PREV
 									}
 								}
+							}
+
+							kingdom = {
+								de_jure_liege = event_target:new_empire
 							}
 						}
 					}

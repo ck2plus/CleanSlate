@@ -947,6 +947,7 @@ character_event = {
 				NOT = { trait = wroth }
 			}
 
+			remove_trait_silently_patient_effect = yes
 			add_trait = wroth
 		}
 
@@ -1206,7 +1207,6 @@ character_event = {
 			name = invigorated
 			years = 15
 		}
-
 	}
 
 	option = {
@@ -1260,7 +1260,7 @@ character_event = {
 		character_event = {
 			id = RIP.11001
 			years = 1
-			random = 1095
+			random = 1095 # 3 years
 		}
 	}
 }
@@ -1348,12 +1348,6 @@ character_event = {
 	option = { # I will invest in this!
 		name = EVTOPTA_RIP_4022
 
-		ai_chance = {
-			factor = 1
-
-			trigger = { wealth >= 300 }
-		}
-
 		scaled_wealth = -0.5
 		prestige = 50
 
@@ -1379,6 +1373,12 @@ character_event = {
 					value = 15
 				}
 			}
+		}
+
+		ai_chance = {
+			factor = 1
+
+			trigger = { wealth >= 300 }
 		}
 	}
 
@@ -2130,6 +2130,11 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTB_RIP_4041_TOOLTIP }
 
+		clr_character_flag = physician_books
+		clr_character_flag = physician_herbs
+		clr_character_flag = physician_tools
+		clr_character_flag = physician_lab_equipment
+
 		ai_chance = {
 			factor = 50
 
@@ -2143,11 +2148,6 @@ character_event = {
 				is_dumb_trigger = yes
 			}
 		}
-
-		clr_character_flag = physician_books
-		clr_character_flag = physician_herbs
-		clr_character_flag = physician_tools
-		clr_character_flag = physician_lab_equipment
 	}
 }
 
@@ -2672,15 +2672,6 @@ character_event = {
 	option = { # Recruit him
 		name = EVTOPTA_RIP_4100
 
-		ai_chance = {
-			factor = 70
-
-			mult_modifier = {
-				factor = 5
-				trait = cynical
-			}
-		}
-
 		event_target:missionary_physician_target = {
 			show_scope_change = no
 
@@ -2702,19 +2693,19 @@ character_event = {
 				random = 30
 			}
 		}
+
+		ai_chance = {
+			factor = 70
+
+			mult_modifier = {
+				factor = 5
+				trait = cynical
+			}
+		}
 	}
 
 	option = { # Seize his assets and execute him!
 		name = EVTOPTB_RIP_4100
-
-		ai_chance = {
-			factor = 30
-
-			mult_modifier = {
-				factor = 5
-				trait = zealous
-			}
-		}
 
 		wealth = 50
 
@@ -2731,6 +2722,15 @@ character_event = {
 			name = opinion_dishonorable_scum
 			who = event_target:origin_realm_of_missionary_physician_target
 			years = 15
+		}
+
+		ai_chance = {
+			factor = 30
+
+			mult_modifier = {
+				factor = 5
+				trait = zealous
+			}
 		}
 	}
 }
@@ -2752,6 +2752,12 @@ character_event = {
 	option = {
 		name = EVTOPTA_RIP_4101
 
+		reverse_opinion = {
+			name = opinion_did_not_trust_me
+			who = event_target:missionary_physician_target
+			years = 10
+		}
+
 		ai_chance = {
 			factor = 60
 
@@ -2765,16 +2771,60 @@ character_event = {
 				trait = craven
 			}
 		}
-
-		reverse_opinion = {
-			name = opinion_did_not_trust_me
-			who = event_target:missionary_physician_target
-			years = 10
-		}
 	}
 
 	option = {
 		name = EVTOPTB_RIP_4101
+
+		reverse_opinion = {
+			name = opinion_glad
+			who = event_target:missionary_physician_target
+			years = 10
+		}
+
+		if = {
+			limit = { religion_group = pagan_group }
+			add_trait = sympathy_pagans
+		}
+
+		religion = event_target:missionary_physician_target
+		prestige = -500
+		piety = 250
+
+		custom_tooltip = {
+			text = EVTOPTB_RIP_4101_TT
+
+			hidden_effect = {
+				any_close_relative = {
+					limit = {
+						vassal_of = ROOT
+						ai = yes
+
+						NOR = {
+							trait = zealous
+							trait = stubborn
+							has_character_flag = ai_flag_refuse_conversion
+						}
+					}
+
+					religion = event_target:missionary_physician_target
+				}
+
+				any_spouse = {
+					limit = {
+						ai = yes
+
+						NOR = {
+							trait = zealous
+							trait = stubborn
+							has_character_flag = ai_flag_refuse_conversion
+						}
+					}
+
+					religion = event_target:missionary_physician_target
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 5
@@ -2828,60 +2878,27 @@ character_event = {
 				trait = paranoid
 			}
 		}
-
-		reverse_opinion = {
-			name = opinion_glad
-			who = event_target:missionary_physician_target
-			years = 10
-		}
-
-		if = {
-			limit = { religion_group = pagan_group }
-			add_trait = sympathy_pagans
-		}
-
-		religion = event_target:missionary_physician_target
-		prestige = -500
-		piety = 250
-
-		custom_tooltip = {
-			text = EVTOPTB_RIP_4101_TT
-
-			hidden_effect = {
-				any_close_relative = {
-					limit = {
-						vassal_of = ROOT
-						ai = yes
-
-						NOR = {
-							trait = zealous
-							trait = stubborn
-							has_character_flag = ai_flag_refuse_conversion
-						}
-					}
-
-					religion = event_target:missionary_physician_target
-				}
-
-				any_spouse = {
-					limit = {
-						ai = yes
-
-						NOR = {
-							trait = zealous
-							trait = stubborn
-							has_character_flag = ai_flag_refuse_conversion
-						}
-					}
-
-					religion = event_target:missionary_physician_target
-				}
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_RIP_4101
+
+		wealth = 50
+
+		event_target:missionary_physician_target = {
+			show_scope_change = no
+
+			death = {
+				death_reason = death_execution_burning
+				killer = ROOT
+			}
+		}
+
+		reverse_opinion = {
+			name = opinion_dishonorable_scum
+			who = event_target:origin_realm_of_missionary_physician_target
+			years = 15
+		}
 
 		ai_chance = {
 			factor = 30
@@ -2900,23 +2917,6 @@ character_event = {
 				factor = 2
 				trait = cruel
 			}
-		}
-
-		wealth = 50
-
-		event_target:missionary_physician_target = {
-			show_scope_change = no
-
-			death = {
-				death_reason = death_execution_burning
-				killer = ROOT
-			}
-		}
-
-		reverse_opinion = {
-			name = opinion_dishonorable_scum
-			who = event_target:origin_realm_of_missionary_physician_target
-			years = 15
 		}
 	}
 }
@@ -3043,12 +3043,6 @@ character_event = {
 	option = { # A wise investment
 		name = EVTOPTA_RIP_4300
 
-		ai_chance = {
-			factor = 30
-
-			trigger = { wealth >= 300  }
-		}
-
 		scaled_wealth = -0.1
 		prestige = 25
 
@@ -3068,6 +3062,12 @@ character_event = {
 					value = 15
 				}
 			}
+		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = { wealth >= 300  }
 		}
 	}
 
@@ -3196,12 +3196,6 @@ character_event = {
 	option = { # A wise investment
 		name = EVTOPTA_RIP_4301
 
-		ai_chance = {
-			factor = 30
-
-			trigger = { wealth >= 300 }
-		}
-
 		scaled_wealth = -0.1
 		piety = 25
 
@@ -3221,6 +3215,12 @@ character_event = {
 					value = 15
 				}
 			}
+		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = { wealth >= 300 }
 		}
 	}
 
@@ -3349,12 +3349,6 @@ character_event = {
 	option = { # A wise investment
 		name = EVTOPTA_RIP_4302
 
-		ai_chance = {
-			factor = 30
-
-			trigger = { wealth >= 300 }
-		}
-
 		scaled_wealth = -0.1
 		prestige = 25
 
@@ -3374,6 +3368,12 @@ character_event = {
 					value = 15
 				}
 			}
+		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = { wealth >= 300 }
 		}
 	}
 
@@ -3502,12 +3502,6 @@ character_event = {
 	option = { # A wise investment
 		name = EVTOPTA_RIP_4303
 
-		ai_chance = {
-			factor = 30
-
-			trigger = { wealth >= 300 }
-		}
-
 		scaled_wealth = -0.1
 		prestige = 25
 
@@ -3527,6 +3521,12 @@ character_event = {
 					value = 15
 				}
 			}
+		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = { wealth >= 300 }
 		}
 	}
 
@@ -3655,12 +3655,6 @@ character_event = {
 	option = { # A wise investment
 		name = EVTOPTA_RIP_4304
 
-		ai_chance = {
-			factor = 30
-
-			trigger = { wealth >= 300 }
-		}
-
 		scaled_wealth = -0.1
 		prestige = 25
 
@@ -3680,6 +3674,12 @@ character_event = {
 					value = 15
 				}
 			}
+		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = { wealth >= 300 }
 		}
 	}
 
@@ -3792,12 +3792,6 @@ character_event = {
 	option = { # A wise investment
 		name = EVTOPTA_RIP_4305
 
-		ai_chance = {
-			factor = 30
-
-			trigger = { wealth >= 300 }
-		}
-
 		scaled_wealth = -0.1
 		prestige = 25
 
@@ -3817,6 +3811,12 @@ character_event = {
 					value = 15
 				}
 			}
+		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = { wealth >= 300 }
 		}
 	}
 
@@ -4226,8 +4226,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_RIP_29001
 
-		ai_chance = { factor = 10 }
-
 		custom_tooltip = {
 			text = EVTOPTA_RIP_29001_TOOLTIP
 
@@ -4251,6 +4249,8 @@ character_event = {
 				}
 			}
 		}
+
+		ai_chance = { factor = 10 }
 	}
 
 	# Stay in room and cry
@@ -4264,8 +4264,6 @@ character_event = {
 				trait = depressed
 			}
 		}
-
-		ai_chance = { factor = 15 }
 
 		custom_tooltip = { text = EVTOPTB_RIP_29001_TOOLTIP }
 
@@ -4322,6 +4320,8 @@ character_event = {
 				}
 			}
 		}
+
+		ai_chance = { factor = 15 }
 	}
 
 	option = {
@@ -4329,11 +4329,11 @@ character_event = {
 
 		trigger = { trait = depressed }
 
-		ai_chance = { factor = 1 }
-
 		custom_tooltip = { text = EVTOPTD_RIP_29001_TOOLTIP }
 
 		death = { death_reason = death_suicide_hanging }
+
+		ai_chance = { factor = 1 }
 	}
 
 	# Face the world. You're a badass!
@@ -4346,8 +4346,6 @@ character_event = {
 				trait = craven
 			}
 		}
-
-		ai_chance = { factor = 10 }
 
 		custom_tooltip = { text = EVTOPTC_RIP_29001_TOOLTIP }
 
@@ -4378,6 +4376,8 @@ character_event = {
 
 			33 = { } # Nothing
 		}
+
+		ai_chance = { factor = 10 }
 	}
 }
 
@@ -4407,12 +4407,10 @@ character_event = {
 			add_trait = kind
 		}
 
-		hidden_effect = {
-			FROM = {
-				character_event = {
-					id = RIP.29004
-					days = 3
-				}
+		FROM = {
+			character_event = {
+				id = RIP.29004
+				days = 3
 			}
 		}
 	}
@@ -4434,12 +4432,10 @@ character_event = {
 			}
 		}
 
-		hidden_effect = {
-			FROM = {
-				character_event = {
-					id = RIP.29003
-					days = 3
-				}
+		FROM = {
+			character_event = {
+				id = RIP.29003
+				days = 3
 			}
 		}
 
@@ -4513,8 +4509,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_RIP_29005
 
-		ai_chance = { factor = 20 }
-
 		custom_tooltip = {
 			text = EVTOPTA_RIP_29005_TOOLTIP
 
@@ -4559,6 +4553,8 @@ character_event = {
 				}
 			}
 		}
+
+		ai_chance = { factor = 20 }
 	}
 
 	# Be alone
@@ -4572,8 +4568,6 @@ character_event = {
 				trait = depressed
 			}
 		}
-
-		ai_chance = { factor = 10 }
 
 		custom_tooltip = { text = EVTOPTB_RIP_29001_TOOLTIP }
 
@@ -4624,6 +4618,8 @@ character_event = {
 				}
 			}
 		}
+
+		ai_chance = { factor = 10 }
 	}
 
 	# Suicide
@@ -4632,11 +4628,11 @@ character_event = {
 
 		trigger = { trait = depressed }
 
-		ai_chance = { factor = 1 }
-
 		custom_tooltip = { text = EVTOPTD_RIP_29001_TOOLTIP }
 
 		death = { death_reason = death_suicide_hanging }
+
+		ai_chance = { factor = 1 }
 	}
 
 	# Get rid of all of your friends
@@ -4645,8 +4641,6 @@ character_event = {
 
 		trigger = { num_of_friends >= 1 }
 
-		ai_chance = { factor = 5 }
-
 		custom_tooltip = { text = EVTOPTD_RIP_29005_TOOLTIP }
 
 		any_friend = { # TODO: Will only show one friend. Add more explicit custom tooltip? Or hide under current one.
@@ -4654,6 +4648,8 @@ character_event = {
 
 			remove_friend = ROOT
 		}
+
+		ai_chance = { factor = 5 }
 	}
 }
 
@@ -4670,8 +4666,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_RIP_29007_A
 
-		ai_chance = { factor = 3 }
-
 		FROM = {
 			show_scope_change = no
 
@@ -4680,13 +4674,13 @@ character_event = {
 				tooltip = EVTOPTA_RIP_29006_TOOLTIP
 			}
 		}
+
+		ai_chance = { factor = 75 }
 	}
 
 	# Leave alone
 	option = {
 		name = EVTOPTB_RIP_29006
-
-		ai_chance = { factor = 1 }
 
 		FROM = {
 			show_scope_change = no
@@ -4696,6 +4690,8 @@ character_event = {
 				tooltip = EVTOPTB_RIP_29006_TOOLTIP
 			}
 		}
+
+		ai_chance = { factor = 25 }
 	}
 }
 
@@ -4727,8 +4723,6 @@ character_event = {
 			text = EVTOPTA_RIP_29007_B
 		}
 
-		ai_chance = { factor = 3 }
-
 		add_friend = FROM
 
 		FROM = {
@@ -4737,13 +4731,13 @@ character_event = {
 				days = 3
 			}
 		}
+
+		ai_chance = { factor = 75 }
 	}
 
 	# I don't want your company!
 	option = {
 		name = EVTOPTB_RIP_29007
-
-		ai_chance = { factor = 1 }
 
 		custom_tooltip = {
 			text = EVTOPTB_RIP_29007_TOOLTIP
@@ -4766,6 +4760,8 @@ character_event = {
 			who = FROM
 			years = 3
 		}
+
+		ai_chance = { factor = 25 }
 	}
 }
 
@@ -4941,11 +4937,11 @@ character_event = {
 			event_target:rip_enemy_2 = { is_alive = yes }
 		}
 
-		ai_chance = { factor = 10 }
-
 		custom_tooltip = { text = EVTOPTB_RIP_29010_TOOLTIP }
 
 		add_friend = event_target:rip_enemy_2
+
+		ai_chance = { factor = 10 }
 	}
 
 	# Get a new enemy
@@ -4956,11 +4952,11 @@ character_event = {
 			event_target:rip_new_enemy = { is_alive = yes }
 		}
 
-		ai_chance = { factor = 5 }
-
 		custom_tooltip = { text = EVTOPTC_RIP_29010_TOOLTIP }
 
 		add_rival = event_target:rip_new_enemy
+
+		ai_chance = { factor = 5 }
 	}
 
 	# Repent
@@ -4975,8 +4971,6 @@ character_event = {
 				NOT = { trait = kind }
 			}
 		}
-
-		ai_chance = { factor = 5 }
 
 		custom_tooltip = { text = EVTOPTD_RIP_29010_TOOLTIP }
 
@@ -5000,18 +4994,20 @@ character_event = {
 
 			remove_rival = ROOT
 		}
+
+		ai_chance = { factor = 5 }
 	}
 
 	# No time
 	option = {
 		name = EVTOPTE_RIP_29010
 
-		ai_chance = { factor = 15 }
-
 		custom_tooltip = { text = EVTOPTE_RIP_29010_TOOLTIP }
 
 		remove_trait_silently_stressed_effect = yes
 		remove_trait_silently_depressed_effect = yes
+
+		ai_chance = { factor = 15 }
 	}
 }
 
@@ -5083,8 +5079,6 @@ character_event = {
 	option = {
 		name = EVTOPTB_RIP_29011
 
-		ai_chance = { factor = 5 }
-
 		if = {
 			limit = {
 				NOT = { is_rival = FROM }
@@ -5112,6 +5106,8 @@ character_event = {
 				tooltip = EVTOPTB_RIP_29011_TOOLTIP
 			}
 		}
+
+		ai_chance = { factor = 5 }
 	}
 }
 
@@ -5490,8 +5486,6 @@ character_event = {
 			}
 		}
 
-		ai_chance = { factor = 15 }
-
 		event_target:rip_heir = {
 			show_scope_change = no
 
@@ -5521,25 +5515,13 @@ character_event = {
 				}
 			}
 		}
+
+		ai_chance = { factor = 15 }
 	}
 
 	# Don't approach
 	option = {
 		name = EVTOPTB_RIP_29020
-
-		ai_chance = {
-			factor = 3
-
-			mult_modifier = {
-				factor = 2
-
-				OR = {
-					trait = shy
-					trait = cruel
-					trait = arbitrary
-				}
-			}
-		}
 
 		custom_tooltip = { text = EVTOPTB_RIP_29020_TOOLTIP }
 
@@ -5559,6 +5541,20 @@ character_event = {
 			random = {
 				chance = 50
 				add_trait_shy_effect = yes
+			}
+		}
+
+		ai_chance = {
+			factor = 3
+
+			mult_modifier = {
+				factor = 2
+
+				OR = {
+					trait = shy
+					trait = cruel
+					trait = arbitrary
+				}
 			}
 		}
 	}
@@ -6279,14 +6275,12 @@ character_event = {
 		custom_tooltip = {
 			text = EVTOPTA_RIP_29107_TOOLTIP
 
-			hidden_effect = {
-				clr_character_flag = do_not_disturb
-				remove_character_modifier = attending_masquerade
+			clr_character_flag = do_not_disturb
+			remove_character_modifier = attending_masquerade
 
-				character_event = {
-					id = RIP.29108
-					days = 100
-				}
+			character_event = {
+				id = RIP.29108
+				days = 100
 			}
 		}
 
@@ -7822,7 +7816,6 @@ character_event = {
 			years = 1
 		}
 
-
 		tooltip = {
 			opinion = {
 				name = opinion_neglected
@@ -7920,6 +7913,35 @@ character_event = {
 	picture = GFX_evt_birth
 	border = GFX_event_normal_frame_religion
 
+	desc = {
+		text = EVTDSC_RIP_29601_A
+		trigger = { has_character_flag = text_bastard }
+	}
+	desc = {
+		text = EVTDSC_RIP_29601_B
+		trigger = { has_character_flag = text_girl_cant_inherit }
+	}
+	desc = {
+		text = EVTDSC_RIP_29601_C
+		trigger = { has_character_flag = text_firstborn_inherits }
+	}
+	desc = {
+		text = EVTDSC_RIP_29601_D
+		trigger = { has_character_flag = text_unsure_future }
+	}
+	desc = {
+		text = EVTDSC_RIP_29601_E
+		trigger = { has_character_flag = text_ugly }
+	}
+	desc = {
+		text = EVTDSC_RIP_29601_F
+		trigger = { has_character_flag = text_weak }
+	}
+	desc = {
+		text = EVTDSC_RIP_29601_G
+		trigger = { has_character_flag = text_strong }
+	}
+
 	is_triggered_only = yes
 
 	trigger = {
@@ -7986,35 +8008,6 @@ character_event = {
 		else = {
 			set_character_flag = text_unsure_future
 		}
-	}
-
-	desc = {
-		text = EVTDSC_RIP_29601_A
-		trigger = { has_character_flag = text_bastard }
-	}
-	desc = {
-		text = EVTDSC_RIP_29601_B
-		trigger = { has_character_flag = text_girl_cant_inherit }
-	}
-	desc = {
-		text = EVTDSC_RIP_29601_C
-		trigger = { has_character_flag = text_firstborn_inherits }
-	}
-	desc = {
-		text = EVTDSC_RIP_29601_D
-		trigger = { has_character_flag = text_unsure_future }
-	}
-	desc = {
-		text = EVTDSC_RIP_29601_E
-		trigger = { has_character_flag = text_ugly }
-	}
-	desc = {
-		text = EVTDSC_RIP_29601_F
-		trigger = { has_character_flag = text_weak }
-	}
-	desc = {
-		text = EVTDSC_RIP_29601_G
-		trigger = { has_character_flag = text_strong }
 	}
 
 	option = {
@@ -8570,20 +8563,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA_RIP_30000 # Ask for money
 
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 5.0
-				trait = greedy
-			}
-
-			mult_modifier = {
-				factor = 2.0
-				trait = envious
-			}
-		}
-
 		FROMFROM = {
 			show_scope_change = no
 
@@ -8600,6 +8579,20 @@ letter_event = {
 				days = 3
 			}
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 5.0
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 2.0
+				trait = envious
+			}
+		}
 	}
 
 	option = {
@@ -8608,6 +8601,13 @@ letter_event = {
 		trigger = {
 			has_dlc = "Conclave"
 			NOT = { holds_favor_on = FROMFROM }
+		}
+
+		FROMFROM = {
+			letter_event = {
+				id = RIP.30007
+				days = 3
+			}
 		}
 
 		ai_chance = {
@@ -8623,17 +8623,27 @@ letter_event = {
 				trait = ambitious
 			}
 		}
-
-		FROMFROM = {
-			letter_event = {
-				id = RIP.30007
-				days = 3
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_RIP_30000 # Ask for nothing
+
+		FROMFROM = {
+			show_scope_change = no
+
+			tooltip = {
+				opinion = {
+					name = opinion_very_grateful
+					who = ROOT
+					years = 5
+				}
+			}
+
+			letter_event = {
+				id = RIP.30001
+				days = 3
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -8669,23 +8679,6 @@ letter_event = {
 				}
 			}
 		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			tooltip = {
-				opinion = {
-					name = opinion_very_grateful
-					who = ROOT
-					years = 5
-				}
-			}
-
-			letter_event = {
-				id = RIP.30001
-				days = 3
-			}
-		}
 	}
 
 	option = {
@@ -8697,6 +8690,21 @@ letter_event = {
 					has_law = ze_administration_laws_1
 					has_law = ze_administration_laws_2
 				}
+			}
+		}
+
+		FROMFROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_refused_to_end_war
+				who = ROOT
+				years = 5
+			}
+
+			letter_event = {
+				id = RIP.30006
+				days = 3
 			}
 		}
 
@@ -8735,21 +8743,6 @@ letter_event = {
 				}
 			}
 		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_refused_to_end_war
-				who = ROOT
-				years = 5
-			}
-
-			letter_event = {
-				id = RIP.30006
-				days = 3
-			}
-		}
 	}
 
 	option = {
@@ -8761,6 +8754,21 @@ letter_event = {
 					has_law = ze_administration_laws_1
 					has_law = ze_administration_laws_2
 				}
+			}
+		}
+
+		FROMFROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_traitor
+				who = ROOT
+				years = 5
+			}
+
+			letter_event = {
+				id = RIP.30006
+				days = 3
 			}
 		}
 
@@ -8799,23 +8807,7 @@ letter_event = {
 				}
 			}
 		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_traitor
-				who = ROOT
-				years = 5
-			}
-
-			letter_event = {
-				id = RIP.30006
-				days = 3
-			}
-		}
 	}
-
 }
 
 # Vassal agrees, asking for nothing
@@ -8898,12 +8890,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA_RIP_30003 # Very well...
 
-		ai_chance = {
-			factor = 100
-
-			trigger = { scaled_wealth = 0.2 }
-		}
-
 		event_target:target_defender = {
 			show_scope_change = no
 
@@ -8936,6 +8922,12 @@ letter_event = {
 
 			set_pacified = { years = 3 }
 			letter_event = { id = RIP.30004 }
+		}
+
+		ai_chance = {
+			factor = 100
+
+			trigger = { scaled_wealth = 0.2 }
 		}
 	}
 
@@ -9088,11 +9080,11 @@ letter_event = {
 	option = {
 		name = EVTOPTB_RIP_30007 # No
 
-		ai_chance = { factor = 0 }
-
 		FROM = {
 			letter_event = { id = RIP.30009 }
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -9218,20 +9210,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA_RIP_30000 # Ask for money
 
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 5.0
-				trait = greedy
-			}
-
-			mult_modifier = {
-				factor = 2.0
-				trait = envious
-			}
-		}
-
 		FROMFROM = {
 			show_scope_change = no
 
@@ -9248,6 +9226,20 @@ letter_event = {
 				days = 3
 			}
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 5.0
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 2.0
+				trait = envious
+			}
+		}
 	}
 
 	option = {
@@ -9256,6 +9248,13 @@ letter_event = {
 		trigger = {
 			has_dlc = "Conclave"
 			NOT = { holds_favor_on = FROMFROM }
+		}
+
+		FROMFROM = {
+			letter_event = {
+				id = RIP.30027
+				days = 3
+			}
 		}
 
 		ai_chance = {
@@ -9271,17 +9270,29 @@ letter_event = {
 				trait = ambitious
 			}
 		}
-
-		FROMFROM = {
-			letter_event = {
-				id = RIP.30027
-				days = 3
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_RIP_30000 # Ask for nothing
+
+		prestige = 100
+
+		FROMFROM = {
+			show_scope_change = no
+
+			tooltip = {
+				opinion = {
+					name = opinion_very_grateful
+					who = ROOT
+					years = 10
+				}
+			}
+
+			letter_event = {
+				id = RIP.30021
+				days = 3
+			}
+		}
 
 		ai_chance = {
 			factor = 50
@@ -9317,25 +9328,6 @@ letter_event = {
 				}
 			}
 		}
-
-		prestige = 100
-
-		FROMFROM = {
-			show_scope_change = no
-
-			tooltip = {
-				opinion = {
-					name = opinion_very_grateful
-					who = ROOT
-					years = 10
-				}
-			}
-
-			letter_event = {
-				id = RIP.30021
-				days = 3
-			}
-		}
 	}
 
 	option = {
@@ -9347,6 +9339,21 @@ letter_event = {
 					has_law = ze_administration_laws_1
 					has_law = ze_administration_laws_2
 				}
+			}
+		}
+
+		FROMFROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_refused_to_end_war
+				who = ROOT
+				years = 3
+			}
+
+			letter_event = {
+				id = RIP.30026
+				days = 3
 			}
 		}
 
@@ -9385,21 +9392,6 @@ letter_event = {
 				}
 			}
 		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_refused_to_end_war
-				who = ROOT
-				years = 3
-			}
-
-			letter_event = {
-				id = RIP.30026
-				days = 3
-			}
-		}
 	}
 
 	option = {
@@ -9411,6 +9403,21 @@ letter_event = {
 					has_law = ze_administration_laws_1
 					has_law = ze_administration_laws_2
 				}
+			}
+		}
+
+		FROMFROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_traitor
+				who = FROMFROM
+				years = 3
+			}
+
+			letter_event = {
+				id = RIP.30026
+				days = 3
 			}
 		}
 
@@ -9447,21 +9454,6 @@ letter_event = {
 					who = FROMFROM
 					value < -75
 				}
-			}
-		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_traitor
-				who = FROMFROM
-				years = 3
-			}
-
-			letter_event = {
-				id = RIP.30026
-				days = 3
 			}
 		}
 	}
@@ -9698,8 +9690,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA_RIP_30003 # Very well...
 
-		ai_chance = { factor = 100 }
-
 		add_favor = event_target:target_attacker
 
 		event_target:target_attacker = {
@@ -9746,11 +9736,11 @@ letter_event = {
 	option = {
 		name = EVTOPTB_RIP_30007 # No
 
-		ai_chance = { factor = 0 }
-
 		FROM = {
 			letter_event = { id = RIP.30029 }
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -9879,20 +9869,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA_RIP_30000 # Ask for money
 
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 5.0
-				trait = greedy
-			}
-
-			mult_modifier = {
-				factor = 2.0
-				trait = envious
-			}
-		}
-
 		FROMFROM = {
 			show_scope_change = no
 
@@ -9909,6 +9885,20 @@ letter_event = {
 				days = 3
 			}
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 5.0
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 2.0
+				trait = envious
+			}
+		}
 	}
 
 	option = {
@@ -9917,6 +9907,13 @@ letter_event = {
 		trigger = {
 			has_dlc = "Conclave"
 			NOT = { holds_favor_on = FROMFROM }
+		}
+
+		FROMFROM = {
+			letter_event = {
+				id = RIP.30047
+				days = 3
+			}
 		}
 
 		ai_chance = {
@@ -9932,17 +9929,29 @@ letter_event = {
 				trait = ambitious
 			}
 		}
-
-		FROMFROM = {
-			letter_event = {
-				id = RIP.30047
-				days = 3
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_RIP_30000 # Ask for nothing
+
+		prestige = 100
+
+		FROMFROM = {
+			show_scope_change = no
+
+			tooltip = {
+				opinion = {
+					name = opinion_very_grateful
+					who = ROOT
+					years = 10
+				}
+			}
+
+			letter_event = {
+				id = RIP.30041
+				days = 3
+			}
+		}
 
 		ai_chance = {
 			factor = 50
@@ -9978,25 +9987,6 @@ letter_event = {
 				}
 			}
 		}
-
-		prestige = 100
-
-		FROMFROM = {
-			show_scope_change = no
-
-			tooltip = {
-				opinion = {
-					name = opinion_very_grateful
-					who = ROOT
-					years = 10
-				}
-			}
-
-			letter_event = {
-				id = RIP.30041
-				days = 3
-			}
-		}
 	}
 
 	option = {
@@ -10008,6 +9998,22 @@ letter_event = {
 					has_law = ze_administration_laws_1
 					has_law = ze_administration_laws_2
 				}
+			}
+		}
+
+		FROMFROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = succ_law_change
+				who = ROOT
+				years = 3
+				multiplier = 2
+			}
+
+			letter_event = {
+				id = RIP.30046
+				days = 3
 			}
 		}
 
@@ -10046,22 +10052,6 @@ letter_event = {
 				}
 			}
 		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = succ_law_change
-				who = ROOT
-				years = 3
-				multiplier = 2
-			}
-
-			letter_event = {
-				id = RIP.30046
-				days = 3
-			}
-		}
 	}
 
 	option = {
@@ -10073,6 +10063,21 @@ letter_event = {
 					has_law = ze_administration_laws_1
 					has_law = ze_administration_laws_2
 				}
+			}
+		}
+
+		FROMFROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_traitor
+				who = FROMFROM
+				years = 3
+			}
+
+			letter_event = {
+				id = RIP.30046
+				days = 3
 			}
 		}
 
@@ -10109,21 +10114,6 @@ letter_event = {
 					who = FROMFROM
 					value < -75
 				}
-			}
-		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_traitor
-				who = FROMFROM
-				years = 3
-			}
-
-			letter_event = {
-				id = RIP.30046
-				days = 3
 			}
 		}
 	}
@@ -10169,12 +10159,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA_RIP_30043 # Very well...
 
-		ai_chance = {
-			factor = 100
-
-			trigger = { scaled_wealth = 0.25 }
-		}
-
 		transfer_scaled_wealth = {
 			to = FROM
 			value = 0.25
@@ -10191,16 +10175,22 @@ letter_event = {
 			letter_event = { id = RIP.30044 }
 			set_character_flag = liege_forced_succ_law
 		}
+
+		ai_chance = {
+			factor = 100
+
+			trigger = { scaled_wealth = 0.25 }
+		}
 	}
 
 	option = {
 		name = EVTOPTB_RIP_30003 # I can't afford that
 
-		ai_chance = { factor = 1 }
-
 		FROM = {
 			letter_event = { id = RIP.30045 }
 		}
+
+		ai_chance = { factor = 1 }
 	}
 }
 
@@ -10303,8 +10293,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA_RIP_30043 # Very well...
 
-		ai_chance = { factor = 100 }
-
 		opinion = {
 			who = FROM
 			name = opinion_grateful
@@ -10328,11 +10316,11 @@ letter_event = {
 	option = {
 		name = EVTOPTB_RIP_30007 # No
 
-		ai_chance = { factor = 0 }
-
 		FROM = {
 			letter_event = { id = RIP.30049 }
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -11390,14 +11378,14 @@ character_event = {
 		text = EVTDESC_RIP_30212_SUCCESS_A
 		trigger = {
 			has_character_flag = suicide_success
-			NOT = { FROM = { character = ROOT } }
+			NOT = { character = FROM }
 		}
 	}
 	desc = {
 		text = EVTDESC_RIP_30212_SUCCESS_B
 		trigger = {
 			has_character_flag = suicide_success
-			FROM = { character = ROOT }
+			character = FROM
 		}
 	}
 	desc = {
@@ -11492,7 +11480,7 @@ character_event = {
 
 		mult_modifier = {
 			factor = 1.5
-			age >= 70
+			practical_age >= 70
 		}
 
 		mult_modifier = {

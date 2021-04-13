@@ -424,20 +424,12 @@ narrative_event = {
 character_event = {
 	id = TOG.3105
 
+	is_triggered_only = yes # on_startup, on_new_holder(_inheritance/usurpation)
 	hide_window = yes
-
-	only_rulers = yes
-	min_age = 16
-	only_capable = yes
-	prisoner = no
 
 	trigger = {
 		has_landed_title = d_varangian_guard
 		NOT = { trait = varangian }
-	}
-
-	mean_time_to_happen = {
-		days = 1
 	}
 
 	immediate = {
@@ -542,7 +534,7 @@ character_event = {
 character_event = {
 	id = TOG.3109
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
 	hide_window = yes
 
 	culture_group = north_germanic
@@ -2043,7 +2035,7 @@ character_event = {
 character_event = {
 	id = HFP.19101
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 	hide_window = yes
 
 	ai = no
@@ -2074,6 +2066,7 @@ character_event = {
 	desc = EVTDESC_TOG_3134
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_war
+
 	is_triggered_only = yes
 
 	has_dlc = "The Old Gods"
@@ -2351,28 +2344,20 @@ character_event = {
 	option = {
 		name = EVTOPTA_TOG_3205
 
-		event_target:warning_volva = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_disappointed
-				years = 1
-				who = ROOT
-			}
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = event_target:warning_volva
+			years = 1
 		}
 	}
 
 	option = {
 		name = EVTOPTB_TOG_3205
 
-		event_target:pregnant_spouse = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_disappointed
-				years = 1
-				who = ROOT
-			}
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = event_target:pregnant_spouse
+			years = 1
 		}
 	}
 }
@@ -2947,14 +2932,10 @@ character_event = {
 
 		custom_tooltip = { text = exorcism_denied }
 
-		event_target:exorcising_volva = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_very_disappointed
-				years = 2
-				who = ROOT
-			}
+		reverse_opinion = {
+			name = opinion_very_disappointed
+			who = event_target:exorcising_volva
+			years = 2
 		}
 	}
 }
@@ -3191,7 +3172,7 @@ character_event = {
 	picture = GFX_evt_vikings_arriving_oldgods
 	border = GFX_event_normal_frame_war
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_loot_settlement, random_events
 
 	ai = no
 	has_dlc = "The Old Gods"
@@ -3224,7 +3205,7 @@ character_event = {
 	picture = GFX_evt_vikings_arriving_oldgods
 	border = GFX_event_normal_frame_economy
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_loot_settlement, random_events
 
 	ai = no
 	has_dlc = "The Old Gods"
@@ -3257,7 +3238,7 @@ character_event = {
 	picture = GFX_evt_vikings_arriving_oldgods
 	border = GFX_event_normal_frame_economy
 
-	is_triggered_only = yes
+	is_triggered_only = yes  # on_loot_settlement, random_events
 
 	ai = no
 	has_dlc = "The Old Gods"
@@ -3291,7 +3272,7 @@ character_event = {
 	picture = GFX_evt_vikings_arriving_oldgods
 	border = GFX_event_normal_frame_economy
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_loot_settlement, random_events
 
 	ai = no
 	has_dlc = "The Old Gods"
@@ -3453,7 +3434,7 @@ character_event = {
 		picture = GFX_evt_norse_tempest
 	}
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_loot_settlement, random_events
 	hide_from = yes
 
 	min_age = 16
@@ -3575,8 +3556,7 @@ character_event = {
 		picture = GFX_evt_norse_tempest
 	}
 
-
-	is_triggered_only = yes
+	is_triggered_only = yes # on_loot_settlement, random_events
 	hide_from = yes
 
 	min_age = 16
@@ -3585,55 +3565,67 @@ character_event = {
 
 	trigger = {
 		OR = {
+			trait = viking
+			trait = pirate
+		}
+
+		check_variable = {
+			which = viking_raids
+			value >= 50
+		}
+
+		OR = {
 			has_dlc = "The Old Gods"
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_viking
 				bloodline_is_active_for = PREV
 			}
+
 			AND = {
 				has_religion_feature = religion_adventuring
 				has_religion_feature = religion_seafaring
 			}
+
 			has_religion_feature = religion_feature_norse
 		}
-		OR = {
-			trait = viking
-			trait = pirate
-		}
+
 		NOR = {
 			trait = ravager
 			trait = seaking
 			trait = sea_queen
 		}
+
 		OR = {
 			religion_openly_norse_or_reformed_trigger = yes
+
 			any_owned_bloodline = {
 				has_bloodline_flag = bloodline_viking
 				bloodline_is_active_for = PREV
 			}
+
 			AND = {
 				has_religion_feature = religion_adventuring
 				has_religion_feature = religion_seafaring
 			}
 		}
-		check_variable = { which = viking_raids value = 50 }
+
 		FROM = { always = yes }
 	}
 
 	option = {
 		name = TOG.3321.a
+
 		if = {
-			limit = {
-				trait = pirate
-			}
+			limit = { trait = pirate }
 			remove_trait = pirate
 		}
+
 		if = {
-			limit = {
-				trait = viking
-			}
+			limit = { trait = viking }
 			remove_trait = viking
 		}
+
 		add_trait = ravager
 	}
 }
@@ -3642,6 +3634,8 @@ character_event = {
 character_event = {
 	id = TGF.3322
 	desc = TOG.3322.d
+	border = GFX_event_normal_frame_war
+
 	picture = {
 		trigger = { is_female = no }
 		picture = GFX_evt_vikings_arriving_oldgods
@@ -3650,11 +3644,10 @@ character_event = {
 		trigger = { is_female = yes }
 		picture = GFX_evt_norse_tempest
 	}
-	border = GFX_event_normal_frame_war
 
+	is_triggered_only = yes # on_loot_settlement, random_events
 	hide_from = yes
 
-	is_triggered_only = yes
 
 	min_age = 16
 	only_capable = yes
@@ -3724,7 +3717,7 @@ character_event = {
 character_event = {
 	id = TGF.3323
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_loot_settlement, random_events
 	hide_window = yes
 
 	min_age = 16
@@ -3736,7 +3729,9 @@ character_event = {
 			trait = pirate
 			trait = viking
 			trait = ravager
-			trait = seaking # Top trait, but there's still chance of gaining a Bloodline if variable goes high enough.
+
+			# Top trait, but there's still chance of gaining a Bloodline if variable goes high enough.
+			trait = seaking
 			trait = sea_queen
 		}
 
@@ -3888,13 +3883,9 @@ character_event = {
 
 		piety = -30
 
-		event_target:buffalo_woman = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_spurned
-				who = ROOT
-			}
+		reverse_opinion = {
+			name = opinion_spurned
+			who = event_target:buffalo_woman
 		}
 	}
 
@@ -3907,13 +3898,9 @@ character_event = {
 
 		piety = 30
 
-		event_target:buffalo_woman = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_spurned
-				who = ROOT
-			}
+		reverse_opinion = {
+			name = opinion_spurned
+			who = event_target:buffalo_woman
 		}
 	}
 }

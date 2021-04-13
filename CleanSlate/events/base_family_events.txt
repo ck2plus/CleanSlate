@@ -264,7 +264,7 @@ character_event = {
 
 				character_event = {
 					id = 37005
-					days = 365
+					years = 1
 					random = 50
 				}
 			}
@@ -337,8 +337,6 @@ character_event = {
 
 		trigger = { has_character_flag = flag_later_title }
 
-		ai_chance = { factor = 750 }
-
 		opinion = {
 			name = opinion_denied_title
 			who = FROM
@@ -347,6 +345,8 @@ character_event = {
 
 		clr_character_flag = flag_later_title
 		set_character_flag = flag_denied_title
+
+		ai_chance = { factor = 750 }
 	}
 
 	option = {
@@ -367,6 +367,21 @@ character_event = {
 			}
 		}
 
+		opinion = {
+			name = opinion_broken_title_promise
+			who = FROM
+			years = 10
+		}
+
+		clr_character_flag = flag_promised_title
+		remove_character_modifier = promised_a_title
+		set_character_flag = flag_denied_title
+
+		character_event = {
+			id = 37010
+			days = 45
+		}
+
 		ai_chance = {
 			factor = 100
 
@@ -384,21 +399,6 @@ character_event = {
 				factor = 0.25
 				trait = slothful
 			}
-		}
-
-		opinion = {
-			name = opinion_broken_title_promise
-			who = FROM
-			years = 10
-		}
-
-		clr_character_flag = flag_promised_title
-		remove_character_modifier = promised_a_title
-		set_character_flag = flag_denied_title
-
-		character_event = {
-			id = 37010
-			days = 45
 		}
 	}
 }
@@ -576,6 +576,21 @@ character_event = {
 			}
 		}
 
+		opinion = {
+			name = opinion_broken_title_promise
+			who = FROM
+			years = 10
+		}
+
+		clr_character_flag = flag_promised_title
+		remove_character_modifier = promised_a_title
+		set_character_flag = flag_denied_title
+
+		character_event = {
+			id = 37010
+			days = 45
+		}
+
 		ai_chance = {
 			factor = 100
 
@@ -593,21 +608,6 @@ character_event = {
 				factor = 0.25
 				trait = slothful
 			}
-		}
-
-		opinion = {
-			name = opinion_broken_title_promise
-			who = FROM
-			years = 10
-		}
-
-		clr_character_flag = flag_promised_title
-		remove_character_modifier = promised_a_title
-		set_character_flag = flag_denied_title
-
-		character_event = {
-			id = 37010
-			days = 45
 		}
 	}
 }
@@ -719,7 +719,7 @@ character_event = {
 			FROMFROM = {
 				character_event = {
 					id = 37015 # The event that actually fires the revolt
-					days = 365
+					years = 1
 				}
 			}
 		}
@@ -931,7 +931,7 @@ character_event = {
 
 				random_demesne_title = {
 					limit = {
-						tier = EMPEROR
+						real_tier = EMPEROR
 						is_primary_holder_title = no
 					}
 
@@ -953,7 +953,7 @@ character_event = {
 
 				random_demesne_title = {
 					limit = {
-						tier = KING
+						real_tier = KING
 						is_primary_holder_title = no
 					}
 
@@ -993,12 +993,11 @@ character_event = {
 # Close relative asks to get married due to obj_get_married
 ##############################################################
 
-# First event of the series
-
+# Liege responds to marriage request
 character_event = {
-	id = 37049
-
-	hide_window = yes
+	id = 37051
+	desc = EVTDESC37051
+	picture = GFX_evt_marriage
 
 	ai = no
 	lacks_dlc = "Conclave"
@@ -1007,8 +1006,32 @@ character_event = {
 	prisoner = no
 	war = no
 
+	trigger = {
+		any_courtier = {
+			is_close_relative = ROOT
+			vassal_of = ROOT
+			has_ambition = obj_get_married
+			religion_group = christian
+			is_ruler = no
+			is_marriage_adult = yes
+			practical_age < 40
+			prisoner = no
+			is_betrothed = no
+			is_consort = no
+			is_married = no
+			is_incapable = no
+
+			NOR = {
+				trait = bastard
+				has_minor_title = title_regent
+				has_character_flag = flag_denied_marriage
+				has_character_flag = flag_promised_marriage
+			}
+		}
+	}
+
 	mean_time_to_happen = {
-		months = 24
+		years = 2
 	}
 
 	immediate = {
@@ -1035,36 +1058,14 @@ character_event = {
 				}
 			}
 
-			character_event = { id = 37050 }
+			save_event_target_as = target_relative
 		}
 	}
-}
-
-character_event = {
-	id = 37050
-
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		liege = {
-			character_event = { id = 37051 }
-		}
-	}
-}
-
-# Liege responds to marriage request
-character_event = {
-	id = 37051
-	desc = EVTDESC37051
-	picture = GFX_evt_marriage
-
-	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA37051 # Promise that you'll arrange it
 
-		FROM = {
+		event_target:target_relative = {
 			show_scope_change = no
 
 			character_event = {
@@ -1079,10 +1080,10 @@ character_event = {
 
 		trigger = {
 			religion_group = christian
-			FROM = { religion_group = christian }
+			religion_group = event_target:target_relative
 		}
 
-		FROM = {
+		event_target:target_relative = {
 			show_scope_change = no
 
 			character_event = {
@@ -1327,18 +1328,16 @@ character_event = {
 # Male relative who was denied decides to marry in secret
 character_event = {
 	id = 37056
+	picture = GFX_evt_marriage
 
 	desc = {
 		trigger = { is_female = no }
 		text = EVTDESC37056
 	}
-
 	desc = {
 		trigger = { is_female = yes }
 		text = EVTDESC37056_B
 	}
-
-	picture = GFX_evt_marriage
 
 	has_character_flag = flag_denied_marriage
 	lacks_dlc = "Conclave"
@@ -1360,7 +1359,7 @@ character_event = {
 	}
 
 	mean_time_to_happen = {
-		months = 120
+		years = 10
 
 		mult_modifier = {
 			factor = 0.25
@@ -1412,18 +1411,16 @@ character_event = {
 # The liege is informed of the secret marriage
 character_event = {
 	id = 37057
+	picture = GFX_evt_marriage
 
 	desc = {
 		trigger = { is_female = no }
 		text = EVTDESC37057
 	}
-
 	desc = {
 		trigger = { is_female = yes }
 		text = EVTDESC37057_B
 	}
-
-	picture = GFX_evt_marriage
 
 	is_triggered_only = yes
 
@@ -1662,7 +1659,7 @@ character_event = {
 		FROM = {
 			opinion = {
 				name = opinion_fulfilled_marriage_wish
-				who = FROM
+				who = ROOT_FROMFROM
 				years = 5
 			}
 		}

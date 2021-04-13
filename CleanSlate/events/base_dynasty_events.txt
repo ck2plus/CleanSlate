@@ -163,8 +163,6 @@
 #	option = {
 #		name = EVTOPTA66000 # Ask for a claim
 #
-#		ai_chance = { factor = 1 }
-#
 #		random_dynasty_member = {
 #			show_scope_change = no
 #
@@ -194,12 +192,12 @@
 #				tooltip = EVTTOOLTIP66010
 #			}
 #		}
+#
+#		ai_chance = { factor = 1 }
 #	}
 #
 #	option = {
 #		name = EVTOPTB66000 # Ask for the actual title
-#
-#		ai_chance = { factor = 1000 }
 #
 #		trigger = {
 #			any_dynasty_member = {
@@ -251,6 +249,8 @@
 #				tooltip = EVTTOOLTIP66020
 #			}
 #		}
+#
+#		ai_chance = { factor = 1000 }
 #	}
 # }
 
@@ -265,6 +265,14 @@
 #	# No need for notifactions back, landless character gets it anyway.
 #	option = {
 #		name = EVTOPTA66010 # Accept demand for claim
+#
+#		prestige = -5
+#
+#		random_demesne_title = {
+#			show_scope_change = no
+#
+#			add_claim = FROM
+#		}
 #
 #		ai_chance = {
 #			factor = 1
@@ -311,18 +319,16 @@
 #				}
 #			}
 #		}
-#
-#		prestige = -5
-#
-#		random_demesne_title = {
-#			show_scope_change = no
-#
-#			add_claim = FROM
-#		}
 #	}
 #
 #	option = {
 #		name = EVTOPTB66010 # Refuse outrageous demands
+#
+#		reverse_opinion = {
+#			name = dynastic_refused_claim
+#			who = FROM
+#			years = 5
+#		}
 #
 #		ai_chance = {
 #			factor = 2
@@ -332,16 +338,6 @@
 #					who = FROM
 #					value < 80
 #				}
-#			}
-#		}
-#
-#		FROM = {
-#			show_scope_change = no
-#
-#			opinion = {
-#				name = dynastic_refused_claim
-#				who = ROOT
-#				years = 5
 #			}
 #		}
 #	}
@@ -358,6 +354,16 @@
 # 	# No need for notifactions back, landless character gets it anyway.
 # 	option = {
 # 		name = EVTOPTA66020 # Accept demand for title
+#
+# 		prestige = -5
+#
+# 		random_demesne_title = {
+#			show_scope_change = no
+#
+# 			limit = { lower_real_tier_than = DUKE }
+#
+# 			grant_title = FROM
+# 		}
 #
 # 		ai_chance = {
 # 			factor = 1
@@ -404,30 +410,15 @@
 #				}
 # 			}
 # 		}
-#
-# 		prestige = -5
-#
-# 		random_demesne_title = {
-#			show_scope_change = no
-#
-# 			limit = { lower_real_tier_than = DUKE }
-#
-# 			grant_title = FROM
-# 		}
-#
 # 	}
 #
 # 	option = {
 # 		name = EVTOPTB66020 # Refuse outrageous demands
 #
-# 		FROM = {
-#			show_scope_change = no
-#
-# 			opinion = {
-# 				name = dynastic_refused_title
-# 				who = ROOT
-# 				years = 5
-# 			}
+# 		reverse_opinion = {
+# 			name = dynastic_refused_title
+# 			who = FROM
+# 			years = 5
 # 		}
 # 	}
 # }
@@ -688,6 +679,18 @@ character_event = {
 	option = {
 		name = EVTOPTA66110 # Go to war!
 
+		event_target:claimant_claim = {
+			show_scope_change = no
+
+			reverse_unsafe_war = {
+				target = event_target:claimant
+				casus_belli = other_claim
+				thirdparty = ROOT
+			}
+
+			log = "66110: [Root.GetBestName] starts war for [From.GetBestName]'s claim on [This.GetName]"
+		}
+
 		ai_chance = {
 			factor = 1
 
@@ -733,22 +736,18 @@ character_event = {
 				}
 			}
 		}
-
-		event_target:claimant_claim = {
-			show_scope_change = no
-
-			reverse_unsafe_war = {
-				target = event_target:claimant
-				casus_belli = other_claim
-				thirdparty = ROOT
-			}
-
-			log = "66110: [Root.GetBestName] starts war for [From.GetBestName]'s claim on [This.GetName]"
-		}
 	}
 
 	option = {
 		name = EVTOPTB66110 # Refuse outrageous demands
+
+		reverse_opinion = {
+			name = dynastic_refused_war
+			who = FROM
+			years = 5
+		}
+
+		prestige = -10
 
 		ai_chance = {
 			factor = 2
@@ -760,17 +759,5 @@ character_event = {
 				}
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = dynastic_refused_war
-				who = ROOT
-				years = 5
-			}
-		}
-
-		prestige = -10
 	}
 }

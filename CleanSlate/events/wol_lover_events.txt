@@ -288,20 +288,20 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1003 # Confront Spouse
 
+		event_target:cheating_spouse = {
+			character_event = {
+				id = WoL.1004
+				days = 2
+				portrait = yes
+			}
+		}
+
 		ai_chance = {
 			factor = 100
 
 			mult_modifier = {
 				factor = 2
 				trait = honest
-			}
-		}
-
-		event_target:cheating_spouse = {
-			character_event = {
-				id = WoL.1004
-				days = 2
-				portrait = yes
 			}
 		}
 	}
@@ -314,6 +314,14 @@ character_event = {
 		name = {
 			text = EVTOPTB_WOL_1003_M # Confront the Lover
 			trigger = { event_target:adulterer = { is_female = no } }
+		}
+
+		event_target:adulterer = {
+			character_event = {
+				id = WoL.1033
+				days = 2
+				portrait = yes
+			}
 		}
 
 		ai_chance = {
@@ -336,14 +344,6 @@ character_event = {
 			mult_modifier = {
 				factor = 3
 				is_lover = event_target:cheating_spouse
-			}
-		}
-
-		event_target:adulterer = {
-			character_event = {
-				id = WoL.1033
-				days = 2
-				portrait = yes
 			}
 		}
 	}
@@ -371,15 +371,6 @@ character_event = {
 			}
 		}
 
-		ai_chance = {
-			factor = 1
-
-			mult_modifier = {
-				factor = 500
-				trait = craven
-			}
-		}
-
 		if = {
 			limit = {
 				NOR = {
@@ -391,6 +382,15 @@ character_event = {
 			random = {
 				chance = 20
 				add_trait_depressed_effect = yes
+			}
+		}
+
+		ai_chance = {
+			factor = 1
+
+			mult_modifier = {
+				factor = 500
+				trait = craven
 			}
 		}
 	}
@@ -414,6 +414,27 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_WOL_1004 # Confess and ask forgiveness (break up with lover)
+
+		event_target:adulterer = {
+			show_scope_change = no
+
+			character_event = {
+				id = WoL.1005 # Lover notified
+				tooltip = EVTTOOLTIP_WoL_1005
+			}
+		}
+
+		remove_lover = event_target:adulterer
+
+		event_target:accuser = {
+			show_scope_change = no
+
+			character_event = {
+				id = WoL.1006
+				days = 2
+				tooltip = EVTTOOLTIP_WoL_1006
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -456,31 +477,20 @@ character_event = {
 				}
 			}
 		}
+	}
 
-		event_target:adulterer = {
-			show_scope_change = no
-
-			character_event = {
-				id = WoL.1005 # Lover notified
-				tooltip = EVTTOOLTIP_WoL_1005
-			}
-		}
-
-		remove_lover = event_target:adulterer
+	option = {
+		name = EVTOPTB_WOL_1004 # Cruelly admit
 
 		event_target:accuser = {
 			show_scope_change = no
 
 			character_event = {
-				id = WoL.1006
+				id = WoL.1009
 				days = 2
-				tooltip = EVTTOOLTIP_WoL_1006
+				tooltip = EVTTOOLTIP_WoL_1009
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTB_WOL_1004 # Cruelly admit
 
 		ai_chance = {
 			factor = 100
@@ -499,29 +509,10 @@ character_event = {
 				trait = cruel
 			}
 		}
-
-		event_target:accuser = {
-			show_scope_change = no
-
-			character_event = {
-				id = WoL.1009
-				days = 2
-				tooltip = EVTTOOLTIP_WoL_1009
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_WOL_1004 # Lie and deny
-
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 5
-				trait = deceitful
-			}
-		}
 
 		event_target:accuser = {
 			show_scope_change = no
@@ -530,6 +521,15 @@ character_event = {
 				id = WoL.1022
 				days = 2
 				tooltip = EVTTOOLTIP_WoL_1022
+			}
+		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 5
+				trait = deceitful
 			}
 		}
 	}
@@ -550,8 +550,6 @@ character_event = {
 			}
 		}
 
-		ai_chance = { factor = 10000 }
-
 		event_target:accuser = {
 			show_scope_change = no
 
@@ -561,6 +559,8 @@ character_event = {
 				tooltip = EVTTOOLTIP_WoL_1010
 			}
 		}
+
+		ai_chance = { factor = 10000 }
 	}
 }
 
@@ -615,6 +615,33 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1006 # Forgive and move on
 
+		opinion = {
+			name = opinion_unfaithful_private
+			who = event_target:cheating_spouse
+			years = 2
+		}
+
+		if = {
+			limit = { same_sex = event_target:adulterer }
+
+			if = {
+				limit = { is_female = yes }
+
+				opinion = {
+					name = slut_seductress
+					who = event_target:adulterer
+					years = 10
+				}
+			}
+			else = {
+				opinion = {
+					name = opinion_cuckolded_private
+					who = event_target:adulterer
+					years = 20
+				}
+			}
+		}
+
 		ai_chance = {
 			factor = 100
 
@@ -652,78 +679,10 @@ character_event = {
 				is_lover = event_target:cheating_spouse
 			}
 		}
-
-		opinion = {
-			name = opinion_unfaithful_private
-			who = event_target:cheating_spouse
-			years = 2
-		}
-
-		if = {
-			limit = { same_sex = event_target:adulterer }
-
-			if = {
-				limit = { is_female = yes }
-
-				opinion = {
-					name = slut_seductress
-					who = event_target:adulterer
-					years = 10
-				}
-			}
-			else = {
-				opinion = {
-					name = opinion_cuckolded_private
-					who = event_target:adulterer
-					years = 20
-				}
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB_WOL_1006 # Denounce them both (scandal)
-
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 0.2
-
-				is_ruler = no
-				event_target:cheating_spouse = { is_ruler = yes }
-				NOT = { trait = arbitrary }
-			}
-
-			mult_modifier = {
-				factor = 2
-
-				personal_opinion = {
-					who = event_target:cheating_spouse
-					value < 0
-				}
-			}
-
-			mult_modifier = {
-				factor = 2
-				trait = wroth
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = proud
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = brave
-			}
-
-			mult_modifier = {
-				factor = 3
-				trait = cruel
-			}
-		}
 
 		if = {
 			limit = {
@@ -789,6 +748,47 @@ character_event = {
 		event_target:cheating_spouse = {
 			character_event = { id = WoL.1008 }
 			character_event = { id = 20 } # Adultery fallout
+		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 0.2
+
+				is_ruler = no
+				event_target:cheating_spouse = { is_ruler = yes }
+				NOT = { trait = arbitrary }
+			}
+
+			mult_modifier = {
+				factor = 2
+
+				personal_opinion = {
+					who = event_target:cheating_spouse
+					value < 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = wroth
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = proud
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = brave
+			}
+
+			mult_modifier = {
+				factor = 3
+				trait = cruel
+			}
 		}
 	}
 }
@@ -904,44 +904,6 @@ character_event = {
 			trigger = { is_female = yes }
 		}
 
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 2
-
-				personal_opinion = {
-					who = event_target:cheating_spouse
-					value >= 50
-				}
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = patient
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = humble
-			}
-
-			mult_modifier = {
-				factor = 2
-				trait = craven
-			}
-
-			mult_modifier = {
-				factor = 3
-				trait = kind
-			}
-
-			mult_modifier = {
-				factor = 3
-				is_lover = event_target:cheating_spouse
-			}
-		}
-
 		if = {
 			limit = {
 				NOR = {
@@ -984,51 +946,48 @@ character_event = {
 				}
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTB_WOL_1009 # Denounce them both (scandal)
 
 		ai_chance = {
 			factor = 100
-
-			mult_modifier = {
-				factor = 0.2
-
-				is_ruler = no
-				event_target:cheating_spouse = { is_ruler = yes }
-				NOT = { trait = arbitrary }
-			}
 
 			mult_modifier = {
 				factor = 2
 
 				personal_opinion = {
 					who = event_target:cheating_spouse
-					value < 0
+					value >= 50
 				}
 			}
 
 			mult_modifier = {
+				factor = 1.5
+				trait = patient
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = humble
+			}
+
+			mult_modifier = {
 				factor = 2
-				trait = wroth
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = proud
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = brave
+				trait = craven
 			}
 
 			mult_modifier = {
 				factor = 3
-				trait = cruel
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 3
+				is_lover = event_target:cheating_spouse
 			}
 		}
+	}
+
+	option = {
+		name = EVTOPTB_WOL_1009 # Denounce them both (scandal)
 
 		if = {
 			limit = {
@@ -1094,6 +1053,47 @@ character_event = {
 			set_character_flag = wol_denounced_after_cruel_admission
 			character_event = { id = WoL.1008 }
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 0.2
+
+				is_ruler = no
+				event_target:cheating_spouse = { is_ruler = yes }
+				NOT = { trait = arbitrary }
+			}
+
+			mult_modifier = {
+				factor = 2
+
+				personal_opinion = {
+					who = event_target:cheating_spouse
+					value < 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = wroth
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = proud
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = brave
+			}
+
+			mult_modifier = {
+				factor = 3
+				trait = cruel
+			}
+		}
 	}
 }
 
@@ -1108,6 +1108,51 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_WOL_1022 # Very well...
+
+		if = {
+			limit = {
+				NOT = { trait = trusting }
+			}
+
+			opinion = {
+				name = opinion_suspected_adultery
+				who = event_target:cheating_spouse
+				years = 2
+			}
+
+			opinion = {
+				name = opinion_chasing_spouse
+				who = event_target:adulterer
+				years = 2
+			}
+
+			if = {
+				limit = {
+					NOT = { trait = arbitrary }
+				}
+
+				random = {
+					chance = 20
+					add_trait_depressed_effect = yes
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { trait = paranoid }
+			}
+
+			random = {
+				chance = 10
+				add_trait_paranoid_effect = yes
+			}
+		}
+		else = {
+			random = {
+				chance = 20
+				remove_trait_trusting_effect = yes
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -1156,51 +1201,6 @@ character_event = {
 				trait = trusting
 			}
 		}
-
-		if = {
-			limit = {
-				NOT = { trait = trusting }
-			}
-
-			opinion = {
-				name = opinion_suspected_adultery
-				who = event_target:cheating_spouse
-				years = 2
-			}
-
-			opinion = {
-				name = opinion_chasing_spouse
-				who = event_target:adulterer
-				years = 2
-			}
-
-			if = {
-				limit = {
-					NOT = { trait = arbitrary }
-				}
-
-				random = {
-					chance = 20
-					add_trait_depressed_effect = yes
-				}
-			}
-		}
-		else_if = {
-			limit = {
-				NOT = { trait = paranoid }
-			}
-
-			random = {
-				chance = 10
-				add_trait_paranoid_effect = yes
-			}
-		}
-		else = {
-			random = {
-				chance = 20
-				remove_trait_trusting_effect = yes
-			}
-		}
 	}
 
 	option = {
@@ -1208,6 +1208,22 @@ character_event = {
 
 		trigger = {
 			event_target:adulterer = { is_married = yes }
+		}
+
+		event_target:adulterer = {
+			show_scope_change = no
+
+			spouse = {
+				show_scope_change = no
+
+				set_character_flag = tipped_off_about_spouse_affair
+
+				character_event = {
+					id = WoL.1003 # Start this event chain for the lover's spouse
+					days = 8
+					tooltip = EVTTOOLTIP_WoL_1023
+				}
+			}
 		}
 
 		ai_chance = {
@@ -1251,28 +1267,20 @@ character_event = {
 				trait = genius
 			}
 		}
-
-		event_target:adulterer = {
-			show_scope_change = no
-
-			spouse = {
-				show_scope_change = no
-
-				set_character_flag = tipped_off_about_spouse_affair
-
-				character_event = {
-					id = WoL.1003 # Start this event chain for the lover's spouse
-					days = 8
-					tooltip = EVTTOOLTIP_WoL_1023
-				}
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_WOL_1022 # Pay to have them both watched
 
 		trigger = { wealth >= 10 }
+
+		event_target:adulterer = {
+			character_event = {
+				id = WoL.1026
+				days = 30
+				random = 30
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -1311,14 +1319,6 @@ character_event = {
 				trait = paranoid
 			}
 		}
-
-		event_target:adulterer = {
-			character_event = {
-				id = WoL.1026
-				days = 30
-				random = 30
-			}
-		}
 	}
 }
 
@@ -1348,8 +1348,10 @@ character_event = {
 	option = {
 #		name = OK # Success!
 
-		trigger = {
-			is_lover = event_target:cheating_spouse
+		trigger = { is_lover = event_target:cheating_spouse }
+
+		event_target:accuser = {
+			character_event = { id = WoL.1028 }
 		}
 
 		ai_chance = {
@@ -1429,14 +1431,14 @@ character_event = {
 				event_target:accuser = { has_focus = focus_intrigue }
 			}
 		}
-
-		event_target:accuser = {
-			character_event = { id = WoL.1028 }
-		}
 	}
 
 	option = {
 #		name = OK # Failure
+
+		event_target:accuser = {
+			character_event = { id = WoL.1027 }
+		}
 
 		ai_chance = {
 			factor = 100
@@ -1505,10 +1507,6 @@ character_event = {
 				}
 			}
 		}
-
-		event_target:accuser = {
-			character_event = { id = WoL.1027 }
-		}
 	}
 }
 
@@ -1539,6 +1537,35 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_WOL_1028 # Don't want a scandal
+
+		opinion = {
+			who = event_target:cheating_spouse
+			name = opinion_unfaithful_private
+			months = 24
+		}
+
+		add_rival = event_target:adulterer
+
+		if = {
+			limit = { same_sex = event_target:adulterer }
+
+			if = {
+				limit = { is_female = yes }
+
+				opinion = {
+					name = slut_seductress
+					who = event_target:adulterer
+					years = 10
+				}
+			}
+			else = {
+				opinion = {
+					name = opinion_cuckolded_private
+					who = event_target:adulterer
+					years = 20
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -1577,80 +1604,10 @@ character_event = {
 				is_lover = event_target:cheating_spouse
 			}
 		}
-
-		opinion = {
-			who = event_target:cheating_spouse
-			name = opinion_unfaithful_private
-			months = 24
-		}
-
-		add_rival = event_target:adulterer
-
-		if = {
-			limit = { same_sex = event_target:adulterer }
-
-			if = {
-				limit = { is_female = yes }
-
-				opinion = {
-					name = slut_seductress
-					who = event_target:adulterer
-					years = 10
-				}
-			}
-			else = {
-				opinion = {
-					name = opinion_cuckolded_private
-					who = event_target:adulterer
-					years = 20
-				}
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB_WOL_1028 # Denounce them both (scandal)
-
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 0.2
-
-				is_ruler = no
-				event_target:cheating_spouse = { is_ruler = yes }
-				NOT = { trait = arbitrary }
-			}
-
-			mult_modifier = {
-				factor = 2
-
-				personal_opinion = {
-					who = event_target:cheating_spouse
-					value < 0
-				}
-			}
-
-			mult_modifier = {
-				factor = 2
-				trait = wroth
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = proud
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = brave
-			}
-
-			mult_modifier = {
-				factor = 3
-				trait = cruel
-			}
-		}
 
 		if = {
 			limit = {
@@ -1717,6 +1674,47 @@ character_event = {
 		event_target:cheating_spouse = {
 			character_event = { id = WoL.1031 }
 			character_event = { id = 20 } # Adultery fallout
+		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 0.2
+
+				is_ruler = no
+				event_target:cheating_spouse = { is_ruler = yes }
+				NOT = { trait = arbitrary }
+			}
+
+			mult_modifier = {
+				factor = 2
+
+				personal_opinion = {
+					who = event_target:cheating_spouse
+					value < 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = wroth
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = proud
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = brave
+			}
+
+			mult_modifier = {
+				factor = 3
+				trait = cruel
+			}
 		}
 	}
 }
@@ -1823,24 +1821,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1033 # Deny affair
 
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 2
-
-				personal_opinion = {
-					who = event_target:cheating_spouse
-					value >= 50
-				}
-			}
-
-			mult_modifier = {
-				factor = 4
-				trait = brave
-			}
-		}
-
 		if = {
 			limit = { same_realm = event_target:accuser }
 
@@ -1859,10 +1839,44 @@ character_event = {
 				}
 			}
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 2
+
+				personal_opinion = {
+					who = event_target:cheating_spouse
+					value >= 50
+				}
+			}
+
+			mult_modifier = {
+				factor = 4
+				trait = brave
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTB_WOL_1033 # Admit
+
+		remove_lover = event_target:cheating_spouse
+
+		event_target:cheating_spouse = {
+			character_event = {
+				id = WoL.1019
+				days = 2
+			}
+		}
+
+		event_target:accuser = {
+			character_event = {
+				id = WoL.1020
+				days = 2
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -1881,22 +1895,6 @@ character_event = {
 				trait = craven
 			}
 		}
-
-		remove_lover = event_target:cheating_spouse
-
-		event_target:cheating_spouse = {
-			character_event = {
-				id = WoL.1019
-				days = 2
-			}
-		}
-
-		event_target:accuser = {
-			character_event = {
-				id = WoL.1020
-				days = 2
-			}
-		}
 	}
 
 	option = { # Fly into a rage and physically assault
@@ -1912,6 +1910,32 @@ character_event = {
 		trigger = {
 			same_realm = FROM
 			same_sex = FROM
+		}
+
+		random_list = {
+			1 = { add_trait_wounded_effect = yes }
+
+			1 = {
+				add_scarred_tiered_effect = yes
+				character_event = { id = 38308 } # Notify
+			}
+
+			1 = { }
+		}
+
+		custom_tooltip = {
+			text = EVTTOOLTIP_WoL_1011_ATTACK
+
+			event_target:accuser = {
+				set_character_flag = wol_lover_assaults
+			}
+
+			event_target:adulterer = {
+				character_event = {
+					id = WoL.1012
+					days = 2
+				}
+			}
 		}
 
 		ai_chance = {
@@ -1944,32 +1968,6 @@ character_event = {
 			mult_modifier = {
 				factor = 3
 				trait = possessed
-			}
-		}
-
-		random_list = {
-			1 = { add_trait_wounded_effect = yes }
-
-			1 = {
-				add_scarred_tiered_effect = yes
-				character_event = { id = 38308 } # Notify
-			}
-
-			1 = { }
-		}
-
-		custom_tooltip = {
-			text = EVTTOOLTIP_WoL_1011_ATTACK
-
-			event_target:accuser = {
-				set_character_flag = wol_lover_assaults
-			}
-
-			event_target:adulterer = {
-				character_event = {
-					id = WoL.1012
-					days = 2
-				}
 			}
 		}
 	}
@@ -2021,6 +2019,52 @@ character_event = {
 			trigger = { has_character_flag = wol_lover_assaults }
 		}
 
+		clr_character_flag = wol_lover_assaults
+
+		if = {
+			limit = { trait = trusting }
+
+			random = {
+				chance = 20
+				remove_trait_trusting_effect = yes
+			}
+		}
+		else = {
+			opinion = {
+				name = opinion_suspected_adultery
+				who = event_target:cheating_spouse
+				years = 2
+			}
+
+			opinion = {
+				name = opinion_chasing_spouse
+				who = event_target:adulterer
+				years = 2
+			}
+
+			if = {
+				limit = {
+					NOT = { trait = arbitrary }
+				}
+
+				random = {
+					chance = 20
+					add_trait_depressed_effect = yes
+				}
+			}
+
+			if = {
+				limit = {
+					NOT = { trait = paranoid }
+				}
+
+				random = {
+					chance = 10
+					add_trait_paranoid_effect = yes
+				}
+			}
+		}
+
 		ai_chance = {
 			factor = 100
 
@@ -2068,58 +2112,22 @@ character_event = {
 				trait = trusting
 			}
 		}
-
-		clr_character_flag = wol_lover_assaults
-
-		if = {
-			limit = { trait = trusting }
-
-			random = {
-				chance = 20
-				remove_trait_trusting_effect = yes
-			}
-		}
-		else = {
-			opinion = {
-				name = opinion_suspected_adultery
-				who = event_target:cheating_spouse
-				years = 2
-			}
-
-			opinion = {
-				name = opinion_chasing_spouse
-				who = event_target:adulterer
-				years = 2
-			}
-
-			if = {
-				limit = {
-					NOT = { trait = arbitrary }
-				}
-
-				random = {
-					chance = 20
-					add_trait_depressed_effect = yes
-				}
-			}
-
-			if = {
-				limit = {
-					NOT = { trait = paranoid }
-				}
-
-				random = {
-					chance = 10
-					add_trait_paranoid_effect = yes
-				}
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_WOL_1022 # Pay to have them both watched
 
 		trigger = { wealth >= 10 }
+
+		clr_character_flag = wol_lover_assaults
+
+		event_target:adulterer = {
+			character_event = {
+				id = WoL.1026
+				days = 30
+				random = 30
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -2158,16 +2166,6 @@ character_event = {
 				trait = paranoid
 			}
 		}
-
-		clr_character_flag = wol_lover_assaults
-
-		event_target:adulterer = {
-			character_event = {
-				id = WoL.1026
-				days = 30
-				random = 30
-			}
-		}
 	}
 
 	option = {
@@ -2183,25 +2181,6 @@ character_event = {
 
 			event_target:adulterer = {
 				NOT = { has_focus = focus_intrigue }
-			}
-		}
-
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 0.25
-				trait = kind
-			}
-
-			mult_modifier = {
-				factor = 2
-				trait = deceitful
-			}
-
-			mult_modifier = {
-				factor = 3
-				trait = cruel
 			}
 		}
 
@@ -2238,6 +2217,25 @@ character_event = {
 				}
 			}
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 0.25
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = deceitful
+			}
+
+			mult_modifier = {
+				factor = 3
+				trait = cruel
+			}
+		}
 	}
 
 	option = {
@@ -2264,6 +2262,18 @@ character_event = {
 			}
 		}
 
+		clr_character_flag = wol_lover_assaults
+
+		event_target:adulterer = {
+			show_scope_change = no
+
+			character_event = {
+				id = WoL.1032
+				days = 2
+				tooltip = EVTTOOLTIP_WoL_1032
+			}
+		}
+
 		ai_chance = {
 			factor = 1000
 
@@ -2275,18 +2285,6 @@ character_event = {
 			mult_modifier = {
 				factor = 2
 				trait = brave
-			}
-		}
-
-		clr_character_flag = wol_lover_assaults
-
-		event_target:adulterer = {
-			show_scope_change = no
-
-			character_event = {
-				id = WoL.1032
-				days = 2
-				tooltip = EVTTOOLTIP_WoL_1032
 			}
 		}
 	}
@@ -2503,6 +2501,33 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1020 # Forgive and move on
 
+		opinion = {
+			name = opinion_unfaithful_private
+			who = event_target:cheating_spouse
+			years = 2
+		}
+
+		if = {
+			limit = { same_sex = event_target:adulterer }
+
+			if = {
+				limit = { is_female = yes }
+
+				opinion = {
+					name = slut_seductress
+					who = event_target:adulterer
+					years = 10
+				}
+			}
+			else = {
+				opinion = {
+					name = opinion_cuckolded_private
+					who = event_target:adulterer
+					years = 20
+				}
+			}
+		}
+
 		ai_chance = {
 			factor = 100
 
@@ -2540,78 +2565,10 @@ character_event = {
 				is_lover = event_target:cheating_spouse
 			}
 		}
-
-		opinion = {
-			name = opinion_unfaithful_private
-			who = event_target:cheating_spouse
-			years = 2
-		}
-
-		if = {
-			limit = { same_sex = event_target:adulterer }
-
-			if = {
-				limit = { is_female = yes }
-
-				opinion = {
-					name = slut_seductress
-					who = event_target:adulterer
-					years = 10
-				}
-			}
-			else = {
-				opinion = {
-					name = opinion_cuckolded_private
-					who = event_target:adulterer
-					years = 20
-				}
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB_WOL_1006 # Denounce them both (scandal)
-
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 0.2
-
-				is_ruler = no
-				event_target:cheating_spouse = { is_ruler = yes }
-				NOT = { trait = arbitrary }
-			}
-
-			mult_modifier = {
-				factor = 2
-
-				personal_opinion = {
-					who = event_target:cheating_spouse
-					value < 0
-				}
-			}
-
-			mult_modifier = {
-				factor = 2
-				trait = wroth
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = proud
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = brave
-			}
-
-			mult_modifier = {
-				factor = 3
-				trait = cruel
-			}
-		}
 
 		if = {
 			limit = {
@@ -2678,6 +2635,47 @@ character_event = {
 		event_target:cheating_spouse = {
 			character_event = { id = WoL.1021 }
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 0.2
+
+				is_ruler = no
+				event_target:cheating_spouse = { is_ruler = yes }
+				NOT = { trait = arbitrary }
+			}
+
+			mult_modifier = {
+				factor = 2
+
+				personal_opinion = {
+					who = event_target:cheating_spouse
+					value < 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = wroth
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = proud
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = brave
+			}
+
+			mult_modifier = {
+				factor = 3
+				trait = cruel
+			}
+		}
 	}
 }
 
@@ -2721,6 +2719,13 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1032 # Accept
 
+		event_target:accuser = {
+			character_event = {
+				id = WoL.1035
+				days = 7
+			}
+		}
+
 		ai_chance = {
 			factor = 100
 
@@ -2762,17 +2767,22 @@ character_event = {
 				}
 			}
 		}
-
-		event_target:accuser = {
-			character_event = {
-				id = WoL.1035
-				days = 7
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB_WOL_1032 # Refuse
+
+		add_character_modifier = {
+			name = wol_refused_duel
+			years = 10
+		}
+
+		event_target:accuser = {
+			character_event = {
+				id = WoL.1034
+				days = 2
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -2805,22 +2815,27 @@ character_event = {
 				event_target:accuser = { trait = duelist }
 			}
 		}
-
-		add_character_modifier = {
-			name = wol_refused_duel
-			years = 10
-		}
-
-		event_target:accuser = {
-			character_event = {
-				id = WoL.1034
-				days = 2
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTC_WOL_1032 # Admit fault and apologize
+
+		remove_lover = event_target:cheating_spouse
+		set_character_flag = wol_lover_admitted_at_sword_point
+
+		event_target:cheating_spouse = {
+			character_event = {
+				id = WoL.1019
+				days = 2
+			}
+		}
+
+		event_target:accuser = {
+			character_event = {
+				id = WoL.1020
+				days = 2
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -2851,23 +2866,6 @@ character_event = {
 			mult_modifier = {
 				factor = 5
 				event_target:accuser = { trait = duelist }
-			}
-		}
-
-		remove_lover = event_target:cheating_spouse
-		set_character_flag = wol_lover_admitted_at_sword_point
-
-		event_target:cheating_spouse = {
-			character_event = {
-				id = WoL.1019
-				days = 2
-			}
-		}
-
-		event_target:accuser = {
-			character_event = {
-				id = WoL.1020
-				days = 2
 			}
 		}
 	}
@@ -2976,7 +2974,7 @@ character_event = {
 						value >= 30
 					}
 				}
-				
+
 				character_event = { id = WoL.1036 } # Notify
 			}
 
@@ -3023,7 +3021,7 @@ character_event = {
 						}
 					}
 				}
-				
+
 				event_target:adulterer = {
 					character_event = { id = WoL.1039 }
 				}
@@ -3952,8 +3950,6 @@ character_event = {
 			NOT = { is_married = event_target:target_lover }
 		}
 
-		ai_chance = { factor = 100 }
-
 		event_target:target_lover = {
 			show_scope_change = no
 
@@ -3965,6 +3961,8 @@ character_event = {
 		}
 
 		clr_character_flag = lost_loving_feeling # Set in chief Qadi event chain (105035). Zina.
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
@@ -3972,10 +3970,6 @@ character_event = {
 
 		trigger = { is_married = event_target:target_lover }
 
-		ai_chance = {
-			factor = 100
-		}
-
 		event_target:target_lover = {
 			show_scope_change = no
 
@@ -3987,6 +3981,8 @@ character_event = {
 		}
 
 		clr_character_flag = lost_loving_feeling # Set in chief Qadi event chain (105035). Zina.
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
@@ -4008,13 +4004,13 @@ character_event = {
 			}
 		}
 
-		ai_chance = { factor = 100 }
-
 		opinion = {
 			name = opinion_rekindle_love
 			who = event_target:target_lover
 			years = 2
 		}
+
+		ai_chance = { factor = 100 }
 	}
 
 	after = {
@@ -4038,10 +4034,10 @@ character_event = {
 			NOT = { is_married = event_target:affair_ender }
 		}
 
-		ai_chance = { factor = 100 }
-
 		remove_lover = event_target:affair_ender
 		clr_character_flag = lost_loving_feeling # Set in chief Qadi event chain (105035). Zina.
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
@@ -4049,10 +4045,10 @@ character_event = {
 
 		trigger = { is_married = event_target:affair_ender }
 
-		ai_chance = { factor = 100 }
-
 		remove_lover = event_target:affair_ender
 		clr_character_flag = lost_loving_feeling # Set in chief Qadi event chain (105035). Zina.
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
@@ -4068,8 +4064,6 @@ character_event = {
 			}
 		}
 
-		ai_chance = { factor = 1000 }
-
 		event_target:affair_ender = {
 			show_scope_change = no
 
@@ -4079,6 +4073,8 @@ character_event = {
 				tooltip = EVTTOOLTIP_WoL_1104
 			}
 		}
+
+		ai_chance = { factor = 1000 }
 	}
 }
 
@@ -4093,6 +4089,22 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_WOL_1104 # Oh yes!
+
+		opinion = {
+			name = opinion_rekindle_love
+			who = event_target:target_lover
+			years = 3
+		}
+
+		event_target:target_lover = {
+			show_scope_change = no
+
+			character_event = {
+				id = WoL.1105
+				days = 3
+				tooltip = EVTTOOLTIP_WoL_1105
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -4128,26 +4140,19 @@ character_event = {
 				trait = lustful
 			}
 		}
-
-		opinion = {
-			name = opinion_rekindle_love
-			who = event_target:target_lover
-			years = 3
-		}
-
-		event_target:target_lover = {
-			show_scope_change = no
-
-			character_event = {
-				id = WoL.1105
-				days = 3
-				tooltip = EVTTOOLTIP_WoL_1105
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB_WOL_1104 # Nope
+
+		remove_lover = event_target:target_lover
+
+		event_target:target_lover = {
+			character_event = {
+				id = WoL.1106
+				days = 3
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -4165,15 +4170,6 @@ character_event = {
 			mult_modifier = {
 				factor = 5
 				trait = chaste
-			}
-		}
-
-		remove_lover = event_target:target_lover
-
-		event_target:target_lover = {
-			character_event = {
-				id = WoL.1106
-				days = 3
 			}
 		}
 	}
@@ -4346,21 +4342,21 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1150 # Become stressed
 
-		ai_chance = { factor = 100 }
-
 		add_trait = stressed
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
 		name = EVTOPTB_WOL_1150 # End an affair
-
-		ai_chance = { factor = 100 }
 
 		event_target:first_lover = {
 			show_scope_change = no
 
 			remove_lover = ROOT
 		}
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
@@ -4368,13 +4364,13 @@ character_event = {
 
 		trigger = { event_target:second_lover = { always = yes } }
 
-		ai_chance = { factor = 100 }
-
 		event_target:second_lover = {
 			show_scope_change = no
 
 			remove_lover = ROOT
 		}
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
@@ -4382,13 +4378,13 @@ character_event = {
 
 		trigger = { event_target:third_lover = { always = yes } }
 
-		ai_chance = { factor = 100 }
-
 		event_target:third_lover = {
 			show_scope_change = no
 
 			remove_lover = ROOT
 		}
+
+		ai_chance = { factor = 100 }
 	}
 }
 
@@ -4531,8 +4527,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1160 # Suggest time together
 
-		ai_chance = { factor = 100 }
-
 		event_target:my_lover = {
 			show_scope_change = no
 
@@ -4571,30 +4565,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_1161 # Agree, country retreat
 
-		ai_chance = {
-			factor = 100
-
-			mult_modifier = {
-				factor = 2
-				trait = slothful
-			}
-
-			mult_modifier = {
-				factor = 2
-				trait = honest
-			}
-
-			mult_modifier = {
-				factor = 5
-				trait = kind
-			}
-
-			mult_modifier = {
-				factor = 2
-				trait = humble
-			}
-		}
-
 		if = {
 			limit = { trait = stressed }
 
@@ -4627,6 +4597,30 @@ character_event = {
 				tooltip = EVTTOOLTIP_WoL_1163
 			}
 		}
+
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 2
+				trait = slothful
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = honest
+			}
+
+			mult_modifier = {
+				factor = 5
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = humble
+			}
+		}
 	}
 
 	option = {
@@ -4636,6 +4630,32 @@ character_event = {
 			OR = {
 				trait = depressed
 				trait = stressed
+			}
+		}
+
+		remove_trait_silently_stressed_effect = yes
+
+		if = {
+			limit = { trait = depressed }
+
+			random = {
+				chance = 50
+				remove_trait_depressed_effect = yes
+			}
+		}
+
+		add_character_modifier = {
+			name = thrill_of_lover
+			years = 1
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = WoL.1162
+				days = 3
+				tooltip = EVTTOOLTIP_WoL_1162
 			}
 		}
 
@@ -4667,32 +4687,6 @@ character_event = {
 				trait = deceitful
 			}
 		}
-
-		remove_trait_silently_stressed_effect = yes
-
-		if = {
-			limit = { trait = depressed }
-
-			random = {
-				chance = 50
-				remove_trait_depressed_effect = yes
-			}
-		}
-
-		add_character_modifier = {
-			name = thrill_of_lover
-			years = 1
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			character_event = {
-				id = WoL.1162
-				days = 3
-				tooltip = EVTTOOLTIP_WoL_1162
-			}
-		}
 	}
 
 	option = {
@@ -4700,6 +4694,19 @@ character_event = {
 
 		trigger = {
 			NOT = { trait = lunatic }
+		}
+
+		opinion = {
+			name = opinion_declined_romance
+			who = FROM
+			years = 2
+		}
+
+		FROM = {
+			character_event = {
+				id = WoL.1164
+				days = 3
+			}
 		}
 
 		ai_chance = {
@@ -4715,19 +4722,6 @@ character_event = {
 				trait = proud
 			}
 		}
-
-		opinion = {
-			name = opinion_declined_romance
-			who = FROM
-			years = 2
-		}
-
-		FROM = {
-			character_event = {
-				id = WoL.1164
-				days = 3
-			}
-		}
 	}
 
 	option = {
@@ -4736,8 +4730,6 @@ character_event = {
 
 		trigger = { trait = lunatic }
 
-		ai_chance = { factor = 1000 }
-
 		opinion = {
 			name = opinion_declined_romance
 			who = FROM
@@ -4750,6 +4742,8 @@ character_event = {
 				days = 3
 			}
 		}
+
+		ai_chance = { factor = 1000 }
 	}
 }
 
