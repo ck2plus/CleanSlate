@@ -174,11 +174,12 @@ character_event = {
 	prisoner = no
 
 	trigger = {
+		has_artifact = finger_of_st_john
+
 		OR = {
 			is_dumb_trigger = yes
 			trait = slothful
 		}
-		has_artifact = finger_of_st_john
 	}
 
 	mean_time_to_happen = {
@@ -323,14 +324,7 @@ character_event = {
 			chance = 20
 
 			remove_trait = ill
-
-			if = {
-				limit = {
-					NOT = { trait = zealous }
-				}
-
-				add_trait_zealous_effect = yes
-			}
+			add_trait_zealous_effect = yes
 		}
 	}
 
@@ -345,14 +339,7 @@ character_event = {
 			chance = 20
 
 			remove_trait = ill
-
-			if = {
-				limit = {
-					NOT = { trait = cynical }
-				}
-
-				add_trait_cynical_effect = yes
-			}
+			add_trait_cynical_effect = yes
 		}
 	}
 }
@@ -525,7 +512,7 @@ character_event = {
 	}
 
 	mean_time_to_happen = {
-		months = 3000
+		years = 250
 	}
 
 	option = {
@@ -580,8 +567,11 @@ character_event = {
 #
 #	trigger = {
 #		has_artifact = finger_of_st_john
-#		NOT = { religion_group = christian }
-#		NOT = { has_character_flag = kept_finger_as_trinket }
+#
+#		NOR = {
+#			religion_group = christian
+#			has_character_flag = kept_finger_as_trinket
+#		}
 #	}
 #
 #	mean_time_to_happen = {
@@ -998,10 +988,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_SoA_5218
 
-		ai_chance = {
-			factor = 0
-		}
-
 		event_target:target_child = {
 			show_scope_change = no
 
@@ -1021,14 +1007,12 @@ character_event = {
 		}
 
 		custom_tooltip = { text = EVTTOOLTIPA_SOA_5218 }
+
+		ai_chance = { factor = 0 }
 	}
 
 	option = {
 		name = EVTOPTB_SoA_5218
-
-		ai_chance = {
-			factor = 100
-		}
 
 		event_target:target_child = {
 			show_scope_change = no
@@ -1190,14 +1174,7 @@ character_event = {
 			NOT = { trait = cynical }
 		}
 
-		if = {
-			limit = {
-				NOT = { trait = zealous }
-			}
-
-			add_trait = zealous
-		}
-
+		add_trait_silently_zealous_effect = yes
 		piety = 30
 	}
 
@@ -1442,7 +1419,6 @@ character_event = {
 
 		random = {
 			chance = 10
-
 			add_trait_wounded_effect = yes
 		}
 	}
@@ -1995,13 +1971,14 @@ character_event = {
 character_event = {
 	id = SoA.5306
 
-	hide_window = yes
 	is_triggered_only = yes # Checked for pope on death on_event
+	hide_window = yes
 
+	religion = catholic
 	has_dlc = "Sons of Abraham"
 
 	trigger = {
-		has_landed_title = k_papal_state
+		controls_religion = yes
 		trait = bad_priest_christian
 		year < 1049
 	}
@@ -2146,19 +2123,8 @@ character_event = {
 		is_priest = yes
 		year >= 950
 		is_catholic_branch = yes
-
-		NOR = {
-			has_landed_title = k_papal_state
-			has_landed_title = d_fraticelli
-
-			any_claim = {
-				OR = {
-					title = k_papal_state
-					title = d_fraticelli
-				}
-			}
-		}
-
+		controls_religion = no
+		is_antipope = no
 	}
 
 	mean_time_to_happen = {
@@ -2196,18 +2162,8 @@ narrative_event = {
 			holder_scope = {
 				religion = ROOT
 				is_priest = yes
-
-				NOR = {
-					has_landed_title = k_papal_state
-					has_landed_title = d_fraticelli
-
-					any_claim = {
-						OR = {
-							title = k_papal_state
-							title = d_fraticelli
-						}
-					}
-				}
+				controls_religion = no
+				is_antipope = no
 			}
 		}
 	}
@@ -2232,42 +2188,38 @@ narrative_event = {
 	option = {
 		name = EVTOPTA_SoA_5341
 
-		ai_chance = {
-			factor = 20
-		}
-
 		if = {
 			limit = { wealth < 600 }
 
-			wealth = -100
+			transfer_scaled_wealth = {
+				to = event_target:bishop_of_cluny
+				value = 1
+				min = 100
+				max = 100
+			}
+
 			prestige = 50
 			piety = 50
-
-			event_target:bishop_of_cluny = {
-				show_scope_change = no
-
-				wealth = 100
-			}
 		}
 		else = {
-			wealth = -300
+			transfer_scaled_wealth = {
+				to = event_target:bishop_of_cluny
+				value = 1
+				min = 300
+				max = 300
+			}
+
 			prestige = 100
 			piety = 100
-
-			event_target:bishop_of_cluny = {
-				show_scope_change = no
-
-				wealth = 300
-			}
 		}
+
+		ai_chance = { factor = 20 }
 	}
 
 	option = {
 		name = EVTOPTB_SoA_5341
 
-		ai_chance = {
-			factor = 80
-		}
+		ai_chance = { factor = 80 }
 	}
 }
 
@@ -2302,18 +2254,8 @@ narrative_event = {
 			holder_scope = {
 				is_priest = yes
 				religion = ROOT
-
-				NOR = {
-					has_landed_title = k_papal_state
-					has_landed_title = d_fraticelli
-
-					any_claim = {
-						OR = {
-							title = k_papal_state
-							title = d_fraticelli
-						}
-					}
-				}
+				controls_religion = no
+				is_antipope = no
 			}
 		}
 
@@ -2552,7 +2494,7 @@ narrative_event = {
 		year >= 885
 
 		distance = {
-			where = 491	# Mount Athos
+			where = 491 # Mount Athos
 			value < 300	# Not too far away
 		}
 
@@ -2562,7 +2504,6 @@ narrative_event = {
 				religion = ROOT
 			}
 		}
-
 	}
 
 	mean_time_to_happen = {
@@ -2721,6 +2662,7 @@ narrative_event = {
 			add_trait = brilliant_strategist
 			add_trait = inspiring_leader
 			add_trait = aggressive_leader
+			flag = no_court_invites
 
 			attributes = {
 				diplomacy = 15
@@ -2735,6 +2677,11 @@ narrative_event = {
 			set_character_flag = is_jeanne_darc
 			set_character_flag = special_marshal
 			save_global_event_target_as = jeanne_darc
+
+			save_persistent_event_target = {
+				name = original_liege
+				scope = ROOT
+			}
 
 			if = {
 				limit = { culture = frankish }
@@ -2768,9 +2715,9 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5355
-			days = 90
-			tooltip = jeanne_arrives_message
+			months = 3
 			random = 60
+			tooltip = jeanne_arrives_message
 		}
 	}
 }
@@ -2813,7 +2760,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5357
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -2830,7 +2777,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5357
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -2872,7 +2819,14 @@ narrative_event = {
 		name = EVTOPTB_SoA_5357
 
 		piety = 30
-		add_trait = zealous
+
+		if = {
+			limit = { NOT = { trait = zealous } }
+
+			remove_trait_silently_cynical_effect = yes
+			add_trait = zealous
+		}
+
 		narrative_event = { id = SoA.5359 }
 	}
 
@@ -2941,7 +2895,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5364
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -2962,7 +2916,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5364
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -2983,7 +2937,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5364
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3004,7 +2958,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5364
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3025,7 +2979,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5364
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3051,7 +3005,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5366
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3098,7 +3052,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5368
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3110,7 +3064,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5368
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3170,7 +3124,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5370
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3187,7 +3141,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5370
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3247,7 +3201,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5373
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3277,7 +3231,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5373
-			days = 90
+			months = 3
 			random = 60
 		}
 	}
@@ -3479,7 +3433,7 @@ narrative_event = {
 
 		narrative_event = {
 			id = SoA.5392
-			days = 30
+			months = 1
 			random = 30
 		}
 	}
@@ -3584,6 +3538,40 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTA_SoA_5398
+	}
+}
+
+# Jeanne d'Arc dies
+narrative_event = {
+	id = SoA.5399
+
+	is_triggered_only = yes # on_death
+	hide_window = yes
+
+	trigger = {
+		character = event_target:jeanne_darc
+	}
+
+	immediate = {
+		# Clean-up
+		persistent_event_target:original_liege = {
+			clear_delayed_event = { id = SoA.5355 }
+			clear_delayed_event = { id = SoA.5357 }
+			clear_delayed_event = { id = SoA.5358 }
+			clear_delayed_event = { id = SoA.5359 }
+			clear_delayed_event = { id = SoA.5360 }
+			clear_delayed_event = { id = SoA.5362 }
+			clear_delayed_event = { id = SoA.5364 }
+			clear_delayed_event = { id = SoA.5366 }
+			clear_delayed_event = { id = SoA.5368 }
+			clear_delayed_event = { id = SoA.5370 }
+			clear_delayed_event = { id = SoA.5373 }
+			clear_delayed_event = { id = SoA.5382 }
+			clear_delayed_event = { id = SoA.5392 }
+			clear_delayed_event = { id = SoA.5394 }
+			clear_delayed_event = { id = SoA.5395 }
+			clear_delayed_event = { id = SoA.5398 }
+		}
 	}
 }
 

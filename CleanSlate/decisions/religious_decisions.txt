@@ -159,13 +159,13 @@ decisions = {
 		potential = {
 			independent = yes
 
-			OR = {
-				religion = catholic
-
-				AND = {
-					religion = fraticelli
-					is_title_active = d_fraticelli
-				}
+			trigger_if = {
+				limit = { religion = catholic }
+				is_title_active = k_papal_state
+			}
+			trigger_else = {
+				religion = fraticelli
+				is_title_active = d_fraticelli
 			}
 
 			has_dlc = "Sons of Abraham"
@@ -213,120 +213,67 @@ decisions = {
 
 		allow = {
 			# Don't give away your only provincw
-			any_demesne_province = {
-				NOT = { province_id = 333 } # Rome
+			trigger_if = {
+				limit = { ai = no }
+				num_of_count_titles > 1
 			}
 		}
 
 		effect = {
-			if = {
-				limit = { religion = catholic }
+			religion_head = {
+				show_scope_change = no
 
-				k_papal_state = {
+				save_event_target_as = restored_pope
+
+				c_roma = {
 					show_scope_change = no
 
-					holder_scope = {
+					grant_title = PREV
+
+					any_de_jure_vassal_title = {
 						show_scope_change = no
 
-						save_event_target_as = restored_pope
-
-						c_roma = {
-							show_scope_change = no
-
-							grant_title = PREV
-
-							any_de_jure_vassal_title = {
-								show_scope_change = no
-
-								limit = {
-									holder_scope = {
-										OR = {
-											character = ROOT
-											is_vassal_or_below_of = ROOT
-										}
-									}
+						limit = {
+							holder_scope = {
+								OR = {
+									character = ROOT
+									is_vassal_or_below_of = ROOT
 								}
-
-								grant_title = PREVPREV
 							}
 						}
+
+						grant_title = PREVPREV
 					}
-				}
-
-				if = {
-					limit = {
-						NOT = { has_character_flag = restored_catholic_pope_in_rome }
-					}
-
-					k_papal_state = {
-						show_scope_change = no
-
-						holder_scope = {
-							show_scope_change = no
-
-							opinion = {
-								name = opinion_restored_to_rome
-								who = ROOT
-							}
-						}
-					}
-
-					piety = 1000
-					set_character_flag = restored_catholic_pope_in_rome
 				}
 			}
 
-			else = {
-				d_fraticelli = {
-					show_scope_change = no
-
-					holder_scope = {
-						show_scope_change = no
-
-						save_event_target_as = restored_pope
-
-						c_roma = {
-							show_scope_change = no
-
-							grant_title = PREV
-
-							any_de_jure_vassal_title = {
-								show_scope_change = no
-
-								limit = {
-									holder_scope = {
-										OR = {
-											character = ROOT
-											is_vassal_or_below_of = ROOT
-										}
-									}
-								}
-
-								grant_title = PREVPREV
-							}
-						}
+			if = {
+				limit = {
+					trigger_if = {
+						limit = { religion = catholic }
+						NOT = { has_character_flag = restored_catholic_pope_in_rome }
+					}
+					trigger_else = {
+						NOT = { has_character_flag = restored_fraticelli_pope_in_rome }
 					}
 				}
 
+				religion_head = {
+					show_scope_change = no
+
+					opinion = {
+						name = opinion_restored_to_rome
+						who = ROOT
+					}
+				}
+
+				piety = 1000
+
 				if = {
-					limit = {
-						NOT = { has_character_flag = restored_fraticelli_pope_in_rome }
-					}
-
-					d_fraticelli = {
-						show_scope_change = no
-
-						holder_scope = {
-							show_scope_change = no
-
-							opinion = {
-								name = opinion_restored_to_rome
-								who = ROOT
-							}
-						}
-					}
-
-					piety = 1000
+					limit = { religion = catholic }
+					set_character_flag = restored_catholic_pope_in_rome
+				}
+				else = {
 					set_character_flag = restored_fraticelli_pope_in_rome
 				}
 			}

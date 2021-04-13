@@ -28,6 +28,18 @@ character_event = {
 	option = {
 		name = EVTOPTA_ZE_6001
 
+		event_target:aspiring_councillor = {
+			show_scope_change = no
+
+			set_character_flag = council_membership_requested
+
+			character_event = {
+				id = ZE.6004
+				days = 1
+				tooltip = EVTTOOLTIPZE_6004
+			}
+		}
+
 		ai_chance = {
 			factor = 30
 
@@ -48,22 +60,28 @@ character_event = {
 				}
 			}
 		}
-
-		event_target:aspiring_councillor = {
-			show_scope_change = no
-
-			set_character_flag = council_membership_requested
-
-			character_event = {
-				id = ZE.6004
-				days = 1
-				tooltip = EVTTOOLTIPZE_6004
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB_ZE_6001
+
+		event_target:aspiring_councillor = {
+			show_scope_change = no
+
+			set_character_flag = council_membership_denied
+
+			opinion = {
+				name = opinion_very_disappointed
+				who = ROOT
+				years = 5
+			}
+
+			character_event = {
+				id = ZE.6005
+				days = 1
+				tooltip = EVTTOOLTIPZE_6005
+			}
+		}
 
 		ai_chance = {
 			factor = 30
@@ -83,24 +101,6 @@ character_event = {
 				is_rival = event_target:aspiring_councillor
 			}
 		}
-
-		event_target:aspiring_councillor = {
-			show_scope_change = no
-
-			set_character_flag = council_membership_denied
-
-			opinion = {
-				name = opinion_very_disappointed
-				who = ROOT
-				years = 5
-			}
-
-			character_event = {
-				id = ZE.6005
-				days = 1
-				tooltip = EVTTOOLTIPZE_6005
-			}
-		}
 	}
 
 	option = {
@@ -108,24 +108,6 @@ character_event = {
 		tooltip_info = diplomacy
 
 		trigger = { diplomacy >= 15 }
-
-		ai_chance = {
-			factor = 30
-
-			trigger = {
-				NOT = { is_friend = event_target:aspiring_councillor }
-
-				opinion = {
-					who = event_target:aspiring_councillor
-					value < 75
-				}
-			}
-
-			mult_modifier = {
-				factor = 3
-				is_rival = event_target:aspiring_councillor
-			}
-		}
 
 		event_target:aspiring_councillor = {
 			show_scope_change = no
@@ -142,6 +124,24 @@ character_event = {
 				id = ZE.6006
 				days = 1
 				tooltip = EVTTOOLTIPZE_6006
+			}
+		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = {
+				NOT = { is_friend = event_target:aspiring_councillor }
+
+				opinion = {
+					who = event_target:aspiring_councillor
+					value < 75
+				}
+			}
+
+			mult_modifier = {
+				factor = 3
+				is_rival = event_target:aspiring_councillor
 			}
 		}
 	}
@@ -251,8 +251,6 @@ character_event = {
 	option = {
 		name = EVTOPTA_ZE_6002
 
-		ai_chance = { factor = 100 }
-
 		liege = {
 			show_scope_change = no
 
@@ -317,27 +315,6 @@ character_event = {
 		trigger = {
 			event_target:councillor_target = {
 				always = yes
-			}
-		}
-
-		ai_chance = {
-			factor = 30
-
-			trigger = {
-				NOT = { is_rival = FROM }
-			}
-
-			mult_modifier = {
-				factor = 3
-
-				OR = {
-					is_friend = FROM
-
-					opinion = {
-						who = FROM
-						value >= 75
-					}
-				}
 			}
 		}
 
@@ -409,19 +386,6 @@ character_event = {
 				}
 			}
 		}
-	}
-
-	# We have an open spot and approve the request
-	option = {
-		name = EVTOPTB_ZE_6003
-
-		trigger = {
-			NOT = {
-				event_target:councillor_target = {
-					always = yes
-				}
-			}
-		}
 
 		ai_chance = {
 			factor = 30
@@ -440,6 +404,19 @@ character_event = {
 						who = FROM
 						value >= 75
 					}
+				}
+			}
+		}
+	}
+
+	# We have an open spot and approve the request
+	option = {
+		name = EVTOPTB_ZE_6003
+
+		trigger = {
+			NOT = {
+				event_target:councillor_target = {
+					always = yes
 				}
 			}
 		}
@@ -509,11 +486,49 @@ character_event = {
 				give_job_title = job_marshal
 			}
 		}
+
+		ai_chance = {
+			factor = 30
+
+			trigger = {
+				NOT = { is_rival = FROM }
+			}
+
+			mult_modifier = {
+				factor = 3
+
+				OR = {
+					is_friend = FROM
+
+					opinion = {
+						who = FROM
+						value >= 75
+					}
+				}
+			}
+		}
 	}
 
 	# We decline the request
 	option = {
 		name = EVTOPTC_ZE_6003
+
+		FROM = {
+			show_scope_change = no
+
+			set_character_flag = council_membership_denied
+
+			opinion = {
+				name = opinion_very_disappointed
+				who = ROOT
+				years = 5
+			}
+
+			character_event = {
+				id = ZE.6005
+				days = 1
+			}
+		}
 
 		ai_chance = {
 			factor = 70
@@ -533,23 +548,6 @@ character_event = {
 				is_rival = FROM
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			set_character_flag = council_membership_denied
-
-			opinion = {
-				name = opinion_very_disappointed
-				who = ROOT
-				years = 5
-			}
-
-			character_event = {
-				id = ZE.6005
-				days = 1
-			}
-		}
 	}
 
 	# We play them against each other
@@ -563,6 +561,18 @@ character_event = {
 			}
 
 			intrigue >= 15
+		}
+
+		event_target:aspiring_councillor = {
+			show_scope_change = no
+
+			set_character_flag = council_membership_denied
+
+			character_event = {
+				id = ZE.6007
+				days = 1
+				tooltip = EVTTOOLTIPZE_6007
+			}
 		}
 
 		ai_chance = {
@@ -580,18 +590,6 @@ character_event = {
 			mult_modifier = {
 				factor = 3
 				is_rival = FROM
-			}
-		}
-
-		event_target:aspiring_councillor = {
-			show_scope_change = no
-
-			set_character_flag = council_membership_denied
-
-			character_event = {
-				id = ZE.6007
-				days = 1
-				tooltip = EVTTOOLTIPZE_6007
 			}
 		}
 	}
@@ -847,8 +845,6 @@ character_event = {
 			}
 		}
 
-		ai_chance = { factor = 20 }
-
 		wealth = 200
 
 		event_target:chosen_child = {
@@ -860,16 +856,18 @@ character_event = {
 		FROMFROM = {
 			character_event = { id = ZE.6013 }
 		}
+
+		ai_chance = { factor = 20 }
 	}
 
 	option = {
 		name = EVTOPTB_ZE_6012
 
-		ai_chance = { factor = 80 }
-
 		FROMFROM = {
 			character_event = { id = ZE.6014 }
 		}
+
+		ai_chance = { factor = 80 }
 	}
 
 	option = {
@@ -880,8 +878,6 @@ character_event = {
 				NOT = { owes_favor_to = ROOT }
 			}
 		}
-
-		ai_chance = { factor = 20 }
 
 		event_target:chosen_child = {
 			show_scope_change = no
@@ -894,6 +890,8 @@ character_event = {
 		FROMFROM = {
 			character_event = { id = ZE.6015 }
 		}
+
+		ai_chance = { factor = 20 }
 	}
 }
 
