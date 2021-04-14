@@ -1,5 +1,6 @@
 name = "CleanSlate"
 path = "mod/CleanSlate"
+picture = "cleanslate.jpg"
 
 replace_path = "common"
 replace_path = "common/alternate_start"
