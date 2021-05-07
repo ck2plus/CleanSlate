@@ -27,7 +27,7 @@ character_event = {
 
 		NOT = {
 			any_courtier_or_vassal = {
-				count = 4
+				count >= 4
 				has_character_flag = bloodline_great_hero
 			}
 		}
@@ -50,7 +50,7 @@ character_event = {
 					factor = 0.75
 
 					any_courtier_or_vassal = {
-						count = 2
+						count >= 2
 						has_character_flag = bloodline_great_hero
 					}
 				}
@@ -59,7 +59,7 @@ character_event = {
 					factor = 0.75
 
 					any_courtier_or_vassal = {
-						count = 3
+						count >= 3
 						has_character_flag = bloodline_great_hero
 					}
 				}
@@ -165,53 +165,10 @@ character_event = {
 
 		trigger = {
 			can_grant_title = title_commander
+			byzantines_can_grant_commander_trigger = yes
 
 			event_target:invited_character = {
 				has_character_flag = invited_soldier
-			}
-
-			trigger_if = {
-				limit = { has_law = succ_byzantine_elective } # Either not Imperial...
-
-				#...Or there are no valid vassal candidates that can be commanders.
-				NOT = {
-					any_vassal = {
-						higher_real_tier_than = BARON
-						prisoner = no
-						is_incapable = no
-						is_inaccessible_trigger = no
-						primary_title = { temporary = no }
-
-						trigger_if = {
-							limit = {
-								NOT = { has_character_flag = special_marshal }
-							}
-
-							OR = {
-								male_can_hold_minor_title_trigger = yes
-								female_can_hold_minor_commander_title_trigger = yes
-							}
-
-							trigger_if = {
-								limit = { religion = hindu }
-								NOT = { trait = kshatriya }
-							}
-
-							is_adult = yes
-						}
-
-						NOR = {
-							has_job_title = job_chancellor
-							has_job_title = job_marshal
-							has_job_title = job_treasurer
-							has_job_title = job_spymaster
-							has_job_title = job_spiritual
-							has_minor_title = title_commander
-							has_character_flag = guru
-							has_character_modifier = refusing_to_lead
-						}
-					}
-				}
 			}
 		}
 
@@ -293,8 +250,8 @@ character_event = {
 					limit = { religion_group = jewish_group }
 					ROOT = { NOT = { trait = sympathy_judaism } }
 				}
-				trigger_else_if = {
-					limit = { religion_group = indian_group }
+				trigger_else = {
+					religion_group = indian_group
 					ROOT = { NOT = { trait = sympathy_indian } }
 				}
 			}
@@ -328,8 +285,8 @@ character_event = {
 						limit = { religion_group = jewish_group }
 						ROOT = { NOT = { trait = sympathy_judaism } }
 					}
-					trigger_else_if = {
-						limit = { religion_group = indian_group }
+					trigger_else = {
+						religion_group = indian_group
 						ROOT = { NOT = { trait = sympathy_indian } }
 					}
 				}
@@ -574,31 +531,26 @@ narrative_event = {
 			give_nickname = nick_the_tyrant
 		}
 
-		if = {
-			limit = { is_female = no }
+	#	if = {
+	#		limit = { is_female = no }
 
 			create_bloodline = { type = phalaris_male }
 			new_bloodline = { set_description = bloodline_desc_phalaris }
-		}
+	#	}
 	#	else = {
 	#		create_bloodline = { type = phalaris_female }
 	#		new_bloodline = { set_description = bloodline_desc_phalaris }
 	#	}
 
-		hidden_effect = {
-			if = {
-				limit = { has_character_modifier = brazen_bull }
-				remove_character_modifier = brazen_bull # Negative opinion is now part of the bloodline itself
+		hidden_effect = { remove_character_modifier = brazen_bull } # Negative opinion is now part of the bloodline itself
+
+		any_player = {
+			limit = {
+				is_within_diplo_range = ROOT
+				NOT = { character = ROOT }
 			}
 
-			any_player = {
-				limit = {
-					is_within_diplo_range = ROOT
-					NOT = { character = ROOT }
-				}
-
-				narrative_event = { id = HF.24006 }
-			}
+			narrative_event = { id = HF.24006 }
 		}
 
 		set_global_flag = flag_phalaris_bloodline
@@ -656,9 +608,7 @@ character_event = {
 			killer = FROM
 		}
 
-		hidden_effect = {
-			FROM = { character_event = { id = HF.24002 } }
-		}
+		FROM = { character_event = { id = HF.24002 } }
 	}
 }
 
@@ -669,14 +619,14 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	desc = {
-		trigger = { has_character_modifier = brazen_bull }
 		text = EVTDESCAHF24002
+		trigger = { has_character_modifier = brazen_bull }
 	}
 	desc = {
+		text = EVTDESCBHF24002
 		trigger = {
 			NOT = { has_character_modifier = brazen_bull }
 		}
-		text = EVTDESCBHF24002
 	}
 
 	is_triggered_only = yes
@@ -686,7 +636,7 @@ character_event = {
 
 		narrative_event = {
 			id = HF.24000 # Apply bloodline after rumors spread
-			days = 30
+			months = 1
 			random = 80
 		}
 
@@ -866,15 +816,11 @@ character_event = {
 				save_event_target_as = defeated_emperor
 			}
 
-			ROOT = {
-				set_character_flag = flag_defensive_teuta
-				narrative_event = { id = HF.24011 days = 20 }
-			}
+			set_character_flag = flag_defensive_teuta
+			narrative_event = { id = HF.24011 days = 20 }
 		}
 		else = {
-			ROOT = {
-				save_event_target_as = defeated_emperor
-			}
+			save_event_target_as = defeated_emperor
 
 			FROM = {
 				set_character_flag = flag_offensive_teuta
@@ -892,12 +838,12 @@ narrative_event = {
 	sound = bloodline_added
 
 	desc = {
-		trigger = { has_character_flag = flag_offensive_teuta }
 		text = EVTDESCAHF24011
+		trigger = { has_character_flag = flag_offensive_teuta }
 	}
 	desc = {
-		trigger = { has_character_flag = flag_defensive_teuta }
 		text = EVTDESCBHF24011
+		trigger = { has_character_flag = flag_defensive_teuta }
 	}
 
 	is_triggered_only = yes
@@ -913,15 +859,13 @@ narrative_event = {
 		create_bloodline = { type = teuta_female }
 		new_bloodline = { set_description = bloodline_desc_teuta }
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					is_within_diplo_range = ROOT
-					NOT = { character = ROOT }
-				}
-
-				narrative_event = { id = HF.24012 }
+		any_player = {
+			limit = {
+				is_within_diplo_range = ROOT
+				NOT = { character = ROOT }
 			}
+
+			narrative_event = { id = HF.24012 }
 		}
 
 		ai_chance = { factor = 100 }
@@ -949,72 +893,63 @@ narrative_event = {
 	sound = bloodline_added
 
 	desc = {
+		text = EVTDESCAHF24012
 		trigger = {
 			OR = {
 				has_landed_title = e_byzantium
 				has_landed_title = e_roman_empire
 			}
 		}
-		text = EVTDESCAHF24012
 	}
 	desc = {
+		text = EVTDESCBHF24012
 		trigger = {
 			NOR = {
 				has_landed_title = e_byzantium
 				has_landed_title = e_roman_empire
 			}
 		}
-		text = EVTDESCBHF24012
 	}
 
 	is_triggered_only = yes
 
 	option = {
-		name = EVTOPTAHF24012
-
-		trigger = {
-			OR = {
-				has_landed_title = e_byzantium
-				has_landed_title = e_roman_empire
+		name = {
+			text = EVTOPTAHF24012
+			trigger = {
+				OR = {
+					has_landed_title = e_byzantium
+					has_landed_title = e_roman_empire
+				}
 			}
 		}
+		name = {
+			text = EVTOPTBHF24012
+			trigger = {
+				OR = {
+					culture_group = byzantine
+					culture = roman
+					religion_openly_hellenic_or_reformed_trigger = yes
+				}
 
-		ai_chance = { factor = 100 }
-	}
-
-	option = {
-		name = EVTOPTBHF24012
-
-		trigger = {
-			OR = {
-				culture_group = byzantine
-				culture = roman
-				religion_openly_hellenic_or_reformed_trigger = yes
-			}
-
-			NOR = {
-				has_landed_title = e_byzantium
-				has_landed_title = e_roman_empire
+				NOR = {
+					has_landed_title = e_byzantium
+					has_landed_title = e_roman_empire
+				}
 			}
 		}
-
-		ai_chance = { factor = 100 }
-	}
-
-	option = {
-		name = I_SEE
-
-		trigger = {
-			NOR = {
-				culture_group = byzantine
-				culture = roman
-				religion_openly_hellenic_or_reformed_trigger = yes
-				has_landed_title = e_byzantium
-				has_landed_title = e_roman_empire
+		name = {
+			text = I_SEE
+			trigger = {
+				NOR = {
+					culture_group = byzantine
+					culture = roman
+					religion_openly_hellenic_or_reformed_trigger = yes
+					has_landed_title = e_byzantium
+					has_landed_title = e_roman_empire
+				}
 			}
 		}
-
-		ai_chance = { factor = 100 }
 	}
 }
 
@@ -1255,14 +1190,14 @@ character_event = {
 	border = GFX_event_normal_frame_war
 
 	desc = {
-		trigger = { character = event_target:pirate_bloodline_target }
 		text = EVTDESCHFA24014
+		trigger = { character = event_target:pirate_bloodline_target }
 	}
 	desc = {
+		text = EVTDESCHFB24014
 		trigger = {
 			NOT = { character = event_target:pirate_bloodline_target }
 		}
-		text = EVTDESCHFB24014
 	}
 
 	is_triggered_only = yes
@@ -1303,18 +1238,19 @@ character_event = {
 # A few ships arrive
 character_event = {
 	id = HF.24015
+	picture = GFX_evt_longships_at_sea_oldgods
+	border = GFX_event_normal_frame_war
+
 	desc = {
-		trigger = { character = event_target:pirate_bloodline_target }
 		text = EVTDESCHFA24015
+		trigger = { character = event_target:pirate_bloodline_target }
 	}
 	desc = {
+		text = EVTDESCHFB24015
 		trigger = {
 			NOT = { character = event_target:pirate_bloodline_target }
 		}
-		text = EVTDESCHFB24015
 	}
-	picture = GFX_evt_longships_at_sea_oldgods
-	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
@@ -1358,14 +1294,14 @@ character_event = {
 	border = GFX_event_normal_frame_war
 
 	desc = {
-		trigger = { character = event_target:pirate_bloodline_target }
 		text = EVTDESCHFA24016
+		trigger = { character = event_target:pirate_bloodline_target }
 	}
 	desc = {
+		text = EVTDESCHFB24016
 		trigger = {
 			NOT = { character = event_target:pirate_bloodline_target }
 		}
-		text = EVTDESCHFB24016
 	}
 
 	is_triggered_only = yes
@@ -1413,6 +1349,7 @@ character_event = {
 character_event = {
 	id = HF.24017
 
+	is_triggered_only = yes
 	hide_window = yes
 
 	has_dlc = "Holy Fury"
@@ -1433,8 +1370,6 @@ character_event = {
 		}
 	}
 
-	is_triggered_only = yes
-
 	immediate = {
 		killer = {
 			murder_bloodline_check_effect = yes
@@ -1448,6 +1383,7 @@ character_event = {
 character_event = {
 	id = HF.24018
 
+	is_triggered_only = yes
 	hide_window = yes
 
 	has_dlc = "Holy Fury"
@@ -1471,7 +1407,6 @@ character_event = {
 		}
 	}
 
-	is_triggered_only = yes
 
 	immediate = {
 		FROM = {
@@ -1490,28 +1425,28 @@ character_event = {
 							value >= 15
 						}
 					}
+
+					set_character_flag = flag_about_to_war_bloodline
+
+					character_event = {
+						id = HF.24031
+						days = 25
+						random = 25
+					}
 				}
+				else_if = { # Murder War Hybrid
+					limit = {
+						check_variable = { which = bloodline_murdered_people value >= 20 }
+						check_variable = { which = bloodline_won_wars value >= 10 }
+					}
 
-				set_character_flag = flag_about_to_war_bloodline
+					set_character_flag = flag_about_to_war_bloodline
 
-				character_event = {
-					id = HF.24031
-					days = 25
-					random = 25
-				}
-			}
-			else_if = { # Murder War Hybrid
-				limit = {
-					check_variable = { which = bloodline_murdered_people value >= 20 }
-					check_variable = { which = bloodline_won_wars value >= 10 }
-				}
-
-				set_character_flag = flag_about_to_war_bloodline
-
-				narrative_event = {
-					id = HF.24045
-					days = 25
-					random = 25
+					narrative_event = {
+						id = HF.24045
+						days = 25
+						random = 25
+					}
 				}
 			}
 		}
@@ -1565,28 +1500,28 @@ character_event = {
 							value >= 15
 						}
 					}
+
+					set_character_flag = flag_about_to_war_bloodline
+
+					character_event = {
+						id = HF.24031
+						days = 25
+						random = 25
+					}
 				}
+				else_if = { # Murder War Hybrid
+					limit = {
+						check_variable = { which = bloodline_murdered_people value >= 20 }
+						check_variable = { which = bloodline_won_wars value >= 10 }
+					}
 
-				set_character_flag = flag_about_to_war_bloodline
+					set_character_flag = flag_about_to_war_bloodline
 
-				character_event = {
-					id = HF.24031
-					days = 25
-					random = 25
-				}
-			}
-			else_if = { # Murder War Hybrid
-				limit = {
-					check_variable = { which = bloodline_murdered_people value >= 20 }
-					check_variable = { which = bloodline_won_wars value >= 10 }
-				}
-
-				set_character_flag = flag_about_to_war_bloodline
-
-				narrative_event = {
-					id = HF.24045
-					days = 25
-					random = 25
+					narrative_event = {
+						id = HF.24045
+						days = 25
+						random = 25
+					}
 				}
 			}
 		}
@@ -1597,6 +1532,7 @@ character_event = {
 character_event = {
 	id = HF.24020
 
+	is_triggered_only = yes
 	hide_window = yes
 
 	has_dlc = "Holy Fury"
@@ -1610,7 +1546,6 @@ character_event = {
 		}
 	}
 
-	is_triggered_only = yes
 
 	immediate = {
 		change_variable = {
@@ -1619,18 +1554,37 @@ character_event = {
 		}
 
 		if = {
-			limit = { has_ambition = obj_forge_bloodline }
+			limit = {
+				check_variable = {
+					which = bloodline_peaceful_years
+					value >= 30
+				}
+			}
+
+			character_event = {
+				id = HF.24037 # Pure Peace Bloodline
+				days = 25
+				random = 25
+			}
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					which = bloodline_peaceful_years
+					value >= 15
+				}
+			}
 
 			if = {
 				limit = {
 					check_variable = {
-						which = bloodline_peaceful_years
-						value >= 30
+						which = bloodline_murdered_people
+						value >= 20
 					}
 				}
 
-				character_event = {
-					id = HF.24037 # Pure Peace Bloodline
+				narrative_event = {
+					id = HF.24046 # Murder Peace Hybrid
 					days = 25
 					random = 25
 				}
@@ -1638,66 +1592,43 @@ character_event = {
 			else_if = {
 				limit = {
 					check_variable = {
-						which = bloodline_peaceful_years
-						value >= 15
+						which = bloodline_built_cities
+						value >= 5
 					}
 				}
 
-				if = {
-					limit = {
-						check_variable = {
-							which = bloodline_murdered_people
-							value >= 20
-						}
-					}
-
-					narrative_event = {
-						id = HF.24046 # Murder Peace Hybrid
-						days = 25
-						random = 25
+				narrative_event = {
+					id = HF.24049 # Peace Architect Hybrid
+					days = 25
+					random = 25
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						which = bloodline_built_castles
+						value >= 5
 					}
 				}
-				else_if = {
-					limit = {
-						check_variable = {
-							which = bloodline_built_cities
-							value >= 5
-						}
-					}
 
-					narrative_event = {
-						id = HF.24049 # Peace Architect Hybrid
-						days = 25
-						random = 25
+				narrative_event = {
+					id = HF.24050 # Peace Castellan Hybrid
+					days = 25
+					random = 25
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						which = bloodline_built_temples
+						value >= 5
 					}
 				}
-				else_if = {
-					limit = {
-						check_variable = {
-							which = bloodline_built_castles
-							value >= 5
-						}
-					}
 
-					narrative_event = {
-						id = HF.24050 # Peace Castellan Hybrid
-						days = 25
-						random = 25
-					}
-				}
-				else_if = {
-					limit = {
-						check_variable = {
-							which = bloodline_built_temples
-							value >= 5
-						}
-					}
-
-					narrative_event = {
-						id = HF.24051 # Peace Monumental Hybrid
-						days = 25
-						random = 25
-					}
+				narrative_event = {
+					id = HF.24051 # Peace Monumental Hybrid
+					days = 25
+					random = 25
 				}
 			}
 		}
@@ -1720,11 +1651,14 @@ character_event = {
 	has_dlc = "Holy Fury"
 
 	trigger = {
-		has_ambition = obj_forge_bloodline
+		OR = {
+			has_ambition = obj_forge_bloodline
+			FROM = { has_ambition = obj_forge_bloodline }
+		}
 	}
 
 	immediate = {
-		ROOT = { set_variable = { which = bloodline_peaceful_years value = 0 } }
+		set_variable = { which = bloodline_peaceful_years value = 0 }
 		FROM = { set_variable = { which = bloodline_peaceful_years value = 0 } }
 	}
 }
@@ -2022,7 +1956,7 @@ character_event = {
 			narrative_event = { id = HF.24026 }
 		}
 		else = {
-			character_event = { id = HF.24027 } #Otherwise let player decide the flavor.
+			character_event = { id = HF.24027 } # Otherwise let player decide the flavor.
 		}
 	}
 }
@@ -2036,12 +1970,12 @@ narrative_event = {
 	sound = bloodline_added
 
 	desc = {
-		trigger = { practical_age >= 25 }
 		text = EVTDESCHFA24026
+		trigger = { practical_age >= 25 }
 	}
 	desc = {
-		trigger = { practical_age < 25 }
 		text = EVTDESCHFB24026
+		trigger = { practical_age < 25 }
 	}
 
 	is_triggered_only = yes
@@ -2057,16 +1991,16 @@ narrative_event = {
 			add_trait = cruel
 		}
 
-		hidden_tooltip = {
+		hidden_effect = {
 			if = {
 				limit = { this_has_super_cool_nickname_trigger = no }
 
 				random_list = {
-					10 = { give_nickname = nick_the_deaths_child }
-					10 = { give_nickname = nick_the_snakeling }
-					10 = { give_nickname = nick_the_little_spider }
-					10 = { give_nickname = nick_the_eerie }
-					10 = { give_nickname = nick_the_little_nightmare }
+					20 = { give_nickname = nick_the_deaths_child }
+					20 = { give_nickname = nick_the_snakeling }
+					20 = { give_nickname = nick_the_little_spider }
+					20 = { give_nickname = nick_the_eerie }
+					20 = { give_nickname = nick_the_little_nightmare }
 				}
 			}
 		}
@@ -2417,7 +2351,7 @@ character_event = {
 			narrative_event = { id = HF.24032 }
 		}
 		else = {
-			character_event = { id = HF.24033 } #Otherwise let player decide the flavor.
+			character_event = { id = HF.24033 } # Otherwise let player decide the flavor.
 		}
 	}
 }
@@ -2431,14 +2365,14 @@ narrative_event = {
 	sound = bloodline_added
 
 	picture = {
-		trigger = { religion_group = christian }
 		picture = GFX_evt_childrens_crusade
+		trigger = { religion_group = christian }
 	}
 	picture = {
+		picture = GFX_evt_child_sword
 		trigger = {
 			NOT = { religion_group = christian }
 		}
-		picture = GFX_evt_child_sword
 	}
 
 	is_triggered_only = yes
@@ -2459,10 +2393,10 @@ narrative_event = {
 				limit = { this_has_super_cool_nickname_trigger = no }
 
 				random_list = {
-					10 = { give_nickname = nick_the_young_eagle }
-					10 = { give_nickname = nick_the_green_warrior }
-					10 = { give_nickname = nick_the_warrior_child }
-					10 = { give_nickname = nick_the_young_conqueror }
+					25 = { give_nickname = nick_the_young_eagle }
+					25 = { give_nickname = nick_the_green_warrior }
+					25 = { give_nickname = nick_the_warrior_child }
+					25 = { give_nickname = nick_the_young_conqueror }
 				}
 			}
 		}
@@ -2503,9 +2437,12 @@ character_event = {
 			is_evil_trigger = no
 
 			trigger_if = {
-				limit = { is_female = no }
-				has_religion_feature = religion_matriarchal # AltStart
-				has_religion_feature = religion_equal
+				limit = { is_female = yes }
+
+				OR = { # AltStart
+					has_religion_feature = religion_matriarchal
+					has_religion_feature = religion_equal
+				}
 			}
 		}
 
@@ -2769,15 +2706,15 @@ narrative_event = {
 				limit = { this_has_super_cool_nickname_trigger = no }
 
 				random_list = {
-					10 = {
+					20 = {
 						trigger = { religion_group = christian }
 						give_nickname = nick_the_angel
 					}
 
-					10 = { give_nickname = nick_the_pure }
-					10 = { give_nickname = nick_the_celestial }
-					10 = { give_nickname = nick_the_radiant }
-					10 = { give_nickname = nick_the_innocent }
+					20 = { give_nickname = nick_the_pure }
+					20 = { give_nickname = nick_the_celestial }
+					20 = { give_nickname = nick_the_radiant }
+					20 = { give_nickname = nick_the_innocent }
 				}
 			}
 		}
@@ -3412,21 +3349,21 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -3492,21 +3429,21 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -3557,21 +3494,21 @@ character_event = {
 	border = GFX_event_normal_frame_economy
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -3620,21 +3557,21 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -3691,21 +3628,21 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -3826,15 +3763,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -3851,21 +3782,21 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -3986,15 +3917,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -4011,21 +3936,21 @@ narrative_event = {
 	sound = bloodline_added
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -4051,6 +3976,7 @@ narrative_event = {
 				this_has_cool_nickname_trigger = no
 				this_has_super_cool_nickname_trigger = no
 			}
+
 			give_nickname = nick_the_benevolent
 		}
 
@@ -4079,12 +4005,12 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { num_of_dynasty_members >= 10 }
 		text = EVTDESCAHF24059
+		trigger = { num_of_dynasty_members >= 10 }
 	}
 	desc = {
-		trigger = { num_of_dynasty_members < 10 }
 		text = EVTDESCBHF24059
+		trigger = { num_of_dynasty_members < 10 }
 	}
 
 	is_triggered_only = yes
@@ -4212,15 +4138,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -4236,12 +4156,12 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { num_of_dynasty_members >= 10 }
 		text = EVTDESCAHF24060
+		trigger = { num_of_dynasty_members >= 10 }
 	}
 	desc = {
-		trigger = { num_of_dynasty_members < 10 }
 		text = EVTDESCBHF24060
+		trigger = { num_of_dynasty_members < 10 }
 	}
 
 	is_triggered_only = yes
@@ -4401,15 +4321,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -4426,12 +4340,12 @@ narrative_event = {
 	sound = bloodline_added
 
 	desc = {
-		trigger = { num_of_dynasty_members >= 10 }
 		text = EVTDESCAHF24061
+		trigger = { num_of_dynasty_members >= 10 }
 	}
 	desc = {
-		trigger = { num_of_dynasty_members < 10 }
 		text = EVTDESCBHF24061
+		trigger = { num_of_dynasty_members < 10 }
 	}
 
 	is_triggered_only = yes
@@ -4601,15 +4515,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -4739,15 +4647,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -5027,15 +4929,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -5157,15 +5053,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -5334,15 +5224,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -5483,15 +5367,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -5648,21 +5526,21 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_bloodlines
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_bloodlines
 	}
 
 	is_triggered_only = yes
@@ -5783,15 +5661,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -5807,21 +5679,21 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_lunatic
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_patriarchal
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_lunatic
 	}
 
 	is_triggered_only = yes
@@ -5961,15 +5833,9 @@ character_event = {
 			random = {
 				chance = 25
 
-				tooltip = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait = content
-				}
-
-				hidden_effect = {
-					remove_trait_silently_ambitious_effect = yes
-					add_trait_content_effect = yes
-				}
+				remove_trait_silently_ambitious_effect = yes
+				tooltip = { add_trait = content }
+				hidden_effect = { add_trait_content_effect = yes }
 			}
 		}
 
@@ -6090,9 +5956,7 @@ character_event = {
 		}
 
 		educator = {
-			prisoner = no
-			is_incapable = no
-			is_inaccessible_trigger = no
+			is_inaccessible_or_incapable_trigger = no
 			NOT = { is_close_relative = ROOT }
 
 			reverse_opinion = {
@@ -6142,10 +6006,8 @@ character_event = {
 
 		trigger = { trait = strong }
 
-		hidden_effect = {
-			FROM = {
-				character_event = { id = HF.24102 }
-			}
+		FROM = {
+			character_event = { id = HF.24102 }
 		}
 	}
 
@@ -6155,10 +6017,8 @@ character_event = {
 
 		trigger = { trait = brawny }
 
-		hidden_effect = {
-			FROM = {
-				character_event = { id = HF.24102 }
-			}
+		FROM = {
+			character_event = { id = HF.24102 }
 		}
 	}
 
@@ -6168,25 +6028,21 @@ character_event = {
 
 		trigger = { intrigue >= 16 }
 
-		hidden_effect = {
-			FROM = {
-				character_event = { id = HF.24102 }
-			}
+		FROM = {
+			character_event = { id = HF.24102 }
 		}
 	}
 
 	option = {
 		name = EVTOPTCHF24101
 
-		hidden_effect = {
-			FROM = {
-				character_event = { id = HF.24103 }
-			}
+		FROM = {
+			character_event = { id = HF.24103 }
+		}
 
-			if = {
-				limit = { NOT = { vassal_of = FROM } }
-				liege = { character_event = { id = HF.24104 } }
-			}
+		if = {
+			limit = { NOT = { vassal_of = FROM } }
+			liege = { character_event = { id = HF.24104 } }
 		}
 
 		death = {
@@ -6308,30 +6164,30 @@ character_event = {
 			trigger_switch = {
 				on_trigger = trait
 
-				kinslayer = { prestige = -500 }
+				kinslayer =          { prestige = -500 }
 				familial_kinslayer = { prestige = -250 }
 				dynastic_kinslayer = { prestige = -150 }
-				tribal_kinslayer = { prestige = -150 }
+				tribal_kinslayer =   { prestige = -150 }
 			}
 		}
 		else = {
 			trigger_switch = {
 				on_trigger = trait
 
-				kinslayer = { prestige = -1000 }
-				familial_kinslayer = { prestige = 500 }
-				dynastic_kinslayer = { prestige = -300 }
-				tribal_kinslayer = { prestige = -300 }
+				kinslayer =          { prestige = -1000 }
+				familial_kinslayer = { prestige =  -500 }
+				dynastic_kinslayer = { prestige =  -300 }
+				tribal_kinslayer =   { prestige =  -300 }
 			}
 		}
 
 		trigger_switch = {
 			on_trigger = trait
 
-			kinslayer = { remove_trait = kinslayer }
+			kinslayer =          { remove_trait = kinslayer }
 			familial_kinslayer = { remove_trait = familial_kinslayer }
 			dynastic_kinslayer = { remove_trait = dynastic_kinslayer }
-			tribal_kinslayer = { remove_trait = tribal_kinslayer }
+			tribal_kinslayer =   { remove_trait = tribal_kinslayer }
 		}
 	}
 
@@ -6397,72 +6253,74 @@ character_event = {
 		hidden_effect = {
 			remove_character_modifier = deflection_decision_cooldown
 		}
-
-		break = yes # Skip 'after'-block
 	}
 
 	after = {
 		hidden_effect = {
-			random_list = {
-				250 = { }
+			if = {
+				limit = { has_character_modifier = deflection_decision_cooldown }
 
-				10 = {
-					trigger = {
-						NOT = { trait = stressed }
+				random_list = {
+					250 = { }
+
+					10 = {
+						trigger = {
+							NOT = { trait = stressed }
+						}
+
+						character_event = {
+							id = HF.24108
+							days = 25
+							random = 25
+						}
 					}
 
-					character_event = {
-						id = HF.24108
-						days = 25
-						random = 25
-					}
-				}
+					10 = {
+						trigger = {
+							NOT = { trait = paranoid }
+						}
 
-				10 = {
-					trigger = {
-						NOT = { trait = paranoid }
-					}
-
-					character_event = {
-						id = HF.24109
-						days = 25
-						random = 25
-					}
-				}
-
-				10 = {
-					trigger = {
-						NOT = { trait = deceitful }
+						character_event = {
+							id = HF.24109
+							days = 25
+							random = 25
+						}
 					}
 
-					character_event = {
-						id = HF.24110
-						days = 25
-						random = 25
-					}
-				}
+					10 = {
+						trigger = {
+							NOT = { trait = deceitful }
+						}
 
-				10 = {
-					trigger = {
-						NOT = { trait = cruel }
-					}
-
-					character_event = {
-						id = HF.24111
-						days = 25
-						random = 25
-					}
-				}
-
-				1 = {
-					trigger = {
-						NOT = { trait = lunatic }
+						character_event = {
+							id = HF.24110
+							days = 25
+							random = 25
+						}
 					}
 
-					character_event = {
-						id = HF.24112
-						days = 25
-						random = 25
+					10 = {
+						trigger = {
+							NOT = { trait = cruel }
+						}
+
+						character_event = {
+							id = HF.24111
+							days = 25
+							random = 25
+						}
+					}
+
+					1 = {
+						trigger = {
+							NOT = { trait = lunatic }
+						}
+
+						character_event = {
+							id = HF.24112
+							days = 25
+							random = 25
+						}
 					}
 				}
 			}
@@ -6587,12 +6445,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_part_of_plot = yes
@@ -6616,11 +6474,7 @@ character_event = {
 				ROOT = { is_inaccessible_trigger = no }
 			}
 
-			is_adult = yes
-			is_inaccessible_trigger = no
-			is_incapable = no
-			prisoner = no
-			NOT = { trait = in_hiding }
+			block_general_event_trigger = no
 		}
 
 		NOT = { has_character_flag = murder_in_motion }
@@ -6758,12 +6612,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -6773,9 +6627,7 @@ character_event = {
 		name = EVTOPTAHF24114
 
 		hidden_effect = {
-			FROM = {
-				clr_character_flag = murder_in_motion
-			}
+			FROM = { clr_character_flag = murder_in_motion }
 
 			random_list = {
 				60 = { # Die
@@ -6959,12 +6811,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7014,12 +6866,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7073,12 +6925,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7128,12 +6980,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7187,12 +7039,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7216,15 +7068,17 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
+
+	ai = no
 
 	option = {
 		name = EVTOPTAHF24122
@@ -7238,12 +7092,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7278,12 +7132,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7313,12 +7167,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7352,12 +7206,12 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_cornered_duel_hf
+		trigger = { is_female = no }
 	}
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_slit_throat_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
@@ -7522,49 +7376,7 @@ character_event = {
 				lower_real_tier_than = COUNT
 			}
 
-			trigger_if = {
-				limit = { has_law = succ_byzantine_elective } # Either not Imperial...
-
-				NOT = { #...or there are no valid vassal candidates who can be commanders.
-					any_vassal = {
-						higher_real_tier_than = BARON
-						prisoner = no
-						is_incapable = no
-						is_inaccessible_trigger = no
-						primary_title = { temporary = no }
-
-						trigger_if = {
-							limit = {
-								NOT = { has_character_flag = special_marshal }
-							}
-
-							OR = {
-								male_can_hold_minor_title_trigger = yes
-								female_can_hold_minor_commander_title_trigger = yes
-							}
-
-							trigger_if = {
-								limit = { religion = hindu }
-								NOT = { trait = kshatriya }
-							}
-
-							is_adult = yes
-						}
-
-
-						NOR = {
-							has_character_flag = guru
-							has_character_modifier = refusing_to_lead
-							has_job_title = job_chancellor
-							has_job_title = job_marshal
-							has_job_title = job_treasurer
-							has_job_title = job_spymaster
-							has_job_title = job_spiritual
-							has_minor_title = title_commander
-						}
-					}
-				}
-			}
+			byzantines_can_grant_commander_trigger = yes
 		}
 
 		random_courtier_or_vassal = {
@@ -7603,51 +7415,8 @@ character_event = {
 
 		trigger = {
 			can_grant_title = title_commander
+			byzantines_can_grant_commander_trigger = yes
 			event_target:invited_character = { has_character_flag = invited_soldier }
-
-			trigger_if = {
-				limit = { has_law = succ_byzantine_elective } # Either not Imperial...
-
-				NOT = { #...or there are no valid vassal candidates who can be commanders.
-					any_vassal = {
-						higher_real_tier_than = BARON
-						prisoner = no
-						is_incapable = no
-						is_inaccessible_trigger = no
-						primary_title = { temporary = no }
-
-						trigger_if = {
-							limit = {
-								NOT = { has_character_flag = special_marshal }
-							}
-
-							OR = {
-								male_can_hold_minor_title_trigger = yes
-								female_can_hold_minor_commander_title_trigger = yes
-							}
-
-							trigger_if = {
-								limit = { religion = hindu }
-								NOT = { trait = kshatriya }
-							}
-
-							is_adult = yes
-						}
-
-
-						NOR = {
-							has_character_flag = guru
-							has_character_modifier = refusing_to_lead
-							has_job_title = job_chancellor
-							has_job_title = job_marshal
-							has_job_title = job_treasurer
-							has_job_title = job_spymaster
-							has_job_title = job_spiritual
-							has_minor_title = title_commander
-						}
-					}
-				}
-			}
 		}
 
 		event_target:invited_character = {
@@ -7735,13 +7504,13 @@ character_event = {
 	max_age = 30
 	only_capable = yes
 	prisoner = no
+	friends = no
 
 	trigger = {
 		is_ruler = no
 		is_married = no
-		num_of_children < 1
+		has_children = no
 		num_of_lovers < 1
-		num_of_friends < 1
 
 		NOR = {
 			trait = nun
@@ -7949,7 +7718,7 @@ character_event = {
 			limit = {
 				OR = {
 					trait = strategist
-					martial = 15
+					martial >= 15
 				}
 			}
 			prestige = -300
@@ -7973,7 +7742,7 @@ character_event = {
 			limit = {
 				OR = {
 					trait = strategist
-					martial = 15
+					martial >= 15
 				}
 			}
 			prestige = -200
@@ -8163,11 +7932,7 @@ character_event = {
 	option = {
 		name = EVTOPTBHF24136
 
-		if = {
-			limit = { trait = stressed }
-			remove_trait = stressed
-		}
-
+		remove_trait_silently_stressed_effect = yes
 		remove_trait_silently_patient_effect = yes
 		add_trait = wroth
 
@@ -8182,12 +7947,12 @@ character_event = {
 	border = GFX_event_normal_frame_war
 
 	desc = {
-		trigger = { is_female = yes }
 		text = EVTDESCAHF24137
+		trigger = { is_female = yes }
 	}
 	desc = {
-		trigger = { is_female = no }
 		text = EVTDESCBHF24137
+		trigger = { is_female = no }
 	}
 
 	is_triggered_only = yes
@@ -8211,10 +7976,7 @@ character_event = {
 			trigger = { NOT = { trait = fat } }
 		}
 
-		if = {
-			limit = { trait = stressed }
-			remove_trait = stressed
-		}
+		remove_trait_silently_stressed_effect = yes
 
 		custom_tooltip = {
 			text = tooltip_warning_20629
@@ -8234,21 +7996,21 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_fancy_feast
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_matriarchal
 				has_religion_feature = religion_patriarchal
 			}
 		}
-		picture = GFX_evt_fancy_feast
 	}
 
 	is_triggered_only = yes
@@ -8268,7 +8030,7 @@ character_event = {
 			limit = {
 				OR = {
 					is_attractive_trigger = yes
-					diplomacy = 15
+					diplomacy >= 15
 				}
 			}
 			prestige = -300
@@ -8277,12 +8039,12 @@ character_event = {
 			prestige = -600
 		}
 
-		hidden_effect = {
-			any_neighbor_independent_ruler = {
-				limit = { is_adult = yes }
-				character_event = { id = HF.24139 }
-			}
+		any_neighbor_independent_ruler = {
+			limit = { is_adult = yes }
+			character_event = { id = HF.24139 }
+		}
 
+		hidden_effect = {
 			# Random infatuation
 			random_neighbor_independent_ruler = {
 				limit = {
@@ -8358,8 +8120,6 @@ character_event = {
 				}
 			}
 		}
-
-		ai_chance = { factor = 25 }
 	}
 
 	option = { # Endear subjects
@@ -8374,7 +8134,7 @@ character_event = {
 			limit = {
 				OR = {
 					is_attractive_trigger = yes
-					diplomacy = 15
+					diplomacy >= 15
 				}
 			}
 			prestige = -200
@@ -8382,8 +8142,6 @@ character_event = {
 		else = {
 			prestige = -400
 		}
-
-		ai_chance = { factor = 25 }
 	}
 
 	option = { # Changed my mind
@@ -8484,32 +8242,32 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { vassal_of = FROM }
 		text = EVTDESCAHF24139
+		trigger = { vassal_of = FROM }
 	}
 	desc = {
+		text = EVTDESCBHF24139
 		trigger = {
 			NOT = { vassal_of = FROM }
 		}
-		text = EVTDESCBHF24139
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_fancy_feast
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_matriarchal
 				has_religion_feature = religion_patriarchal
 			}
 		}
-		picture = GFX_evt_fancy_feast
 	}
 
 	is_triggered_only = yes
@@ -8663,21 +8421,21 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_fancy_feast
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_matriarchal
 				has_religion_feature = religion_patriarchal
 			}
 		}
-		picture = GFX_evt_fancy_feast
 	}
 
 	is_triggered_only = yes
@@ -8728,30 +8486,30 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { is_female = yes }
 		text = EVTDESCAHF24142
+		trigger = { is_female = yes }
 	}
 	desc = {
-		trigger = { is_female = no }
 		text = EVTDESCBHF24142
+		trigger = { is_female = no }
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_fancy_feast
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_matriarchal
 				has_religion_feature = religion_patriarchal
 			}
 		}
-		picture = GFX_evt_fancy_feast
 	}
 
 	is_triggered_only = yes
@@ -8782,30 +8540,30 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { is_female = yes }
 		text = EVTDESCAHF24143
+		trigger = { is_female = yes }
 	}
 	desc = {
-		trigger = { is_female = no }
 		text = EVTDESCBHF24143
+		trigger = { is_female = no }
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_matriarchy_throne_room
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
-		trigger = { has_religion_feature = religion_patriarchal }
 		picture = GFX_evt_tengri_throneroom_oldgods
+		trigger = { has_religion_feature = religion_patriarchal }
 	}
 	picture = {
+		picture = GFX_evt_fancy_feast
 		trigger = {
 			NOR = {
 				has_religion_feature = religion_matriarchal
 				has_religion_feature = religion_patriarchal
 			}
 		}
-		picture = GFX_evt_fancy_feast
 	}
 
 	is_triggered_only = yes
@@ -8831,10 +8589,7 @@ character_event = {
 			}
 		}
 
-		if = {
-			limit = { trait = stressed }
-			remove_trait = stressed
-		}
+		remove_trait_silently_stressed_effect = yes
 
 		custom_tooltip = {
 			text = tooltip_warning_20606
@@ -9214,40 +8969,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -9359,40 +9114,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -9533,7 +9288,7 @@ character_event = {
 			trigger = {
 				event_target:meddling_target = {
 					is_married = yes
-					num_of_children = 2
+					num_of_children >= 2
 				}
 			}
 		}
@@ -9690,40 +9445,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -9773,7 +9528,9 @@ character_event = {
 				event_target:meddling_target = { is_female = no }
 
 				NOR = {
-					has_religion_feature = religion_matriarchal
+					has_law = enatic_succession
+					has_law = enatic_cognatic_succession
+					has_law = status_of_women_4
 
 					has_game_rule = {
 						name = gender
@@ -9828,7 +9585,9 @@ character_event = {
 				event_target:meddling_target = { is_female = yes }
 
 				NOR = {
-					has_religion_feature = religion_matriarchal
+					has_law = enatic_succession
+					has_law = enatic_cognatic_succession
+					has_law = status_of_women_4
 
 					has_game_rule = {
 						name = gender
@@ -9986,40 +9745,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -10048,40 +9807,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -10114,40 +9873,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -10248,40 +10007,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -10416,49 +10175,49 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { is_female = no }
 		text = EVTDESCAHF24159
+		trigger = { is_female = no }
 	}
 	desc = {
-		trigger = { is_female = yes }
 		text = EVTDESCBHF24159
+		trigger = { is_female = yes }
 	}
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -10606,49 +10365,49 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { is_female = no }
 		text = EVTDESCAHF24160
+		trigger = { is_female = no }
 	}
 	desc = {
-		trigger = { is_female = yes }
 		text = EVTDESCBHF24160
+		trigger = { is_female = yes }
 	}
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -10704,7 +10463,6 @@ character_event = {
 		name = EVTOPTBHF24160
 
 		tiered_prestige_negative_effect = yes
-
 
 		FROM = {
 			show_scope_change = no
@@ -10782,49 +10540,49 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { is_female = no }
 		text = EVTDESCAHF24161
+		trigger = { is_female = no }
 	}
 	desc = {
-		trigger = { is_female = yes }
 		text = EVTDESCBHF24161
+		trigger = { is_female = yes }
 	}
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -10979,48 +10737,49 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { is_female = no }
 		text = EVTDESCAHF24162
+		trigger = { is_female = no }
 	}
 	desc = {
-		trigger = { is_female = yes }
 		text = EVTDESCBHF24162
+		trigger = { is_female = yes }
 	}
+
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -11182,40 +10941,40 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	picture = {
-		trigger = {
-			event_target:meddling_target = {
-				is_female = yes
-				same_sex = event_target:meddler_target
-			}
-		}
 		picture = GFX_evt_daughter_asking_mother
+		trigger = {
+			event_target:meddling_target = {
+				is_female = yes
+				same_sex = event_target:meddler_target
+			}
+		}
 	}
 	picture = {
+		picture = GFX_evt_daughter_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = yes
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_daughter_asking_father
 	}
 	picture = {
+		picture = GFX_evt_courtiers_talking
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				is_opposite_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_courtiers_talking
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			event_target:meddling_target = {
 				is_female = no
 				same_sex = event_target:meddler_target
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -11291,6 +11050,8 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
+		text = EVTDESCAHF24165
+		picture = GFX_evt_library
 		trigger = {
 			FROM = { is_female = no }
 			NAND = {
@@ -11298,10 +11059,10 @@ character_event = {
 				trait = uncouth
 			}
 		}
-		text = EVTDESCAHF24165
-		picture = GFX_evt_library
 	}
 	desc = {
+		text = EVTDESCBHF24165
+		picture = GFX_evt_princess_byzantine
 		trigger = {
 			FROM = { is_female = yes }
 			NAND = {
@@ -11309,10 +11070,10 @@ character_event = {
 				trait = uncouth
 			}
 		}
-		text = EVTDESCBHF24165
-		picture = GFX_evt_princess_byzantine
 	}
 	desc = {
+		text = EVTDESCCHF24165
+		picture = GFX_evt_library
 		trigger = {
 			FROM = {
 				is_female = no
@@ -11320,10 +11081,10 @@ character_event = {
 			}
 			trait = uncouth
 		}
-		text = EVTDESCCHF24165
-		picture = GFX_evt_library
 	}
 	desc = {
+		text = EVTDESCCHF24165
+		picture = GFX_evt_princess_byzantine
 		trigger = {
 			FROM = {
 				is_female = yes
@@ -11331,8 +11092,6 @@ character_event = {
 			}
 			trait = uncouth
 		}
-		text = EVTDESCCHF24165
-		picture = GFX_evt_princess_byzantine
 	}
 
 	is_triggered_only = yes
@@ -11412,6 +11171,7 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
+		text = EVTDESCAHF24167
 		trigger = {
 			FROM = { is_female = no }
 			NAND = {
@@ -11419,9 +11179,9 @@ character_event = {
 				trait = groomed
 			}
 		}
-		text = EVTDESCAHF24167
 	}
 	desc = {
+		text = EVTDESCBHF24167
 		trigger = {
 			FROM = { is_female = yes }
 			NAND = {
@@ -11429,9 +11189,9 @@ character_event = {
 				trait = groomed
 			}
 		}
-		text = EVTDESCBHF24167
 	}
 	desc = {
+		text = EVTDESCCHF24167
 		trigger = {
 			FROM = {
 				is_female = no
@@ -11439,9 +11199,9 @@ character_event = {
 			}
 			trait = groomed
 		}
-		text = EVTDESCCHF24167
 	}
 	desc = {
+		text = EVTDESCDHF24167
 		trigger = {
 			FROM = {
 				is_female = yes
@@ -11449,7 +11209,6 @@ character_event = {
 			}
 			trait = groomed
 		}
-		text = EVTDESCDHF24167
 	}
 
 	is_triggered_only = yes
@@ -11529,6 +11288,7 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
+		text = EVTDESCAHF24169
 		trigger = {
 			FROM = { is_female = no }
 			NAND = {
@@ -11536,9 +11296,9 @@ character_event = {
 				trait = fat
 			}
 		}
-		text = EVTDESCAHF24169
 	}
 	desc = {
+		text = EVTDESCBHF24169
 		trigger = {
 			FROM = { is_female = yes }
 			NAND = {
@@ -11546,9 +11306,9 @@ character_event = {
 				trait = fat
 			}
 		}
-		text = EVTDESCBHF24169
 	}
 	desc = {
+		text = EVTDESCCHF24169
 		trigger = {
 			FROM = {
 				is_female = no
@@ -11556,9 +11316,9 @@ character_event = {
 			}
 			trait = fat
 		}
-		text = EVTDESCCHF24169
 	}
 	desc = {
+		text = EVTDESCDHF24169
 		trigger = {
 			FROM = {
 				is_female = yes
@@ -11566,7 +11326,6 @@ character_event = {
 			}
 			trait = fat
 		}
-		text = EVTDESCDHF24169
 	}
 
 	is_triggered_only = yes
@@ -11646,6 +11405,7 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
+		text = EVTDESCAHF24171
 		trigger = {
 			FROM = { is_female = no }
 			NAND = {
@@ -11653,9 +11413,9 @@ character_event = {
 				trait = fat
 			}
 		}
-		text = EVTDESCAHF24171
 	}
 	desc = {
+		text = EVTDESCBHF24171
 		trigger = {
 			FROM = { is_female = yes }
 			NAND = {
@@ -11663,9 +11423,9 @@ character_event = {
 				trait = fat
 			}
 		}
-		text = EVTDESCBHF24171
 	}
 	desc = {
+		text = EVTDESCCHF24171
 		trigger = {
 			FROM = {
 				is_female = no
@@ -11673,9 +11433,9 @@ character_event = {
 			}
 			trait = malnourished
 		}
-		text = EVTDESCCHF24171
 	}
 	desc = {
+		text = EVTDESCDHF24171
 		trigger = {
 			FROM = {
 				is_female = yes
@@ -11683,7 +11443,6 @@ character_event = {
 			}
 			trait = malnourished
 		}
-		text = EVTDESCDHF24171
 	}
 
 	is_triggered_only = yes
@@ -11763,22 +11522,22 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
+		text = EVTDESCAHF24173
 		trigger = {
 			FROM = { is_female = no }
 			NOT = { is_married = ROOT }
 		}
-		text = EVTDESCAHF24173
 	}
 	desc = {
+		text = EVTDESCBHF24173
 		trigger = {
 			FROM = { is_female = yes }
 			NOT = { is_married = ROOT }
 		}
-		text = EVTDESCBHF24173
 	}
 	desc = {
-		trigger = { is_married = ROOT }
 		text = EVTDESCCHF24173
+		trigger = { is_married = ROOT }
 	}
 
 	is_triggered_only = yes
@@ -11839,11 +11598,11 @@ narrative_event = {
 	ai = no
 	only_capable = yes
 	prisoner = no
+	min_age = 16
 
 	trigger = {
 		real_tier = EMPEROR
 		prestige >= 15000
-		is_adult = yes
 		is_alternate_start = no
 
 		capital_scope = {
@@ -12127,6 +11886,7 @@ narrative_event = {
 	border = GFX_event_narrative_frame_war
 
 	desc = {
+		text = EVTDESCAHF24201
 		trigger = {
 			capital_scope = {
 				OR = {
@@ -12136,9 +11896,9 @@ narrative_event = {
 				}
 			}
 		}
-		text = EVTDESCAHF24201
 	}
 	desc = {
+		text = EVTDESCBHF24201
 		trigger = {
 			capital_scope = {
 				NOR = {
@@ -12148,7 +11908,6 @@ narrative_event = {
 				}
 			}
 		}
-		text = EVTDESCBHF24201
 	}
 
 	is_triggered_only = yes
@@ -12291,57 +12050,57 @@ narrative_event = {
 
 					mult_modifier = {
 						factor = 1.25
-						intrigue = 10
+						intrigue >= 10
 					}
 
 					mult_modifier = {
 						factor = 1.25
-						intrigue = 12
+						intrigue >= 12
 					}
 
 					mult_modifier = {
 						factor = 1.25
-						intrigue = 14
+						intrigue >= 14
 					}
 
 					mult_modifier = {
 						factor = 1.25
-						intrigue = 16
+						intrigue >= 16
 					}
 
 					mult_modifier = {
 						factor = 1.25
-						intrigue = 18
+						intrigue >= 18
 					}
 
 					mult_modifier = {
 						factor = 1.5
-						intrigue = 20
+						intrigue >= 20
 					}
 
 					mult_modifier = {
 						factor = 1.5
-						intrigue = 22
+						intrigue >= 22
 					}
 
 					mult_modifier = {
 						factor = 1.5
-						intrigue = 24
+						intrigue >= 24
 					}
 
 					mult_modifier = {
 						factor = 1.5
-						intrigue = 26
+						intrigue >= 26
 					}
 
 					mult_modifier = {
 						factor = 1.5
-						intrigue = 28
+						intrigue >= 28
 					}
 
 					mult_modifier = {
 						factor = 1.5
-						intrigue = 30
+						intrigue >= 30
 					}
 
 					mult_modifier = {
@@ -13304,149 +13063,158 @@ narrative_event = {
 		}
 
 		prestige = -3000
-		break = yes # Skip 'after'
 	}
 
 	after = {
 		hidden_effect = {
-			random_list = {
-				## Basic lower chance if tomb was not found
-				# Success - Bloodline created
-				# Failure - Retry or change approach
-
-				40 = {
-					mult_modifier = {
-						factor = 0.1
-						has_character_flag = flag_alex_prestige_search_cheap
-					}
-
-					mult_modifier = {
-						factor = 0.35
-						has_character_flag = flag_alex_prestige_search_low
-					}
-
-					mult_modifier = {
-						factor = 0.75
+			if = {
+				limit = {
+					OR = {
+						has_character_flag = flag_alex_prestige_search_high
 						has_character_flag = flag_alex_prestige_search_medium
-					}
-
-					mult_modifier = {
-						factor = 1.25
-						trait = socializer
-					}
-
-					mult_modifier = {
-						factor = 1.25
-						diplomacy >= 10
-					}
-
-					mult_modifier = {
-						factor = 1.25
-						diplomacy >= 12
-					}
-
-					mult_modifier = {
-						factor = 1.25
-						diplomacy >= 14
-					}
-
-					mult_modifier = {
-						factor = 1.25
-						diplomacy >= 16
-					}
-
-					mult_modifier = {
-						factor = 1.25
-						diplomacy >= 18
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						diplomacy >= 20
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						diplomacy >= 22
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						diplomacy >= 24
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						diplomacy >= 26
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						diplomacy >= 28
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						diplomacy >= 30
-					}
-
-					mult_modifier = {
-						factor = 1.75
-						trait = genius
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						trait = quick
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						job_chancellor = { diplomacy >= 8 }
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						job_chancellor = { diplomacy >= 10 }
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						job_chancellor = { diplomacy >= 12 }
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						job_chancellor = { diplomacy >= 14 }
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						job_chancellor = { diplomacy >= 16 }
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						job_chancellor = { diplomacy >= 18 }
-					}
-
-					mult_modifier = {
-						factor = 1.5
-						job_chancellor = { diplomacy >= 20 }
-					}
-
-					narrative_event = {
-						id = HF.24208 # Success
-						days = 350
-						random = 450
+						has_character_flag = flag_alex_prestige_search_low
 					}
 				}
 
-				60 = {
-					narrative_event = {
-						id = HF.24209 # Failure
-						days = 350
-						random = 450
+				random_list = {
+					## Basic lower chance if tomb was not found
+					# Success - Bloodline created
+					# Failure - Retry or change approach
+
+					40 = {
+						mult_modifier = {
+							factor = 0.1
+							has_character_flag = flag_alex_prestige_search_cheap
+						}
+
+						mult_modifier = {
+							factor = 0.35
+							has_character_flag = flag_alex_prestige_search_low
+						}
+
+						mult_modifier = {
+							factor = 0.75
+							has_character_flag = flag_alex_prestige_search_medium
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							trait = socializer
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							diplomacy >= 10
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							diplomacy >= 12
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							diplomacy >= 14
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							diplomacy >= 16
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							diplomacy >= 18
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							diplomacy >= 20
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							diplomacy >= 22
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							diplomacy >= 24
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							diplomacy >= 26
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							diplomacy >= 28
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							diplomacy >= 30
+						}
+
+						mult_modifier = {
+							factor = 1.75
+							trait = genius
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							trait = quick
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							job_chancellor = { diplomacy >= 8 }
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							job_chancellor = { diplomacy >= 10 }
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							job_chancellor = { diplomacy >= 12 }
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							job_chancellor = { diplomacy >= 14 }
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							job_chancellor = { diplomacy >= 16 }
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							job_chancellor = { diplomacy >= 18 }
+						}
+
+						mult_modifier = {
+							factor = 1.5
+							job_chancellor = { diplomacy >= 20 }
+						}
+
+						narrative_event = {
+							id = HF.24208 # Success
+							days = 350
+							random = 450
+						}
+					}
+
+					60 = {
+						narrative_event = {
+							id = HF.24209 # Failure
+							days = 350
+							random = 450
+						}
 					}
 				}
 			}
@@ -13454,7 +13222,7 @@ narrative_event = {
 	}
 }
 
-# Players notified of accomplishment
+# Other players notified of accomplishment
 narrative_event = {
 	id = HF.24210
 	title = EVTTITLEHF24210
@@ -13463,8 +13231,6 @@ narrative_event = {
 	border = GFX_event_narrative_frame_war
 
 	is_triggered_only = yes
-
-	ai = no
 
 	option = {
 		name = {
@@ -13492,15 +13258,16 @@ narrative_event = {
 	border = GFX_event_narrative_frame_religion
 
 	desc = {
+		text = EVTDESCAHF24220
 		trigger = {
 			any_owned_bloodline = {
 				has_bloodline_flag = samrat_chakravartin_bloodline
 				bloodline_is_active_for = PREV
 			}
 		}
-		text = EVTDESCAHF24220
 	}
 	desc = {
+		text = EVTDESCBHF24220
 		trigger = {
 			NOT = {
 				any_owned_bloodline = {
@@ -13509,7 +13276,6 @@ narrative_event = {
 				}
 			}
 		}
-		text = EVTDESCBHF24220
 	}
 
 	is_triggered_only = yes # on_decade_pulse
@@ -13518,11 +13284,11 @@ narrative_event = {
 	religion_group = indian_group
 	only_capable = yes
 	prisoner = no
+	min_age = 16
 
 	trigger = {
 		real_tier = EMPEROR
 		prestige >= 15000
-		is_adult = yes
 		is_alternate_start = no
 
 		capital_scope = {
@@ -13751,15 +13517,16 @@ narrative_event = {
 	border = GFX_event_narrative_frame_religion
 
 	desc = {
+		text = EVTDESCAHF24221
 		trigger = {
 			any_owned_bloodline = {
 				has_bloodline_flag = samrat_chakravartin_bloodline
 				bloodline_is_active_for = PREV
 			}
 		}
-		text = EVTDESCAHF24221
 	}
 	desc = {
+		text = EVTDESCBHF24221
 		trigger = {
 			NOT = {
 				any_owned_bloodline = {
@@ -13768,7 +13535,6 @@ narrative_event = {
 				}
 			}
 		}
-		text = EVTDESCBHF24221
 	}
 
 	is_triggered_only = yes
@@ -13854,7 +13620,7 @@ narrative_event = {
 		tooltip_info = diplomacy
 
 		trigger = {
-			diplomacy = 12
+			diplomacy >= 12
 			trait = brave
 		}
 
@@ -13866,7 +13632,7 @@ narrative_event = {
 		tooltip_info = intrigue
 
 		trigger = {
-			intrigue = 18
+			intrigue >= 18
 			NOT = { trait = brave }
 		}
 
@@ -13878,7 +13644,7 @@ narrative_event = {
 		tooltip_info = learning
 
 		trigger = {
-			learning = 18
+			learning >= 18
 			NOT = { trait = brave }
 		}
 
@@ -14199,10 +13965,10 @@ narrative_event = {
 
 	after = {
 		if = {
-			limit = {
-				NOT = { has_character_flag = flag_ashoka_abandoning_quest }
-			}
-
+			limit = { has_character_flag = flag_ashoka_abandoning_quest }
+			clr_character_flag = flag_ashoka_abandoning_quest
+		}
+		else = {
 			piety = -500
 
 			hidden_effect = {
@@ -14378,9 +14144,6 @@ narrative_event = {
 					}
 				}
 			}
-		}
-		else = {
-			clr_character_flag = flag_ashoka_abandoning_quest
 		}
 	}
 }
@@ -14751,10 +14514,10 @@ narrative_event = {
 
 	after = {
 		if = {
-			limit = {
-				NOT = { has_character_flag = flag_ashoka_abandoning_quest }
-			}
-
+			limit = { has_character_flag = flag_ashoka_abandoning_quest }
+			clr_character_flag = flag_ashoka_abandoning_quest
+		}
+		else = {
 			piety = -500
 
 			hidden_effect = {
@@ -14930,9 +14693,6 @@ narrative_event = {
 					}
 				}
 			}
-		}
-		else = {
-			clr_character_flag = flag_ashoka_abandoning_quest
 		}
 	}
 }
@@ -15327,10 +15087,10 @@ narrative_event = {
 
 	after = {
 		if = {
-			limit = {
-				NOT = { has_character_flag = flag_ashoka_abandoning_quest }
-			}
-
+			limit = { has_character_flag = flag_ashoka_abandoning_quest }
+			clr_character_flag = flag_ashoka_abandoning_quest
+		}
+		else = {
 			piety = -500
 
 			hidden_effect = {
@@ -15507,9 +15267,6 @@ narrative_event = {
 				}
 			}
 		}
-		else = {
-			clr_character_flag = flag_ashoka_abandoning_quest
-		}
 	}
 }
 
@@ -15521,15 +15278,16 @@ narrative_event = {
 	border = GFX_event_narrative_frame_religion
 
 	desc = {
+		text = EVTDESCAHF24228
 		trigger = {
 			any_owned_bloodline = {
 				has_bloodline_flag = samrat_chakravartin_bloodline
 				bloodline_is_active_for = PREV
 			}
 		}
-		text = EVTDESCAHF24228
 	}
 	desc = {
+		text = EVTDESCBHF24228
 		trigger = {
 			NOT = {
 				any_owned_bloodline = {
@@ -15538,7 +15296,6 @@ narrative_event = {
 				}
 			}
 		}
-		text = EVTDESCBHF24228
 	}
 
 	is_triggered_only = yes
@@ -15589,6 +15346,7 @@ narrative_event = {
 	}
 }
 
+# Notify other players
 narrative_event = {
 	id = HF.24229
 	title = EVTTITLEHF24228
@@ -15596,6 +15354,7 @@ narrative_event = {
 	border = GFX_event_narrative_frame_religion
 
 	desc = {
+		text = EVTDESCAHF24229
 		trigger = {
 			FROM = {
 				any_owned_bloodline = {
@@ -15604,9 +15363,9 @@ narrative_event = {
 				}
 			}
 		}
-		text = EVTDESCAHF24229
 	}
 	desc = {
+		text = EVTDESCBHF24229
 		trigger = {
 			NOT = {
 				FROM = {
@@ -15617,12 +15376,9 @@ narrative_event = {
 				}
 			}
 		}
-		text = EVTDESCBHF24229
 	}
 
 	is_triggered_only = yes
-
-	ai = no
 
 	option = {
 		name = EVTOPTAHF24229
@@ -15896,10 +15652,6 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
-	only_capable = yes
-	prisoner = no
-
 	immediate = {
 		spawn_fantastic_diplomat_effect = yes
 
@@ -15946,10 +15698,6 @@ character_event = {
 
 	is_triggered_only = yes
 
-	only_playable = yes
-	only_capable = yes
-	prisoner = no
-
 	immediate = {
 		spawn_fantastic_scholar_effect = yes
 
@@ -15993,21 +15741,17 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { is_female = no }
-		picture = GFX_evt_hooded_figure_hf
 		text = EVTDESCHFA24239
+		picture = GFX_evt_hooded_figure_hf
+		trigger = { is_female = no }
 	}
 	desc = {
-		trigger = { is_female = yes }
-		picture = GFX_evt_woman_at_window_hf
 		text = EVTDESCHFB24239
+		picture = GFX_evt_woman_at_window_hf
+		trigger = { is_female = yes }
 	}
 
 	is_triggered_only = yes
-
-	only_playable = yes
-	only_capable = yes
-	prisoner = no
 
 	immediate = {
 		spawn_fantastic_scholar_effect = yes
@@ -16031,7 +15775,6 @@ character_event = {
 				}
 
 				become_heretic = yes
-				set_character_flag = ai_flag_refuse_conversion
 			}
 
 			else = {
@@ -16041,9 +15784,9 @@ character_event = {
 					25 = { religion = slavic_pagan }
 					25 = { }
 				}
-
-				set_character_flag = ai_flag_refuse_conversion
 			}
+
+			set_character_flag = ai_flag_refuse_conversion
 		}
 	}
 
@@ -16246,14 +15989,14 @@ narrative_event = {
 	sound = bloodline_added
 
 	desc = {
-		trigger = { character = c_7757 } # Special loc for Matilde
 		text = EVTDESCAHF24251
+		trigger = { character = c_7757 } # Special loc for Matilde
 	}
 	desc = {
+		text = EVTDESCBHF24251
 		trigger = {
 			NOT = { character = c_7757 } # Generic if just similar ruler
 		}
-		text = EVTDESCBHF24251
 	}
 
 	is_triggered_only = yes
@@ -16286,29 +16029,27 @@ narrative_event = {
 			create_bloodline = { type = matilde_male_bloodline }
 		}
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					religion = ROOT
-					is_within_diplo_range = ROOT
+		any_player = {
+			limit = {
+				religion = ROOT
+				is_within_diplo_range = ROOT
 
-					NOR = {
-						character = event_target:defeated_emperor
-						character = ROOT
-					}
-				}
-
-				narrative_event = {
-					id = HF.24252
-					days = 1
+				NOR = {
+					character = event_target:defeated_emperor
+					character = ROOT
 				}
 			}
 
-			event_target:defeated_emperor = {
-				narrative_event = {
-					id = HF.24253
-					days = 1
-				}
+			narrative_event = {
+				id = HF.24252
+				days = 1
+			}
+		}
+
+		event_target:defeated_emperor = {
+			narrative_event = {
+				id = HF.24253
+				days = 1
 			}
 		}
 	}
@@ -16327,6 +16068,7 @@ narrative_event = {
 	}
 }
 
+# Notify players
 narrative_event = {
 	id = HF.24252
 	title = EVTTITLEHF24252
@@ -16335,27 +16077,26 @@ narrative_event = {
 	sound = bloodline_added
 
 	desc = {
+		text = EVTDESCAHF24252
 		trigger = {
 			FROM = { character = c_7757 }
 		}
-		text = EVTDESCAHF24252
 	}
 	desc = {
+		text = EVTDESCBHF24252
 		trigger = {
 			FROM = { NOT = { character = c_7757 } }
 		}
-		text = EVTDESCBHF24252
 	}
 
 	is_triggered_only = yes
-
-	ai = no
 
 	option = {
 		name = EVTOPTAHF24252
 	}
 }
 
+# Notify defeated emperor
 narrative_event = {
 	id = HF.24253
 	title = EVTTITLEHF24252
@@ -16364,16 +16105,16 @@ narrative_event = {
 	sound = bloodline_added
 
 	desc = {
+		text = EVTDESCAHF24253
 		trigger = {
 			FROM = { character = c_7757 }
 		}
-		text = EVTDESCAHF24253
 	}
 	desc = {
+		text = EVTDESCBHF24253
 		trigger = {
 			FROM = { NOT = { character = c_7757 } }
 		}
-		text = EVTDESCBHF24253
 	}
 
 	is_triggered_only = yes
@@ -16390,9 +16131,7 @@ narrative_event = {
 
 		if = {
 			limit = {
-				FROM = {
-					character = c_7757
-				}
+				FROM = { character = c_7757 }
 			}
 
 			e_hre = {
