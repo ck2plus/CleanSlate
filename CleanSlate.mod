@@ -75,6 +75,9 @@ replace_path = "localisation"
 replace_path = "localisation/customizable_localisation"
 
 # replace_path = "history"
+replace_path = "history/characters"
 replace_path = "history/provinces"
+replace_path = "history/technology"
+replace_path = "history/titles"
 
 # To replace later: gfx, history, interface, launcher, map, songs
