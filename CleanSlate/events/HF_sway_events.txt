@@ -6,17 +6,17 @@ namespace = HF
 character_event = {
 	id = HF.21998
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_five_year_pulse
 	hide_window = yes
 
 	only_playable = yes
 	has_dlc = "Holy Fury"
 	ai = yes
-	only_capable = no
+	only_capable = yes
 	prisoner = no
+	min_age = 16
 
 	trigger = {
-		is_adult = yes
 		is_landed = yes
 		is_inaccessible_trigger = no
 
@@ -47,43 +47,39 @@ character_event = {
 				}
 
 				is_adult = yes
-
-				OR = {
-					religion_group = ROOT
-
-					AND = {
-						ROOT = { trait = sympathy_christendom }
-						religion_group = christian
-					}
-
-					AND = {
-						ROOT = { trait = sympathy_islam }
-						religion_group = muslim
-					}
-
-					AND = {
-						ROOT = { trait = sympathy_pagans }
-						religion_group = pagan_group
-					}
-
-					AND = {
-						ROOT = { trait = sympathy_zoroastrianism }
-						religion_group = zoroastrian_group
-					}
-
-					AND = {
-						ROOT = { trait = sympathy_judaism }
-						religion_group = jewish_group
-					}
-
-					AND = {
-						ROOT = { trait = sympathy_indian }
-						religion_group = indian_group
-					}
-				}
-
 				is_inaccessible_trigger = no
 				is_incapable = no
+
+				trigger_if = {
+					limit = {
+						NOT = { religion_group = ROOT }
+					}
+
+					trigger_if = {
+						limit = { religion_group = christian }
+						ROOT = { trait = sympathy_christendom }
+					}
+					trigger_else_if = {
+						limit = { religion_group = muslim }
+						ROOT = { trait = sympathy_islam }
+					}
+					trigger_else_if = {
+						limit = { religion_group = pagan_group }
+						ROOT = { trait = sympathy_pagans }
+					}
+					trigger_else_if = {
+						limit = { religion_group = zoroastrian_group }
+						ROOT = { trait = sympathy_zoroastrianism }
+					}
+					trigger_else_if = {
+						limit = { religion_group = jewish_group }
+						ROOT = { trait = sympathy_judaism }
+					}
+					trigger_else = {
+						religion_group = indian_group
+						ROOT = { trait = sympathy_indian }
+					}
+				}
 
 				NOR = {
 					has_opinion_modifier = {
@@ -97,8 +93,8 @@ character_event = {
 					has_character_flag = flag_character_being_swayed
 					has_character_flag = flag_character_being_antagonized
 
-					AND = {
-						religion_group = pagan_group
+					trigger_if = {
+						limit = { religion_group = pagan_group }
 						NOT = { religion = ROOT }
 						ROOT = { trait = zealous }
 					}
@@ -540,7 +536,7 @@ character_event = {
 
 	has_dlc = "Holy Fury"
 	prisoner = no
-	only_capable = no
+	only_capable = yes
 
 	trigger = {
 		# If character has become incapable, out of reach or otherwise unable to be interacted with, a notification event will be sent.
@@ -565,7 +561,7 @@ character_event = {
 	is_triggered_only = yes
 	hide_window = yes
 
-	only_capable = no
+	only_capable = yes
 	prisoner = no
 
 	trigger = {
@@ -1085,7 +1081,7 @@ character_event = {
 character_event = {
 	id = HF.21001
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 	hide_window = yes
 
 	has_character_flag = flag_character_being_swayed
@@ -1130,8 +1126,6 @@ character_event = {
 	picture = GFX_evt_woman_at_window_hf
 	portrait = persistent_event_target:sway_target
 
-	is_triggered_only = yes
-
 	desc = {
 		text = EVTDESCHFP21002_A # They are in Seclusion
 		trigger = {
@@ -1143,6 +1137,7 @@ character_event = {
 		text = EVTDESCHFP21002_B # I am in Seclusion (without them)
 		trigger = {
 			in_seclusion = yes
+
 			persistent_event_target:sway_target = {
 				in_seclusion = no
 				NOT = { at_location = ROOT } # Just in case you somehow kicked them out of your own Seclusion
@@ -1153,12 +1148,15 @@ character_event = {
 		text = EVTDESCHFP21002_A_B # I am in Seclusion, and they are too (separately)
 		trigger = {
 			in_seclusion = yes
+
 			persistent_event_target:sway_target = {
 				in_seclusion = yes
 				NOT = { at_location = ROOT }
 			}
 		}
 	}
+
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTAHFP21002
@@ -1332,10 +1330,9 @@ character_event = {
 	option = { # No
 		name = EVTOPTBHFP21010
 
-		custom_tooltip = {
-			text = tooltip_21003_B
-			set_character_flag = flag_swayed_swayed_notification
-		}
+		custom_tooltip = { text = tooltip_21003_B }
+
+		set_character_flag = flag_swayed_swayed_notification
 
 		ai_chance = { factor = 0 }
 	}
@@ -1784,13 +1781,13 @@ character_event = {
 	}
 	desc = {
 		text = EVTDESCCHFP21018
-		trigger = { FROM = { has_character_flag = flag_generic_sway_failure } }
 		picture = GFX_evt_upsetting_letter
+		trigger = { FROM = { has_character_flag = flag_generic_sway_failure } }
 	}
 	desc = {
 		text = EVTDESCDHFP21018
-		trigger = { FROM = { has_character_flag = flag_generic_sway_crit_failure } }
 		picture = GFX_evt_upsetting_letter
+		trigger = { FROM = { has_character_flag = flag_generic_sway_crit_failure } }
 	}
 
 	is_triggered_only = yes
@@ -2033,19 +2030,15 @@ character_event = {
 		name = EVTOPTDHFP21021
 
 		trigger = { NOT = { trait = greedy } }
-
-		ai_chance = { factor = 1 }
 	}
 
-	option = { # No gift more gifts
+	option = { # No more gifts
 		name = EVTOPTEHFP21021
 		tooltip_info = greedy
 
 		trigger = { trait = greedy }
 
 		set_character_flag = flag_tired_of_gifts
-
-		ai_chance = { factor = 1 }
 	}
 }
 
@@ -2123,7 +2116,7 @@ character_event = {
 
 		reverse_opinion = {
 			name = opinion_offended
-			who = ROOT
+			who = FROM
 			years = 2
 		}
 
@@ -2263,14 +2256,12 @@ character_event = {
 
 		trigger = { prestige >= 300 }
 
-		custom_tooltip = {
-			text = tooltip_21026_A
+		custom_tooltip = { text = tooltip_21026_A }
 
-			set_character_flag = flag_sway_big_gift
+		set_character_flag = flag_sway_big_gift
 
-			FROM = {
-				character_event = { id = HF.21027 }
-			}
+		FROM = {
+			character_event = { id = HF.21027 }
 		}
 
 		prestige = -300
@@ -2283,14 +2274,12 @@ character_event = {
 
 		trigger = { prestige >= 150 }
 
-		custom_tooltip = {
-			text = tooltip_21026_B
+		custom_tooltip = { text = tooltip_21026_B }
 
-			set_character_flag = flag_sway_medium_gift
+		set_character_flag = flag_sway_medium_gift
 
-			FROM = {
-				character_event = { id = HF.21027 }
-			}
+		FROM = {
+			character_event = { id = HF.21027 }
 		}
 
 		prestige = -150
@@ -2303,14 +2292,12 @@ character_event = {
 
 		trigger = { prestige >= 50 }
 
-		custom_tooltip = {
-			text = tooltip_21026_C
+		custom_tooltip = { text = tooltip_21026_C }
 
-			set_character_flag = flag_sway_small_gift
+		set_character_flag = flag_sway_small_gift
 
-			FROM = {
-				character_event = { id = HF.21027 }
-			}
+		FROM = {
+			character_event = { id = HF.21027 }
 		}
 
 		prestige = -50
@@ -2541,14 +2528,14 @@ character_event = {
 	portrait = persistent_event_target:sway_target
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -2556,14 +2543,12 @@ character_event = {
 	option = { # Discuss strategy
 		name = EVTOPTAHFP21031
 
-		custom_tooltip = {
-			text = tooltip_21031_A # Using martial
+		custom_tooltip = { text = tooltip_21031_A } # Using martial
 
-			set_character_flag = flag_sway_discuss_strategy
+		set_character_flag = flag_sway_discuss_strategy
 
-			FROM = {
-				character_event = { id = HF.21032 }
-			}
+		FROM = {
+			character_event = { id = HF.21032 }
 		}
 
 		ai_chance = { factor = 20 }
@@ -2572,14 +2557,12 @@ character_event = {
 	option = { # Brag about military accomplishments
 		name = EVTOPTBHFP21031
 
-		custom_tooltip = {
-			text = tooltip_21031_B # Using diplomacy (but also checking martial traits)
+		custom_tooltip = { text = tooltip_21031_B } # Using diplomacy (but also checking martial traits)
 
-			set_character_flag = flag_sway_brag_military
+		set_character_flag = flag_sway_brag_military
 
-			FROM = {
-				character_event = { id = HF.21032 }
-			}
+		FROM = {
+			character_event = { id = HF.21032 }
 		}
 
 		ai_chance = { factor = 40 }
@@ -2606,14 +2589,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -2922,17 +2905,18 @@ character_event = {
 			has_character_flag = flag_sway_brag_military
 		}
 	}
+
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = {
 				has_religion_feature = religion_matriarchal
 			}
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -2977,14 +2961,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -3017,14 +3001,12 @@ character_event = {
 			persistent_event_target:sway_target = { is_ruler = yes }
 		}
 
-		custom_tooltip = {
-			text = tooltip_21036_A
+		custom_tooltip = { text = tooltip_21036_A }
 
-			set_character_flag = flag_way_send_diploembassy
+		set_character_flag = flag_way_send_diploembassy
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21037 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21037 }
 		}
 
 		ai_chance = { factor = 40 }
@@ -3033,14 +3015,12 @@ character_event = {
 	option = {
 		name = EVTOPTBHFP21036
 
-		custom_tooltip = {
-			text = tooltip_21036_B
+		custom_tooltip = { text = tooltip_21036_B }
 
-			set_character_flag = flag_sway_send_diploletter
+		set_character_flag = flag_sway_send_diploletter
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21037 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21037 }
 		}
 
 		ai_chance = { factor = 20 }
@@ -3253,13 +3233,13 @@ character_event = {
 
 	desc = {
 		text = EVTDESCAHFP21038
-		trigger = { has_character_flag = flag_way_send_diploembassy }
 		picture = GFX_evt_state_diplomacy
+		trigger = { has_character_flag = flag_way_send_diploembassy }
 	}
 	desc = {
 		text = EVTDESCBHFP21038
-		trigger = { has_character_flag = flag_sway_send_diploletter }
 		picture = GFX_evt_pleasing_letter
+		trigger = { has_character_flag = flag_sway_send_diploletter }
 	}
 
 	is_triggered_only = yes
@@ -3305,14 +3285,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -3377,14 +3357,12 @@ character_event = {
 
 		trigger = { stewardship >= 10 }
 
-		custom_tooltip = {
-			text = tooltip_21041_A
+		custom_tooltip = { text = tooltip_21041_A }
 
-			set_character_flag = flag_sway_send_stewletter
+		set_character_flag = flag_sway_send_stewletter
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21042 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21042 }
 		}
 
 		ai_chance = { factor = 60 }
@@ -3405,24 +3383,16 @@ character_event = {
 		random = {
 			chance = 10
 
-			if = {
-				limit = { trait = greedy }
-				remove_trait_greedy_effect = yes
-			}
-			else_if = {
-				limit = { NOT = { trait = charitable } }
-				add_trait_charitable_effect = yes
-			}
+			add_trait_charitable_effect = yes
+			remove_trait_greedy_effect = yes
 		}
 
-		custom_tooltip = {
-			text = tooltip_21041_B
+		custom_tooltip = { text = tooltip_21041_B }
 
-			set_character_flag = flag_sway_share_wealth
+		set_character_flag = flag_sway_share_wealth
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21042 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21042 }
 		}
 
 		wealth = -100
@@ -3440,14 +3410,12 @@ character_event = {
 	option = { # Tell about your prosperous realm - Diplomacy check
 		name = EVTOPTCHFP21041
 
-		custom_tooltip = {
-			text = tooltip_21041_C
+		custom_tooltip = { text = tooltip_21041_C }
 
-			set_character_flag = flag_sway_tell_prosperity
+		set_character_flag = flag_sway_tell_prosperity
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21042 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21042 }
 		}
 
 		ai_chance = { factor = 20 }
@@ -3813,8 +3781,8 @@ character_event = {
 	}
 	desc = {
 		text = EVTDESCBHFP21043
-		trigger = { has_character_flag = flag_sway_share_wealth }
 		picture = GFX_evt_pleasing_letter
+		trigger = { has_character_flag = flag_sway_share_wealth }
 	}
 	desc = {
 		text = EVTDESCCHFP21043
@@ -3880,14 +3848,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -3917,14 +3885,12 @@ character_event = {
 
 		trigger = { stewardship >= 10 }
 
-		custom_tooltip = {
-			text = tooltip_21046_A
+		custom_tooltip = { text = tooltip_21046_A }
 
-			set_character_flag = flag_sway_gift_book
+		set_character_flag = flag_sway_gift_book
 
-			FROM = {
-				character_event = { id = HF.21047 }
-			}
+		FROM = {
+			character_event = { id = HF.21047 }
 		}
 
 		scaled_wealth = -0.1
@@ -3939,14 +3905,12 @@ character_event = {
 			NOT = { trait = cynical }
 		}
 
-		custom_tooltip = {
-			text = tooltip_21046_B
+		custom_tooltip = { text = tooltip_21046_B }
 
-			set_character_flag = flag_sway_offer_prayers
+		set_character_flag = flag_sway_offer_prayers
 
-			FROM = {
-				character_event = { id = HF.21047 }
-			}
+		FROM = {
+			character_event = { id = HF.21047 }
 		}
 
 		ai_chance = {
@@ -3962,14 +3926,12 @@ character_event = {
 	option = { # Lend books
 		name = EVTOPTCHFP21046
 
-		custom_tooltip = {
-			text = tooltip_21046_C
+		custom_tooltip = { text = tooltip_21046_C }
 
-			set_character_flag = flag_sway_lend_books
+		set_character_flag = flag_sway_lend_books
 
-			FROM = {
-				character_event = { id = HF.21047 }
-			}
+		FROM = {
+			character_event = { id = HF.21047 }
 		}
 
 		add_character_modifier = {
@@ -4257,17 +4219,14 @@ character_event = {
 	desc = {
 		text = EVTDESCAHFP21048
 		trigger = { has_character_flag = flag_sway_gift_book }
-		picture = GFX_evt_pleasing_letter
 	}
 	desc = {
 		text = EVTDESCBHFP21048
 		trigger = { has_character_flag = flag_sway_offer_prayers }
-		picture = GFX_evt_pleasing_letter
 	}
 	desc = {
 		text = EVTDESCCHFP21048
 		trigger = { has_character_flag = flag_sway_lend_books }
-		picture = GFX_evt_pleasing_letter
 	}
 
 	is_triggered_only = yes
@@ -4317,14 +4276,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -4364,14 +4323,12 @@ character_event = {
 
 		trigger = { learning >= 10 }
 
-		custom_tooltip = {
-			text = tooltip_21051_A
+		custom_tooltip = { text = tooltip_21051_A }
 
-			set_character_flag = flag_sway_dirty_letter
+		set_character_flag = flag_sway_dirty_letter
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21052 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21052 }
 		}
 
 		ai_chance = { factor = 60 }
@@ -4387,14 +4344,12 @@ character_event = {
 			trigger = { persistent_event_target:sway_target = { prefers_men_trigger = yes } }
 		}
 
-		custom_tooltip = {
-			text = tooltip_21051_B
+		custom_tooltip = { text = tooltip_21051_B }
 
-			set_character_flag = flag_sway_send_prostitutes
+		set_character_flag = flag_sway_send_prostitutes
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21052 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21052 }
 		}
 
 		scaled_wealth = {
@@ -4422,14 +4377,12 @@ character_event = {
 			}
 		}
 
-		custom_tooltip = {
-			text = tooltip_21051_C
+		custom_tooltip = { text = tooltip_21051_C }
 
-			set_character_flag = flag_sway_lustful_present
+		set_character_flag = flag_sway_lustful_present
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21052 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21052 }
 		}
 
 		tiered_piety_negative_effect = yes
@@ -4496,18 +4449,14 @@ character_event = {
 			chance = 10
 
 			if = {
-				limit = { trait = chaste }
-				remove_trait_chaste_effect = yes
-			}
-			else_if = {
 				limit = {
-					NOR = {
-						trait = lustful
-						trait = celibate
-					}
+					NOT = { trait = celibate }
 				}
+
 				add_trait_lustful_effect = yes
 			}
+
+			remove_trait_chaste_effect = yes
 		}
 
 		FROM = {
@@ -4602,9 +4551,7 @@ character_event = {
 			factor = 50
 
 			trigger = {
-				FROM = {
-					root_attraction_trigger = yes # Must be compatible
-				}
+				FROM = { root_attraction_trigger = yes } # Must be compatible
 			}
 
 			mult_modifier = {
@@ -5116,18 +5063,18 @@ character_event = {
 
 	desc = {
 		text = EVTDESCAHFP21053
-		trigger = { has_character_flag = flag_sway_dirty_letter }
 		picture = GFX_evt_recovery
+		trigger = { has_character_flag = flag_sway_dirty_letter }
 	}
 	desc = {
 		text = EVTDESCBHFP21053
-		trigger = { has_character_flag = flag_sway_send_prostitutes }
 		picture = GFX_evt_sultan
+		trigger = { has_character_flag = flag_sway_send_prostitutes }
 	}
 	desc = {
 		text = EVTDESCCHFP21053
-		trigger = { has_character_flag = flag_sway_lustful_present }
 		picture = GFX_evt_lovers
+		trigger = { has_character_flag = flag_sway_lustful_present }
 	}
 
 	is_triggered_only = yes
@@ -5216,14 +5163,12 @@ character_event = {
 
 		trigger = { learning >= 10 }
 
-		custom_tooltip = {
-			text = tooltip_21056_A
+		custom_tooltip = { text = tooltip_21056_A }
 
-			set_character_flag = flag_sway_exotic_food
+		set_character_flag = flag_sway_exotic_food
 
-			FROM = {
-				character_event = { id = HF.21057 }
-			}
+		FROM = {
+			character_event = { id = HF.21057 }
 		}
 
 		scaled_wealth = -0.5
@@ -5242,14 +5187,12 @@ character_event = {
 	option = { # Invite to dinner
 		name = EVTOPTBHFP21056
 
-		custom_tooltip = {
-			text = tooltip_21056_B
+		custom_tooltip = { text = tooltip_21056_B }
 
-			set_character_flag = flag_sway_glutton_dinner
+		set_character_flag = flag_sway_glutton_dinner
 
-			FROM = {
-				character_event = { id = HF.21057 }
-			}
+		FROM = {
+			character_event = { id = HF.21057 }
 		}
 
 		tiered_prestige_negative_effect = yes
@@ -5292,14 +5235,8 @@ character_event = {
 		random = {
 			chance = 10
 
-			if = {
-				limit = { trait = temperate }
-				remove_trait_temperate_effect = yes
-			}
-			else_if = {
-				limit = { NOT = { trait = gluttonous } }
-				add_trait_gluttonous_effect = yes
-			}
+			add_trait_gluttonous_effect = yes
+			remove_trait_temperate_effect = yes
 		}
 
 		FROM = {
@@ -5731,14 +5668,12 @@ character_event = {
 	option = { # Invite for sightseeing
 		name = EVTOPTAHFP21061
 
-		custom_tooltip = {
-			text = tooltip_21061_A
+		custom_tooltip = { text = tooltip_21061_A }
 
-			set_character_flag = flag_sway_sloth_sights
+		set_character_flag = flag_sway_sloth_sights
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21062 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21062 }
 		}
 
 		ai_chance = {
@@ -5756,14 +5691,12 @@ character_event = {
 
 		trigger = { event_target:localized_chancellor = { always = yes } }
 
-		custom_tooltip = {
-			text = tooltip_21061_B
+		custom_tooltip = { text = tooltip_21061_B }
 
-			set_character_flag = flag_sway_sloth_letter
+		set_character_flag = flag_sway_sloth_letter
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21062 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21062 }
 		}
 
 		ai_chance = {
@@ -6187,14 +6120,12 @@ character_event = {
 	option = { # Benefits of direct action
 		name = EVTOPTAHFP21066
 
-		custom_tooltip = {
-			text = tooltip_21066_A
+		custom_tooltip = { text = tooltip_21066_A }
 
-			set_character_flag = flag_sway_wroth_approach
+		set_character_flag = flag_sway_wroth_approach
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21067 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21067 }
 		}
 
 		ai_chance = {
@@ -6210,14 +6141,12 @@ character_event = {
 	option = { # Demand friendship
 		name = EVTOPTBHFP21066
 
-		custom_tooltip = {
-			text = tooltip_21066_B
+		custom_tooltip = { text = tooltip_21066_B }
 
-			set_character_flag = flag_sway_wroth_demand
+		set_character_flag = flag_sway_wroth_demand
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21067 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21067 }
 		}
 
 		ai_chance = {
@@ -6494,14 +6423,12 @@ character_event = {
 	option = { # Send letter
 		name = EVTOPTAHFP21071
 
-		custom_tooltip = {
-			text = tooltip_21071_A
+		custom_tooltip = { text = tooltip_21071_A }
 
-			set_character_flag = flag_sway_proud_letter
+		set_character_flag = flag_sway_proud_letter
 
-			FROM = {
-				character_event = { id = HF.21072 }
-			}
+		FROM = {
+			character_event = { id = HF.21072 }
 		}
 
 		ai_chance = {
@@ -6519,14 +6446,12 @@ character_event = {
 
 		trigger = { job_chancellor = { always = yes } }
 
-		custom_tooltip = {
-			text = tooltip_21071_B
+		custom_tooltip = { text = tooltip_21071_B }
 
-			set_character_flag = flag_sway_proud_statue
+		set_character_flag = flag_sway_proud_statue
 
-			FROM = {
-				character_event = { id = HF.21072 }
-			}
+		FROM = {
+			character_event = { id = HF.21072 }
 		}
 
 		scaled_wealth = {
@@ -6937,14 +6862,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -6952,14 +6877,12 @@ character_event = {
 	option = { # Ask for friendship
 		name = EVTOPTAHFP21076
 
-		custom_tooltip = {
-			text = tooltip_21076_A
+		custom_tooltip = { text = tooltip_21076_A }
 
-			set_character_flag = flag_sway_kind_approach
+		set_character_flag = flag_sway_kind_approach
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21077 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21077 }
 		}
 
 		tiered_prestige_negative_effect = yes
@@ -6982,14 +6905,12 @@ character_event = {
 			any_courtier_or_vassal = { has_minor_title = title_court_physician }
 		}
 
-		custom_tooltip = {
-			text = tooltip_21076_B
+		custom_tooltip = { text = tooltip_21076_B }
 
-			set_character_flag = flag_sway_kind_health
+		set_character_flag = flag_sway_kind_health
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21077 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21077 }
 		}
 
 		ai_chance = { factor = 40 }
@@ -7005,14 +6926,12 @@ character_event = {
 			}
 		}
 
-		custom_tooltip = {
-			text = tooltip_21076_C
+		custom_tooltip = { text = tooltip_21076_C }
 
-			set_character_flag = flag_sway_kind_religion
+		set_character_flag = flag_sway_kind_religion
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21077 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21077 }
 		}
 
 		if = {
@@ -7078,14 +6997,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -7354,14 +7273,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -7466,14 +7385,14 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -7632,12 +7551,12 @@ character_event = {
 	portrait = persistent_event_target:sway_target
 
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_prisoner_hf
+		trigger = { is_female = yes }
 	}
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_hooded_figure_hf
+		trigger = { is_female = no }
 	}
 
 	is_triggered_only = yes
@@ -7645,14 +7564,12 @@ character_event = {
 	option = { # Offer head of detractor
 		name = EVTOPTAHFP21085
 
-		custom_tooltip = {
-			text = tooltip_21085_A
+		custom_tooltip = { text = tooltip_21085_A }
 
-			set_character_flag = flag_way_cruel_head
+		set_character_flag = flag_way_cruel_head
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21086 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21086 }
 		}
 
 		ai_chance = {
@@ -7668,14 +7585,12 @@ character_event = {
 	option = { # Send treaty on torture
 		name = EVTOPTBHFP21085
 
-		custom_tooltip = {
-			text = tooltip_21085_B
+		custom_tooltip = { text = tooltip_21085_B }
 
-			set_character_flag = flag_way_cruel_letter
+		set_character_flag = flag_way_cruel_letter
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21086 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21086 }
 		}
 
 		ai_chance = {
@@ -7707,13 +7622,14 @@ character_event = {
 		text = EVTDESCBHFP21086
 		trigger = { FROM = { has_character_flag = flag_way_cruel_letter } }
 	}
+
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_prisoner_hf
+		trigger = { is_female = yes }
 	}
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_hooded_figure_hf
+		trigger = { is_female = no }
 	}
 
 	is_triggered_only = yes
@@ -7790,14 +7706,8 @@ character_event = {
 		random = {
 			chance = 30
 
-			if = {
-				limit = { trait = kind }
-				remove_trait_kind_effect = yes
-			}
-			else_if = {
-				limit = { NOT = { trait = cruel } }
-				add_trait_cruel_effect = yes
-			}
+			add_trait_cruel_effect = yes
+			remove_trait_kind_effect = yes
 		}
 
 		opinion = {
@@ -8022,12 +7932,12 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_prisoner_hf
+		trigger = { is_female = yes }
 	}
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_hooded_figure_hf
+		trigger = { is_female = no }
 	}
 
 	is_triggered_only = yes
@@ -8076,12 +7986,12 @@ character_event = {
 	}
 
 	picture = {
-		trigger = { is_female = yes }
 		picture = GFX_evt_prisoner_hf
+		trigger = { is_female = yes }
 	}
 	picture = {
-		trigger = { is_female = no }
 		picture = GFX_evt_hooded_figure_hf
+		trigger = { is_female = no }
 	}
 
 	is_triggered_only = yes
@@ -8132,14 +8042,12 @@ character_event = {
 			}
 		}
 
-		custom_tooltip = {
-			text = tooltip_21090_A
+		custom_tooltip = { text = tooltip_21090_A }
 
-			set_character_flag = flag_sway_poet_looks
+		set_character_flag = flag_sway_poet_looks
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21091 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21091 }
 		}
 
 		ai_chance = {
@@ -8162,14 +8070,12 @@ character_event = {
 
 		trigger = { is_ruler = yes }
 
-		custom_tooltip = {
-			text = tooltip_21090_B
+		custom_tooltip = { text = tooltip_21090_B }
 
-			set_character_flag = flag_sway_poet_realm
+		set_character_flag = flag_sway_poet_realm
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21091 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21091 }
 		}
 
 		ai_chance = {
@@ -8185,14 +8091,12 @@ character_event = {
 	option = { # Write about accomplishments
 		name = EVTOPTCHFP21090
 
-		custom_tooltip = {
-			text = tooltip_21090_C
+		custom_tooltip = { text = tooltip_21090_C }
 
-			set_character_flag = flag_sway_poet_deeds
+		set_character_flag = flag_sway_poet_deeds
 
-			persistent_event_target:sway_target = {
-				character_event = { id = HF.21091 }
-			}
+		persistent_event_target:sway_target = {
+			character_event = { id = HF.21091 }
 		}
 
 		ai_chance = {
@@ -8233,6 +8137,8 @@ character_event = {
 # Swayed: Poet swaying
 character_event = {
 	id = HF.21091
+	picture = GFX_evt_pleasing_letter
+
 	desc = {
 		text = EVTDESCAHFP21091
 		trigger = { FROM = { has_character_flag = flag_sway_poet_looks } }
@@ -8245,8 +8151,6 @@ character_event = {
 		text = EVTDESCCHFP21091
 		trigger = { FROM = { has_character_flag = flag_sway_poet_deeds } }
 	}
-
-	picture = GFX_evt_pleasing_letter
 
 	is_triggered_only = yes
 
@@ -8348,14 +8252,8 @@ character_event = {
 		random = {
 			chance = 20
 
-			if = {
-				limit = { trait = humble }
-				remove_trait_humble_effect = yes
-			}
-			else_if = {
-				limit = { NOT = { trait = proud } }
-				add_trait_proud_effect = yes
-			}
+			add_trait_proud_effect = yes
+			remove_trait_humble_effect = yes
 		}
 
 		opinion = {
@@ -8713,8 +8611,8 @@ character_event = {
 			show_scope_change = no
 
 			opinion = {
-				who = ROOT
 				name = opinion_swayed_2
+				who = ROOT
 				years = 10
 			}
 
@@ -9027,7 +8925,7 @@ character_event = {
 		# Do not let this event happen too often
 		add_character_modifier = {
 			name = sway_visit_cooldown
-			duration = 2000
+			days = 2000
 			hidden = yes
 		}
 	}
@@ -9082,7 +8980,7 @@ character_event = {
 
 		add_character_modifier = {
 			name = out_traveling
-			duration = 15
+			days = 15
 		}
 	}
 
@@ -9108,14 +9006,14 @@ character_event = {
 	desc = EVTDESCHFP21100
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	trigger = {
@@ -14281,14 +14179,14 @@ character_event = {
 	desc = EVTDESCHFP21105 # Composite custom loc
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -14340,18 +14238,18 @@ character_event = {
 					}
 				}
 			}
-
-			clr_character_flag = flag_sway_visit_relative
-			clr_character_flag = flag_sway_visit_religion
-			clr_character_flag = flag_sway_visit_inside
-			clr_character_flag = flag_sway_visit_outside
-
-			clr_character_flag = flag_sway_visit_swayed_3
-			clr_character_flag = flag_sway_visit_swayed_2
-			clr_character_flag = flag_sway_visit_swayed_1
-			clr_character_flag = flag_sway_visit_swayed_0
-			clr_character_flag = flag_sway_visit_failure_1
 		}
+
+		clr_character_flag = flag_sway_visit_relative
+		clr_character_flag = flag_sway_visit_religion
+		clr_character_flag = flag_sway_visit_inside
+		clr_character_flag = flag_sway_visit_outside
+
+		clr_character_flag = flag_sway_visit_swayed_3
+		clr_character_flag = flag_sway_visit_swayed_2
+		clr_character_flag = flag_sway_visit_swayed_1
+		clr_character_flag = flag_sway_visit_swayed_0
+		clr_character_flag = flag_sway_visit_failure_1
 
 		hidden_effect = {
 			random_list = {
@@ -14466,7 +14364,7 @@ character_event = {
 
 				20 = {
 					trigger = {
-						has_any_lifestyle_trait = no
+						lifestyle_traits < 1
 
 						FROM = {
 							OR = {
@@ -14883,14 +14781,14 @@ character_event = {
 	desc = EVTDESCHFP21114
 
 	picture = {
-		trigger = { has_religion_feature = religion_matriarchal }
 		picture = GFX_evt_daughter_asking_mother
+		trigger = { has_religion_feature = religion_matriarchal }
 	}
 	picture = {
+		picture = GFX_evt_son_asking_father
 		trigger = {
 			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		picture = GFX_evt_son_asking_father
 	}
 
 	is_triggered_only = yes
@@ -15148,7 +15046,7 @@ character_event = {
 	}
 }
 
-# SwayeR: Has become rivals with Swayed
+# Swayer: Has become rivals with Swayed
 character_event = {
 	id = HF.21123
 	desc = EVTDESCHFP21123
@@ -17824,11 +17722,11 @@ character_event = {
 		trigger = { FROM = { has_character_flag = flag_sway_war_compliment } }
 	}
 
+	is_triggered_only = yes
+
 	trigger = {
 		FROM = { is_alive = yes }
 	}
-
-	is_triggered_only = yes
 
 	option = { # Accept new tactic limitations
 		name = EVTOPTAHF21141

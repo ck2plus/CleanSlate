@@ -7,29 +7,42 @@ decisions = {
 
 		potential = {
 			is_adult = yes
-			prisoner = no
-			OR = {
-				has_character_flag = survivor_mom
-				num_of_children = 6
-			}
-			is_ruler = yes
 			is_female = yes
 			is_incapable = no
-			NOT = { trait = celibate }
-			NOT = { has_character_flag = survivor_mom_broken_vow }
+			prisoner = no
+
+			OR = {
+				has_character_flag = survivor_mom
+				num_of_children >= 6
+			}
+
+			NOR = {
+				trait = celibate
+				has_character_flag = survivor_mom_broken_vow
+			}
 		}
 
 		allow = {
 			OR = {
-				has_character_flag = survivor_mom
-				num_of_children = 6
+				has_character_flag = survivor_mom # TODO: Shows nothing in tooltip
+				num_of_children >= 6
 			}
 
 			OR = {
 				is_married = no
 				spouse = { is_ruler = no }
-				has_law = status_of_women_4
-				has_religion_feature = religion_matriarchal
+				has_law = enatic_succession
+				has_law = enatic_cognatic_succession
+
+				trigger_if = {
+					limit = { has_dlc = "Conclave" }
+					has_law = status_of_women_4
+				}
+
+				has_game_rule = {
+					name = gender
+					value = all
+				}
 			}
 		}
 
@@ -174,36 +187,82 @@ decisions = {
 
 			mult_modifier = {
 				factor = 1.5
-				num_of_children >= 1
-				any_child = { is_female = no }
+
+				trigger_if = {
+					limit = {
+						OR = {
+							has_law = cognatic_succession
+							has_law = agnatic_succession
+						}
+					}
+
+					any_child = { is_female = no }
+				}
+				trigger_else_if = {
+					limit = {
+						OR = {
+							has_law = enatic_cognatic_succession
+							has_law = enatic_succession
+						}
+					}
+
+					any_child = { is_female = yes }
+				}
+				trigger_else = {
+					has_living_children = yes
+				}
 			}
 
 			mult_modifier = {
 				factor = 1.5
+
 				num_of_children >= 2
-				any_child = { is_female = no }
+
+				trigger_if = {
+					limit = {
+						OR = {
+							has_law = cognatic_succession
+							has_law = agnatic_succession
+						}
+					}
+
+					any_child = { is_female = no }
+				}
+				trigger_else_if = {
+					limit = {
+						OR = {
+							has_law = enatic_cognatic_succession
+							has_law = enatic_succession
+						}
+					}
+
+					any_child = { is_female = yes }
+				}
+				trigger_else = {
+					has_living_children = yes
+				}
 			}
 
 			mult_modifier = {
 				factor = 0.75
-				age < 20
+				practical_age < 20
 			}
 
 			mult_modifier = {
 				factor = 0.85
-				age >= 20
-				age < 30
+				practical_age >= 20
+				practical_age < 30
 			}
 
 			mult_modifier = {
 				factor = 0.95
-				age >= 30
-				age < 40
+				practical_age >= 30
+				practical_age < 40
 			}
 
 			mult_modifier = {
 				factor = 3
-				age >= 40
+				practical_age >= 40
 			}
 		}
 	}
