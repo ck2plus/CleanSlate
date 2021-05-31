@@ -545,11 +545,7 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 	}
 
 	if = { # If you go after your rival, small bonus...
-		limit = {
-			event_target:combatant_2 = {
-				is_rival = event_target:combatant_1
-			}
-		}
+		limit = { is_rival = event_target:combatant_2 }
 
 		change_variable = {
 			which = duel_result_score # (50 + X) - Y
@@ -559,14 +555,12 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 
 	if = { # If you go after someone who is romantically interested in you, small bonus (they might get distracted)...
 		limit = {
-			event_target:combatant_2 = {
-				has_opinion_modifier = {
-					who = event_target:combatant_1
-					name = opinion_budding_romance
-				}
-
-				NOT = { is_lover = event_target:combatant_1 }
+			reverse_has_opinion_modifier = {
+				who = event_target:combatant_2
+				name = opinion_budding_romance
 			}
+
+			NOT = { is_lover = event_target:combatant_2 }
 		}
 
 		change_variable = {
@@ -595,7 +589,7 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 
 	if = { # If you go after someone whom you have no feelings towards really, small bonus...
 		limit = {
-			 opinion = {
+			opinion = {
 				who = event_target:combatant_2
 				value < 0
 			}
@@ -614,10 +608,7 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 	################################################################
 
 	if = {
-		limit = {
-			event_target:combatant_2 = { trait = wroth }
-		}
-
+		limit = { event_target:combatant_2 = { trait = wroth } }
 		subtract_variable = {
 			which = duel_result_score # (50 + X) - Y
 			value = 1
@@ -625,9 +616,7 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 	}
 
 	if = {
-		limit = {
-			event_target:combatant_2 = { religion_group = pagan_group }
-		}
+		limit = { event_target:combatant_2 = { religion_group = pagan_group } }
 
 		subtract_variable = {
 			which = duel_result_score # (50 + X) - Y
@@ -697,11 +686,9 @@ evaluate_extra_duel_result_score_effect = { # [SPECIAL CIRCUMSTANCES - OPTIONAL]
 
 	if = { # If you go after someone who has no feelings towards you really, small malus (ie bonus for them)...
 		limit = {
-			event_target:combatant_2 = {
-				opinion = {
-					who = event_target:combatant_1
-					value < 5
-				}
+			reverse_opinion = {
+				who = event_target:combatant_1
+				value < 5
 			}
 		}
 
@@ -2571,12 +2558,14 @@ apply_random_minor_injury_effect = {
 apply_generic_duel_victory_effect = {
 	if = {
 		limit = { has_character_flag = mock_duel }
+
 		prestige = 15
 		# Run appropriate effects for joining or not joining the society
 	}
 	else = {
 		if = {
 			limit = { has_character_flag = is_rival_fight }
+
 			prestige = 100
 		}
 		else = {

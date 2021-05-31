@@ -8939,7 +8939,7 @@ character_event = {
 
 ### MISC EVENTS###
 
-# Makes sure d_hashashin owner and subjects have appropriate religion and assassins membership
+# Makes sure d_hashshashin owner and subjects have appropriate religion and assassins membership
 character_event = {
 	id = MNM.6990
 
@@ -8957,31 +8957,32 @@ character_event = {
 		if = {
 			limit = {
 				independent = yes
-				primary_title = { title = d_hashshashin }
 				NOT = { religion = shiite }
 			}
 
-			# Workaround for automatic usurption of theocratic characters
+			# Workaround for automatic usurpation of theocratic characters
 			shiite = { save_event_target_as = target_religion }
 
 			convert_religion_failsafe_effect = yes
 		}
-
 		else_if = {
 			limit = {
-				NOT = { secret_religion = shiite }
+				NOR = {
+					religion = shiite
+					secret_religion = shiite
+				}
 			}
+
 			clear_secret_religion = yes
 			set_secret_religion = shiite
 		}
 
 		# Try and force them to lvl 3 of the assassins
 		if = {
-			limit = {
-				NOT = { society_member_of = the_assassins }
-			}
+			limit = { NOT = { society_member_of = the_assassins } }
 			join_society = the_assassins
 		}
+
 		if = {
 			limit = {
 				society_rank = {
@@ -8989,6 +8990,7 @@ character_event = {
 					society = the_assassins
 				}
 			}
+
 			society_rank_up = {
 				rank = 2
 				society = the_assassins
@@ -9001,6 +9003,7 @@ character_event = {
 					society = the_assassins
 				}
 			}
+
 			society_rank_up = {
 				rank = 1
 				society = the_assassins
@@ -9009,12 +9012,10 @@ character_event = {
 
 		# Make every appropriate courtier member of society
 		if = {
-			limit = {
-				primary_title = { title = d_hashshashin }
-				religion = shiite
-			}
-			any_courtier = {
-				# Workaround for automatic usurption of theocratic characters
+			limit = { religion = shiite }
+
+			any_courtier_or_vassal = {
+				# Workaround for automatic usurpation of theocratic characters
 				shiite = { save_event_target_as = target_religion }
 
 				convert_religion_failsafe_effect = yes
@@ -9025,37 +9026,17 @@ character_event = {
 						is_adult = yes
 						prisoner = no
 						is_incapable = no
+
 						trigger_if = {
 							limit = { is_female = yes }
+
 							has_game_rule = {
 								name = gender
 								value = all
 							}
 						}
 					}
-					join_society = the_assassins
-				}
-			}
-			any_vassal = {
-				# Workaround for automatic usurption of theocratic characters
-				shiite = { save_event_target_as = target_religion }
 
-				convert_religion_failsafe_effect = yes
-
-				if = {
-					limit = {
-						is_in_society = no
-						is_adult = yes
-						prisoner = no
-						is_incapable = no
-						trigger_if = {
-							limit = { is_female = yes }
-							has_game_rule = {
-								name = gender
-								value = all
-							}
-						}
-					}
 					join_society = the_assassins
 				}
 			}
