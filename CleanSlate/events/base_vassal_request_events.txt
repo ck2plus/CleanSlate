@@ -19,7 +19,7 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	only_playable = yes
-	only_men = yes
+	only_men = yes # TODO: Does this need to be gender locked?
 	min_age = 16
 	only_capable = yes
 	prisoner = no
@@ -69,8 +69,6 @@ character_event = {
 	option = {
 		name = EVTOPTA63000 # Ask my liege for the title
 
-		ai_chance = { factor = 100 }
-
 		set_character_flag = requested_vassal_transfer
 
 		liege = {
@@ -101,19 +99,37 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		is_liege_of = ROOT # To make sure no titles have *just* been given away
+		is_liege_of = FROM # To make sure no titles have *just* been given away
 	}
 
 	fail_trigger_effect = {
-		FROM = {
-			clr_character_flag = requested_vassal_transfer
-		}
+		FROM = { clr_character_flag = requested_vassal_transfer }
 	}
 
 	option = {
 		name = EVTOPTA63001B # Very well, for a favor
 
 		trigger = { has_dlc = "Conclave" }
+
+		add_favor = FROM
+
+		FROM = { set_character_flag = vassal_for_favor }
+
+		random_vassal = {
+			show_scope_change = no
+
+			limit = {
+				de_jure_liege = FROM
+				war = no
+				is_patrician = no
+				NOT = { character = FROM }
+			}
+
+			character_event = {
+				id = 63002
+				tooltip = EVTTOOLTIP63002
+			}
+		}
 
 		ai_chance = {
 			factor = 50
@@ -152,28 +168,6 @@ character_event = {
 					who = FROM
 					value >= 25
 				}
-			}
-		}
-
-		add_favor = FROM
-
-		FROM = {
-			set_character_flag = vassal_for_favor
-		}
-
-		random_vassal = {
-			show_scope_change = no
-
-			limit = {
-				de_jure_liege = FROM
-				war = no
-				is_patrician = no
-				NOT = { character = FROM }
-			}
-
-			character_event = {
-				id = 63002
-				tooltip = EVTTOOLTIP63002
 			}
 		}
 	}
@@ -185,6 +179,22 @@ character_event = {
 			NOT = { has_dlc = "Conclave" }
 		}
 
+		random_vassal = {
+			show_scope_change = no
+
+			limit = {
+				de_jure_liege = FROM
+				war = no
+				is_patrician = no
+				NOT = { character = FROM }
+			}
+
+			character_event = {
+				id = 63002
+				tooltip = EVTTOOLTIP63002
+			}
+		}
+
 		ai_chance = {
 			factor = 50
 
@@ -224,26 +234,25 @@ character_event = {
 				}
 			}
 		}
-
-		random_vassal = {
-			show_scope_change = no
-
-			limit = {
-				de_jure_liege = FROM
-				war = no
-				is_patrician = no
-				NOT = { character = FROM }
-			}
-
-			character_event = {
-				id = 63002
-				tooltip = EVTTOOLTIP63002
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB63001 # I think not
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = FROM
+			years = 5
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = 63003
+				tooltip = EVTTOOLTIP63003
+			}
+		}
 
 		ai_chance = {
 			factor = 50
@@ -268,21 +277,6 @@ character_event = {
 				trait = greedy
 			}
 		}
-
-		reverse_opinion = {
-			name = opinion_disappointed
-			who = FROM
-			years = 5
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			character_event = {
-				id = 63003
-				tooltip = EVTTOOLTIP63003
-			}
-		}
 	}
 
 	option = {
@@ -290,10 +284,6 @@ character_event = {
 		tooltip_info = intrigue
 
 		trigger = { intrigue >= 9 }
-
-		ai_chance = {
-			factor = 50
-		}
 
 		random_vassal = {
 			show_scope_change = no
@@ -326,6 +316,8 @@ character_event = {
 		FROM = {
 			character_event = { id = 63004 }
 		}
+
+		ai_chance = { factor = 50 }
 	}
 
 	option = {
@@ -333,6 +325,21 @@ character_event = {
 		tooltip_info = diplomacy
 
 		trigger = { diplomacy >= 9 }
+
+		reverse_opinion = {
+			name = opinion_impressed
+			who = FROM
+			years = 2
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 63005
+				tooltip = EVTTOOLTIP63005
+			}
+		}
 
 		ai_chance = {
 			factor = 1000
@@ -355,21 +362,6 @@ character_event = {
 			mult_modifier = {
 				factor = 10.0
 				trait = greedy
-			}
-		}
-
-		reverse_opinion = {
-			name = opinion_impressed
-			who = FROM
-			years = 2
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 63005
-				tooltip = EVTTOOLTIP63005
 			}
 		}
 	}
@@ -400,7 +392,6 @@ character_event = {
 character_event = {
 	id = 63003
 	desc = EVTDESC63003
-
 	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_intrigue
 
@@ -417,7 +408,6 @@ character_event = {
 character_event = {
 	id = 63004
 	desc = EVTDESC63004
-
 	picture = GFX_evt_shadowy_cabal
 	border = GFX_event_normal_frame_intrigue
 
@@ -454,15 +444,10 @@ character_event = {
 
 	desc = {
 		text = EVTDESC63006B
-
-		trigger = {
-			has_character_flag = vassal_for_favor
-		}
+		trigger = { has_character_flag = vassal_for_favor }
 	}
-
 	desc = {
 		text = EVTDESC63006
-
 		trigger = {
 			NOT = { has_character_flag = vassal_for_favor }
 		}
@@ -513,7 +498,6 @@ character_event = {
 character_event = {
 	id = 63007
 	desc = EVTDESC63007
-
 	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_intrigue
 
@@ -543,27 +527,29 @@ character_event = {
 character_event = {
 	id = 63010
 	desc = EVTDESC63010
-
 	picture = GFX_evt_shadowy_cabal
 	border = GFX_event_normal_frame_intrigue
 
-	only_rulers = yes
+	only_playable = yes
 	only_capable = yes
 	prisoner = no
 	min_age = 16
 
 	trigger = {
-		higher_real_tier_than = BARON
 		independent = no
 		intrigue >= 7
 		NOT = { has_character_flag = requested_rival_removal }
 
-		any_rival = {
-			is_ruler = yes
-			same_liege = ROOT
-			is_adult = yes
-			prisoner = no
-			NOT = { character = liege }
+		liege = {
+			ROOT = {
+				any_rival = {
+					is_ruler = yes
+					same_liege = ROOT
+					is_adult = yes
+					prisoner = no
+					NOT = { character = PREVPREV } # ROOT's liege
+				}
+			}
 		}
 	}
 
@@ -617,8 +603,6 @@ character_event = {
 	option = {
 		name = EVTOPTA63010 # Inform my liege
 
-		ai_chance = { factor = 100 }
-
 		set_character_flag = requested_rival_removal
 
 		liege = {
@@ -664,6 +648,30 @@ letter_event = {
 	option = {
 		name = EVTOPTA63011 # Imprison the traitor!
 
+		event_target:target_rival = {
+			show_scope_change = no
+
+			character_event = { id = 63012 }
+
+			tooltip = {
+				opinion = {
+					name = opinion_falsely_convicted
+					who = ROOT
+					years = 10
+				}
+			}
+
+			imprison = ROOT
+		}
+
+		tooltip = {
+			reverse_opinion = {
+				name = opinion_grateful
+				who = FROM
+				years = 20
+			}
+		}
+
 		ai_chance = {
 			factor = 25
 
@@ -698,40 +706,10 @@ letter_event = {
 				}
 			}
 		}
-
-		event_target:target_rival = {
-			show_scope_change = no
-
-			character_event = { id = 63012 }
-
-			tooltip = {
-				opinion = {
-					name = opinion_falsely_convicted
-					who = ROOT
-					years = 10
-				}
-			}
-
-			imprison = ROOT
-		}
 	}
 
 	option = {
 		name = EVTOPTB63011 # This is nonsense
-
-		ai_chance = {
-			factor = 50
-
-			mult_modifier = {
-				factor = 2.0
-				trait = just
-			}
-
-			mult_modifier = {
-				factor = 0.5
-				trait = arbitrary
-			}
-		}
 
 		FROM = {
 			show_scope_change = no
@@ -750,15 +728,31 @@ letter_event = {
 			}
 		}
 
-		hidden_effect = {
-			event_target:target_rival = {
+		event_target:target_rival = {
+			show_scope_change = no
+
+			tooltip = {
 				opinion = {
-					who = ROOT
 					name = opinion_grateful
+					who = ROOT
 					years = 2
 				}
+			}
 
-				letter_event = { id = 63020 }
+			letter_event = { id = 63020 }
+		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 2.0
+				trait = just
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = arbitrary
 			}
 		}
 	}
@@ -772,17 +766,15 @@ letter_event = {
 
 			# Not already tipped off
 			event_target:target_rival = {
-				NOT = {	has_character_flag = pleaded_innocence }
+				NOT = { has_character_flag = pleaded_innocence }
 			}
 		}
 
-		ai_chance = { factor = 50 }
-
 		event_target:target_rival = {
-			show_scope_change = no
-
 			letter_event = { id = 63015 }
 		}
+
+		ai_chance = { factor = 50 }
 	}
 
 	option = {
@@ -790,6 +782,24 @@ letter_event = {
 		tooltip_info = intrigue
 
 		trigger = { intrigue >= 10 }
+
+		FROM = {
+			show_scope_change = no
+
+			imprison = ROOT
+
+			character_event = {
+				id = 63017
+				tooltip = EVTTOOLTIP63017
+			}
+
+			opinion = {
+				name = opinion_betrayed
+				who = ROOT
+				years = 10
+				multiplier = 2
+			}
+		}
 
 		ai_chance = {
 			factor = 50
@@ -825,24 +835,6 @@ letter_event = {
 					who = FROM
 					value < -25
 				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			imprison = ROOT
-
-			character_event = {
-				id = 63017
-				tooltip = EVTTOOLTIP63017
-			}
-
-			opinion = {
-				who = ROOT
-				name = opinion_betrayed
-				years = 10
-				multiplier = 2
 			}
 		}
 	}
@@ -904,7 +896,7 @@ letter_event = {
 
 		opinion = {
 			name = opinion_grateful
-			who = FROM
+			who = FROMFROM
 			years = 20
 		}
 	}
@@ -970,15 +962,15 @@ letter_event = {
 		prestige = -5
 
 		opinion = {
-			who = FROM
 			name = opinion_furious
+			who = FROM
 			years = 5
 			multiplier = 2
 		}
 
 		opinion = {
-			who = liege
 			name = opinion_dislike
+			who = liege
 			years = 3
 		}
 	}
@@ -1057,19 +1049,15 @@ letter_event = {
 		clr_character_flag = pleaded_innocence
 
 		opinion = {
-			who = FROM
 			name = opinion_grateful
+			who = FROM
 			years = 2
 		}
 
-		FROMFROM = {
-			show_scope_change = no
-
-			reverse_opinion = {
-				name = opinion_furious
-				who = ROOT
-				years = 5
-			}
+		reverse_opinion = {
+			name = opinion_furious
+			who = FROMFROM
+			years = 5
 		}
 	}
 }
@@ -1080,310 +1068,308 @@ letter_event = {
 ####################################################################
 
 # Vassal complains of high troop maintenance costs
-character_event = {
-	id = 63030
-	desc = EVTDESC63030
-	picture = GFX_evt_crusaders
-	border = GFX_event_normal_frame_war
-
-	only_rulers = yes
-	only_capable = yes
-	prisoner = no
-	min_age = 16
-
-	trigger = {
-		always = no # Intentionally disabled
-
-		independent = no
-		wealth < 100
-
-		liege = {
-			war = yes
-			has_raised_levies = ROOT
-		}
-
-		opinion_levy_raised_days = {
-			who = liege
-			days >= 73
-		}
-
-		trigger_if = {
-			limit = { has_character_flag = requested_money_for_levies }
-
-			had_character_flag = {
-				flag = requested_money_for_levies
-				years = 10
-			}
-		}
-	}
-
-	mean_time_to_happen = {
-		months = 216
-
-		mult_modifier = {
-			factor = 0.5
-			trait = greedy
-		}
-
-		mult_modifier = {
-			factor = 0.5
-			wealth < 0
-		}
-
-		mult_modifier = {
-			factor = 2.0
-			wealth >= 50
-		}
-
-		mult_modifier = {
-			factor = 5.0
-			trait = charitable
-		}
-	}
-
-	option = {
-		name = EVTOPTA63030 # Ask my liege for money
-
-		ai_chance = { factor = 100 }
-
-		set_character_flag = requested_money_for_levies
-
-		liege = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 63031
-				days = 4
-				tooltip = EVTTOOLTIP63031
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTB63030 # I'll endure
-
-		ai_chance = { factor = 0 }
-	}
-}
+# character_event = {
+#	id = 63030
+#	desc = EVTDESC63030
+#	picture = GFX_evt_crusaders
+#	border = GFX_event_normal_frame_war
+#
+#	only_rulers = yes
+#	only_capable = yes
+#	prisoner = no
+#	min_age = 16
+#
+#	trigger = {
+#		always = no # Intentionally disabled
+#
+#		independent = no
+#		wealth < 100
+#
+#		liege = {
+#			war = yes
+#			has_raised_levies = ROOT
+#		}
+#
+#		opinion_levy_raised_days = {
+#			who = liege
+#			days >= 73
+#		}
+#
+#		trigger_if = {
+#			limit = { has_character_flag = requested_money_for_levies }
+#
+#			had_character_flag = {
+#				flag = requested_money_for_levies
+#				years = 10
+#			}
+#		}
+#	}
+#
+#	mean_time_to_happen = {
+#		months = 216
+#
+#		mult_modifier = {
+#			factor = 0.5
+#			trait = greedy
+#		}
+#
+#		mult_modifier = {
+#			factor = 0.5
+#			wealth < 0
+#		}
+#
+#		mult_modifier = {
+#			factor = 2.0
+#			wealth >= 50
+#		}
+#
+#		mult_modifier = {
+#			factor = 5.0
+#			trait = charitable
+#		}
+#	}
+#
+#	option = {
+#		name = EVTOPTA63030 # Ask my liege for money
+#
+#		set_character_flag = requested_money_for_levies
+#
+#		liege = {
+#			show_scope_change = no
+#
+#			letter_event = {
+#				id = 63031
+#				days = 4
+#				tooltip = EVTTOOLTIP63031
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = EVTOPTB63030 # I'll endure
+#
+#		ai_chance = { factor = 0 }
+#	}
+# }
 
 # The liege is asked for recompense
-letter_event = {
-	id = 63031
-	desc = EVTDESC63031
-	border = GFX_event_letter_frame_war
-
-	is_triggered_only = yes
-	is_friendly = yes
-
-	option = {
-		name = EVTOPTA63031 # 30 Gold should do it
-
-		ai_chance = {
-			factor = 50
-
-			trigger = {
-				NOT = { trait = greedy }
-			}
-
-			mult_modifier = {
-				factor = 3.0
-				trait = charitable
-			}
-		}
-
-		wealth = -30
-
-		FROM = {
-			show_scope_change = no
-
-			tooltip = {
-				opinion = {
-					name = opinion_grateful
-					who = ROOT
-					years = 2
-				}
-			}
-
-			hidden_effect = {
-				set_opinion_levy_raised_days = {
-					who = ROOT
-					days = 0
-				}
-
-				letter_event = {
-					id = 63032
-					days = 2
-				}
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTB63031 # 15 Gold is enough
-
-		ai_chance = {
-			factor = 50
-
-			mult_modifier = {
-				factor = 0.2
-				trait = greedy
-			}
-
-			mult_modifier = {
-				factor = 1.5
-				trait = charitable
-			}
-		}
-
-		wealth = -15
-
-		hidden_effect = {
-			FROM = {
-				set_opinion_levy_raised_days = {
-					who = ROOT
-					days = 0
-				}
-
-				letter_event = {
-					id = 63033
-					days = 2
-				}
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTC63031 # Money? It's his duty!
-
-		trigger = { diplomacy < 9 }
-
-		ai_chance = {
-			factor = 50
-
-			mult_modifier = {
-				factor = 2.0
-				trait = greedy
-			}
-
-			mult_modifier = {
-				factor = 0.25
-				trait = charitable
-			}
-
-			mult_modifier = {
-				factor = 2.0
-				trait = diligent
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_disgruntled
-				who = ROOT
-				years = 5
-			}
-
-			letter_event = {
-				id = 63034
-				days = 2
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTD63031 # Placate him with flattery
-		tooltip_info = diplomacy
-
-		trigger = { diplomacy >= 9 }
-
-		ai_chance = { factor = 1000 }
-
-		hidden_effect = {
-			FROM = {
-				set_opinion_levy_raised_days = {
-					who = ROOT
-					days = 0
-				}
-
-				letter_event = {
-					id = 63035
-					days = 2
-				}
-			}
-		}
-	}
-}
+# letter_event = {
+#	id = 63031
+#	desc = EVTDESC63031
+#	border = GFX_event_letter_frame_war
+#
+#	is_triggered_only = yes
+#	is_friendly = yes
+#
+#	option = {
+#		name = EVTOPTA63031 # 30 Gold should do it
+#
+#		wealth = -30
+#
+#		FROM = {
+#			show_scope_change = no
+#
+#			tooltip = {
+#				opinion = {
+#					name = opinion_grateful
+#					who = ROOT
+#					years = 2
+#				}
+#			}
+#
+#			hidden_effect = {
+#				set_opinion_levy_raised_days = {
+#					who = ROOT
+#					days = 0
+#				}
+#
+#				letter_event = {
+#					id = 63032
+#					days = 2
+#				}
+#			}
+#		}
+#
+#		ai_chance = {
+#			factor = 50
+#
+#			trigger = {
+#				NOT = { trait = greedy }
+#			}
+#
+#			mult_modifier = {
+#				factor = 3.0
+#				trait = charitable
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = EVTOPTB63031 # 15 Gold is enough
+#
+#		wealth = -15
+#
+#		hidden_effect = {
+#			FROM = {
+#				set_opinion_levy_raised_days = {
+#					who = ROOT
+#					days = 0
+#				}
+#
+#				letter_event = {
+#					id = 63033
+#					days = 2
+#				}
+#			}
+#		}
+#
+#		ai_chance = {
+#			factor = 50
+#
+#			mult_modifier = {
+#				factor = 0.2
+#				trait = greedy
+#			}
+#
+#			mult_modifier = {
+#				factor = 1.5
+#				trait = charitable
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = EVTOPTC63031 # Money? It's his duty!
+#
+#		trigger = { diplomacy < 9 }
+#
+#		FROM = {
+#			show_scope_change = no
+#
+#			opinion = {
+#				name = opinion_disgruntled
+#				who = ROOT
+#				years = 5
+#			}
+#
+#			letter_event = {
+#				id = 63034
+#				days = 2
+#			}
+#		}
+#
+#		ai_chance = {
+#			factor = 50
+#
+#			mult_modifier = {
+#				factor = 2.0
+#				trait = greedy
+#			}
+#
+#			mult_modifier = {
+#				factor = 0.25
+#				trait = charitable
+#			}
+#
+#			mult_modifier = {
+#				factor = 2.0
+#				trait = diligent
+#			}
+#		}
+#	}
+#
+#	option = {
+#		name = EVTOPTD63031 # Placate him with flattery
+#		tooltip_info = diplomacy
+#
+#		trigger = { diplomacy >= 9 }
+#
+#		hidden_effect = {
+#			FROM = {
+#				set_opinion_levy_raised_days = {
+#					who = ROOT
+#					days = 0
+#				}
+#
+#				letter_event = {
+#					id = 63035
+#					days = 2
+#				}
+#			}
+#		}
+#
+#		ai_chance = { factor = 1000 }
+#	}
+# }
 
 # Vassal receives 30 gold
-letter_event = {
-	id = 63032
-	desc = EVTDESC63032
-	border = GFX_event_letter_frame_war
-
-	is_triggered_only = yes
-	is_friendly = yes
-
-	option = {
-		name = EXCELLENT
-
-		opinion = {
-			name = opinion_grateful
-			who = FROM
-			years = 2
-		}
-
-		wealth = 30
-	}
-}
+# letter_event = {
+#	id = 63032
+#	desc = EVTDESC63032
+#	border = GFX_event_letter_frame_war
+#
+#	is_triggered_only = yes
+#	is_friendly = yes
+#
+#	option = {
+#		name = EXCELLENT
+#
+#		opinion = {
+#			name = opinion_grateful
+#			who = FROM
+#			years = 2
+#		}
+#
+#		wealth = 30
+#	}
+# }
 
 # Vassal receives 15 gold
-letter_event = {
-	id = 63033
-	desc = EVTDESC63033
-	border = GFX_event_letter_frame_war
-
-	is_triggered_only = yes
-	is_friendly = yes
-
-	option = {
-		name = EVTOPTA63033 # I suppose that will do
-
-		wealth = 15
-	}
-}
+# letter_event = {
+#	id = 63033
+#	desc = EVTDESC63033
+#	border = GFX_event_letter_frame_war
+#
+#	is_triggered_only = yes
+#	is_friendly = yes
+#
+#	option = {
+#		name = EVTOPTA63033 # I suppose that will do
+#
+#		wealth = 15
+#	}
+# }
 
 # Vassal request denied
-letter_event = {
-	id = 63034
-	desc = EVTDESC63034
-	border = GFX_event_letter_frame_war
-
-	is_triggered_only = yes
-
-	ai = no
-
-	option = {
-		name = EVTOPTA63034 # I shall be reduced to begging!
-	}
-}
+# letter_event = {
+#	id = 63034
+#	desc = EVTDESC63034
+#	border = GFX_event_letter_frame_war
+#
+#	is_triggered_only = yes
+#
+#	ai = no
+#
+#	option = {
+#		name = EVTOPTA63034 # I shall be reduced to begging!
+#	}
+# }
 
 # Vassal is placated with empty words
-letter_event = {
-	id = 63035
-	desc = EVTDESC63035
-	border = GFX_event_letter_frame_war
-
-	is_triggered_only = yes
-	is_friendly = yes
-
-	ai = no
-
-	option = {
-		name = EVTOPTA63035 # He is right, of course
-	}
-}
+# letter_event = {
+#	id = 63035
+#	desc = EVTDESC63035
+#	border = GFX_event_letter_frame_war
+#
+#	is_triggered_only = yes
+#	is_friendly = yes
+#
+#	ai = no
+#
+#	option = {
+#		name = EVTOPTA63035 # He is right, of course
+#	}
+# }
 
 ####################################################################
 # Character requests a de jure title that you hold
@@ -1431,7 +1417,7 @@ character_event = {
 	}
 
 	mean_time_to_happen = {
-		months = 480
+		years = 40
 
 		mult_modifier = {
 			factor = 0.5
@@ -1479,8 +1465,6 @@ character_event = {
 	option = {
 		name = EVTOPTA63040 # Ask for the Title
 
-		ai_chance = { factor = 100 }
-
 		liege = {
 			show_scope_change = no
 
@@ -1521,14 +1505,6 @@ letter_event = {
 			NOT = { holds_favor_on = FROM }
 		}
 
-		ai_chance = {
-			factor = 50
-
-			trigger = {
-				NOT = { trait = greedy }
-			}
-		}
-
 		add_favor = FROM
 
 		event_target:vassal_wanted_title = {
@@ -1543,10 +1519,37 @@ letter_event = {
 				days = 1
 			}
 		}
+
+		ai_chance = {
+			factor = 50
+
+			trigger = {
+				NOT = { trait = greedy }
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTA63041 # Accept the request
+
+		event_target:vassal_wanted_title = {
+			show_scope_change = no
+
+			gain_title = FROM
+		}
+
+		FROM = {
+			letter_event = {
+				id = 63042
+				days = 1
+			}
+		}
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = FROM
+			years = 10
+		}
 
 		ai_chance = {
 			factor = 50
@@ -1583,29 +1586,25 @@ letter_event = {
 				is_friend = FROM
 			}
 		}
-
-		event_target:vassal_wanted_title = {
-			show_scope_change = no
-
-			gain_title = FROM
-		}
-
-		FROM = {
-			letter_event = {
-				id = 63042
-				days = 1
-			}
-		}
-
-		reverse_opinion = {
-			name = opinion_grateful
-			who = FROM
-			years = 10
-		}
 	}
 
 	option = {
 		name = EVTOPTB63041 # Deny the request
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_disappointed
+				who = ROOT
+				years = 10
+			}
+
+			letter_event = {
+				id = 63043
+				tooltip = EVTTOOLTIP63043
+			}
+		}
 
 		ai_chance = {
 			factor = 100
@@ -1633,21 +1632,6 @@ letter_event = {
 				}
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_disappointed
-				who = ROOT
-				years = 10
-			}
-
-			letter_event = {
-				id = 63043
-				tooltip = EVTTOOLTIP63043
-			}
-		}
 	}
 
 	option = {
@@ -1655,8 +1639,6 @@ letter_event = {
 		tooltip_info = diplomacy
 
 		trigger = { diplomacy >= 9 }
-
-		ai_chance = { factor = 1000 }
 
 		FROM = {
 			show_scope_change = no
@@ -1666,6 +1648,8 @@ letter_event = {
 				tooltip = EVTTOOLTIP63044
 			}
 		}
+
+		ai_chance = { factor = 1000 }
 	}
 }
 
@@ -1709,7 +1693,7 @@ letter_event = {
 		custom_tooltip = {
 			text = EVTOPTB63043_TOOLTIP
 
-			set_character_flag = obj_gain_any_title_abandoned
+			cancel_ambition = yes
 		}
 	}
 }
@@ -1757,8 +1741,8 @@ character_event = {
 				OR = {
 					is_friend = ROOT
 
-					AND = {
-						dynasty = ROOT
+					trigger_if = {
+						limit = { dynasty = ROOT }
 						NOT = { is_rival = ROOT }
 					}
 				}
@@ -1783,8 +1767,8 @@ character_event = {
 					OR = {
 						is_friend = ROOT
 
-						AND = {
-							dynasty = ROOT
+						trigger_if = {
+							limit = { dynasty = ROOT }
 							NOT = { is_rival = ROOT }
 						}
 					}
@@ -1816,6 +1800,16 @@ letter_event = {
 	option = {
 		name = EVTOPTA63051 # Intercede on behalf of the prisoner
 
+		liege = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 63052
+				days = 4
+				tooltip = EVTTOOLTIP63052
+			}
+		}
+
 		ai_chance = {
 			factor = 1
 
@@ -1841,22 +1835,10 @@ letter_event = {
 				}
 			}
 		}
-
-		liege = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 63052
-				days = 4
-				tooltip = EVTTOOLTIP63052
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB63051 # Better not
-
-		ai_chance = { factor = 1 }
 	}
 }
 
@@ -1873,6 +1855,17 @@ letter_event = {
 	option = {
 		name = EVTOPTA63052 # Very well
 
+		FROMFROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = 63053
+				days = 1
+				tooltip = EVTTOOLTIP63053
+				portrait = yes
+			}
+		}
+
 		ai_chance = {
 			factor = 50
 
@@ -1885,21 +1878,22 @@ letter_event = {
 				}
 			}
 		}
-
-		FROMFROM = {
-			show_scope_change = no
-
-			character_event = {
-				id = 63053
-				days = 1
-				tooltip = EVTTOOLTIP63053
-				portrait = yes
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB63052 # Absolutely not!
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_tyrant
+				who = ROOT
+				years = 10
+			}
+
+			letter_event = { id = 63054 }
+		}
 
 		ai_chance = {
 			factor = 50
@@ -1913,44 +1907,16 @@ letter_event = {
 				}
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			tooltip = {
-				opinion = {
-					name = opinion_tyrant
-					who = ROOT
-					years = 10
-				}
-			}
-
-			letter_event = { id = 63054 }
-		}
 	}
 
 	option = {
 		name = EVTOPTC63052 # How about you join him?
-		# tooltip_info =
 
 		trigger = {
 			OR = {
 				trait = arbitrary
 				trait = cruel
 				trait = lunatic
-			}
-		}
-
-		ai_chance = {
-			factor = 50
-
-			mult_modifier = {
-				factor = 0.1
-
-				opinion = {
-					who = FROM
-					value >= 20
-				}
 			}
 		}
 
@@ -1971,6 +1937,19 @@ letter_event = {
 				tooltip = EVTTOOLTIP63055
 			}
 		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 0.1
+
+				opinion = {
+					who = FROM
+					value >= 20
+				}
+			}
+		}
 	}
 
 	option = {
@@ -1978,8 +1957,6 @@ letter_event = {
 		tooltip_info = diplomacy
 
 		trigger = { diplomacy >= 9 }
-
-		ai_chance = { factor = 1000 }
 
 		FROM = {
 			show_scope_change = no
@@ -1989,6 +1966,8 @@ letter_event = {
 				tooltip = EVTTOOLTIP63056
 			}
 		}
+
+		ai_chance = { factor = 1000 }
 	}
 }
 
@@ -2036,13 +2015,17 @@ letter_event = {
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
 		name = EVTOPTA63054 # Such a shame...
 
-		opinion = {
-			name = opinion_tyrant
-			who = FROM
-			years = 10
+		tooltip  = {
+			opinion = {
+				name = opinion_tyrant
+				who = FROM
+				years = 10
+			}
 		}
 	}
 }
@@ -2064,8 +2047,8 @@ character_event = {
 		name = EVTOPTA63055 # That's what you get for showing compassion
 
 		opinion = {
-			who = FROM
 			name = opinion_tyrant
+			who = FROM
 			years = 20
 			multiplier = 5
 		}
@@ -2131,8 +2114,8 @@ character_event = {
 
 	trigger = {
 		is_republic = yes
-		wealth < 300
 		independent = no
+		wealth < 300
 
 		liege = {
 			NOT = { has_law = city_tax_0 }
@@ -2167,8 +2150,6 @@ character_event = {
 
 	option = {
 		name = EVTOPTA63060 # Request a vote for the law change
-
-		ai_chance = { factor = 100 }
 
 		liege = {
 			show_scope_change = no
@@ -2270,7 +2251,10 @@ letter_event = {
 			}
 		}
 
-		scaled_wealth = -0.5
+		transfer_scaled_wealth = {
+			to = FROM
+			value = 0.5
+		}
 	}
 
 	option = {
@@ -2295,7 +2279,6 @@ letter_event = {
 letter_event = {
 	id = 63062
 	desc = EVTDESC63062
-
 	border = GFX_event_letter_frame_economy
 
 	is_triggered_only = yes
@@ -2330,10 +2313,17 @@ letter_event = {
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
 		name = OK
 
-		scaled_wealth = 0.5
+		tooltip = {
+			transfer_scaled_wealth = {
+				from = FROM
+				value = 0.5
+			}
+		}
 	}
 }
 
@@ -2365,7 +2355,7 @@ character_event = {
 	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_intrigue
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_over_vassal_limit_succession
 
 	immediate = {
 		liege = {
@@ -2377,84 +2367,7 @@ character_event = {
 		name = EVTOPTA63100 # Become independent
 
 		trigger = {
-			liege = {
-				independent = yes
-			}
-		}
-
-		ai_chance = {
-			factor = 50
-
-			mult_modifier = {
-				factor = 0.25
-
-				liege = {
-					is_strong_trigger = yes
-				}
-
-				OR = {
-					is_tribal = yes
-					is_nomadic = yes
-				}
-			}
-
-			mult_modifier = {
-				factor = 4
-
-				liege = {
-					is_weak_trigger = yes
-				}
-
-				OR = {
-					is_tribal = yes
-					is_nomadic = yes
-				}
-			}
-
-			mult_modifier = {
-				factor = 0.5
-				trait = just
-			}
-
-			mult_modifier = {
-				factor = 0.5
-				trait = content
-			}
-
-			mult_modifier = {
-				factor = 10.0
-				trait = greedy
-			}
-
-			mult_modifier = {
-				factor = 10.0
-				trait = ambitious
-			}
-
-			mult_modifier = {
-				factor = 10.0
-
-				religion_group = pagan_group
-				is_reformed_religion = no
-			}
-
-			mult_modifier = {
-				factor = 0.2
-
-				opinion = {
-					who = liege
-					value >= 0
-				}
-			}
-
-			mult_modifier = {
-				factor = 0.2
-
-				opinion = {
-					who = liege
-					value >= 25
-				}
-			}
+			liege = { independent = yes }
 		}
 
 		set_defacto_liege = THIS
@@ -2475,16 +2388,6 @@ character_event = {
 				days = 4
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTA63100 # Retract vassalage
-
-		trigger = {
-			liege = {
-				independent = no
-			}
-		}
 
 		ai_chance = {
 			factor = 50
@@ -2559,6 +2462,14 @@ character_event = {
 					value >= 25
 				}
 			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA63100 # Retract vassalage
+
+		trigger = {
+			liege = { independent = no }
 		}
 
 		liege = {
@@ -2589,12 +2500,85 @@ character_event = {
 				days = 4
 			}
 		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 0.25
+
+				liege = {
+					is_strong_trigger = yes
+				}
+
+				OR = {
+					is_tribal = yes
+					is_nomadic = yes
+				}
+			}
+
+			mult_modifier = {
+				factor = 4
+
+				liege = {
+					is_weak_trigger = yes
+				}
+
+				OR = {
+					is_tribal = yes
+					is_nomadic = yes
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = just
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = content
+			}
+
+			mult_modifier = {
+				factor = 10.0
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 10.0
+				trait = ambitious
+			}
+
+			mult_modifier = {
+				factor = 10.0
+
+				religion_group = pagan_group
+				is_reformed_religion = no
+			}
+
+			mult_modifier = {
+				factor = 0.2
+
+				opinion = {
+					who = liege
+					value >= 0
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.2
+
+				opinion = {
+					who = liege
+					value >= 25
+				}
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTB63100 # Swear fealty to new liege
-
-		ai_chance = { factor = 50 }
 
 		tooltip = {
 			reverse_opinion = {
@@ -2610,6 +2594,8 @@ character_event = {
 				days = 4
 			}
 		}
+
+		ai_chance = { factor = 50 }
 	}
 }
 
