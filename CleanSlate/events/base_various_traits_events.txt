@@ -17,7 +17,7 @@ character_event = {
 	desc = EVTDESC65000
 	picture = GFX_evt_crusaders
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	in_command = yes
 	war = yes
@@ -60,10 +60,10 @@ character_event = {
 	desc = EVTDESC65001
 	picture = GFX_evt_emissary
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
-	only_rulers = yes
-	only_men = yes
+	only_playable = yes
+	only_men = yes # TODO: Does this need to be gender locked?
 	only_capable = yes
 	prisoner = no
 
@@ -133,10 +133,10 @@ character_event = {
 	desc = EVTDESC65003
 	picture = GFX_evt_crusaders
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
-	only_rulers = yes
-	only_men = yes
+	only_playable = yes
+	only_men = yes # TODO: Does this need to be gender locked?
 	only_capable = yes
 	prisoner = no
 	in_command = no
@@ -207,10 +207,10 @@ character_event = {
 	desc = EVTDESC65005
 	picture = GFX_evt_shadowy_cabal
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
-	only_rulers = yes
-	only_men = yes
+	only_playable = yes
+	only_men = yes # TODO: Does this need to be gender locked?
 	only_capable = yes
 	prisoner = no
 
@@ -280,21 +280,20 @@ character_event = {
 	desc = EVTDESC65007
 	picture = GFX_evt_library
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
-	only_rulers = yes
-	only_men = yes
+	only_playable = yes
+	only_men = yes # TODO: Does this need to be gender locked?
 	only_capable = yes
 	prisoner = no
 
 	trigger = {
 		trait = stressed
-		stewardship = 2
-		NOT = {
-			stewardship = 10
-		}
+		stewardship >= 2
+		stewardship < 10
+
 		job_treasurer = {
-			stewardship = 10
+			stewardship >= 10
 		}
 	}
 
@@ -349,15 +348,26 @@ character_event = {
 }
 
 ### Stressed: Learning ###
+# CleanSlate: Merged with event 65166
 character_event = {
 	id = 65009
 	desc = EVTDESC65009
-	picture = GFX_evt_bishop
 
-	is_triggered_only = yes
+	picture = {
+		picture = GFX_evt_bishop
+		trigger = {
+			NOT = { religion_group = muslim }
+		}
+	}
+	picture = {
+		picture = GFX_evt_jerusalem_captured_muslims
+		trigger = { religion_group = muslim }
+	}
 
-	only_rulers = yes
-	only_men = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
+
+	only_playable = yes
+	only_men = yes # TODO: Does this need to be gender locked?
 	only_capable = yes
 	prisoner = no
 
@@ -365,7 +375,6 @@ character_event = {
 		trait = stressed
 
 		NOR = {
-			religion_group = muslim
 			religion = buddhist
 			religion = jain
 		}
@@ -410,6 +419,11 @@ character_event = {
 
 	option = {
 		name = EVTOPTB65009
+
+		if = {
+			limit = { religion_group = muslim }
+			piety = -5
+		}
 	}
 }
 
@@ -417,7 +431,19 @@ character_event = {
 character_event = {
 	id = 65010
 	desc = EVTDESC65010
-	picture = GFX_evt_bishop
+
+	picture = {
+		picture = GFX_evt_bishop
+		trigger = {
+			NOT = {
+				religion_group = muslim
+			}
+		}
+	}
+	picture = {
+		picture = GFX_evt_jerusalem_captured_muslims
+		trigger = { religion_group = muslim }
+	}
 
 	is_triggered_only = yes
 
@@ -433,7 +459,7 @@ character_event = {
 	desc = EVTDESC65011
 	picture = GFX_evt_scandal
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_men = yes
 	only_capable = yes
@@ -529,14 +555,11 @@ character_event = {
 		name = EVTOPTC65011
 
 		trigger = {
-			any_courtier = {
-				is_councillor = yes
-			}
+			any_voter = { always = yes }
 		}
 
-		random_courtier = {
+		random_voter = {
 			limit = {
-				is_councillor = yes
 				prisoner = no
 				is_incapable = no
 			}
@@ -599,7 +622,7 @@ character_event = {
 	desc = EVTDESC65020
 	picture = GFX_evt_guardian
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_capable = yes
 	prisoner = no
@@ -667,17 +690,14 @@ character_event = {
 				years = 100
 			}
 
-			random = {
-				chance = 25
-				add_trait_brave_effect = yes
-			}
+			random_list = {
+				25 = { add_trait_fully_brave_effect = yes }
 
-			random = {
-				chance = 75
-
-				death = {
-					death_reason = death_execution
-					killer = ROOT
+				75 = {
+					death = {
+						death_reason = death_execution
+						killer = ROOT
+					}
 				}
 			}
 		}
@@ -690,7 +710,7 @@ character_event = {
 	desc = EVTDESC65021
 	picture = GFX_evt_into_the_dungeon
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	only_capable = yes
@@ -701,10 +721,7 @@ character_event = {
 
 		any_courtier = {
 			prisoner = yes
-
-			host = {
-				character = ROOT
-			}
+			host = { character = ROOT }
 		}
 	}
 
@@ -716,10 +733,7 @@ character_event = {
 		random_courtier = {
 			limit = {
 				prisoner = yes
-
-				host = {
-					character = ROOT
-				}
+				host = { character = ROOT }
 			}
 
 			save_event_target_as = target_prisoner
@@ -770,7 +784,7 @@ character_event = {
 	desc = EVTDESC65022
 	picture = GFX_evt_lunatic
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	only_capable = yes
@@ -864,7 +878,7 @@ character_event = {
 	desc = EVTDESC65023
 	picture = GFX_evt_scandal
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	only_capable = yes
@@ -946,7 +960,7 @@ character_event = {
 	desc = EVTDESC65030 # God should not make us feel this...
 	picture = GFX_evt_bad_news
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -990,7 +1004,7 @@ character_event = {
 	desc = EVTDESC65031
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1011,9 +1025,7 @@ character_event = {
 
 		random_list = {
 			10 = {
-				death = {
-					death_reason = death_trait
-				}
+				death = { death_reason = death_trait }
 			}
 
 			10 = {
@@ -1031,17 +1043,20 @@ character_event = {
 
 					give_flu_effect = yes
 				}
-				else_if = {
-					limit = {
-						NOT = { trait = measles }
-					}
-
+				else = {
 					give_measles_effect = yes
 				}
 			}
 
 			33 = {
 				remove_disease_trait_effect = yes
+				remove_disease_flags_effect = yes
+
+				hidden_effect = {
+					remove_symptoms_effect = yes
+					remove_treatment_modifiers_effect = yes
+				}
+
 				character_event = { id = 38283 } # Notify
 			}
 		}
@@ -1054,6 +1069,13 @@ character_event = {
 			chance = 1
 
 			remove_disease_trait_effect = yes
+			remove_disease_flags_effect = yes
+
+			hidden_effect = {
+				remove_symptoms_effect = yes
+				remove_treatment_modifiers_effect = yes
+			}
+
 			character_event = { id = 38283 } # Notify
 		}
 	}
@@ -1065,7 +1087,7 @@ character_event = {
 	desc = EVTDESC65032
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1109,9 +1131,7 @@ character_event = {
 		random = {
 			chance = 10
 
-			death = {
-				death_reason = death_trait
-			}
+			death = { death_reason = death_trait }
 		}
 	}
 }
@@ -1122,7 +1142,7 @@ character_event = {
 	desc = EVTDESC65033
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1159,7 +1179,7 @@ character_event = {
 	desc = EVTDESC65034 # We feel so guilty...
 	picture = GFX_evt_bad_news
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1169,16 +1189,7 @@ character_event = {
 
 	trigger = {
 		trait = zealous
-
-		OR = {
-			trait = lustful
-			trait = gluttonous
-			trait = greedy
-			trait = slothful
-			trait = envious
-			trait = wroth
-			trait = proud
-		}
+		has_vice_trigger = yes
 	}
 
 	weight_multiplier = {
@@ -1207,7 +1218,7 @@ character_event = {
 	desc = EVTDESC65035
 	picture = GFX_evt_bishop
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1248,14 +1259,10 @@ character_event = {
 
 		piety = 10
 
-		liege = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_religious_tract
-				who = ROOT
-				years = 10
-			}
+		reverse_opinion = {
+			name = opinion_religious_tract
+			who = liege
+			years = 10
 		}
 	}
 
@@ -1271,14 +1278,10 @@ character_event = {
 
 		piety = 10
 
-		host = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_religious_tract
-				who = ROOT
-				years = 10
-			}
+		reverse_opinion = {
+			name = opinion_religious_tract
+			who = host
+			years = 10
 		}
 	}
 }
@@ -1289,7 +1292,7 @@ character_event = {
 	desc = EVTDESC65036
 	picture = GFX_evt_bishop
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1316,14 +1319,8 @@ character_event = {
 
 			limit = {
 				OR = {
-					trait = lustful
-					trait = gluttonous
-					trait = slothful
-					trait = greedy
-					trait = envious
-					trait = wroth
+					has_vice_trigger = yes
 					trait = chaste
-					trait = proud
 				}
 
 				prisoner = no
@@ -1339,25 +1336,19 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB65036 # Thank the Lord in private
-
-		trigger = {
-			NOT = { religion_group = muslim }
+		name = {
+			text = EVTOPTB65036 # Thank the Lord in private
+			trigger = {
+				NOT = { religion_group = muslim }
+			}
+		}
+		name = {
+			text = EVTOPTC65036 # Thank Allah in private
+			trigger = { religion_group = muslim }
 		}
 
 		piety = 1
-		add_trait_silently_humble_effect = yes
-	}
-
-	option = {
-		name = EVTOPTC65036 # Thank Allah in private
-
-		trigger = {
-			religion_group = muslim
-		}
-
-		piety = 1
-		add_trait_silently_humble_effect = yes
+		add_trait_fully_silently_humble_effect = yes
 	}
 }
 
@@ -1367,7 +1358,7 @@ character_event = {
 	desc = EVTDESC65037
 	picture = GFX_evt_bishop
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1382,6 +1373,8 @@ character_event = {
 			trait = celibate
 			trait = lustful
 			trait = hedonist
+			trait = master_seducer
+			trait = master_seductress
 		}
 
 		any_courtier_or_vassal = {
@@ -1394,59 +1387,26 @@ character_event = {
 		factor = 1
 	}
 
-	option = {
-		name = EVTOPTA65037 # Ask him/her for advice...
+	immediate = {
+		hidden_effect = {
+			random_courtier_or_vassal = {
+				limit = {
+					trait = celibate
+					prisoner = no
+				}
 
-		trigger = {
-			any_courtier = {
-				trait = celibate
-				prisoner = no
+				save_event_target_as = target_courtier
 			}
-		}
-
-		random_courtier = {
-			limit = {
-				trait = celibate
-				prisoner = no
-				is_incapable = no
-			}
-
-			opinion = {
-				name = opinion_flattered
-				who = ROOT
-				years = 5
-			}
-		}
-
-		random = {
-			chance = 50
-			add_trait_celibate_effect = yes
 		}
 	}
 
 	option = {
-		name = EVTOPTB65037 # Try to emulate him/her
+		name = EVTOPTA65037 # Ask him/her for advice...
 
-		trigger = {
-			any_vassal = {
-				trait = celibate
-				prisoner = no
-			}
-		}
-
-		random_vassal = {
-			show_scope_change = no
-
-			limit = {
-				trait = celibate
-				prisoner = no
-			}
-
-			opinion = {
-				name = opinion_flattered
-				who = ROOT
-				years = 5
-			}
+		reverse_opinion = {
+			name = opinion_flattered
+			who = event_target:target_courtier
+			years = 5
 		}
 
 		random = {
@@ -1475,7 +1435,7 @@ character_event = {
 	desc = EVTDESC65040
 	picture = GFX_evt_drunk
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1523,7 +1483,7 @@ character_event = {
 			}
 		}
 		else = {
-			add_trait = gluttonous
+			add_trait_fully_silently_gluttonous_effect = yes
 		}
 	}
 }
@@ -1534,7 +1494,7 @@ character_event = {
 	desc = EVTDESC65041
 	picture = GFX_evt_crusaders
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	in_command = yes
@@ -1552,32 +1512,33 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65041	# Find solace in the bottle of wine
+		name = EVTOPTA65041 # Find solace in the bottle of wine
 
 		add_trait = drunkard
-		remove_trait = stressed
 	}
 
 	option = {
-		name = EVTOPTB65041	# Find solace in god
+		name = EVTOPTB65041 # Find solace in god
 
 		trigger = {
 			NOT = { trait = zealous }
 		}
 
-		add_trait = zealous
+		add_trait_fully_silently_zealous_effect = yes
 		piety = 5
-		remove_trait = stressed
 	}
 
 	option = {
-		name = EVTOPTC65041	# Find solace in the camp followers
+		name = EVTOPTC65041 # Find solace in the camp followers
 
 		trigger = {
 			NOT = { trait = lustful }
 		}
 
-		add_trait = lustful
+		add_trait_fully_silently_lustful_effect = yes
+	}
+
+	after = {
 		remove_trait = stressed
 	}
 }
@@ -1588,7 +1549,7 @@ character_event = {
 	desc = EVTDESC65042
 	picture = GFX_evt_feast
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 16
@@ -1606,7 +1567,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65042	# I know I drank some wine..
+		name = EVTOPTA65042 # I know I drank some wine..
 
 		add_trait = drunkard
 	}
@@ -1618,7 +1579,7 @@ character_event = {
 	desc = EVTDESC65043
 	picture = GFX_evt_drunk
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	religion_group = christian
@@ -1635,7 +1596,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65043	# Keep Sleeping
+		name = EVTOPTA65043 # Keep Sleeping
 
 		piety = -10
 
@@ -1646,7 +1607,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB65043	# Apologise to the priest
+		name = EVTOPTB65043 # Apologise to the priest
 
 		prestige = -10
 	}
@@ -1658,7 +1619,7 @@ character_event = {
 	desc = EVTDESC65044
 	picture = GFX_evt_drunk
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_capable = yes
 	prisoner = no
@@ -1669,14 +1630,14 @@ character_event = {
 
 		any_child = {
 			practical_age >= 5
-			is_abroad = no
+			at_location = ROOT
 
 			NOR = {
 				trait = drunkard
 
 				has_opinion_modifier = {
-					who = ROOT
 					name = despise_drunkard
+					who = ROOT
 				}
 			}
 		}
@@ -1687,21 +1648,21 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65044	# Oh well..
+		name = EVTOPTA65044 # Oh well..
 
 		any_child = {
 			show_scope_change = no
 
 			limit = {
 				practical_age >= 5
-				is_abroad = no
+				at_location = ROOT
 
 				NOR = {
 					trait = drunkard
 
 					has_opinion_modifier = {
-						who = ROOT
 						name = despise_drunkard
+						who = ROOT
 					}
 				}
 			}
@@ -1722,7 +1683,7 @@ character_event = {
 	desc = EVTDESC65045
 	picture = GFX_evt_drunk
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	is_married = yes
@@ -1741,8 +1702,8 @@ character_event = {
 				trait = drunkard
 
 				has_opinion_modifier = {
-					who = ROOT
 					name = despise_drunkard
+					who = ROOT
 				}
 			}
 		}
@@ -1753,7 +1714,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65045	# Force her to drink with you
+		name = EVTOPTA65045 # Force her to drink with you
 
 		trigger = { is_female = no }
 
@@ -1769,21 +1730,17 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB65045	# Ignore her
+		name = EVTOPTB65045 # Ignore her
 
-		spouse = {
-			show_scope_change = no
-
-			opinion = {
-				name = despise_drunkard
-				who = ROOT
-				years = 2
-			}
+		reverse_opinion = {
+			name = despise_drunkard
+			who = spouse
+			years = 2
 		}
 	}
 
 	option = {
-		name = EVTOPTC65045	# Attempt to stop
+		name = EVTOPTC65045 # Attempt to stop
 
 		prestige = -20
 
@@ -1832,9 +1789,9 @@ character_event = {
 			years = 2
 		}
 
-		remove_opinion = {
-			name = opinion_lover
-			who = FROM
+		if = {
+			limit = { is_lover = FROM }
+			remove_lover = FROM
 		}
 	}
 }
@@ -1845,7 +1802,7 @@ character_event = {
 	desc = EVTDESC65048
 	picture = GFX_evt_crusaders
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	in_command = yes
@@ -1864,7 +1821,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65048	# Talk to the commanders
+		name = EVTOPTA65048 # Talk to the commanders
 
 		trigger = {
 			any_vassal = {
@@ -1875,8 +1832,8 @@ character_event = {
 					trait = drunkard
 
 					has_opinion_modifier = {
-						who = ROOT
 						name = despise_drunkard
+						who = ROOT
 					}
 				}
 			}
@@ -1893,8 +1850,8 @@ character_event = {
 					trait = drunkard
 
 					has_opinion_modifier = {
-						who = ROOT
 						name = despise_drunkard
+						who = ROOT
 					}
 				}
 			}
@@ -1908,7 +1865,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB65048	# Talk to the soldiers
+		name = EVTOPTB65048 # Talk to the soldiers
 
 		add_character_modifier = {
 			name = drunk_commander
@@ -1923,7 +1880,7 @@ character_event = {
 	desc = EVTDESC65049
 	picture = GFX_evt_drunk
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_capable = yes
 	prisoner = no
@@ -1965,7 +1922,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65049	# Work hard with the sword
+		name = EVTOPTA65049 # Work hard with the sword
 
 		trigger = { is_female = no }
 
@@ -1975,7 +1932,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB65049	# Embroidery will take my mind off it
+		name = EVTOPTB65049 # Embroidery will take my mind off it
 
 		trigger = { is_female = yes }
 
@@ -1985,7 +1942,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTC65049	# God cures me!
+		name = EVTOPTC65049 # God cures me!
 
 		trigger = {
 			NOR = {
@@ -2006,7 +1963,7 @@ character_event = {
 	desc = EVTDESC65050
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_capable = yes
 	prisoner = no
@@ -2032,32 +1989,30 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65050	# But the wine..
+		name = EVTOPTA65050 # But the wine..
 
 		health = -1
 		fertility = -0.05
 	}
 
 	option = {
-		name = EVTOPTB65050	# Ask priests for advice
+		name = {
+			text = EVTOPTB65050 # Ask priests for advice
+			trigger = {
+				NOT = { religion_group = muslim }
+			}
+		}
+		name = {
+			text = EVTOPTC65050 # Ask Imam for advice
+			trigger = { religion_group = muslim }
+		}
 
 		trigger = {
 			NOR = {
-				religion_group = muslim
 				religion = buddhist
 				religion = jain
 			}
 		}
-
-		piety = 5
-		health = -0.5
-		prestige = -10
-	}
-
-	option = {
-		name = EVTOPTC65050	# Ask Imam for advice
-
-		trigger = { religion_group = muslim }
 
 		piety = 5
 		health = -0.5
@@ -2071,7 +2026,7 @@ character_event = {
 	desc = EVTDESC65051
 	picture = GFX_evt_drunk
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_capable = yes
 	prisoner = no
@@ -2101,7 +2056,7 @@ character_event = {
 	desc = EVTDESC65052
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	in_command = yes
 	war = yes
@@ -2146,7 +2101,7 @@ character_event = {
 	desc = EVTDESC65053
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 50
@@ -2155,17 +2110,7 @@ character_event = {
 
 	trigger = {
 		is_ill = yes
-
-		OR = {
-			trait = lustful
-			trait = gluttonous
-			trait = greedy
-			trait = slothful
-			trait = envious
-			trait = wroth
-			trait = proud
-		}
-
+		has_vice_trigger = yes
 		NOT = { trait = cynical }
 	}
 
@@ -2209,7 +2154,14 @@ character_event = {
 	option = {
 		name = EVTOPTA65054
 
-		remove_trait = ill
+		cure_illness = yes
+		remove_disease_flags_effect = yes
+
+		hidden_effect = {
+			clear_disease_level_effect = yes
+			remove_symptoms_effect = yes
+			remove_treatment_modifiers_effect = yes
+		}
 	}
 }
 
@@ -2219,7 +2171,7 @@ character_event = {
 	desc = EVTDESC65055
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	religion_group = christian
 	min_age = 6
@@ -2265,6 +2217,18 @@ character_event = {
 	option = {
 		name = EVTOPTA65056 # Yes, you are a sinner who deserves it
 
+		FROM = {
+			show_scope_change = no
+
+			if = {
+				limit = { has_vice_trigger = yes }
+				add_trait_stressed_effect = yes
+			}
+			else = {
+				add_trait_fully_cynical_effect = yes
+			}
+		}
+
 		ai_chance = {
 			factor = 10
 
@@ -2292,33 +2256,56 @@ character_event = {
 				}
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			if = {
-				limit = {
-					OR = {
-						trait = lustful
-						trait = gluttonous
-						trait = greedy
-						trait = slothful
-						trait = envious
-						trait = wroth
-						trait = proud
-					}
-				}
-
-				add_trait_stressed_effect = yes
-			}
-			else = {
-				add_trait_cynical_effect = yes
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB65056 # Don't worry, I'll take care of you
+
+		FROM = {
+			show_scope_change = no
+
+			random_list = {
+				45 = {
+					trigger = {
+						NOT = { trait = kind }
+					}
+
+					add_trait_fully_kind_effect = yes
+
+					ROOT = {
+						character_event = { id = 38168 } # Notify guardian
+					}
+				}
+
+				45 = {
+					trigger = {
+						NOT = { trait = charitable }
+					}
+
+					add_trait_fully_charitable_effect = yes
+
+					ROOT = {
+						character_event = { id = 38173 } # Notify guardian
+					}
+				}
+
+				10 = {
+					remove_disease_trait_effect = yes
+					remove_disease_flags_effect = yes
+
+					hidden_effect = {
+						remove_symptoms_effect = yes
+						remove_treatment_modifiers_effect = yes
+					}
+
+					character_event = { id = 38283 } # Notify
+
+					ROOT = {
+						character_event = { id = 38183 } # Notify guardian
+					}
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 10
@@ -2362,43 +2349,40 @@ character_event = {
 				}
 			}
 		}
+	}
+
+	option = {
+		name = EVTOPTC65056 # Why do you bother me?
 
 		FROM = {
 			show_scope_change = no
 
 			random_list = {
-				45 = {
-					add_trait_kind_effect = yes
+				70 = {
+					trigger = {
+						NOT = { trait = arbitrary }
+					}
+
+					add_trait_fully_arbitrary_effect = yes
 
 					ROOT = {
-						# Notify guardian
-						character_event = { id = 38168 }
+						character_event = { id = 38166 } # Notify guardian
 					}
 				}
 
-				45 = {
-					add_trait_charitable_effect = yes
-
-					ROOT = {
-						# Notify guardian
-						character_event = { id = 38173 }
+				30 = {
+					trigger = {
+						NOT = { trait = cynical }
 					}
-				}
 
-				10 = { # CleanSlate: account for Reapers?
-					remove_trait_ill_effect = yes
+					add_trait_fully_cynical_effect = yes
 
 					ROOT = {
-						# Notify guardian
-						character_event = { id = 38183 }
+						character_event = { id = 38158 } # Notify guardian
 					}
 				}
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTC65056 # Why do you bother me?
 
 		ai_chance = {
 			factor = 10
@@ -2413,54 +2397,6 @@ character_event = {
 				trait = cruel
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			random_list = {
-				70 = {
-					trigger = {
-						NOT = { trait = arbitrary }
-					}
-
-					tooltip = {
-						remove_trait_silently_just_effect = yes
-						add_trait = arbitrary
-					}
-
-					hidden_effect = {
-						remove_trait_silently_just_effect = yes
-						add_trait_arbitrary_effect = yes
-
-						ROOT = {
-							# Notify guardian
-							character_event = { id = 38166 }
-						}
-					}
-				}
-
-				30 = {
-					trigger = {
-						NOT = { trait = cynical }
-					}
-
-					tooltip = {
-						remove_trait_silently_zealous_effect = yes
-						add_trait = cynical
-					}
-
-					hidden_effect = {
-						remove_trait_silently_zealous_effect = yes
-						add_trait_cynical_effect = yes
-
-						ROOT = {
-							# Notify guardian
-							character_event = { id = 38158 }
-						}
-					}
-				}
-			}
-		}
 	}
 
 	option = {
@@ -2473,12 +2409,123 @@ character_event = {
 				chance = 10
 
 				remove_disease_trait_effect = yes
+				remove_disease_flags_effect = yes
+
+				hidden_effect = {
+					remove_symptoms_effect = yes
+					remove_treatment_modifiers_effect = yes
+				}
+
 				character_event = { id = 38283 } # Notify
 
 				ROOT = {
-					# Notify guardian
-					character_event = { id = 38183 }
+					character_event = { id = 38183 } # Notify guardian
 				}
+			}
+		}
+	}
+}
+
+# Pneumonic - setup
+character_event = {
+	id = 65057
+
+	hide_window = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
+
+	only_capable = yes
+
+	trigger = {
+		trait = pneumonic
+	}
+
+	weight_multiplier = {
+		factor = 1
+	}
+
+	immediate = {
+		trigger_switch = {
+			on_trigger = month
+
+			11 = {
+				character_event = {
+					id = 65058
+					months = 1
+				}
+			}
+
+			10 = {
+				character_event = {
+					id = 65058
+					months = 2
+				}
+			}
+
+			9 = {
+				character_event = {
+					id = 65058
+					months = 3
+				}
+			}
+
+			8 = {
+				character_event = {
+					id = 65058
+					months = 4
+				}
+			}
+
+			7 = {
+				character_event = {
+					id = 65058
+					months = 5
+				}
+			}
+
+			6 = {
+				character_event = {
+					id = 65058
+					months = 6
+				}
+			}
+
+			5 = {
+				character_event = {
+					id = 65058
+					months = 7
+				}
+			}
+
+			4 = {
+				character_event = {
+					id = 65058
+					months = 8
+				}
+			}
+
+			3 = {
+				character_event = {
+					id = 65058
+					months = 9
+				}
+			}
+
+			2 = {
+				character_event = {
+					id = 65058
+					months = 10
+				}
+			}
+
+			1 = {
+				character_event = {
+					id = 65058
+					months = 11
+				}
+			}
+
+			0 = {
+				character_event = { id = 65058 }
 			}
 		}
 	}
@@ -2486,7 +2533,7 @@ character_event = {
 
 # Pneumonic
 character_event = {
-	id = 65057
+	id = 65058
 	desc = EVTDESC65057
 	picture = GFX_evt_illness
 
@@ -2496,11 +2543,6 @@ character_event = {
 
 	trigger = {
 		trait = pneumonic
-		month == 0
-	}
-
-	weight_multiplier = {
-		factor = 1
 	}
 
 	option = {
@@ -2524,7 +2566,7 @@ character_event = {
 	desc = EVTDESC65060
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -2551,23 +2593,7 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
-
+			20 = { add_trait_fully_brave_effect = yes }
 			20 = { add_trait_wounded_effect = yes }
 		}
 	}
@@ -2576,37 +2602,8 @@ character_event = {
 		name = EVTOPTB65060
 
 		random_list = {
-			80 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			80 = { add_trait_fully_shy_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 }
@@ -2617,7 +2614,7 @@ character_event = {
 	desc = EVTDESC65061
 	picture = GFX_evt_jugglers
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	only_capable = yes
@@ -2631,8 +2628,8 @@ character_event = {
 		NOT = {
 			any_vassal = {
 				has_opinion_modifier = {
-					who = ROOT
 					name = opinion_laughing_at_you
+					who = ROOT
 				}
 			}
 		}
@@ -2667,6 +2664,10 @@ character_event = {
 		any_vassal = {
 			show_scope_change = no
 
+			limit = {
+				NOT = { trait = dwarf }
+			}
+
 			opinion = {
 				name = opinion_laughing_at_you
 				who = ROOT
@@ -2682,7 +2683,7 @@ character_event = {
 	desc = EVTDESC65065
 	picture = GFX_evt_scandal
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_men = yes
 	min_age = 12
@@ -2756,7 +2757,7 @@ character_event = {
 
 		random = {
 			chance = 25
-			add_trait_slothful_effect = yes
+			add_trait_fully_slothful_effect = yes
 		}
 	}
 }
@@ -2786,7 +2787,7 @@ character_event = {
 	desc = EVTDESC65070
 	picture = GFX_evt_illness
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	prisoner = no
 	only_capable = yes
@@ -2815,7 +2816,7 @@ character_event = {
 	desc = EVTDESC65071
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -2842,23 +2843,7 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
-
+			20 = { add_trait_fully_brave_effect = yes }
 			20 = { add_trait_wounded_effect = yes }
 		}
 	}
@@ -2867,37 +2852,8 @@ character_event = {
 		name = EVTOPTB65071
 
 		random_list = {
-			80 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			80 = { add_trait_fully_shy_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 }
@@ -2908,7 +2864,7 @@ character_event = {
 	desc = EVTDESC65072
 	picture = GFX_evt_hunt
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	only_men = yes
@@ -2935,38 +2891,8 @@ character_event = {
 
 		random_list = {
 			30 = { }
-
-			30 = {
-				trigger = {
-					NOT = { trait = wroth }
-				}
-
-				tooltip = {
-					remove_trait_silently_patient_effect = yes
-					add_trait = wroth
-				}
-
-				hidden_effect = {
-					remove_trait_silently_patient_effect = yes
-					add_trait_wroth_effect = yes
-				}
-			}
-
-			40 = {
-				trigger = {
-					NOT = { trait = cruel }
-				}
-
-				tooltip = {
-					remove_trait_silently_kind_effect = yes
-					add_trait = cruel
-				}
-
-				hidden_effect = {
-					remove_trait_silently_kind_effect = yes
-					add_trait_cruel_effect = yes
-				}
-			}
+			30 = { add_trait_fully_wroth_effect = yes }
+			40 = { add_trait_fully_cruel_effect = yes }
 		}
 	}
 
@@ -3032,7 +2958,7 @@ character_event = {
 	desc = EVTDESC65074
 	picture = GFX_evt_courtiers_talking
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_women = yes
 	min_age = 20
@@ -3059,23 +2985,7 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
-
+			20 = { add_trait_fully_brave_effect = yes }
 			20 = { add_trait_wounded_effect = yes }
 		}
 	}
@@ -3100,7 +3010,7 @@ character_event = {
 	option = {
 		name = EVTOPTC65074
 
-		add_trait_silently_content_effect = yes
+		add_trait_fully_silently_content_effect = yes
 
 		random = {
 			chance = 25
@@ -3115,7 +3025,7 @@ character_event = {
 	desc = EVTDESC65080
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -3142,23 +3052,7 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
-
+			20 = { add_trait_fully_brave_effect = yes }
 			20 = { add_trait_wounded_effect = yes }
 		}
 	}
@@ -3167,37 +3061,8 @@ character_event = {
 		name = EVTOPTB65080
 
 		random_list = {
-			80 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			80 = { add_trait_fully_shy_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 }
@@ -3208,7 +3073,7 @@ character_event = {
 	desc = EVTDESC65081
 	picture = GFX_evt_courtiers_talking
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	prisoner = no
@@ -3293,38 +3158,8 @@ character_event = {
 		name = EVTOPTC65081
 
 		random_list = {
-			50 = {
-				trigger = {
-					NOT = { trait = deceitful }
-				}
-
-				tooltip = {
-					remove_trait_silently_honest_effect = yes
-					add_trait = deceitful
-				}
-
-				hidden_effect = {
-					remove_trait_silently_honest_effect = yes
-					add_trait_deceitful_effect = yes
-				}
-			}
-
-			30 = {
-				trigger = {
-					NOT = { trait = craven }
-				}
-
-				tooltip = {
-					remove_trait_silently_brave_effect = yes
-					add_trait = craven
-				}
-
-				hidden_effect = {
-					remove_trait_silently_brave_effect = yes
-					add_trait_craven_effect = yes
-				}
-			}
-
+			50 = { add_trait_fully_deceitful_effect = yes }
+			30 = { add_trait_fully_craven_effect = yes }
 			20 = { }
 		}
 	}
@@ -3336,7 +3171,7 @@ character_event = {
 	desc = EVTDESC65085
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -3363,23 +3198,7 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
-
+			20 = { add_trait_fully_brave_effect = yes }
 			20 = { add_trait_wounded_effect = yes }
 		}
 	}
@@ -3388,37 +3207,8 @@ character_event = {
 		name = EVTOPTB65085
 
 		random_list = {
-			80 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			80 = { add_trait_fully_shy_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 }
@@ -3429,7 +3219,7 @@ character_event = {
 	desc = EVTDESC65090
 	picture = GFX_evt_bishop
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	ai = no
 	# only_rulers = yes
@@ -3477,8 +3267,8 @@ character_event = {
 		name = EVTOPTA65090
 
 		random_list = {
-			40 = { add_trait_wroth_effect = yes }
-			30 = { add_trait_cynical_effect = yes }
+			40 = { add_trait_fully_wroth_effect = yes }
+			30 = { add_trait_fully_cynical_effect = yes }
 			30 = { }
 		}
 	}
@@ -3489,7 +3279,7 @@ character_event = {
 		random = {
 			chance = 25
 
-			add_trait_zealous_effect = yes
+			add_trait_fully_zealous_effect = yes
 
 			character_event = {
 				id = 65091
@@ -3506,20 +3296,10 @@ character_event = {
 		random = {
 			chance = 10
 
-			add_trait_ambitious_effect = yes
+			add_trait_fully_ambitious_effect = yes
 		}
 
-		if = {
-			limit = { trait = shy }
-			remove_trait = shy
-		}
-		else_if = {
-			limit = {
-				NOT = { trait = gregarious }
-			}
-
-			add_trait = gregarious
-		}
+		add_trait_partially_silently_gregarious_effect = yes
 	}
 }
 
@@ -3581,21 +3361,13 @@ character_event = {
 				NOT = { trait = wroth }
 			}
 
-			add_trait = wroth
+			add_trait_fully_silently_wroth_effect = yes
 		}
-		else_if = {
-			limit = {
-				NOT = { trait = cruel }
-			}
-
-			add_trait = cruel
+		else = {
+			add_trait_fully_silently_cruel_effect = yes
 		}
 
-		event_target:hope = {
-			show_scope_change = no
-
-			imprison = ROOT
-		}
+		reverse_imprison = event_target:hope
 	}
 }
 
@@ -3610,27 +3382,13 @@ character_event = {
 	option = {
 		name = EVTOPTA65092
 
-		event_target:hope = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_lover
-				who = ROOT
-				years = 10
-			}
-
-			reverse_opinion = {
-				name = opinion_lover
-				who = ROOT
-				years = 10
-			}
-		}
+		add_lover = event_target:hope
 	}
 
 	option = {
 		name = EVTOPTB65092
 
-		add_trait_silently_cynical_effect = yes
+		add_trait_fully_silently_cynical_effect = yes
 		prestige = -5
 	}
 }
@@ -3641,7 +3399,7 @@ character_event = {
 	desc = EVTDESC65095
 	picture = GFX_evt_bad_news
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	prisoner = no
@@ -3652,16 +3410,7 @@ character_event = {
 	trigger = {
 		trait = hunchback
 		prestige < 50
-
-		OR = {
-			trait = lustful
-			trait = gluttonous
-			trait = greedy
-			trait = slothful
-			trait = envious
-			trait = wroth
-			trait = proud
-		}
+		has_vice_trigger = yes
 	}
 
 	weight_multiplier = {
@@ -3694,9 +3443,7 @@ character_event = {
 				}
 			}
 
-			30 = {
-				add_trait_wounded_effect = yes
-			}
+			30 = { add_trait_wounded_effect = yes }
 		}
 	}
 
@@ -3705,8 +3452,8 @@ character_event = {
 
 		random_list = {
 			60 = { }
-			20 = { add_trait_proud_effect = yes }
-			20 = { add_trait_honest_effect = yes }
+			20 = { add_trait_fully_proud_effect = yes }
+			20 = { add_trait_fully_honest_effect = yes }
 		}
 	}
 
@@ -3718,7 +3465,7 @@ character_event = {
 		random_list = {
 			50 = { }
 			25 = { add_trait_depressed_effect = yes }
-			25 = { add_trait_shy_effect = yes }
+			25 = { add_trait_fully_shy_effect = yes }
 		}
 	}
 }
@@ -3729,7 +3476,7 @@ character_event = {
 	desc = EVTDESC65100
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -3756,23 +3503,7 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
-
+			20 = { add_trait_fully_brave_effect = yes }
 			20 = { add_trait_wounded_effect = yes }
 		}
 	}
@@ -3781,37 +3512,8 @@ character_event = {
 		name = EVTOPTB65100
 
 		random_list = {
-			80 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			80 = { add_trait_fully_shy_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 }
@@ -3822,7 +3524,7 @@ character_event = {
 	desc = EVTDESC65101
 	picture = GFX_evt_courtiers_talking
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	prisoner = no
@@ -3878,14 +3580,10 @@ character_event = {
 
 		prestige = 5
 
-		event_target:target_vassal = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_disgruntled
-				who = ROOT
-				years = 5
-			}
+		reverse_opinion = {
+			name = opinion_disgruntled
+			who = event_target:target_vassal
+			years = 5
 		}
 	}
 
@@ -3894,14 +3592,10 @@ character_event = {
 
 		prestige = -5
 
-		event_target:target_vassal = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_forgive
-				who = ROOT
-				years = 5
-			}
+		reverse_opinion = {
+			name = opinion_forgive
+			who = event_target:target_vassal
+			years = 5
 		}
 	}
 
@@ -3909,38 +3603,8 @@ character_event = {
 		name = EVTOPTC65101
 
 		random_list = {
-			50 = {
-				trigger = {
-					NOT = { trait = deceitful }
-				}
-
-				tooltip = {
-					remove_trait_silently_honest_effect = yes
-					add_trait = deceitful
-				}
-
-				hidden_effect = {
-					remove_trait_silently_honest_effect = yes
-					add_trait_deceitful_effect = yes
-				}
-			}
-
-			30 = {
-				trigger = {
-					NOT = { trait = craven }
-				}
-
-				tooltip = {
-					remove_trait_silently_brave_effect = yes
-					add_trait = craven
-				}
-
-				hidden_effect = {
-					remove_trait_silently_brave_effect = yes
-					add_trait_craven_effect = yes
-				}
-			}
-
+			50 = { add_trait_fully_deceitful_effect = yes }
+			30 = { add_trait_fully_craven_effect = yes }
 			20 = { }
 		}
 	}
@@ -3952,7 +3616,7 @@ character_event = {
 	desc = EVTDESC65102
 	picture = GFX_evt_courtiers_talking
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	prisoner = no
 	only_capable = yes
@@ -3978,7 +3642,7 @@ character_event = {
 
 		random = {
 			chance = 30
-			add_trait_gregarious_effect = yes
+			add_trait_fully_gregarious_effect = yes
 		}
 	}
 
@@ -3988,38 +3652,8 @@ character_event = {
 		random_list = {
 			40 = { }
 			20 = { add_trait_depressed_effect = yes }
-
-			20 = {
-				trigger = {
-					NOT = { trait = patient }
-				}
-
-				tooltip = {
-					remove_trait_silently_wroth_effect = yes
-					add_trait = patient
-				}
-
-				hidden_effect = {
-					remove_trait_silently_wroth_effect = yes
-					add_trait_patient_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			20 = { add_trait_fully_patient_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 
@@ -4031,14 +3665,7 @@ character_event = {
 			remove_trait_lisp_effect = yes
 		}
 
-		if = {
-			limit = {
-				NOT = { trait = zealous }
-			}
-
-			remove_trait_silently_cynical_effect = yes
-			add_trait = zealous
-		}
+		add_trait_fully_silently_zealous_effect = yes
 	}
 }
 
@@ -4048,7 +3675,7 @@ character_event = {
 	desc = EVTDESC65105
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -4075,23 +3702,7 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
-
+			20 = { add_trait_fully_brave_effect = yes }
 			20 = { add_trait_wounded_effect = yes }
 		}
 	}
@@ -4100,37 +3711,8 @@ character_event = {
 		name = EVTOPTB65105
 
 		random_list = {
-			80 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			80 = { add_trait_fully_shy_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 }
@@ -4141,7 +3723,7 @@ character_event = {
 	desc = EVTDESC65106
 	picture = GFX_evt_courtiers_talking
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	prisoner = no
 	only_capable = yes
@@ -4167,7 +3749,7 @@ character_event = {
 
 		random = {
 			chance = 30
-			add_trait_gregarious_effect = yes
+			add_trait_fully_gregarious_effect = yes
 		}
 	}
 
@@ -4177,38 +3759,8 @@ character_event = {
 		random_list = {
 			40 = { }
 			20 = { add_trait_depressed_effect = yes }
-
-			20 = {
-				trigger = {
-					NOT = { trait = patient }
-				}
-
-				tooltip = {
-					remove_trait_silently_wroth_effect = yes
-					add_trait = patient
-				}
-
-				hidden_effect = {
-					remove_trait_silently_wroth_effect = yes
-					add_trait_patient_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			20 = { add_trait_fully_patient_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 
@@ -4220,14 +3772,7 @@ character_event = {
 			remove_trait_lisp_effect = yes
 		}
 
-		if = {
-			limit = {
-				NOT = { trait = zealous }
-			}
-
-			remove_trait_silently_cynical_effect = yes
-			add_trait = zealous
-		}
+		add_trait_fully_silently_zealous_effect = yes
 	}
 }
 
@@ -4237,7 +3782,7 @@ character_event = {
 	desc = EVTDESC65107
 	picture = GFX_evt_courtiers_talking
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	prisoner = no
@@ -4295,14 +3840,10 @@ character_event = {
 
 		prestige = 5
 
-		event_target:target_vassal = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_disgruntled
-				who = ROOT
-				years = 5
-			}
+		reverse_opinion = {
+			name = opinion_disgruntled
+			who = event_target:target_vassal
+			years = 5
 		}
 	}
 
@@ -4311,14 +3852,10 @@ character_event = {
 
 		prestige = -5
 
-		event_target:target_vassal = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_forgive
-				who = ROOT
-				years = 5
-			}
+		reverse_opinion = {
+			name = opinion_forgive
+			who = event_target:target_vassal
+			years = 5
 		}
 	}
 
@@ -4326,38 +3863,8 @@ character_event = {
 		name = EVTOPTC65107
 
 		random_list = {
-			50 = {
-				trigger = {
-					NOT = { trait = deceitful }
-				}
-
-				tooltip = {
-					remove_trait_silently_honest_effect = yes
-					add_trait = deceitful
-				}
-
-				hidden_effect = {
-					remove_trait_silently_honest_effect = yes
-					add_trait_deceitful_effect = yes
-				}
-			}
-
-			30 = {
-				trigger = {
-					NOT = { trait = craven }
-				}
-
-				tooltip = {
-					remove_trait_silently_brave_effect = yes
-					add_trait = craven
-				}
-
-				hidden_effect = {
-					remove_trait_silently_brave_effect = yes
-					add_trait_craven_effect = yes
-				}
-			}
-
+			50 = { add_trait_fully_deceitful_effect = yes }
+			30 = { add_trait_fully_craven_effect = yes }
 			20 = { }
 		}
 	}
@@ -4369,7 +3876,7 @@ character_event = {
 	desc = EVTDESC65110
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -4396,24 +3903,8 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
 			35 = { add_trait_wounded_effect = yes }
-
-			5 = {
-				trigger = {
-					NOT = { trait = brave }
-				}
-
-				tooltip = {
-					remove_trait_silently_craven_effect = yes
-					add_trait = brave
-				}
-
-				hidden_effect = {
-					remove_trait_silently_craven_effect = yes
-					add_trait_brave_effect = yes
-				}
-			}
+			 5 = { add_trait_fully_brave_effect = yes }
 		}
 	}
 
@@ -4421,37 +3912,8 @@ character_event = {
 		name = EVTOPTB65110
 
 		random_list = {
-			80 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
+			80 = { add_trait_fully_shy_effect = yes }
+			20 = { add_trait_fully_humble_effect = yes }
 		}
 	}
 }
@@ -4464,7 +3926,7 @@ character_event = {
 	desc = EVTDESC65115
 	picture = GFX_evt_child_bully
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 6
 	max_age = 16
@@ -4491,7 +3953,7 @@ character_event = {
 
 		random = {
 			chance = 20
-			add_trait_proud_effect = yes
+			add_trait_fully_proud_effect = yes
 		}
 	}
 
@@ -4500,38 +3962,8 @@ character_event = {
 
 		random_list = {
 			40 = { }
-
-			40 = {
-				trigger = {
-					NOT = { trait = humble }
-				}
-
-				tooltip = {
-					remove_trait_silently_proud_effect = yes
-					add_trait = humble
-				}
-
-				hidden_effect = {
-					remove_trait_silently_proud_effect = yes
-					add_trait_humble_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
+			40 = { add_trait_fully_humble_effect = yes }
+			20 = { add_trait_fully_shy_effect = yes }
 		}
 	}
 }
@@ -4542,7 +3974,7 @@ character_event = {
 	desc = EVTDESC65120
 	picture = GFX_evt_bloody_man
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	max_age = 60
@@ -4562,7 +3994,7 @@ character_event = {
 	option = {
 		name = EVTOPTA65120 # Ouch!
 
-		add_trait_wounded_effect = yes
+		add_trait_silently_wounded_effect = yes
 	}
 }
 
@@ -4572,7 +4004,7 @@ character_event = {
 	desc = EVTDESC65125
 	picture = GFX_evt_courier
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	max_age = 60
@@ -4594,7 +4026,7 @@ character_event = {
 
 		random = {
 			chance = 25
-			add_trait_honest_effect = yes
+			add_trait_fully_honest_effect = yes
 		}
 	}
 
@@ -4603,7 +4035,7 @@ character_event = {
 
 		random = {
 			chance = 25
-			add_trait_proud_effect = yes
+			add_trait_fully_proud_effect = yes
 		}
 	}
 }
@@ -4614,7 +4046,7 @@ character_event = {
 	desc = EVTDESC65126
 	picture = GFX_evt_scandal
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	only_men = yes
@@ -4660,7 +4092,7 @@ character_event = {
 	desc = EVTDESC65130
 	picture = GFX_evt_bad_news
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	max_age = 80
@@ -4691,38 +4123,8 @@ character_event = {
 
 		random_list = {
 			60 = { }
-
-			20 = {
-				trigger = {
-					NOT = { trait = proud }
-				}
-
-				tooltip = {
-					remove_trait_silently_humble_effect = yes
-					add_trait = proud
-				}
-
-				hidden_effect = {
-					remove_trait_silently_humble_effect = yes
-					add_trait_proud_effect = yes
-				}
-			}
-
-			20 = {
-				trigger = {
-					NOT = { trait = deceitful }
-				}
-
-				tooltip = {
-					remove_trait_silently_honest_effect = yes
-					add_trait = deceitful
-				}
-
-				hidden_effect = {
-					remove_trait_silently_honest_effect = yes
-					add_trait_deceitful_effect = yes
-				}
-			}
+			20 = { add_trait_fully_proud_effect = yes }
+			20 = { add_trait_fully_deceitful_effect = yes }
 		}
 	}
 }
@@ -4733,7 +4135,7 @@ character_event = {
 	desc = EVTDESC65135
 	picture = GFX_evt_whispers
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_men = yes
 	min_age = 16
@@ -4755,16 +4157,7 @@ character_event = {
 
 		random = {
 			chance = 30
-
-			tooltip = {
-				remove_trait_silently_gregarious_effect = yes
-				add_trait = shy
-			}
-
-			hidden_effect = {
-				remove_trait_silently_gregarious_effect = yes
-				add_trait_shy_effect = yes
-			}
+			add_trait_fully_shy_effect = yes
 		}
 	}
 
@@ -4773,7 +4166,7 @@ character_event = {
 
 		random = {
 			chance = 30
-			add_trait_proud_effect = yes
+			add_trait_fully_proud_effect = yes
 		}
 	}
 }
@@ -4784,7 +4177,7 @@ character_event = {
 	desc = EVTDESC65140
 	picture = GFX_evt_peasants
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_women = yes
 	min_age = 16
@@ -4806,7 +4199,7 @@ character_event = {
 
 		random = {
 			chance = 30
-			add_trait_patient_effect = yes
+			add_trait_fully_patient_effect = yes
 		}
 	}
 
@@ -4815,7 +4208,7 @@ character_event = {
 
 		random = {
 			chance = 30
-			add_trait_cruel_effect = yes
+			add_trait_fully_cruel_effect = yes
 		}
 	}
 }
@@ -4826,7 +4219,7 @@ character_event = {
 	desc = EVTDESC65145
 	picture = GFX_evt_child_talking
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 12
 	max_age = 20
@@ -4848,10 +4241,7 @@ character_event = {
 
 		random_list = {
 			80 = {
-				if = {
-					limit = { trait = ugly }
-					remove_trait = ugly
-				}
+				remove_trait_silently_ugly_effect = yes
 
 				if = {
 					limit = { trait = uncouth }
@@ -4860,22 +4250,12 @@ character_event = {
 			}
 
 			20 = {
-				if = {
-					limit = { trait = ugly }
-					remove_trait = ugly
-					add_trait = attractive
-				}
+				add_trait_fully_attractive_effect = yes
 
 				if = {
-					limit = { trait = uncouth }
+					limit = { trait = uncouth  }
 					remove_trait = uncouth
 					add_trait = groomed
-				}
-
-				hidden_effect = {
-					character_event = {
-						id = 38301 #Notify Fair
-					}
 				}
 			}
 		}
@@ -4906,7 +4286,7 @@ character_event = {
 	desc = EVTDESC65150
 	picture = GFX_evt_courier
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	prisoner = no
@@ -4936,29 +4316,13 @@ character_event = {
 
 		random_list = {
 			50 = { }
-
-			25 = {
-				trigger = {
-					NOT = { trait = shy }
-				}
-
-				tooltip = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait = shy
-				}
-
-				hidden_effect = {
-					remove_trait_silently_gregarious_effect = yes
-					add_trait_shy_effect = yes
-				}
-			}
-
+			25 = { add_trait_fully_shy_effect = yes }
 			25 = { remove_trait_gluttonous_effect = yes }
 		}
 	}
 
 	option = {
-		name = EVTOPTA65155 #Admission of fatness - Buddhist ambition
+		name = EVTOPTA65155 # Admission of fatness - Buddhist ambition
 
 		trigger = { has_ambition = obj_buddhist_temperance_food }
 
@@ -4981,7 +4345,7 @@ character_event = {
 	desc = EVTDESC65155
 	picture = GFX_evt_castle_construction
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	prisoner = no
@@ -5003,14 +4367,27 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65155 # No more food
+		name = {
+			text = EVTOPTA65155 # No more food
+			trigger = {
+				NOR = {
+					religion_group = muslim
+					religion_group = jewish_group
+				}
+			}
+		}
+		name = {
+			text = EVTOPTC65155 # No more food - Muslim or Jew
+			trigger = {
+				OR = {
+					religion_group = muslim
+					religion_group = jewish_group
+				}
+			}
+		}
 
 		trigger = {
-			NOR = {
-				religion_group = muslim
-				religion_group = jewish_group
-				has_ambition = obj_buddhist_temperance_food
-			}
+			NOT = { has_ambition = obj_buddhist_temperance_food }
 		}
 
 		random_list = {
@@ -5029,23 +4406,6 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTC65155 # No more food - Muslim or Jew
-
-		trigger = {
-			OR = {
-				religion_group = muslim
-				religion_group = jewish_group
-			}
-		}
-
-		random_list = {
-			55 = { }
-			25 = { add_trait_depressed_effect = yes }
-			20 = { remove_trait_gluttonous_effect = yes }
-		}
-	}
-
-	option = {
 		name = EVTOPTB65155 # Expand doorways
 
 		scaled_wealth = -0.05
@@ -5054,13 +4414,13 @@ character_event = {
 
 ### SLOW EVENTS ###
 
-#Slow: Coin Purse Inspector
+# Slow: Coin Purse Inspector
 character_event = {
 	id = 65160
 	desc = EVTDESC65160
 	picture = GFX_evt_market
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	min_age = 16
 	prisoner = no
@@ -5090,7 +4450,7 @@ character_event = {
 	desc = EVTDESC65165
 	picture = GFX_evt_drunk
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
 	only_rulers = yes
 	religion_group = muslim
@@ -5107,7 +4467,7 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTA65165	# Keep Sleeping
+		name = EVTOPTA65165 # Keep Sleeping
 
 		piety = -10
 
@@ -5118,83 +4478,11 @@ character_event = {
 	}
 
 	option = {
-		name = EVTOPTB65165	# Apologise to the imam
+		name = EVTOPTB65165 # Apologise to the imam
 
 		prestige = -10
 	}
 }
 
 ### Stressed Muslim: Learning ###
-character_event = {
-	id = 65166
-	desc = EVTDESC65166
-	picture = GFX_evt_jerusalem_captured_muslims
-
-	is_triggered_only = yes
-
-	only_rulers = yes
-	religion_group = muslim
-	only_men = yes
-	only_capable = yes
-	prisoner = no
-
-	trigger = {
-		trait = stressed
-		learning >= 2
-		learning < 10
-
-		job_spiritual = {
-			learning >= 10
-		}
-	}
-
-	weight_multiplier = {
-		factor = 1
-	}
-
-	option = {
-		name = EVTOPTA65009
-
-		random = {
-			chance = 25
-
-			change_learning = -1
-			remove_trait_stressed_effect = yes
-		}
-
-		job_spiritual = {
-			show_scope_change = no
-
-			opinion = {
-				name = trusting_pos
-				who = ROOT
-				years = 5
-			}
-
-			character_event = {
-				id = 65167
-				tooltip = EVTTOOLTIP65010
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTB65009
-
-		piety = -5
-	}
-}
-
-# Spiritual gets +learning and relation
-character_event = {
-	id = 65167
-	desc = EVTDESC65167
-	picture = GFX_evt_jerusalem_captured_muslims
-
-	is_triggered_only = yes
-
-	option = {
-		name = EVTOPTA65010
-		change_learning = 1
-	}
-}
+# CleanSlate: Event id 65166 merged with event 65009

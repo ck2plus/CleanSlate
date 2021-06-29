@@ -12,7 +12,7 @@ character_event = {
 	desc = EVTDESC_GR_1
 	picture = GFX_evt_throne_room
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_five_year_pulse
 
 	only_playable = yes
 	war = no
@@ -105,7 +105,7 @@ character_event = {
 
 	immediate = {
 		current_heir = {
-		  save_event_target_as = nomadic_heir
+			save_event_target_as = nomadic_heir
 		}
 
 		any_vassal = {
@@ -204,6 +204,72 @@ character_event = {
 	option = {
 		name = EVTOPTB_GR_11 # Go independent
 
+		event_target:nomadic_heir = {
+			character_event = {
+				id = GR.12
+				days = 1
+			}
+		}
+
+		if = {
+			limit = { is_nomadic = yes }
+
+			any_demesne_title = {
+				show_scope_change = no
+
+				limit = { tier = COUNT }
+
+				add_claim = event_target:nomadic_heir
+			}
+		}
+
+		else = {
+			reverse_opinion = {
+				name = declared_independence_nomad
+				who = event_target:nomadic_heir
+				years = 50
+			}
+
+			hidden_effect = {
+				any_courtier_or_vassal = {
+					limit = { dynasty = ROOT }
+
+					reverse_opinion = {
+						name = declared_independence_nomad
+						who = event_target:nomadic_heir
+						years = 50
+					}
+				}
+			}
+		}
+
+		# Avoid invalidating defensive wars (?)
+		liege = {
+			show_scope_change = no
+
+			any_vassal = {
+				show_scope_change = no
+
+				limit = {
+					in_revolt = yes
+
+					any_war = {
+						defender = {
+							character = ROOT
+						}
+
+						attacker = {
+							character = THIS
+						}
+					}
+				}
+
+				set_defacto_liege = THIS
+			}
+		}
+
+		set_defacto_liege = THIS
+
 		ai_chance = {
 			factor = 50
 
@@ -270,72 +336,6 @@ character_event = {
 				trait = ambitious
 			}
 		}
-
-		event_target:nomadic_heir = {
-			character_event = {
-				id = GR.12
-				days = 1
-			}
-		}
-
-		if = {
-			limit = { is_nomadic = yes }
-
-			any_demesne_title = {
-				show_scope_change = no
-
-				limit = { tier = COUNT }
-
-				add_claim = event_target:nomadic_heir
-			}
-		}
-
-		else = {
-			reverse_opinion = {
-				name = declared_independence_nomad
-				who = event_target:nomadic_heir
-				years = 50
-			}
-
-			hidden_effect = {
-				any_courtier_or_vassal = {
-					limit = { dynasty = ROOT }
-
-					reverse_opinion = {
-						name = declared_independence_nomad
-						who = event_target:nomadic_heir
-						years = 50
-					}
-				}
-			}
-		}
-
-		# Avoid invalidating defensive wars (?)
-		liege = {
-			show_scope_change = no
-
-			any_vassal = {
-				show_scope_change = no
-
-				limit = {
-					in_revolt = yes
-
-					any_war = {
-						defender = {
-							character = ROOT
-						}
-
-						attacker = {
-							character = THIS
-						}
-					}
-				}
-
-				set_defacto_liege = THIS
-			}
-		}
-
-		set_defacto_liege = THIS
 	}
 }
 
@@ -403,7 +403,7 @@ character_event = {
 		}
 
 		holy_order = no # Holy orders are intended to hold baronies all over the place
-		NOT = {	has_landed_title = k_papacy } # The Pope should also be able to hold baronies all over the place
+		NOT = { has_landed_title = k_papacy } # The Pope should also be able to hold baronies all over the place # TODO: Should this be expanded to include d_fraticelli or other religious heads?
 
 		capital_scope = {
 			any_disconnected_province = {
@@ -2659,7 +2659,7 @@ character_event = {
 								is_connected_to = {
 									sub_realm = ROOT
 									target = realm_capital
-									#land_gap = yes
+									# land_gap = yes
 									naval_distance = yes
 								}
 							}
@@ -2824,7 +2824,7 @@ character_event = {
 												is_connected_to = {
 													sub_realm = ROOT
 													target = realm_capital
-													#land_gap = yes
+													# land_gap = yes
 													naval_distance = yes
 												}
 											}
@@ -2997,7 +2997,7 @@ character_event = {
 								is_connected_to = {
 									sub_realm = no
 									target = realm_capital
-									#land_gap = yes
+									# land_gap = yes
 									naval_distance = 1000
 								}
 							}
@@ -3109,7 +3109,7 @@ character_event = {
 										is_connected_to = {
 											sub_realm = no
 											target = realm_capital
-											#land_gap = yes
+											# land_gap = yes
 											naval_distance = 1000
 										}
 									}
@@ -6827,7 +6827,7 @@ character_event = {
 	id = GR.23
 
 	hide_window = yes
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse
 
 	only_playable = yes
 	has_character_flag = delayed_cleanse_ai
@@ -6912,9 +6912,11 @@ character_event = {
 			}
 		}
 		trigger_else = {
-			has_game_rule = {
-				name = generate_families
-				value = ai_only
+			NOT = {
+				has_game_rule = {
+					name = generate_families
+					value = off
+				}
 			}
 		}
 
@@ -6951,7 +6953,7 @@ character_event = {
 
 			OR = {
 				# All close relatives must be your children
-				NOR = {
+				NOT = {
 					any_close_relative = {
 						is_alive = yes
 						NOT = { is_child_of = ROOT }
@@ -6972,9 +6974,7 @@ character_event = {
 
 					NOR = {
 						any_child = {
-							mother = {
-								character = yes
-							}
+							mother = { always = yes }
 						}
 
 						any_dynasty_member = {
@@ -7113,9 +7113,9 @@ character_event = {
 				on_trigger = real_tier
 
 				EMPEROR = { prestige = 400 }
-				KING = { prestige = 300 }
-				DUKE = { prestige = 200 }
-				COUNT = { prestige = 100 }
+				KING    = { prestige = 300 }
+				DUKE    = { prestige = 200 }
+				COUNT   = { prestige = 100 }
 			}
 		}
 
@@ -7909,29 +7909,6 @@ character_event = {
 			}
 		}
 
-		# Set orphaned historical children to new mother
-		spouse = {
-			save_event_target_as = new_mother
-		}
-
-		any_child = {
-			limit = {
-				mother = {
-					character = yes
-					NOT = { character = event_target:new_mother }
-				}
-
-				could_be_child_of = event_target:new_mother
-
-				NOR = {
-					trait = legit_bastard
-					trait = bastard
-				}
-			}
-
-			set_mother = event_target:new_mother
-		}
-
 		if = { # Caste fix
 			limit = {
 				religion = hindu
@@ -7948,106 +7925,128 @@ character_event = {
 			}
 		}
 
+		# Set orphaned historical children to new mother
+		spouse = {
+			save_event_target_as = new_mother
+		}
+
 		any_child = {
+			if = {
+				limit = {
+					mother = {
+						character = yes
+						NOT = { character = event_target:new_mother }
+					}
+
+					could_be_child_of = event_target:new_mother
+
+					NOR = {
+						trait = legit_bastard
+						trait = bastard
+					}
+				}
+
+				set_mother = event_target:new_mother
+			}
+
 			character_event = { id = RoI.30121 } # Set religious branch to liege's branch
-		}
 
-		any_child = { # Fix for children not getting any traits
-			limit = {
-				is_adult = yes
-				has_education_diplomacy_trigger = no
-				has_education_martial_trigger = no
-				has_education_learning_trigger = no
-				has_education_stewardship_trigger = no
-			}
-
-			add_random_education_trait = yes
-
-			random_independent_ruler = {
+			# Fix for children not getting any traits
+			if = {
 				limit = {
+					is_adult = yes
+					has_education_diplomacy_trigger = no
+					has_education_martial_trigger = no
+					has_education_learning_trigger = no
+					has_education_stewardship_trigger = no
+				}
+
+				add_random_education_trait = yes
+
+				random_independent_ruler = {
+					limit = {
+						PREV = {
+							can_copy_personality_trait_from = PREV
+						}
+					}
+
 					PREV = {
-						can_copy_personality_trait_from = PREV
+						copy_random_personality_trait = PREV
 					}
 				}
 
-				PREV = {
-					copy_random_personality_trait = PREV
-				}
-			}
+				random_independent_ruler = {
+					limit = {
+						PREV = {
+							can_copy_personality_trait_from = PREV
+						}
+					}
 
-			random_independent_ruler = {
-				limit = {
 					PREV = {
-						can_copy_personality_trait_from = PREV
+						copy_random_personality_trait = PREV
 					}
 				}
 
-				PREV = {
-					copy_random_personality_trait = PREV
+				random_independent_ruler = {
+					limit = {
+						PREV = {
+							can_copy_personality_trait_from = PREV
+						}
+					}
+
+					PREV = {
+						copy_random_personality_trait = PREV
+					}
 				}
 			}
-
-			random_independent_ruler = {
+			else_if = {
 				limit = {
+					is_adult = no
+					practical_age >= 10
+					personality_traits < 2
+				}
+
+				random_independent_ruler = {
+					limit = {
+						PREV = {
+							can_copy_personality_trait_from = PREV
+						}
+					}
+
 					PREV = {
-						can_copy_personality_trait_from = PREV
+						copy_random_personality_trait = PREV
 					}
 				}
 
-				PREV = {
-					copy_random_personality_trait = PREV
-				}
-			}
-		}
+				random_independent_ruler = {
+					limit = {
+						PREV = {
+							can_copy_personality_trait_from = PREV
+						}
+					}
 
-		any_child = {
-			limit = {
-				is_adult = no
-				practical_age >= 10
-				personality_traits < 2
-			}
-
-			random_independent_ruler = {
-				limit = {
 					PREV = {
-						can_copy_personality_trait_from = PREV
+						copy_random_personality_trait = PREV
 					}
 				}
-
-				PREV = {
-					copy_random_personality_trait = PREV
-				}
 			}
-
-			random_independent_ruler = {
+			else_if = {
 				limit = {
-					PREV = {
-						can_copy_personality_trait_from = PREV
+					practical_age >= 6
+					practical_age < 10
+					personality_traits < 1
+				}
+
+				random_independent_ruler = {
+					limit = {
+						PREV = {
+							can_copy_personality_trait_from = PREV
+						}
 					}
-				}
 
-				PREV = {
-					copy_random_personality_trait = PREV
-				}
-			}
-		}
-
-		any_child = {
-			limit = {
-				practical_age >= 6
-				practical_age < 10
-				personality_traits < 1
-			}
-
-			random_independent_ruler = {
-				limit = {
 					PREV = {
-						can_copy_personality_trait_from = PREV
+						copy_random_personality_trait = PREV
 					}
-				}
-
-				PREV = {
-					copy_random_personality_trait = PREV
 				}
 			}
 		}

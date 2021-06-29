@@ -18,18 +18,11 @@ character_event = {
 
 	desc = { # regular desc
 		text = EVTDESC_77800_A
-
-		trigger = {
-			is_dumb_trigger = no
-		}
+		trigger = { is_dumb_trigger = no }
 	}
-
 	desc = { # dumb desc
 		text = EVTDESC_77800_B
-
-		trigger = {
-			is_dumb_trigger = yes
-		}
+		trigger = { is_dumb_trigger = yes }
 	}
 
 	is_triggered_only = yes
@@ -42,8 +35,6 @@ character_event = {
 		trigger = { is_dumb_trigger = no }
 
 		custom_tooltip = { text = EVTOPTA_77800_TOOLTIP }
-
-		remove_character_modifier = pet_owl
 	}
 
 	option = { # Bury next to ancestors
@@ -52,16 +43,12 @@ character_event = {
 		trigger = { is_dumb_trigger = no }
 
 		custom_tooltip = { text = EVTOPTB_77800_TOOLTIP }
-
-		remove_character_modifier = pet_owl
 	}
 
 	option = { # Lunatic option - "I've already absorbed her soul. Hooo HOOOO!"
 		name = EVTOPTC_77800
 
 		trigger = {
-			ai = no
-
 			OR = {
 				trait = lunatic
 				trait = possessed
@@ -70,9 +57,9 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTC_77800_TOOLTIP }
 
-		remove_character_modifier = pet_owl
 		character_event = { id = 77801 }
 
+		ai_chance = { factor = 0 }
 	}
 
 	option = { # Dumb option - "Birds are mean."
@@ -81,7 +68,9 @@ character_event = {
 		trigger = { is_dumb_trigger = yes }
 
 		custom_tooltip = { text = EVTOPTD_77800_TOOLTIP }
+	}
 
+	after = {
 		remove_character_modifier = pet_owl
 	}
 }
@@ -92,27 +81,29 @@ character_event = {
 	picture = GFX_evt_scandal
 	border = GFX_event_normal_frame_diplomacy
 
+	desc = { # you survived desc
+		text = EVTDESC_77801_A
+		trigger = {
+			NOT = { has_character_flag = died_in_flight }
+		}
+	}
+	desc = { # you die desc
+		text = EVTDESC_77801_B
+		trigger = {	has_character_flag = died_in_flight	}
+	}
+
 	is_triggered_only = yes
 
 	immediate = {
 		random = {
 			chance = 20
 			set_character_flag = died_in_flight
+
+			if = {
+				limit = { multiplayer = yes }
+				death = { death_reason = death_accident_fall }
+			}
 		}
-	}
-
-	desc = { # you survived desc
-		text = EVTDESC_77801_A
-
-		trigger = {
-			NOT = { has_character_flag = died_in_flight }
-		}
-	}
-
-	desc = { # you die desc
-		text = EVTDESC_77801_B
-
-		trigger = {	has_character_flag = died_in_flight	}
 	}
 
 	option = { # Not bad!
@@ -126,11 +117,19 @@ character_event = {
 	option = { # Oh cra-
 		name = EVTOPTB_77801
 
-		trigger = {	has_character_flag = died_in_flight	}
+		trigger = { has_character_flag = died_in_flight	}
 
 		custom_tooltip = { text = EVTOPTB_77801_TOOLTIP }
 
-		death = { death_reason = death_accident_fall }
+		if = {
+			limit = { multiplayer = no }
+			death = { death_reason = death_accident_fall }
+		}
+		else = {
+			tooltip = {
+				death = { death_reason = death_accident_fall }
+			}
+		}
 	}
 }
 
@@ -140,25 +139,18 @@ character_event = {
 	picture = GFX_evt_cat
 	border = GFX_event_normal_frame_intrigue
 
+	desc = { # regular desc
+		text = EVTDESC_77802_A
+		trigger = { is_dumb_trigger = no }
+	}
+	desc = { # dumb desc
+		text = EVTDESC_77802_B
+		trigger = { is_dumb_trigger = yes }
+	}
+
 	is_triggered_only = yes
 
 	trigger = { has_character_modifier = pet_cat }
-
-	desc = { # regular desc
-		text = EVTDESC_77802_A
-
-		trigger = {
-			is_dumb_trigger = no
-		}
-	}
-
-	desc = { # dumb desc
-		text = EVTDESC_77802_B
-
-		trigger = {
-			is_dumb_trigger = yes
-		}
-	}
 
 	immediate = {
 		remove_character_modifier = pet_best_friends
@@ -171,26 +163,22 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTA_77802_TOOLTIP }
 
-		remove_character_modifier = pet_cat
+		if = {
+			limit = {
+				has_dlc = "Mystics"
 
-		hidden_effect = {
-			if = {
-				limit = {
-					has_dlc = "Mystics"
-
-					OR = {
-						has_character_modifier = good_relationship_omen
-						has_character_modifier = bad_relationship_omen
-					}
+				OR = {
+					has_character_modifier = good_relationship_omen
+					has_character_modifier = bad_relationship_omen
 				}
+			}
 
-				set_character_flag = cat_death_omen
+			set_character_flag = cat_death_omen
 
-				character_event = {
-					id = MNM.1213 # Scrying vision come true
-					days = 35
-					random = 30
-				}
+			character_event = {
+				id = MNM.1213 # Scrying vision come true
+				days = 35
+				random = 30
 			}
 		}
 	}
@@ -204,38 +192,24 @@ character_event = {
 
 		scaled_wealth = -0.6
 
+		add_trait_partially_silently_charitable_effect = yes
+
 		if = {
-			limit = { trait = greedy }
-			remove_trait = greedy
-		}
-		else_if = {
 			limit = {
-				NOT = { trait = charitable }
+				has_dlc = "Mystics"
+
+				OR = {
+					has_character_modifier = good_relationship_omen
+					has_character_modifier = bad_relationship_omen
+				}
 			}
 
-			add_trait = charitable
-		}
+			set_character_flag = cat_death_omen
 
-		remove_character_modifier = pet_cat
-
-		hidden_effect = {
-			if = {
-				limit = {
-					has_dlc = "Mystics"
-
-					OR = {
-						has_character_modifier = good_relationship_omen
-						has_character_modifier = bad_relationship_omen
-					}
-				}
-
-				set_character_flag = cat_death_omen
-
-				character_event = {
-					id = MNM.1213 # Scrying vision come true
-					days = 35
-					random = 30
-				}
+			character_event = {
+				id = MNM.1213 # Scrying vision come true
+				days = 35
+				random = 30
 			}
 		}
 	}
@@ -244,8 +218,6 @@ character_event = {
 		name = EVTOPTC_77802
 
 		trigger = {
-			ai = no
-
 			OR = {
 				trait = lunatic
 				trait = possessed
@@ -254,8 +226,9 @@ character_event = {
 
 		custom_tooltip = { text = EVTOPTC_77802_TOOLTIP }
 
-		remove_character_modifier = pet_cat
 		character_event = { id = 77803 }
+
+		ai_chance = { factor = 0 }
 	}
 
 	option = { # Dumb option - "Cats are mean."
@@ -264,7 +237,9 @@ character_event = {
 		trigger = { is_dumb_trigger = yes }
 
 		custom_tooltip = { text = EVTOPTD_77802_TOOLTIP }
+	}
 
+	after = {
 		remove_character_modifier = pet_cat
 	}
 }
@@ -310,7 +285,7 @@ character_event = {
 character_event = {
 	id = 77850
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
 	hide_window = yes
 
 	only_playable = yes
@@ -409,108 +384,34 @@ character_event = {
 	}
 }
 
-#Spouse/friend/lover doesn't like cat
+# Spouse/friend/lover doesn't like cat
 character_event = {
 	id = 77851
 	desc = EVTDSC_7851
+	picture = GFX_evt_cat
 	border = GFX_event_normal_frame_intrigue
-
-	picture = {
-		trigger = { has_dlc = "Reapers" }
-
-		picture = GFX_evt_cat
-	}
-
-	picture = {
-		trigger = {
-			NOT = { has_dlc = "Reapers" }
-		}
-
-		picture = GFX_evt_quarrel
-	}
 
 	is_triggered_only = yes
 
-	trigger = {
-		OR = {
-			any_spouse = {
-				ai = yes
-				prisoner = no
-				is_incapable = no
-
-				NOR = {
-					has_character_modifier = pet_cat
-					trait = kind
-				}
-			}
-
-			any_lover = {
-				ai = yes
-				prisoner = no
-				is_incapable = no
-
-				NOR = {
-					has_character_modifier = pet_cat
-					trait = kind
-				}
-			}
-
-			any_friend = {
-				ai = yes
-				prisoner = no
-				is_incapable = no
-
-				NOR = {
-					has_character_modifier = pet_cat
-					trait = kind
-				}
-			}
-		}
-	}
-
 	immediate = {
+		random_spouse = {
+			limit = {
+				ai = yes
+				prisoner = no
+				is_incapable = no
+
+				NOR = {
+					trait = kind
+					has_character_modifier = pet_cat
+				}
+			}
+
+			save_event_target_as = cat_hater
+		}
+
 		if = {
 			limit = {
-				any_spouse = {
-					ai = yes
-					prisoner = no
-					is_incapable = no
-
-					NOR = {
-						trait = kind
-						has_character_modifier = pet_cat
-					}
-				}
-			}
-
-			random_spouse = {
-				limit = {
-					ai = yes
-					prisoner = no
-					is_incapable = no
-
-					NOR = {
-						trait = kind
-						has_character_modifier = pet_cat
-					}
-				}
-
-				save_event_target_as = cat_hater
-			}
-		}
-
-		else_if = {
-			limit = {
-				any_lover = {
-					ai = yes
-					prisoner = no
-					is_incapable = no
-
-					NOR = {
-						trait = kind
-						has_character_modifier = pet_cat
-					}
-				}
+				NOT = { event_target:cat_hater = { always = yes } }
 			}
 
 			random_lover = {
@@ -528,7 +429,12 @@ character_event = {
 				save_event_target_as = cat_hater
 			}
 		}
-		else = {
+
+		if = {
+			limit = {
+				NOT = { event_target:cat_hater = { always = yes } }
+			}
+
 			random_friend = {
 				limit = {
 					ai = yes
@@ -796,6 +702,8 @@ character_event = {
 
 	# Impalement
 	option = {
+		name = EVTOPTD_77851
+
 		trigger = {
 			event_target:cat_hater = {
 				vassal_of = ROOT
@@ -825,8 +733,6 @@ character_event = {
 			}
 		}
 
-		name = EVTOPTD_77851
-
 		custom_tooltip = { text = EVTOPTD_77851_TOOLTIP }
 
 		event_target:cat_hater = {
@@ -841,6 +747,8 @@ character_event = {
 
 	# Tiger
 	option = {
+		name = EVTOPTE_77851
+
 		trigger = {
 			event_target:cat_hater = {
 				vassal_of = ROOT
@@ -861,8 +769,6 @@ character_event = {
 				has_character_modifier = crazy_cat_lord
 			}
 		}
-
-		name = EVTOPTE_77851
 
 		custom_tooltip = { text = EVTOPTD_77851_TOOLTIP }
 
@@ -901,63 +807,42 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = {
-			has_dlc = "Reapers"
-
-			event_target:new_cat_owner = {
-				has_character_modifier = pet_cat
-			}
-		}
-
 		text = EVTDSC_7852
 		picture = GFX_evt_cat
-	}
-
-	desc = {
 		trigger = {
-			NOT = { has_dlc = "Reapers" }
-
 			event_target:new_cat_owner = {
 				has_character_modifier = pet_cat
 			}
 		}
-
-		text = EVTDSC_7852
-		picture = GFX_evt_courtiers_talking
 	}
-
 	desc = {
+		text = EVTDSC_7852_dog
+		picture = GFX_evt_hunting_scene
 		trigger = {
 			event_target:new_cat_owner = {
 				has_character_modifier = pet_hunting_dog
 			}
 		}
-
-		text = EVTDSC_7852_dog
-		picture = GFX_evt_hunting_scene
 	}
 
 	is_triggered_only = yes
 
 	option = {
 		name = {
+			text = EVTOPTA_77852
 			trigger = {
 				event_target:new_cat_owner = {
 					has_character_modifier = pet_cat
 				}
 			}
-
-			text = EVTOPTA_77852
 		}
-
 		name = {
+			text = EVTOPTA_77852_dog
 			trigger = {
 				event_target:new_cat_owner = {
 					has_character_modifier = pet_hunting_dog
 				}
 			}
-
-			text = EVTOPTA_77852_dog
 		}
 
 		if = {
@@ -977,12 +862,11 @@ character_event = {
 			limit = { is_friend = event_target:new_cat_owner }
 
 			reverse_opinion = {
-				who = event_target:new_cat_owner
 				name = opinion_grateful
+				who = event_target:new_cat_owner
 				years = 10
 			}
 		}
-
 		else = {
 			add_friend = event_target:new_cat_owner
 		}
@@ -992,27 +876,24 @@ character_event = {
 # Bad new owner
 character_event = {
 	id = 77853
-	border = GFX_event_normal_frame_intrigue
 	picture = GFX_evt_quarrel
+	border = GFX_event_normal_frame_intrigue
 
 	desc = {
+		text = EVTDSC_7853
 		trigger = {
 			event_target:new_cat_owner = {
 				has_character_modifier = pet_cat
 			}
 		}
-
-		text = EVTDSC_7853
 	}
-
 	desc = {
+		text = EVTDSC_7853_dog
 		trigger = {
 			event_target:new_cat_owner = {
 				has_character_modifier = pet_hunting_dog
 			}
 		}
-
-		text = EVTDSC_7853_dog
 	}
 
 	is_triggered_only = yes
@@ -1027,17 +908,11 @@ character_event = {
 	option = {
 		name = EVTOPTA_77853
 
-		custom_tooltip = { text = EVTOPTA_77853_TOOLTIP }
+		custom_tooltip = {
+			text = EVTOPTA_77853_TOOLTIP
 
-		hidden_tooltip = {
-			if = {
-				limit = { is_friend = event_target:new_cat_owner }
-				remove_friend = event_target:new_cat_owner
-			}
-			if = {
-				limit = { is_lover = event_target:new_cat_owner }
-				remove_lover = event_target:new_cat_owner
-			}
+			remove_friend = event_target:new_cat_owner
+			remove_lover = event_target:new_cat_owner
 		}
 
 		add_rival = event_target:new_cat_owner
@@ -1048,21 +923,8 @@ character_event = {
 character_event = {
 	id = 77854
 	desc = EVTDSC_7854
+	picture = GFX_evt_cat
 	border = GFX_event_normal_frame_intrigue
-
-	picture = {
-		trigger = { has_dlc = "Reapers" }
-
-		picture = GFX_evt_cat
-	}
-
-	picture = {
-		trigger = {
-			NOT = { has_dlc = "Reapers" }
-		}
-
-		picture = GFX_evt_quarrel
-	}
 
 	is_triggered_only = yes
 
@@ -1080,8 +942,8 @@ character_event = {
 		custom_tooltip = { text = EVTOPTA_77854_TOOLTIP }
 
 		reverse_remove_opinion = {
-			who = event_target:cat_hater
 			name = opinion_ignored_demands
+			who = event_target:cat_hater
 		}
 
 		remove_character_modifier = pet_cat
@@ -1109,31 +971,18 @@ character_event = {
 character_event = {
 	id = 77856
 	desc = EVTDSC_7856
+	picture = GFX_evt_cat
 	border = GFX_event_normal_frame_diplomacy
-
-	picture = {
-		trigger = { has_dlc = "Reapers" }
-
-		picture = GFX_evt_cat
-	}
-
-	picture = {
-		trigger = {
-			NOT = { has_dlc = "Reapers" }
-		}
-
-		picture = GFX_evt_burning_house
-	}
 
 	is_triggered_only = yes
 
 	# Let it play
 	option = {
+		name = EVTOPTA_77856
+
 		trigger = {
 			NOT = { trait = wroth }
 		}
-
-		name = EVTOPTA_77856
 
 		custom_tooltip = { text = EVTOPTA_77856_TOOLTIP }
 
@@ -1166,11 +1015,11 @@ character_event = {
 	}
 
 	option = {
+		name = EVTOPTC_77856
+
 		trigger = {
 			NOT = { trait = patient }
 		}
-
-		name = EVTOPTC_77856
 
 		custom_tooltip = { text = EVTOPTC_77856_TOOLTIP }
 
@@ -1194,21 +1043,8 @@ character_event = {
 character_event = {
 	id = 77857
 	desc = EVTDSC_77857_CAT
+	picture = GFX_evt_cat
 	border = GFX_event_normal_frame_diplomacy
-
-	picture = {
-		trigger = { has_dlc = "Reapers" }
-
-		picture = GFX_evt_cat
-	}
-
-	picture = {
-		trigger = {
-			NOT = { has_dlc = "Reapers" }
-		}
-
-		picture = GFX_evt_guardian
-	}
 
 	is_triggered_only = yes
 
@@ -1227,9 +1063,7 @@ character_event = {
 			}
 
 			save_event_target_as = rabbit_parent
-		}
 
-		event_target:rabbit_parent = {
 			random_child = {
 				limit = {
 					practical_age < 13
@@ -1271,8 +1105,8 @@ character_event = {
 		}
 
 		reverse_opinion = {
-			who = event_target:rabbit_parent
 			name = opinion_fulfilled_demands
+			who = event_target:rabbit_parent
 			years = 5
 		}
 	}
@@ -1294,21 +1128,8 @@ character_event = {
 character_event = {
 	id = 77858
 	desc = EVTDSC_77858
+	picture = GFX_evt_cat
 	border = GFX_event_normal_frame_intrigue
-
-	picture = {
-		trigger = { has_dlc = "Reapers" }
-
-		picture = GFX_evt_cat
-	}
-
-	picture = {
-		trigger = {
-			NOT = { has_dlc = "Reapers" }
-		}
-
-		picture = GFX_evt_lunatic
-	}
 
 	is_triggered_only = yes
 
@@ -1332,7 +1153,6 @@ character_event = {
 				duration = -1
 			}
 		}
-
 	}
 
 	# Don't adopt all the cats
@@ -1354,7 +1174,7 @@ character_event = {
 	desc = EVTDESC_77860
 	picture = GFX_evt_cat
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
 
 	only_playable = yes
 	only_capable = yes
@@ -1431,15 +1251,13 @@ character_event = {
 			limit = {
 				practical_age >= 8
 				ai = yes
-				prisoner = no
-				is_incapable = no
-				is_inaccessible_trigger = no
+				is_inaccessible_or_incapable_trigger = no
 
 				NOR = {
-			 		trait = cruel
-			 		has_character_modifier = pet_cat
-			 		has_character_modifier = pet_hunting_dog
-			 	}
+					trait = cruel
+					has_character_modifier = pet_cat
+					has_character_modifier = pet_hunting_dog
+				}
 			}
 
 			save_event_target_as = animal_caretaker
@@ -1456,15 +1274,13 @@ character_event = {
 				limit = {
 					practical_age >= 8
 					ai = yes
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 
 					NOR = {
-				 		trait = cruel
-				 		has_character_modifier = pet_cat
-				 		has_character_modifier = pet_hunting_dog
-				 	}
+						trait = cruel
+						has_character_modifier = pet_cat
+						has_character_modifier = pet_hunting_dog
+					}
 				}
 
 				save_event_target_as = animal_caretaker
@@ -1489,9 +1305,9 @@ character_event = {
 
 	# Get rid of dog
 	option = {
-		trigger = { event_target:animal_caretaker = { always = yes } }
-
 		name = EVTOPTB_77861
+
+		trigger = { event_target:animal_caretaker = { always = yes } }
 
 		remove_character_modifier = pet_hunting_dog
 
@@ -1553,13 +1369,15 @@ character_event = {
 
 	# Get rid of cat
 	option = {
-		trigger = { event_target:animal_caretaker = { always = yes } }
-
 		name = EVTOPTC_77861
+
+		trigger = { event_target:animal_caretaker = { always = yes } }
 
 		remove_character_modifier = pet_cat
 
 		event_target:animal_caretaker = {
+			show_scope_change = no
+
 			add_character_modifier = {
 				name = pet_cat
 				duration = -1
@@ -1620,28 +1438,23 @@ character_event = {
 	picture = GFX_evt_cat
 
 	desc = {
+		text = EVTDESC_77862_A
 		trigger = {
 			NOT = { has_character_modifier = pet_hunting_dog }
 		}
-
-		text = EVTDESC_77862_A
 	}
-
 	desc = {
+		text = EVTDESC_77862_B
 		trigger = {
 			NOT = { has_character_modifier = pet_cat }
 		}
-
-		text = EVTDESC_77862_B
 	}
-
 	desc = {
+		text = EVTDESC_77862_C
 		trigger = {
 			has_character_modifier = pet_hunting_dog
 			has_character_modifier = pet_cat
 		}
-
-		text = EVTDESC_77862_C
 	}
 
 	is_triggered_only = yes
@@ -1656,11 +1469,11 @@ character_event = {
 	}
 
 	option = {
+		name = EVTOPTA_77862
+
 		trigger = {
 			NOT = { has_character_modifier = pet_hunting_dog }
 		}
-
-		name = EVTOPTA_77862
 
 		tooltip = {
 			remove_character_modifier = pet_hunting_dog
@@ -1673,11 +1486,11 @@ character_event = {
 	}
 
 	option = {
+		name = EVTOPTB_77862
+
 		trigger = {
 			NOT = { has_character_modifier = pet_hunting_dog }
 		}
-
-		name = EVTOPTB_77862
 
 		custom_tooltip = { text = EVTOPTB_77862_TOOLTIP }
 
@@ -1689,11 +1502,11 @@ character_event = {
 	}
 
 	option = {
+		name = EVTOPTC_77862
+
 		trigger = {
 			NOT = { has_character_modifier = pet_cat }
 		}
-
-		name = EVTOPTC_77862
 
 		tooltip = {
 			remove_character_modifier = pet_cat
@@ -1706,11 +1519,11 @@ character_event = {
 	}
 
 	option = {
+		name = EVTOPTD_77862
+
 		trigger = {
 			NOT = { has_character_modifier = pet_cat }
 		}
-
-		name = EVTOPTD_77862
 
 		custom_tooltip = { text = EVTOPTD_77862_TOOLTIP }
 
@@ -1722,12 +1535,12 @@ character_event = {
 	}
 
 	option = {
+		name = EVTOPTE_77862
+
 		trigger = {
 			has_character_modifier = pet_hunting_dog
 			has_character_modifier = pet_cat
 		}
-
-		name = EVTOPTE_77862
 
 		add_character_modifier = {
 			name = pet_best_friends

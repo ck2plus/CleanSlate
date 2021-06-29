@@ -119,35 +119,33 @@ character_event = {
 	option = {
 		name = EVTOPTA7250
 
-		hidden_effect = {
-			random_realm_lord = {
-				limit = {
-					higher_real_tier_than = BARON
+		random_realm_lord = {
+			limit = {
+				higher_real_tier_than = BARON
 
-					opinion = {
-						who = ROOT
-						value < 0
-					}
+				opinion = {
+					who = ROOT
+					value < 0
+				}
 
-					NOR = {
+				NOR = {
+					character = ROOT
+					is_liege_of = ROOT
+					is_plot_target_of = ROOT
+
+					any_backed_character = {
 						character = ROOT
-						is_liege_of = ROOT
-						is_plot_target_of = ROOT
+					}
 
-						any_backed_character = {
-							character = ROOT
-						}
-
-						employer = {
-							character = ROOT
-						}
+					employer = {
+						character = ROOT
 					}
 				}
+			}
 
-				letter_event = {
-					id = 7255
-					days = 1
-				}
+			letter_event = {
+				id = 7255
+				days = 1
 			}
 		}
 	}
@@ -164,6 +162,16 @@ letter_event = {
 	option = {
 		name = EVTOPTA7255
 
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 7260
+				days = 1
+				tooltip = EVTTOOLTIP7260
+			}
+		}
+
 		ai_chance = {
 			factor = 75
 
@@ -174,16 +182,6 @@ letter_event = {
 					who = FROM
 					value < -25
 				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 7260
-				days = 1
-				tooltip = EVTTOOLTIP7260
 			}
 		}
 	}
@@ -230,9 +228,7 @@ letter_event = {
 		if = {
 			limit = {
 				plot_target_char = {
-					job_spymaster = {
-						character = yes
-					}
+					job_spymaster = { always = yes }
 				}
 			}
 
@@ -434,9 +430,7 @@ character_event = {
 		if = {
 			limit = {
 				plot_target_char = {
-					job_spymaster = {
-						character = yes
-					}
+					job_spymaster = { always = yes }
 				}
 			}
 
@@ -597,9 +591,7 @@ character_event = {
 		if = {
 			limit = {
 				plot_target_char = {
-					job_spymaster = {
-						character = yes
-					}
+					job_spymaster = { always = yes }
 				}
 			}
 			reveal_plot_w_message = yes
@@ -634,13 +626,23 @@ letter_event = {
 	option = {
 		name = EVTOPTA8000
 
+		FROM = {
+			show_scope_change = no
+
+			letter_event = { id = 8050 }
+
+			any_plot_backer = {
+				letter_event = { id = 8070 }
+			}
+
+			usurp_title_plus_barony_if_unlanded = plot_target_title
+		}
+
 		ai_chance = {
 			factor = 10
 
 			trigger = {
-				FROM = {
-					plot_power >= 1.0
-				}
+				FROM = { plot_power >= 1.0 }
 			}
 
 			mult_modifier = {
@@ -678,22 +680,26 @@ letter_event = {
 				trait = content
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = { id = 8050 }
-
-			any_plot_backer = {
-				letter_event = { id = 8070 }
-			}
-
-			usurp_title_plus_barony_if_unlanded = plot_target_title
-		}
 	}
 
 	option = {
 		name = EVTOPTB8000
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 8100
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
+
+			tooltip = {
+				any_plot_backer = {
+					count = 10
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 90
@@ -753,22 +759,6 @@ letter_event = {
 				FROM = { plot_power >= 4.0 }
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8100
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_plot_backer = {
-					count = 10
-				}
-			}
-		}
 	}
 }
 
@@ -780,9 +770,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_succ_seniority
-		}
+		FROM = { in_faction = faction_succ_seniority }
 	}
 
 	immediate = {
@@ -799,6 +787,39 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_succ_seniority }
+			}
+
+			character_event = { id = 8076 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				diplomatic_immunity = no
+				letter_event = { id = 8055 }
+
+				any_faction_backer = {
+					faction = faction_succ_seniority
+
+					letter_event = { id = 8075 }
+					diplomatic_immunity = no
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			faction_succ_seniority = { # The target (title) of the faction
+				show_scope_change = no
+
+				succession = seniority
+			}
+		}
 
 		ai_chance = {
 			factor = 20
@@ -847,85 +868,13 @@ letter_event = {
 				trait = content
 			}
 		}
-
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_succ_seniority }
-				}
-
-				character_event = { id = 8076 }
-			}
-
-			FROM = {
-				diplomatic_immunity = no
-				letter_event = { id = 8055 }
-
-				any_faction_backer = {
-					faction = faction_succ_seniority
-
-					letter_event = { id = 8075 }
-					diplomatic_immunity = no
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			faction_succ_seniority = { # The target (title) of the faction
-				show_scope_change = no
-
-				succession = seniority
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB8005
 
-		ai_chance = {
-			factor = 80
-
-			mult_modifier = {
-				factor = 1.25
-				is_strong_trigger = yes
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = brave
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = proud
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = envious
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = greedy
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = wroth
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = ambitious
-			}
-
-			mult_modifier = {
-				factor = 0.75
-
+		if = {
+			limit = {
 				FROM = {
 					faction_power = {
 						faction = faction_succ_seniority
@@ -934,69 +883,12 @@ letter_event = {
 				}
 			}
 
-			mult_modifier = {
-				factor = 0.5
+			random = {
+				chance = 25
 
-				FROM = {
-					faction_power = {
-						faction = faction_succ_seniority
-						power >= 1.5
-					}
-				}
-			}
-
-			mult_modifier = {
-				factor = 0.5
-
-				FROM = {
-					faction_power =	{
-						faction = faction_succ_seniority
-						power >= 2.0
-					}
-				}
-			}
-
-			mult_modifier = {
-				factor = 0.5
-
-				FROM = {
-					faction_power = {
-						faction = faction_succ_seniority
-						power >= 3.0
-					}
-				}
-			}
-
-			mult_modifier = {
-				factor = 0.5
-
-				FROM = {
-					faction_power = {
-						faction = faction_succ_seniority
-						power >= 4.0
-					}
-				}
-			}
-		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_succ_seniority
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
 				}
 			}
 		}
@@ -1027,8 +919,7 @@ letter_event = {
 					}
 
 					random_list = {
-						50 = {
-						}
+						50 = { }
 
 						30 = {
 							character_event = {
@@ -1055,8 +946,7 @@ letter_event = {
 					}
 
 					random_list = {
-						75 = {
-						}
+						75 = { }
 
 						5 = {
 							character_event = {
@@ -1075,6 +965,100 @@ letter_event = {
 				}
 			}
 		}
+
+		ai_chance = {
+			factor = 80
+
+			mult_modifier = {
+				factor = 1.25
+				is_strong_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = brave
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = proud
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = envious
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = wroth
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = ambitious
+			}
+
+			mult_modifier = {
+				factor = 0.75
+
+				FROM = {
+					faction_power = {
+						faction = faction_succ_seniority
+						power >= 1.0
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.5
+
+				FROM = {
+					faction_power = {
+						faction = faction_succ_seniority
+						power >= 1.5
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.5
+
+				FROM = {
+					faction_power =	{
+						faction = faction_succ_seniority
+						power >= 2.0
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.5
+
+				FROM = {
+					faction_power = {
+						faction = faction_succ_seniority
+						power >= 3.0
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.5
+
+				FROM = {
+					faction_power = {
+						faction = faction_succ_seniority
+						power >= 4.0
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -1086,9 +1070,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_succ_primogeniture
-		}
+		FROM = { in_faction = faction_succ_primogeniture }
 	}
 
 	immediate = {
@@ -1105,6 +1087,38 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_succ_primogeniture }
+			}
+			character_event = { id = 8081 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				letter_event = { id = 8060 }
+				diplomatic_immunity = no
+
+				any_faction_backer = {
+					faction = faction_succ_primogeniture
+
+					letter_event = { id = 8080 }
+					diplomatic_immunity = no
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			faction_succ_primogeniture = { # The target (title) of the faction
+				show_scope_change = no
+
+				succession = primogeniture
+			}
+		}
 
 		ai_chance = {
 			factor = 20
@@ -1153,25 +1167,27 @@ letter_event = {
 				trait = content
 			}
 		}
+	}
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_succ_primogeniture }
+	option = {
+		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_succ_primogeniture
+						power >= 1.0
+					}
 				}
-				character_event = { id = 8081 }
 			}
 
-			FROM = {
-				letter_event = { id = 8060 }
-				diplomatic_immunity = no
+			random = {
+				chance = 25
 
-				any_faction_backer = {
-					faction = faction_succ_primogeniture
-
-					letter_event = { id = 8080 }
-					diplomatic_immunity = no
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
 				}
 			}
 		}
@@ -1179,16 +1195,74 @@ letter_event = {
 		FROM = {
 			show_scope_change = no
 
-			faction_succ_primogeniture = { # The target (title) of the faction
-				show_scope_change = no
+			letter_event = {
+				id = 8110
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
 
-				succession = primogeniture
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_succ_primogeniture
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_succ_primogeniture
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_succ_primogeniture
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTB8000
 
 		ai_chance = {
 			factor = 80
@@ -1283,102 +1357,6 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_succ_primogeniture
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8110
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_succ_primogeniture
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_succ_primogeniture
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_succ_primogeniture
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -1390,9 +1368,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_succ_feudal_elective
-		}
+		FROM = { in_faction = faction_succ_feudal_elective }
 	}
 
 	immediate = {
@@ -1410,63 +1386,15 @@ letter_event = {
 	option = {
 		name = EVTOPTA8000
 
-		ai_chance = {
-			factor = 20
-
-			trigger = {
-				FROM = {
-					faction_power = {
-						faction = faction_succ_feudal_elective
-						power >= 0.5
-					}
-				}
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_succ_feudal_elective }
 			}
-
-			mult_modifier = {
-				factor = 1.25
-				is_weak_trigger = yes
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = craven
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = humble
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = kind
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = charitable
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = patient
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = content
-			}
+			character_event = { id = 8086 }
 		}
 
 		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_succ_feudal_elective }
-				}
-				character_event = { id = 8086 }
-			}
-
 			FROM = {
 				letter_event = { id = 8065 }
 				diplomatic_immunity = no
@@ -1498,10 +1426,150 @@ letter_event = {
 				}
 			}
 		}
+
+		ai_chance = {
+			factor = 20
+
+			trigger = {
+				FROM = {
+					faction_power = {
+						faction = faction_succ_feudal_elective
+						power >= 0.5
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				is_weak_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = craven
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = humble
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = charitable
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = patient
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = content
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_succ_feudal_elective
+						power >= 1.0
+					}
+				}
+			}
+
+			random = {
+				chance = 25
+
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 8115
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
+
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_succ_feudal_elective
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_succ_feudal_elective
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_succ_feudal_elective
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 80
@@ -1594,102 +1662,6 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_succ_feudal_elective
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8115
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_succ_feudal_elective
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_succ_feudal_elective
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_succ_feudal_elective
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -1701,9 +1673,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_succ_gavelkind
-		}
+		FROM = { in_faction = faction_succ_gavelkind }
 	}
 
 	immediate = {
@@ -1720,6 +1690,38 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_succ_gavelkind }
+			}
+			character_event = { id = 8091 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				letter_event = { id = 8066 }
+				diplomatic_immunity = no
+
+				any_faction_backer = {
+					faction = faction_succ_gavelkind
+
+					letter_event = { id = 8090 }
+					diplomatic_immunity = no
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			faction_succ_gavelkind = { # The target (title) of the faction
+				show_scope_change = no
+
+				succession = gavelkind
+			}
+		}
 
 		ai_chance = {
 			factor = 20
@@ -1768,25 +1770,27 @@ letter_event = {
 				trait = content
 			}
 		}
+	}
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_succ_gavelkind }
+	option = {
+		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_succ_gavelkind
+						power >= 1.0
+					}
 				}
-				character_event = { id = 8091 }
 			}
 
-			FROM = {
-				letter_event = { id = 8066 }
-				diplomatic_immunity = no
+			random = {
+				chance = 25
 
-				any_faction_backer = {
-					faction = faction_succ_gavelkind
-
-					letter_event = { id = 8090 }
-					diplomatic_immunity = no
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
 				}
 			}
 		}
@@ -1794,16 +1798,74 @@ letter_event = {
 		FROM = {
 			show_scope_change = no
 
-			faction_succ_gavelkind = { # The target (title) of the faction
-				show_scope_change = no
+			letter_event = {
+				id = 8116
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
 
-				succession = gavelkind
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_succ_gavelkind
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_succ_gavelkind
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_succ_gavelkind
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTB8000
 
 		ai_chance = {
 			factor = 80
@@ -1898,102 +1960,6 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_succ_gavelkind
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8116
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_succ_gavelkind
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_succ_gavelkind
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_succ_gavelkind
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -2005,9 +1971,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_lower_crown_authority
-		}
+		FROM = { in_faction = faction_lower_crown_authority }
 	}
 
 	immediate = {
@@ -2025,66 +1989,16 @@ letter_event = {
 	option = {
 		name = EVTOPTA8000
 
-		ai_chance = {
-			factor = 10
-
-			trigger = {
-				FROM = {
-					faction_power = {
-						faction = faction_lower_crown_authority
-						power >= 1.0
-					}
-
-					plot_power >= 1.0
-				}
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_lower_crown_authority }
 			}
 
-			mult_modifier = {
-				factor = 1.25
-				is_weak_trigger = yes
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = craven
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = humble
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = kind
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = charitable
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = patient
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = content
-			}
+			character_event = { id = 8094 }
 		}
 
 		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_lower_crown_authority }
-				}
-
-				character_event = { id = 8094 }
-			}
-
 			FROM = {
 				letter_event = { id = 8067 }
 				diplomatic_immunity = no
@@ -2118,10 +2032,151 @@ letter_event = {
 				years = 1
 			}
 		}
+
+		ai_chance = {
+			factor = 10
+
+			trigger = {
+				FROM = {
+					faction_power = {
+						faction = faction_lower_crown_authority
+						power >= 1.0
+					}
+
+					plot_power >= 1.0
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				is_weak_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = craven
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = humble
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = charitable
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = patient
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = content
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_lower_crown_authority
+						power >= 1.0
+					}
+				}
+			}
+
+			random = {
+				chance = 25
+
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
+				}
+			}
+		}
+
+		FROM = {
+			letter_event = {
+				id = 8117
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
+
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_lower_crown_authority
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_lower_crown_authority
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_lower_crown_authority
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 90
@@ -2216,101 +2271,6 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_lower_crown_authority
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			letter_event = {
-				id = 8117
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_lower_crown_authority
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_lower_crown_authority
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_lower_crown_authority
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -2322,9 +2282,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_lower_tribal_organization
-		}
+		FROM = { in_faction = faction_lower_tribal_organization }
 	}
 
 	immediate = {
@@ -2341,6 +2299,50 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_lower_tribal_organization }
+			}
+
+			character_event = { id = 8028 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				letter_event = { id = 8071 }
+				diplomatic_immunity = no
+
+				any_faction_backer = {
+					faction = faction_lower_tribal_organization
+
+					letter_event = { id = 8029 }
+					diplomatic_immunity = no
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			faction_lower_tribal_organization = { # The target (title) of the faction
+				trigger_switch = {
+					on_trigger = has_law
+
+					tribal_organization_1 = { add_law_w_cooldown = tribal_organization_0 }
+					tribal_organization_2 = { add_law_w_cooldown = tribal_organization_1 }
+					tribal_organization_3 = { add_law_w_cooldown = tribal_organization_2 }
+					tribal_organization_4 = { add_law_w_cooldown = tribal_organization_3 }
+				}
+			}
+
+			opinion = {
+				name = opinion_lowered_tribal_organization
+				who = ROOT
+				years = 1
+			}
+		}
 
 		ai_chance = {
 			factor = 10
@@ -2392,26 +2394,27 @@ letter_event = {
 				trait = content
 			}
 		}
+	}
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_lower_tribal_organization }
+	option = {
+		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_lower_tribal_organization
+						power >= 1.0
+					}
 				}
-
-				character_event = { id = 8028 }
 			}
 
-			FROM = {
-				letter_event = { id = 8071 }
-				diplomatic_immunity = no
+			random = {
+				chance = 25
 
-				any_faction_backer = {
-					faction = faction_lower_tribal_organization
-
-					letter_event = { id = 8029 }
-					diplomatic_immunity = no
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
 				}
 			}
 		}
@@ -2419,27 +2422,74 @@ letter_event = {
 		FROM = {
 			show_scope_change = no
 
-			faction_lower_tribal_organization = { # The target (title) of the faction
-				trigger_switch = {
-					on_trigger = has_law
+			letter_event = {
+				id = 8114
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
 
-					tribal_organization_1 = { add_law_w_cooldown = tribal_organization_0 }
-					tribal_organization_2 = { add_law_w_cooldown = tribal_organization_1 }
-					tribal_organization_3 = { add_law_w_cooldown = tribal_organization_2 }
-					tribal_organization_4 = { add_law_w_cooldown = tribal_organization_3 }
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_lower_tribal_organization
+					count = 10
 				}
 			}
 
-			opinion = {
-				name = opinion_lowered_tribal_organization
-				who = ROOT
-				years = 1
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_lower_tribal_organization
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_lower_tribal_organization
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTB8000
 
 		ai_chance = {
 			factor = 90
@@ -2530,102 +2580,6 @@ letter_event = {
 					faction_power = {
 						faction = faction_lower_tribal_organization
 						power >= 4.0
-					}
-				}
-			}
-		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_lower_tribal_organization
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8114
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_lower_tribal_organization
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_lower_tribal_organization
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_lower_tribal_organization
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
 					}
 				}
 			}
@@ -2683,6 +2637,18 @@ letter_event = {
 	option = {
 		name = EVTOPTA8000
 
+		FROM = {
+			show_scope_change = no
+
+			letter_event = { id = 8068 }
+
+			any_plot_backer = {
+				letter_event = { id = 8096 }
+			}
+
+			usurp_title_plus_barony_if_unlanded = plot_target_title
+		}
+
 		ai_chance = {
 			factor = 10
 
@@ -2727,22 +2693,20 @@ letter_event = {
 				trait = content
 			}
 		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = { id = 8068 }
-
-			any_plot_backer = {
-				letter_event = { id = 8096 }
-			}
-
-			usurp_title_plus_barony_if_unlanded = plot_target_title
-		}
 	}
 
 	option = {
 		name = EVTOPTB8000
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 8118
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
+		}
 
 		ai_chance = {
 			factor = 90
@@ -2800,16 +2764,6 @@ letter_event = {
 			mult_modifier = {
 				factor = 0.5
 				FROM = { plot_power >= 4.0 }
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8118
-				days = 3
-				tooltip = EVTTOOLTIP8100
 			}
 		}
 	}
@@ -2901,9 +2855,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_independence
-		}
+		FROM = { in_faction = faction_independence }
 	}
 
 	immediate = {
@@ -2920,6 +2872,50 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000 # Fold to demand
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_independence }
+			}
+			character_event = { id = 8093 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				show_scope_change = no
+
+				letter_event = { id = 8069 }
+				diplomatic_immunity = no
+
+				any_faction_backer = {
+					faction = faction_independence
+
+					letter_event = { id = 8097 }
+					diplomatic_immunity = no
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			set_defacto_liege = THIS
+
+			any_faction_backer = {
+				show_scope_change = no
+
+				faction = faction_independence
+
+				set_defacto_liege = THIS
+			}
+
+			opinion = {
+				name = opinion_granted_independence
+				who = ROOT
+				years = 10
+			}
+		}
 
 		ai_chance = {
 			factor = 5
@@ -2968,27 +2964,27 @@ letter_event = {
 				trait = content
 			}
 		}
+	}
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_independence }
+	option = {
+		name = EVTOPTB8000 # War!
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_independence
+						power >= 1.0
+					}
 				}
-				character_event = { id = 8093 }
 			}
 
-			FROM = {
-				show_scope_change = no
+			random = {
+				chance = 25
 
-				letter_event = { id = 8069 }
-				diplomatic_immunity = no
-
-				any_faction_backer = {
-					faction = faction_independence
-
-					letter_event = { id = 8097 }
-					diplomatic_immunity = no
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
 				}
 			}
 		}
@@ -2996,26 +2992,84 @@ letter_event = {
 		FROM = {
 			show_scope_change = no
 
-			set_defacto_liege = THIS
-
-			any_faction_backer = {
-				show_scope_change = no
-
-				faction = faction_independence
-
-				set_defacto_liege = THIS
+			letter_event = {
+				id = 8119
+				days = 3
+				tooltip = EVTTOOLTIP8100
 			}
 
-			opinion = {
-				name = opinion_granted_independence
-				who = ROOT
-				years = 10
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_independence
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_independence
+							power >= 0.33
+						}
+
+						faction_power = {
+							faction = faction_independence
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						15 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						35 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_independence
+							power >= 0.75
+						}
+
+						faction_power = {
+							faction = faction_independence
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTB8000 # War!
 
 		ai_chance = {
 			factor = 95
@@ -3110,112 +3164,6 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_independence
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8119
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_independence
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_independence
-							power >= 0.33
-						}
-
-						faction_power = {
-							faction = faction_independence
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						15 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						35 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_independence
-							power >= 0.75
-						}
-
-						faction_power = {
-							faction = faction_independence
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -3227,9 +3175,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_claimant
-		}
+		FROM = { in_faction = faction_claimant }
 	}
 
 	immediate = {
@@ -3246,6 +3192,29 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000 # Give in
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_claimant }
+			}
+
+			character_event = { id = 8099 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				letter_event = { id = 8061 }
+				diplomatic_immunity = no
+
+				any_faction_backer = {
+					faction = faction_claimant
+
+					letter_event = { id = 8098 }
+					diplomatic_immunity = no
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 5
@@ -3299,33 +3268,103 @@ letter_event = {
 				trait = content
 			}
 		}
-
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_claimant }
-				}
-
-				character_event = { id = 8099 }
-			}
-
-			FROM = {
-				letter_event = { id = 8061 }
-				diplomatic_immunity = no
-
-				any_faction_backer = {
-					faction = faction_claimant
-
-					letter_event = { id = 8098 }
-					diplomatic_immunity = no
-				}
-			}
-		}
 	}
 
 	option = {
 		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_claimant
+						power >= 1.0
+					}
+				}
+			}
+
+			random = {
+				chance = 25
+
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 8111
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
+
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_claimant
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_claimant
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_claimant
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 95
@@ -3420,111 +3459,15 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_claimant
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8111
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_claimant
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_claimant
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_claimant
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
+# Claimant notification
 letter_event = {
 	id = 8037
 	desc = EVTDESC8037
 
-	is_triggered_only = yes
+	is_triggered_only = yes # faction_claimant_ultimatum, faction_decisions.txt
 
 	ai = no
 
@@ -4168,8 +4111,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA8100
 
-		ai_chance = { factor = 100 }
-
 		hidden_effect = {
 			reveal_plot = yes
 		}
@@ -4188,8 +4129,6 @@ letter_event = {
 	option = {
 		name = EVTOPTB8100
 
-		ai_chance = { factor = 0 }
-
 		prestige = -100
 		cancel_plot = plot_gain_title
 
@@ -4204,6 +4143,8 @@ letter_event = {
 				years = 5
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -4288,7 +4229,11 @@ letter_event = {
 		name = EVTOPTA8100
 
 		if = {
-			limit = { character = supported_claimant }
+			limit = {
+				supported_claimant = {
+					character = ROOT
+				}
+			}
 
 			faction_claimant = { # The target (title) of the faction
 				show_scope_change = no
@@ -4422,8 +4367,6 @@ letter_event = {
 	option = {
 		name = EVTOPTA8118
 
-		ai_chance = { factor = 100 }
-
 		hidden_effect = {
 			reveal_plot = yes
 		}
@@ -4441,8 +4384,6 @@ letter_event = {
 	option = {
 		name = EVTOPTB8118
 
-		ai_chance = { factor = 0 }
-
 		prestige = -100
 		cancel_plot = plot_gain_vassal_title
 
@@ -4457,6 +4398,8 @@ letter_event = {
 				years = 5
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -4528,8 +4471,8 @@ character_event = {
 
 		plot_target_char = {
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			NOT = { trait = in_hiding }
-			is_adult = yes
+			block_general_event_trigger = no
+			is_murder_quest_target_of_root_trigger = no
 
 			trigger_if = {
 				limit = { religion_group = muslim }
@@ -4540,11 +4483,6 @@ character_event = {
 					trait = drunkard
 				}
 			}
-
-			prisoner = no
-			is_incapable = no
-			is_inaccessible_trigger = no
-			is_murder_quest_target_of_root_trigger = no
 		}
 
 		plot_power_contribution = {
@@ -4798,10 +4736,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			learning < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -4826,11 +4765,7 @@ character_event = {
 			plot_power >= 0.5
 
 			plot_target_char = {
-				is_adult = yes
-				NOT = { trait = in_hiding }
-				prisoner = no
-				is_incapable = no
-				is_inaccessible_trigger = no
+				block_general_event_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -4867,11 +4802,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -4896,11 +4827,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -4925,11 +4852,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -4954,11 +4877,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -4983,11 +4902,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -5012,11 +4927,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -5041,11 +4952,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -5070,11 +4977,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -5099,11 +5002,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -5128,11 +5027,7 @@ character_event = {
 				plot_power >= 1.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -5150,11 +5045,7 @@ character_event = {
 				plot_power >= 1.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -5172,11 +5063,7 @@ character_event = {
 				plot_power >= 2.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -5196,11 +5083,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -5320,13 +5203,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			learning < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -5445,9 +5329,9 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	trigger = {
-		prisoner = no
+	prisoner = no
 
+	trigger = {
 		# Is the plot still in motion?
 		event_target:plot_leader = {
 			OR = {
@@ -5867,12 +5751,9 @@ character_event = {
 
 		plot_target_char = {
 			is_adult = no
-			NOT = { trait = in_hiding }
 			practical_age >= 5
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			prisoner = no
-			is_incapable = no
-			is_inaccessible_trigger = no
+			is_inaccessible_or_incapable_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -6115,10 +5996,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -6144,11 +6026,8 @@ character_event = {
 
 			plot_target_char = {
 				is_adult = no
-				NOT = { trait = in_hiding }
 				practical_age >= 5
-				prisoner = no
-				is_incapable = no
-				is_inaccessible_trigger = no
+				is_inaccessible_or_incapable_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -6186,11 +6065,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6216,11 +6092,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6246,11 +6119,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6275,11 +6145,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6305,11 +6172,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6335,11 +6199,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6365,11 +6226,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6395,11 +6253,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6425,11 +6280,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6455,11 +6307,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -6478,11 +6327,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -6501,11 +6347,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -6526,11 +6369,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -6650,13 +6490,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -6775,13 +6616,9 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
-		prisoner = no
-
 		# Is the plot still in motion?
 		event_target:plot_leader = {
 			OR = {
@@ -6793,6 +6630,10 @@ character_event = {
 				character = event_target:plot_target
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -6973,9 +6814,7 @@ character_event = {
 			}
 		}
 
-		else_if = {
-			limit = { trait = trusting }
-
+		else = {
 			random = {
 				chance = 50
 				remove_trait_trusting_effect = yes
@@ -7198,6 +7037,8 @@ letter_event = {
 	id = 7500
 	desc = EVTDESC7500
 
+	is_triggered_only = yes
+
 	immediate = {
 		save_event_target_as = plot_liege
 
@@ -7213,8 +7054,6 @@ letter_event = {
 			}
 		}
 	}
-
-	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA7500 # Yes
@@ -7271,14 +7110,10 @@ letter_event = {
 			}
 		}
 
-		FROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = approves_of_my_behaviour
-				who = ROOT
-				years = 2
-			}
+		reverse_opinion = {
+			name = approves_of_my_behaviour
+			who = FROM
+			years = 2
 		}
 	}
 }
@@ -7300,14 +7135,10 @@ letter_event = {
 
 		reveal_plot = yes
 
-		FROM = {
-			show_scope_change = no
-
-			opinion = {
-				name = resentful_of_my_behaviour
-				who = ROOT
-				years = 2
-			}
+		reverse_opinion = {
+			name = resentful_of_my_behaviour
+			who = FROM
+			years = 2
 		}
 	}
 }
@@ -7358,9 +7189,7 @@ letter_event = {
 		}
 
 		liege = {
-			letter_event = {
-				id = 7508
-			}
+			letter_event = { id = 7508 }
 		}
 	}
 
@@ -7435,8 +7264,6 @@ letter_event = {
 		}
 
 		event_target:plot_leader = {
-			show_scope_change = no
-
 			letter_event = { id = 7506 }
 		}
 	}
@@ -7489,14 +7316,10 @@ letter_event = {
 	option = {
 		name = EXCELLENT
 
-		event_target:plot_target = {
-			show_scope_change = no
-
-			opinion = {
-				name = scheming_bastard
-				who = ROOT
-				years = 6
-			}
+		reverse_opinion = {
+			name = scheming_bastard
+			who = event_target:plot_target
+			years = 6
 		}
 	}
 }
@@ -7510,8 +7333,6 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA7507
-
-		ai_chance = { factor = 100 }
 
 		hidden_effect = {
 			reveal_plot = yes
@@ -7531,8 +7352,6 @@ letter_event = {
 	option = {
 		name = EVTOPTB7507
 
-		ai_chance = { factor = 0 }
-
 		prestige = -100
 		cancel_plot = plot_weaken_fellow_vassal
 
@@ -7547,6 +7366,8 @@ letter_event = {
 
 			letter_event = { id = 8120 }
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -7564,14 +7385,10 @@ letter_event = {
 			character_event = { id = 7510 }
 		}
 
-		event_target:plot_target = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_bitter
-				who = ROOT
-				years = 6
-			}
+		reverse_opinion = {
+			name = opinion_bitter
+			who = event_target:plot_target
+			years = 6
 		}
 	}
 }
@@ -7595,14 +7412,10 @@ letter_event = {
 			character_event = { id = 7511 }
 		}
 
-		event_target:plot_target = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_bitter
-				who = ROOT
-				years = 6
-			}
+		reverse_opinion = {
+			name = opinion_bitter
+			who = event_target:plot_target
+			years = 6
 		}
 	}
 }
@@ -7762,12 +7575,8 @@ character_event = {
 
 		plot_target_char = {
 			is_ruler = yes
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			is_adult = yes
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -8022,10 +7831,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			martial < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -8051,11 +7861,7 @@ character_event = {
 
 			plot_target_char = {
 				is_ruler = yes
-				NOT = { trait = in_hiding }
-				is_adult = yes
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				block_general_event_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -8093,11 +7899,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8123,11 +7925,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8153,11 +7951,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8183,11 +7977,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8213,11 +8003,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8243,11 +8029,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8273,11 +8055,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8303,11 +8081,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8333,11 +8107,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8363,11 +8133,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -8386,11 +8152,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -8409,11 +8171,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -8434,11 +8192,7 @@ character_event = {
 
 				plot_target_char = {
 					is_ruler = yes
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -8558,13 +8312,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			martial < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -8683,9 +8438,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -8699,6 +8452,10 @@ character_event = {
 				character = event_target:plot_target
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -8956,20 +8713,20 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	desc = {
+		text = EVTDESC7712
 		trigger = {
 			event_target:plot_target = {
 				is_inaccessible_trigger = no
 			}
 		}
-		text = EVTDESC7712
 	}
 	desc = {
+		text = EVTDESC7712_B
 		trigger = {
 			event_target:plot_target = {
 				is_inaccessible_trigger = yes
 			}
 		}
-		text = EVTDESC7712_B
 	}
 
 	is_triggered_only = yes
@@ -9117,12 +8874,8 @@ character_event = {
 		}
 
 		plot_target_char = {
-			is_adult = yes
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -9377,10 +9130,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			stewardship < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -9406,10 +9160,7 @@ character_event = {
 
 			plot_target_char = {
 				is_adult = yes
-				NOT = { trait = in_hiding }
-				prisoner = no
-				is_incapable = no
-				is_inaccessible_trigger = no
+				is_inaccessible_or_incapable_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -9446,11 +9197,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9475,11 +9222,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9504,11 +9247,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9533,11 +9272,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9562,11 +9297,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9591,11 +9322,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9620,11 +9347,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9649,11 +9372,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9678,11 +9397,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9707,11 +9422,7 @@ character_event = {
 				plot_power >= 1.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -9729,11 +9440,7 @@ character_event = {
 				plot_power >= 1.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -9751,11 +9458,7 @@ character_event = {
 				plot_power >= 2.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -9775,11 +9478,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					prisoner = no
-					is_incapable = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -9899,13 +9598,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			stewardship < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -10022,12 +9722,9 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	hide_from = yes
-
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -10041,6 +9738,10 @@ character_event = {
 				character = event_target:plot_target
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -10441,7 +10142,6 @@ character_event = {
 
 		plot_target_char = {
 			practical_age < 5
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
 			is_inaccessible_trigger = no
 			is_murder_quest_target_of_root_trigger = no
@@ -10698,10 +10398,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -10727,7 +10428,6 @@ character_event = {
 
 			plot_target_char = {
 				practical_age < 5
-				NOT = { trait = in_hiding }
 				is_inaccessible_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
@@ -10766,7 +10466,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10793,7 +10492,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10820,7 +10518,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10847,7 +10544,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10874,7 +10570,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10901,7 +10596,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10928,7 +10622,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10955,7 +10648,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -10982,7 +10674,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -11009,7 +10700,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -11029,7 +10719,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -11049,7 +10738,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -11071,7 +10759,6 @@ character_event = {
 
 				plot_target_char = {
 					practical_age < 5
-					NOT = { trait = in_hiding }
 					is_inaccessible_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
@@ -11192,13 +10879,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
  }
 
@@ -11317,9 +11005,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -11331,6 +11017,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -11587,6 +11277,8 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	is_triggered_only = yes
+
+	ai = no
 
 	option = {
 		name = EVTOPTA8162
@@ -11987,10 +11679,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -12481,13 +12174,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -12602,10 +12296,6 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
-
 	trigger = {
 		# Is the plot still in motion?
 		is_plot_target_of = event_target:plot_leader
@@ -12616,6 +12306,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -13020,7 +12714,6 @@ character_event = {
 
 		plot_target_char = {
 			is_incapable = yes
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
 			practical_age >= 5
 			prisoner = no
@@ -13279,10 +12972,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
  }
 
@@ -13308,7 +13002,6 @@ character_event = {
 
 			plot_target_char = {
 				is_incapable = yes
-				NOT = { trait = in_hiding }
 				practical_age >= 5
 				prisoner = no
 				is_inaccessible_trigger = no
@@ -13349,7 +13042,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13378,7 +13070,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13407,7 +13098,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13436,7 +13126,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13465,7 +13154,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13494,7 +13182,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13523,7 +13210,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13552,7 +13238,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13581,7 +13266,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13610,7 +13294,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13632,7 +13315,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13654,7 +13336,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13678,7 +13359,6 @@ character_event = {
 
 				plot_target_char = {
 					is_incapable = yes
-					NOT = { trait = in_hiding }
 					practical_age >= 5
 					prisoner = no
 					is_inaccessible_trigger = no
@@ -13801,13 +13481,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -13926,9 +13607,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -13940,6 +13619,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -14344,12 +14027,9 @@ character_event = {
 
 		plot_target_char = {
 			is_adult = no
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
 			practical_age > 5
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			is_inaccessible_or_incapable_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -14605,10 +14285,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			learning < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -14634,11 +14315,8 @@ character_event = {
 
 			plot_target_char = {
 				is_adult = no
-				NOT = { trait = in_hiding }
 				practical_age >= 5
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				is_inaccessible_or_incapable_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -14676,11 +14354,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14706,11 +14381,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14736,11 +14408,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14766,11 +14435,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14796,11 +14462,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14826,11 +14489,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14856,11 +14516,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14886,11 +14543,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14916,11 +14570,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -14946,11 +14597,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -14969,11 +14617,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -14992,11 +14637,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -15017,11 +14659,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -15141,13 +14780,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			learning < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -15266,9 +14906,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -15280,6 +14918,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -15683,12 +15325,8 @@ character_event = {
 		}
 
 		plot_target_char = {
-			is_adult = yes
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -15941,11 +15579,13 @@ character_event = {
 
 	option = {
 		name = EVTOPTD8150 # I cannot afford this
+
 		trigger = {
-			ai = no
 			learning < 10
 			plot_power < 1.0
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -15970,11 +15610,7 @@ character_event = {
 			plot_power >= 0.5
 
 			plot_target_char = {
-				is_adult = yes
-				NOT = { trait = in_hiding }
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				block_general_event_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -16011,11 +15647,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16040,11 +15672,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16069,11 +15697,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16098,11 +15722,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16127,11 +15747,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16156,11 +15772,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16185,11 +15797,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16214,11 +15822,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16243,11 +15847,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16272,11 +15872,7 @@ character_event = {
 				plot_power >= 1.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -16294,11 +15890,7 @@ character_event = {
 				plot_power >= 1.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -16316,11 +15908,7 @@ character_event = {
 				plot_power >= 2.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -16340,11 +15928,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -16464,13 +16048,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			learning < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -16589,9 +16174,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -16603,6 +16186,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -17006,12 +16593,8 @@ character_event = {
 		}
 
 		plot_target_char = {
-			is_adult = yes
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -17266,10 +16849,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -17294,11 +16878,7 @@ character_event = {
 			plot_power >= 0.5
 
 			plot_target_char = {
-				is_adult = yes
-				NOT = { trait = in_hiding }
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				block_general_event_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -17335,11 +16915,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17364,11 +16940,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17393,11 +16965,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17422,11 +16990,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17451,11 +17015,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17480,11 +17040,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17509,11 +17065,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17538,11 +17090,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17567,11 +17115,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17596,11 +17140,7 @@ character_event = {
 				plot_power >= 1.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -17618,11 +17158,7 @@ character_event = {
 				plot_power >= 1.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -17640,11 +17176,7 @@ character_event = {
 				plot_power >= 2.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -17664,11 +17196,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -17788,13 +17316,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -17913,9 +17442,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -17927,6 +17454,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -18331,12 +17862,9 @@ character_event = {
 
 		plot_target_char = {
 			is_adult = no
-			NOT = { trait = in_hiding }
 			practical_age >= 5
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			is_inaccessible_or_incapable_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -18591,10 +18119,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -18620,11 +18149,8 @@ character_event = {
 
 			plot_target_char = {
 				is_adult = no
-				NOT = { trait = in_hiding }
 				practical_age >= 5
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				is_inaccessible_or_incapable_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -18662,11 +18188,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18692,11 +18215,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18722,11 +18242,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18752,11 +18269,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18782,11 +18296,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18812,11 +18323,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18842,11 +18350,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18872,11 +18377,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18902,11 +18404,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -18932,11 +18431,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -18955,11 +18451,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -18978,11 +18471,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -19003,11 +18493,8 @@ character_event = {
 
 				plot_target_char = {
 					is_adult = no
-					NOT = { trait = in_hiding }
 					practical_age >= 5
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					is_inaccessible_or_incapable_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -19127,13 +18614,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -19252,9 +18740,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -19266,6 +18752,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -19669,12 +19159,8 @@ character_event = {
 		}
 
 		plot_target_char = {
-			is_adult = yes
-			NOT = { trait = in_hiding }
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -19929,10 +19415,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -19957,11 +19444,7 @@ character_event = {
 			plot_power >= 0.5
 
 			plot_target_char = {
-				is_adult = yes
-				NOT = { trait = in_hiding }
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				block_general_event_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -19998,11 +19481,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20027,11 +19506,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20056,11 +19531,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20085,11 +19556,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20114,11 +19581,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20143,11 +19606,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20172,11 +19631,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20201,11 +19656,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20230,11 +19681,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20259,11 +19706,7 @@ character_event = {
 				plot_power >= 1.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -20281,11 +19724,7 @@ character_event = {
 				plot_power >= 1.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -20303,11 +19742,7 @@ character_event = {
 				plot_power >= 2.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -20327,11 +19762,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -20451,13 +19882,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+		
+		ai_chance = { factor = 0 }
 	}
  }
 
@@ -20576,9 +20008,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -20590,6 +20020,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -20994,11 +20428,7 @@ character_event = {
 
 		plot_target_char = {
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			NOT = { trait = in_hiding }
-			is_adult = yes
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -21253,10 +20683,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -21281,11 +20712,7 @@ character_event = {
 			plot_power >= 0.5
 
 			plot_target_char = {
-				is_adult = yes
-				NOT = { trait = in_hiding }
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				block_general_event_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -21322,11 +20749,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21351,11 +20774,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21380,11 +20799,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21409,11 +20824,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21438,11 +20849,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21467,11 +20874,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21496,11 +20899,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21525,11 +20924,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21554,11 +20949,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21583,11 +20974,7 @@ character_event = {
 				plot_power >= 1.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -21605,11 +20992,7 @@ character_event = {
 				plot_power >= 1.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -21627,11 +21010,7 @@ character_event = {
 				plot_power >= 2.0
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -21651,11 +21030,7 @@ character_event = {
 				plot_power >= 0.5
 
 				plot_target_char = {
-					is_adult = yes
-					NOT = { trait = in_hiding }
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -21775,13 +21150,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -21900,9 +21276,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -21914,6 +21288,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -22085,6 +21463,8 @@ character_event = {
 
 	hide_from = yes
 	is_triggered_only = yes
+
+	ai = no
 
 	option = {
 		name = EVTOPTA7909
@@ -22320,11 +21700,7 @@ character_event = {
 			trait = decadent
 			dynasty = ROOT
 			at_location = ROOT # The Plot Head needs to be at the target's location to get a chance
-			NOT = { trait = in_hiding }
-			is_adult = yes
-			is_incapable = no
-			prisoner = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			is_murder_quest_target_of_root_trigger = no
 		}
 
@@ -22579,10 +21955,11 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 			plot_power < 1.0
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -22611,11 +21988,7 @@ character_event = {
 			plot_target_char = {
 				trait = decadent
 				dynasty = PREV
-				NOT = { trait = in_hiding }
-				is_adult = yes
-				is_incapable = no
-				prisoner = no
-				is_inaccessible_trigger = no
+				block_general_event_trigger = no
 				is_murder_quest_target_of_prev_trigger = no
 			}
 
@@ -22654,11 +22027,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22685,11 +22054,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22716,11 +22081,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22747,11 +22108,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22778,11 +22135,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22809,11 +22162,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22840,11 +22189,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22871,11 +22216,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22902,11 +22243,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -22933,11 +22270,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -22957,11 +22290,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -22981,11 +22310,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 			}
@@ -23007,11 +22332,7 @@ character_event = {
 				plot_target_char = {
 					trait = decadent
 					dynasty = PREV
-					NOT = { trait = in_hiding }
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-					is_inaccessible_trigger = no
+					block_general_event_trigger = no
 					is_murder_quest_target_of_prev_trigger = no
 				}
 
@@ -23131,13 +22452,14 @@ character_event = {
 		name = EVTOPTD8150 # I cannot afford this
 
 		trigger = {
-			ai = no
 			intrigue < 10
 
 			event_target:plot_leader = {
 				plot_power < 1.0
 			}
 		}
+		
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -23261,9 +22583,7 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	immediate = {
-		save_event_target_as = target_victim
-	}
+	prisoner = no
 
 	trigger = {
 		# Is the plot still in motion?
@@ -23275,6 +22595,10 @@ character_event = {
 				has_plot = plot_kill_spouse
 			}
 		}
+	}
+
+	immediate = {
+		save_event_target_as = target_victim
 	}
 
 	option = {
@@ -23697,9 +23021,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_antiking
-		}
+		FROM = { in_faction = faction_antiking }
 	}
 
 	immediate = {
@@ -23716,6 +23038,66 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_antiking }
+			}
+			character_event = { id = 8202 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				letter_event = { id = 8203 }
+				diplomatic_immunity = no
+
+				any_faction_backer = {
+					faction = faction_antiking
+
+					letter_event = { id = 8201 }
+					diplomatic_immunity = no
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			religion_authority = {
+				name = deposed_antipope
+				years = 50
+			}
+
+			faction_antiking = { # The target (title) of the faction
+				if = {
+					limit = { has_law = investiture_law_1 }
+					add_law_w_cooldown = investiture_law_0
+				}
+			}
+
+			hidden_effect = {
+				religion_head = {
+					opinion = {
+						name = opinion_deposed_antipope
+						who = PREV
+					}
+				}
+			}
+		}
+
+		hidden_effect = {
+			rightful_religious_head_scope = {
+				remove_claim = k_papacy
+				remove_claim = d_fraticelli
+			}
+		}
+
+		primary_title = {
+			show_scope_change = no
+
+			usurp_title = FROM
+		}
 
 		ai_chance = {
 			factor = 5
@@ -23764,25 +23146,27 @@ letter_event = {
 				trait = content
 			}
 		}
+	}
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_antiking }
+	option = {
+		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_antiking
+						power >= 1.0
+					}
 				}
-				character_event = { id = 8202 }
 			}
 
-			FROM = {
-				letter_event = { id = 8203 }
-				diplomatic_immunity = no
+			random = {
+				chance = 25
 
-				any_faction_backer = {
-					faction = faction_antiking
-
-					letter_event = { id = 8201 }
-					diplomatic_immunity = no
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
 				}
 			}
 		}
@@ -23790,44 +23174,74 @@ letter_event = {
 		FROM = {
 			show_scope_change = no
 
-			religion_authority = {
-				name = deposed_antipope
-				years = 50
+			letter_event = {
+				id = 8204
+				days = 3
+				tooltip = EVTTOOLTIP8100
 			}
 
-			faction_antiking = { # The target (title) of the faction
-				if = {
-					limit = { has_law = investiture_law_1 }
-					add_law_w_cooldown = investiture_law_0
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_antiking
+					count = 10
 				}
 			}
 
 			hidden_effect = {
-				religion_head = {
-					opinion = {
-						who = PREV
-						name = opinion_deposed_antipope
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_antiking
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_antiking
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
 					}
 				}
 			}
 		}
-
-		hidden_effect = {
-			rightful_religious_head_scope = {
-				remove_claim = k_papacy
-				remove_claim = d_fraticelli
-			}
-		}
-
-		primary_title = {
-			show_scope_change = no
-
-			usurp_title = FROM
-		}
-	}
-
-	option = {
-		name = EVTOPTB8000
 
 		ai_chance = {
 			factor = 90
@@ -23918,102 +23332,6 @@ letter_event = {
 					faction_power = {
 						faction = faction_antiking
 						power >= 4.0
-					}
-				}
-			}
-		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_antiking
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8204
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_antiking
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_antiking
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_antiking
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
 					}
 				}
 			}
@@ -24116,9 +23434,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_overthrow
-		}
+		FROM = { in_faction = faction_overthrow }
 	}
 
 	immediate = {
@@ -24135,29 +23451,6 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000
-
-		ai_chance = {
-			factor = 5
-
-			trigger = {
-				FROM = {
-					faction_power = {
-						faction = faction_overthrow
-						power >= 1.0
-					}
-				}
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				is_weak_trigger = yes
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = craven
-			}
-		}
 
 		custom_tooltip = {
 			text = khagan_overthrow_execution_warning_tooltip
@@ -24191,10 +23484,51 @@ letter_event = {
 				type = faction_demand
 			}
 		}
+
+		ai_chance = {
+			factor = 5
+
+			trigger = {
+				FROM = {
+					faction_power = {
+						faction = faction_overthrow
+						power >= 1.0
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				is_weak_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = craven
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTB8000
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 8214
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
+
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_overthrow
+					count = 10
+				}
+			}
+		}
+
 		ai_chance = {
 			factor = 90
 
@@ -24270,23 +23604,6 @@ letter_event = {
 						faction = faction_overthrow
 						power >= 4.0
 					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8214
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_overthrow
-					count = 10
 				}
 			}
 		}
@@ -24400,9 +23717,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_increase_council_power
-		}
+		FROM = { in_faction = faction_increase_council_power }
 	}
 
 	immediate = {
@@ -24419,6 +23734,43 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA8000
+
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_increase_council_power }
+			}
+			character_event = { id = 8217 }
+		}
+
+		hidden_effect = {
+			FROM = {
+				letter_event = { id = 8218 }
+				diplomatic_immunity = no
+
+				any_faction_backer = {
+					faction = faction_increase_council_power
+
+					letter_event = { id = 8216 }
+					diplomatic_immunity = no
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_increased_council_power
+				who = ROOT
+				months = 12
+			}
+
+			faction_increase_council_power = { # The target (title) of the faction
+				increase_council_power_effect = yes
+				increase_vassal_freedom_effect = yes
+			}
+		}
 
 		ai_chance = {
 			factor = 20
@@ -24469,25 +23821,27 @@ letter_event = {
 				trait = content
 			}
 		}
+	}
 
-		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_increase_council_power }
+	option = {
+		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_increase_council_power
+						power >= 1.0
+					}
 				}
-				character_event = { id = 8217 }
 			}
 
-			FROM = {
-				letter_event = { id = 8218 }
-				diplomatic_immunity = no
+			random = {
+				chance = 25
 
-				any_faction_backer = {
-					faction = faction_increase_council_power
-
-					letter_event = { id = 8216 }
-					diplomatic_immunity = no
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
 				}
 			}
 		}
@@ -24495,21 +23849,74 @@ letter_event = {
 		FROM = {
 			show_scope_change = no
 
-			opinion = {
-				name = opinion_increased_council_power
-				who = ROOT
-				months = 12
+			letter_event = {
+				id = 8219
+				days = 3
+				tooltip = EVTTOOLTIP8100
 			}
 
-			faction_increase_council_power = { # The target (title) of the faction
-				increase_council_power_effect = yes
-				increase_vassal_freedom_effect = yes
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_increase_council_power
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_increase_council_power
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_increase_council_power
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
 			}
 		}
-	}
-
-	option = {
-		name = EVTOPTB8000
 
 		ai_chance = {
 			factor = 8
@@ -24609,102 +24016,6 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_increase_council_power
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8219
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_increase_council_power
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_increase_council_power
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_increase_council_power
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
  }
 
@@ -24743,6 +24054,8 @@ character_event = {
 	show_from_from = yes
 	is_triggered_only = yes
 	notification = yes
+
+	ai = no
 
 	option = {
 		name = I_SEE
@@ -24801,9 +24114,7 @@ letter_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		FROM = {
-			in_faction = faction_powerful_vassal_takeover
-		}
+		FROM = { in_faction = faction_powerful_vassal_takeover }
 	}
 
 	immediate = {
@@ -24821,17 +24132,29 @@ letter_event = {
 			limit = {
 				higher_real_tier_than = BARON
 				is_feudal = yes
-				is_adult = yes
+				block_general_event_trigger = no
+				has_inheritance_blocker = no
 
 				trigger_if = {
 					limit = { is_female = yes }
-					ROOT = { has_law = true_cognatic_succession }
-				}
 
-				prisoner = no
-				is_incapable = no
-				NOT = { trait = eunuch }
-				is_inaccessible_trigger = no
+					ROOT = {
+						OR = {
+							has_law = true_cognatic_succession
+							has_law = enatic_cognatic_succession
+							has_law = enatic_succession
+						}
+					}
+				}
+				trigger_else = {
+					ROOT = {
+						OR = {
+							has_law = true_cognatic_succession
+							has_law = cognatic_succession
+							has_law = agnatic_succession
+						}
+					}
+				}
 			}
 
 			save_event_target_as = new_title_holder
@@ -24841,63 +24164,15 @@ letter_event = {
 	option = {
 		name = EVTOPTA8000
 
-		ai_chance = {
-			factor = 10
-
-			trigger = {
-				FROM = {
-					faction_power = {
-						faction = faction_powerful_vassal_takeover
-						power >= 1.0
-					}
-				}
+		any_player = {
+			limit = {
+				vassal_of = ROOT
+				NOT = { in_faction = faction_powerful_vassal_takeover }
 			}
-
-			mult_modifier = {
-				factor = 1.25
-				is_weak_trigger = yes
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = craven
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = humble
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = kind
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = charitable
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = patient
-			}
-
-			mult_modifier = {
-				factor = 1.25
-				trait = content
-			}
+			character_event = { id = 8222 }
 		}
 
 		hidden_effect = {
-			any_player = {
-				limit = {
-					vassal_of = ROOT
-					NOT = { in_faction = faction_powerful_vassal_takeover }
-				}
-				character_event = { id = 8222 }
-			}
-
 			FROM = {
 				letter_event = { id = 8223 }
 				diplomatic_immunity = no
@@ -25018,10 +24293,150 @@ letter_event = {
 				}
 			}
 		}
+
+		ai_chance = {
+			factor = 10
+
+			trigger = {
+				FROM = {
+					faction_power = {
+						faction = faction_powerful_vassal_takeover
+						power >= 1.0
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				is_weak_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = craven
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = humble
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = charitable
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = patient
+			}
+
+			mult_modifier = {
+				factor = 1.25
+				trait = content
+			}
+		}
 	}
 
 	option = {
 		name = EVTOPTB8000
+
+		if = {
+			limit = {
+				FROM = {
+					faction_power = {
+						faction = faction_powerful_vassal_takeover
+						power >= 1.0
+					}
+				}
+			}
+
+			random = {
+				chance = 25
+
+				character_event = {
+					id = 45002 # Loyalists flock to the liege's banner
+					months = 4
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			letter_event = {
+				id = 8224
+				days = 3
+				tooltip = EVTTOOLTIP8100
+			}
+
+			tooltip = {
+				any_faction_backer = {
+					faction = faction_powerful_vassal_takeover
+					count = 10
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
+						faction_power = {
+							faction = faction_powerful_vassal_takeover
+							power < 0.75
+						}
+					}
+
+					random_list = {
+						50 = { }
+
+						30 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						faction_power = {
+							faction = faction_powerful_vassal_takeover
+							power < 1.5
+						}
+					}
+
+					random_list = {
+						75 = { }
+
+						5 = {
+							character_event = {
+								id = 45000 # A great number of rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+
+						20 = {
+							character_event = {
+								id = 45004 # Rebels flock to the revolter's banner
+								days = 17
+							}
+						}
+					}
+				}
+			}
+		}
 
 		ai_chance = {
 			factor = 90
@@ -25121,102 +24536,6 @@ letter_event = {
 				}
 			}
 		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					FROM = {
-						faction_power = {
-							faction = faction_powerful_vassal_takeover
-							power >= 1.0
-						}
-					}
-				}
-
-				random = {
-					chance = 25
-
-					character_event = {
-						id = 45002 # Loyalists flock to the liege's banner
-						days = 120
-					}
-				}
-			}
-		}
-
-		FROM = {
-			show_scope_change = no
-
-			letter_event = {
-				id = 8224
-				days = 3
-				tooltip = EVTTOOLTIP8100
-			}
-
-			tooltip = {
-				any_faction_backer = {
-					faction = faction_powerful_vassal_takeover
-					count = 10
-				}
-			}
-
-			hidden_effect = {
-				if = {
-					limit = {
-						faction_power = {
-							faction = faction_powerful_vassal_takeover
-							power < 0.75
-						}
-					}
-
-					random_list = {
-						50 = {
-						}
-
-						30 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						faction_power = {
-							faction = faction_powerful_vassal_takeover
-							power < 1.5
-						}
-					}
-
-					random_list = {
-						75 = {
-						}
-
-						5 = {
-							character_event = {
-								id = 45000 # A great number of rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-
-						20 = {
-							character_event = {
-								id = 45004 # Rebels flock to the revolter's banner
-								days = 17
-							}
-						}
-					}
-				}
-			}
-		}
 	}
  }
 
@@ -25297,8 +24616,8 @@ letter_event = {
 			add_favor = event_target:new_title_holder
 
 			opinion = {
-				who = event_target:new_title_holder
 				name = opinion_favorite
+				who = event_target:new_title_holder
 				years = 5
 			}
 		}
