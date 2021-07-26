@@ -19,7 +19,6 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue
 
 	only_playable = yes
-	only_men = yes # TODO: Does this need to be gender locked?
 	min_age = 16
 	only_capable = yes
 	prisoner = no
@@ -109,7 +108,10 @@ character_event = {
 	option = {
 		name = EVTOPTA63001B # Very well, for a favor
 
-		trigger = { has_dlc = "Conclave" }
+		trigger = {
+			has_dlc = "Conclave"
+			NOT = { owes_favor_to = FROM }
+		}
 
 		add_favor = FROM
 
@@ -176,7 +178,10 @@ character_event = {
 		name = EVTOPTA63001 # Very well
 
 		trigger = {
-			NOT = { has_dlc = "Conclave" }
+			NAND = {
+				has_dlc = "Conclave"
+				NOT = { owes_favor_to = FROM }
+			}
 		}
 
 		random_vassal = {
@@ -239,14 +244,14 @@ character_event = {
 	option = {
 		name = EVTOPTB63001 # I think not
 
-		reverse_opinion = {
-			name = opinion_disappointed
-			who = FROM
-			years = 5
-		}
-
 		FROM = {
 			show_scope_change = no
+
+			opinion = {
+				name = opinion_disappointed
+				who = ROOT
+				years = 5
+			}
 
 			character_event = {
 				id = 63003
@@ -307,13 +312,15 @@ character_event = {
 			}
 		}
 
-		reverse_opinion = {
-			name = opinion_betrayed
-			who = FROM
-			years = 5
-		}
-
 		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_betrayed
+				who = ROOT
+				years = 5
+			}
+
 			character_event = { id = 63004 }
 		}
 
@@ -326,14 +333,14 @@ character_event = {
 
 		trigger = { diplomacy >= 9 }
 
-		reverse_opinion = {
-			name = opinion_impressed
-			who = FROM
-			years = 2
-		}
-
 		FROM = {
 			show_scope_change = no
+
+			opinion = {
+				name = opinion_impressed
+				who = ROOT
+				years = 2
+			}
 
 			letter_event = {
 				id = 63005
@@ -460,11 +467,7 @@ character_event = {
 
 		trigger = { has_character_flag = vassal_for_favor }
 
-		FROM = {
-			show_scope_change = no
-
-			set_defacto_liege = ROOT
-		}
+		set_defacto_vassal = FROM
 
 		tooltip = {
 			reverse_add_favor = liege
@@ -480,11 +483,7 @@ character_event = {
 			NOT = { has_character_flag = vassal_for_favor }
 		}
 
-		FROM = {
-			show_scope_change = no
-
-			set_defacto_liege = ROOT
-		}
+		set_defacto_vassal = FROM
 
 		opinion = {
 			name = opinion_vassal_transfer
@@ -540,16 +539,12 @@ character_event = {
 		intrigue >= 7
 		NOT = { has_character_flag = requested_rival_removal }
 
-		liege = {
-			ROOT = {
-				any_rival = {
-					is_ruler = yes
-					same_liege = ROOT
-					is_adult = yes
-					prisoner = no
-					NOT = { character = PREVPREV } # ROOT's liege
-				}
-			}
+		any_rival = {
+			is_ruler = yes
+			same_liege = ROOT
+			is_adult = yes
+			prisoner = no
+			NOT = { is_liege_of = ROOT }
 		}
 	}
 
@@ -583,20 +578,16 @@ character_event = {
 	}
 
 	immediate = {
-		liege = {
-			ROOT = {
-				random_rival = {
-					limit = {
-						is_ruler = yes
-						same_liege = ROOT
-						is_adult = yes
-						prisoner = no
-						NOT = { character = PREVPREV } # ROOT's liege
-					}
-
-					save_event_target_as = target_rival
-				}
+		random_rival = {
+			limit = {
+				is_ruler = yes
+				same_liege = ROOT
+				is_adult = yes
+				prisoner = no
+				NOT = { is_liege_of = ROOT }
 			}
+
+			save_event_target_as = target_rival
 		}
 	}
 
@@ -2372,16 +2363,14 @@ character_event = {
 
 		set_defacto_liege = THIS
 
-		tooltip = {
-			reverse_opinion = {
-				name = opinion_rightful_vassal
-				who = event_target:rightful_liege
-				years = 5
-			}
-		}
-
 		event_target:rightful_liege = {
 			show_scope_change = no
+
+			opinion = {
+				name = opinion_rightful_vassal
+				who = ROOT
+				years = 5
+			}
 
 			character_event = {
 				id = 63101
@@ -2478,23 +2467,19 @@ character_event = {
 			liege = {
 				show_scope_change = no
 
-				ROOT = {
-					show_scope_change = no
-
-					set_defacto_liege = PREV
-				}
-			}
-		}
-
-		tooltip = {
-			reverse_opinion = {
-				name = opinion_rightful_vassal
-				who = event_target:rightful_liege
-				years = 5
+				set_defacto_vassal = ROOT
 			}
 		}
 
 		event_target:rightful_liege = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_rightful_vassal
+				who = ROOT
+				years = 5
+			}
+
 			character_event = {
 				id = 63101
 				days = 4
@@ -2580,15 +2565,15 @@ character_event = {
 	option = {
 		name = EVTOPTB63100 # Swear fealty to new liege
 
-		tooltip = {
-			reverse_opinion = {
+		event_target:rightful_liege = {
+			show_scope_change = no
+
+			opinion = {
 				name = opinion_loyal_vassal
-				who = event_target:rightful_liege
+				who = ROOT
 				years = 5
 			}
-		}
 
-		event_target:rightful_liege = {
 			character_event = {
 				id = 63102
 				days = 4
@@ -2608,13 +2593,17 @@ character_event = {
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
 		name = EVTOPTA63101
 
-		opinion = {
-			name = opinion_rightful_vassal
-			who = FROM
-			years = 5
+		tooltip = {
+			opinion = {
+				name = opinion_rightful_vassal
+				who = FROM
+				years = 5
+			}
 		}
 	}
 }
@@ -2628,13 +2617,17 @@ character_event = {
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = {
 		name = EVTOPTA63102
 
-		opinion = {
-			name = opinion_loyal_vassal
-			who = FROM
-			years = 5
+		tooltip = {
+			opinion = {
+				name = opinion_loyal_vassal
+				who = FROM
+				years = 5
+			}
 		}
 	}
 }
