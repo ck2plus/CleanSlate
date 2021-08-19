@@ -1256,24 +1256,28 @@ character_event = {
 			}
 		}
 
-		# If the old liege is still alive... (most often the case, we assume)!
 		if = {
-			limit = {
-				FROM = { is_alive = yes }
+			limit = { is_ruler = no } # Hasn't become a ruler since going on a journey
+
+			# If the old liege is still alive... (most often the case, we assume)!
+			if = {
+				limit = {
+					FROM = { is_alive = yes }
+				}
+
+				FROM = { save_event_target_as = home_liege }
+				force_host = FROM
 			}
+			# In case the liege who sent them away has died, send them back from where they came anyway...
+			else = {
+				event_target:original_court_province_target = {
+					owner = {
+						save_event_target_as = home_liege
 
-			FROM = { save_event_target_as = home_liege }
-			force_host = FROM
-		}
-		# In case the liege who sent them away has died, send them back from where they came anyway...
-		else = {
-			event_target:original_court_province_target = {
-				owner = {
-					save_event_target_as = home_liege
-
-					ROOT = { # moves ROOT to the new host
-						force_host = PREV
-						move_character = PREV
+						ROOT = { # moves ROOT to the new host
+							force_host = PREV
+							move_character = PREV
+						}
 					}
 				}
 			}
