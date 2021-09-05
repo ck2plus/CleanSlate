@@ -1743,7 +1743,10 @@ character_event = {
 			has_assigned_minor_title = title_court_physician
 		}
 		trigger_else = {
-			host = { has_assigned_minor_title = title_court_physician }
+			OR = {
+				host = { has_assigned_minor_title = title_court_physician }
+				has_minor_title = title_court_physician # So unlanded court physicians can treat themselves
+			}
 		}
 
 		OR = {
@@ -1780,14 +1783,20 @@ character_event = {
 		if = {
 			limit = { is_playable = no }
 
-			host = {
-				random_courtier_or_vassal = { # Markus' doing
-					limit = {
-						has_minor_title = title_court_physician
-						vassal_of = PREV
-					}
+			if = { # random_courtier_or_vassal below excludes ROOT
+				limit = { has_minor_title = title_court_physician }
+				save_event_target_as = court_physician
+			}
+			else = {
+				host = {
+					random_courtier_or_vassal = { # Markus' doing
+						limit = {
+							has_minor_title = title_court_physician
+							vassal_of = PREV
+						}
 
-					save_event_target_as = court_physician
+						save_event_target_as = court_physician
+					}
 				}
 			}
 		}
