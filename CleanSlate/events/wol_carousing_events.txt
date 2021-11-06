@@ -922,6 +922,30 @@ character_event = {
 
 	is_triggered_only = yes
 
+	immediate = {
+		if = {
+			limit = { has_character_flag = party_host }
+
+			random_opinion_modifier_target = {
+				limit = {
+					has_opinion_modifier = {
+						name = opinion_carousing
+						who = ROOT
+					}
+
+					ai = yes # Don't eat other players!
+				}
+
+				save_event_target_as = cannibal_target
+			}
+		}
+		else = {
+			FROM = {
+				save_event_target_as = cannibal_target
+			}
+		}
+	}
+
 	option = {
 		name = EVTOPTA_WoL_4101 # No
 
@@ -955,8 +979,6 @@ character_event = {
 	option = {
 		name = EVTOPTB_WoL_4101 # Eat, for host
 
-		trigger = { has_character_flag = party_host }
-
 		if = {
 			limit = {
 				NOT = { trait = cannibal }
@@ -965,52 +987,7 @@ character_event = {
 			add_trait = cannibal
 		}
 
-		random_opinion_modifier_target = {
-			show_scope_change = no
-
-			limit = {
-				has_opinion_modifier = {
-					name = opinion_carousing
-					who = ROOT
-				}
-
-				ai = yes # Don't eat other players!
-			}
-
-			death = {
-				death_reason = death_murder_unknown_butchered
-				killer = ROOT
-			}
-
-			if = {
-				limit = {
-					religion_openly_bon_or_reformed_trigger = yes
-
-					ROOT = {
-						ai = no
-						is_ironman = yes
-					}
-				}
-
-				ROOT = { set_character_flag = achievement_bon_appetit }
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTB_WoL_4101 # Eat, for guest
-
-		trigger = { has_character_flag = party_guest }
-
-		if = {
-			limit = {
-				NOT = { trait = cannibal }
-			}
-
-			add_trait = cannibal
-		}
-
-		FROM = {
+		event_target:cannibal_target = {
 			show_scope_change = no
 
 			death = {
