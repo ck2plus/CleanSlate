@@ -1,7 +1,7 @@
 #########################################################
 #
 # Rebel Events for The Old Gods DLC
-# ( TOG.1000 to TOG.1199)
+# (TOG.999 to TOG.1199)
 #
 # NOTE: The Old Gods DLC disables the old rebel system
 #
@@ -11,8 +11,225 @@
 
 namespace = TOG
 
+# Single event to decide which uprising occurs
+# Avoids all manner of messy, ugly triggers
+province_event = {
+	id = TOG.999
+
+	is_triggered_only = yes # on_rebel_revolt
+	hide_window = yes
+
+	immediate = {
+		# See if a minor clan could rise up
+		if = {
+			limit = {
+				has_dlc = "Horse Lords"
+				culture = owner
+				has_empty_holding = yes # To allow a Clan capital
+
+				owner = {
+					independent = yes
+					is_nomadic = yes
+					risks_minor_clan_rising = yes
+					in_revolt = no
+					NOT = { is_capital = ROOT }
+				}
+			}
+
+			if = {
+				limit = {
+					top_liege = {
+						any_war = {
+							defender = { character = PREV }
+							using_cb = cb_minor_clan_revolt
+						}
+					}
+				}
+
+				province_event = { id = HL.2010 } # Reinforce ongoing minor clan uprising
+			}
+			else = {
+				province_event = { id = HL.2000 } # Start new minor clan uprising
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_castle = yes
+					has_tribal = yes
+					has_temple = yes
+					has_city = yes
+				}
+
+				has_dlc = "The Old Gods"
+			}
+
+			# Heretic revolts have the highest priority
+			if = {
+				limit = {
+					is_heresy_of = top_liege
+					has_dlc = "The Old Gods"
+
+					NOT = { # Not if there is already an ongoing revolt
+						top_liege = {
+							any_war = {
+								defender = { character = PREV }
+
+								OR = {
+									AND = {
+										using_cb = peasant_revolt
+										war_title = ROOT # The county
+									}
+
+									AND = {
+										using_cb = religious_revolt
+										attacker = { religion = ROOT }
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						top_liege = {
+							any_war = {
+								defender = { character = PREV }
+								using_cb = heretic_revolt
+								attacker = { religion = ROOT }
+							}
+						}
+					}
+
+					province_event = { id = TOG.1030 } # Reinforce ongoing heretic revolt
+				}
+				else = {
+					province_event = { id = TOG.1020 } # Start new heretic revolt
+				}
+			}
+			# Nationalist revolts have the next highest priority
+			else_if = {
+				limit = {
+					NOT = { culture = top_liege }
+					has_dlc = "The Old Gods"
+
+					kingdom = {
+						has_holder = no
+						culture = ROOT
+
+						# The de jure kingdom must have had an appropriate holder in the past
+						any_previous_holder = {
+							ROOT = {
+								top_liege = {
+									NOT = { dynasty = PREVPREV }
+
+									trigger_if = {
+										limit = { is_nomadic = yes }
+										NOT = { culture_group = ROOT }
+									}
+								}
+							}
+						}
+					}
+
+					NOT = { # Not if there is already an ongoing revolt
+						top_liege = {
+							any_war = {
+								defender = { character = PREV }
+
+								trigger_if = {
+									limit = { using_cb = heretic_revolt }
+									attacker = { religion = ROOT }
+								}
+								trigger_else = {
+									using_cb = liberation_revolt
+									ROOT = { de_jure_liege_or_above = thirdparty_title_scope }
+								}
+							}
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						# There is already an ongoing nationalist revolt for the same kingdom
+						top_liege = {
+							any_war = {
+								using_cb = liberation_revolt
+								defender = { character = PREV }
+								ROOT = { de_jure_liege_or_above = thirdparty_title_scope }
+							}
+						}
+					}
+
+					province_event = { id = TOG.1050 } # Reinforce ongoing revolt
+				}
+				else = {
+					province_event = { id = TOG.1040 } # Start new revolt
+				}
+			}
+			# Religious revolts are lower priority still
+			else_if = {
+				limit = {
+					NOT = { religion_group = top_liege }
+					has_dlc = "The Old Gods"
+
+					NOT = { # Not if there is already an ongoing revolt
+						top_liege = {
+							any_war = {
+								defender = { character = PREV }
+
+								trigger_if = {
+									limit = { using_cb = peasant_revolt }
+									war_title = ROOT # The province
+								}
+							}
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						top_liege = {
+							any_war = {
+								using_cb = religious_revolt
+								defender = { character = PREV }
+								attacker = { religion = ROOT }
+							}
+						}
+					}
+
+					province_event = { id = TOG.1070 } # Reinforce ongoing religious revolt
+				}
+				else = {
+					province_event = { id = TOG.1060 } # Start new religious revolt
+				}
+			}
+			# Peasant revolts are the fallback
+			else = {
+				if = {
+					limit = {
+						top_liege = {
+							any_war = {
+								defender = { character = PREV }
+								using_cb = peasant_revolt
+								war_title = ROOT # The province
+							}
+						}
+					}
+
+					province_event = { id = TOG.1010 } # Reinforce ongoing peasant uprising
+				}
+				else = {
+					province_event = { id = TOG.1000 } # Start new peasant uprising
+				}
+			}
+		}
+	}
+}
+
 # Peasant Rebels rise up (temporary rebel title created, with a leader and a war)
-# Triggered from "on_rebel_revolt"
 province_event = {
 	id = TOG.1000
 	desc = EVTDESC_TOG_1000
@@ -21,112 +238,6 @@ province_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		# Will get clan rebels instead
-		trigger_if = {
-			limit = { has_empty_holding = yes }
-
-			owner = {
-				is_nomadic = no
-			}
-		}
-
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-
-		trigger_if = {
-			limit = {
-				NOT = { has_province_flag = force_peasant_revolt }
-			}
-
-			has_dlc = "The Old Gods"
-
-			# Heretic revolts have priority
-			trigger_if = {
-				limit = { is_heretic = yes }
-
-				owner = {
-					top_liege = {
-						NOT = { is_parent_religion = ROOT }
-					}
-				}
-			}
-
-			owner = {
-				top_liege = {
-					# Religious revolts have priority
-					religion_group = ROOT
-
-					# Not if there is already an ongoing revolt for this province
-					NOT = {
-						any_war = {
-							defender = { character = PREV }
-
-							trigger_if = {
-								limit = { using_cb = peasant_revolt }
-								war_title = ROOT # Province
-							}
-							trigger_else_if = {
-								limit = {
-									OR = {
-										using_cb = heretic_revolt
-										using_cb = religious_revolt
-									}
-								}
-
-								attacker = {
-									religion = ROOT # Province
-								}
-							}
-							trigger_else = {
-								using_cb = liberation_revolt
-
-								ROOT = {
-									de_jure_liege_or_above = thirdparty_title_scope
-								}
-							}
-						}
-					}
-				}
-			}
-
-			# Nationalist revolts have priority
-			OR = {
-				owner = {
-					top_liege = {
-						culture = ROOT
-					}
-				}
-
-				kingdom = {
-					OR = {
-						has_holder = yes
-						NOT = { culture = ROOT }
-
-						NOT = {
-							# The de jure kingdom must have had an appropriate holder in the past
-							any_previous_holder = {
-								ROOT = {
-									owner = {
-										top_liege = {
-											NOT = { dynasty = PREVPREVPREV }
-
-											trigger_if = {
-												limit = { is_nomadic = yes }
-												NOT = { culture_group = ROOT }
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	immediate = {
 		add_province_modifier = {
 			name = recent_county_uprising # -100% revolt risk
@@ -134,6 +245,10 @@ province_event = {
 		}
 
 		remove_province_modifier = rumors_of_witchcraft
+
+		top_liege = {
+			save_event_target_as = province_top_liege
+		}
 
 		create_character = {
 			random_traits = yes
@@ -205,21 +320,15 @@ province_event = {
 			}
 
 			# DoW on the province top liege
-			ROOT = {
-				owner = {
-					top_liege = {
-						reverse_war = {
-							target = PREVPREVPREV
-							casus_belli = peasant_revolt
-							thirdparty_title = ROOT # The county
-						}
+			war = {
+				target = event_target:province_top_liege
+				casus_belli = peasant_revolt
+				thirdparty_title = ROOT
+			}
 
-						reverse_opinion = {
-							name = opinion_evil_tyrant
-							who = PREVPREVPREV
-						}
-					}
-				}
+			opinion = {
+				name = opinion_evil_tyrant
+				who = event_target:province_top_liege
 			}
 		}
 
@@ -285,7 +394,6 @@ character_event = {
 }
 
 # Peasant Rebels rise up to reinforce an ongoing provincial peasant revolt
-# Triggered from "on_rebel_revolt"
 province_event = {
 	id = TOG.1010
 	desc = EVTDESC_TOG_1010
@@ -293,25 +401,6 @@ province_event = {
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
-
-	has_dlc = "The Old Gods"
-
-	trigger = {
-		# There is already an ongoing peasant revolt for this province
-		owner = {
-			top_liege = {
-				any_war = {
-					defender = { character = PREV }
-					using_cb = peasant_revolt
-					war_title = ROOT # The province
-				}
-			}
-		}
-
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-	}
 
 	immediate = {
 		add_province_modifier = {
@@ -370,9 +459,7 @@ province_event = {
 					}
 				}
 			}
-		}
 
-		owner = {
 			any_liege = { # Inform the lieges
 				character_event = {
 					id = TOG.1011
@@ -402,7 +489,6 @@ character_event = {
 }
 
 # Heretic Rebels rise up (temporary rebel title created, with a leader and a war)
-# Triggered from "on_rebel_revolt"
 province_event = {
 	id = TOG.1020
 	desc = EVTDESC_TOG_1020
@@ -411,52 +497,20 @@ province_event = {
 
 	is_triggered_only = yes
 
-	has_dlc = "The Old Gods"
-
-	trigger = {
-		is_heretic = yes
-
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-
-		owner = {
-			top_liege = {
-				is_parent_religion = ROOT
-			}
-		}
-
-		NOT = { # Not if there is already an ongoing revolt
-			owner = {
-				top_liege = {
-					war = yes
-					any_war = {
-						defender = { character = PREV }
-						OR = {
-							AND = {
-								using_cb = peasant_revolt
-								war_title = ROOT # The county
-							}
-							AND = {
-								using_cb = heretic_revolt
-								attacker = { religion = ROOT }
-							}
-							AND = {
-								using_cb = religious_revolt
-								attacker = { religion = ROOT }
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	immediate = {
 		add_province_modifier = {
 			name = recent_county_uprising # -100% revolt risk
 			years = 5
 		}
+
+		top_liege = {
+			save_event_target_as = province_top_liege
+		}
+
+		duchy = {
+			save_event_target_as = province_duchy
+		}
+
 		create_character = {
 			random_traits = yes
 			dynasty = none
@@ -533,26 +587,21 @@ province_event = {
 			}
 
 			# DoW on the province top liege
-			ROOT = {
-				owner = {
-					top_liege = {
-						reverse_war = {
-							target = PREVPREVPREV
-							casus_belli = heretic_revolt
-							thirdparty_title = ROOT # The county...
-							tier = DUKE # ... but really the de jure duchy
-						}
+			war = {
+				target = event_target:province_top_liege
+				casus_belli = heretic_revolt
+				thirdparty_title = event_target:province_duchy
+			}
 
-						reverse_opinion = {
-							name = opinion_evil_tyrant
-							who = PREVPREVPREV
-						}
-					}
+			opinion = {
+				name = opinion_evil_tyrant
+				who = event_target:province_top_liege
+			}
+		}
 
-					any_liege = { # Inform the lieges
-						character_event = { id = TOG.1021 }
-					}
-				}
+		owner = {
+			any_liege = { # Inform the lieges
+				character_event = { id = TOG.1021 }
 			}
 		}
 	}
@@ -623,7 +672,6 @@ character_event = {
 }
 
 # Heretic Rebels rise up to reinforce an ongoing heretic uprising
-# Triggered from "on_rebel_revolt"
 province_event = {
 	id = TOG.1030
 	desc = EVTDESC_TOG_1030
@@ -631,28 +679,6 @@ province_event = {
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
-
-	has_dlc = "The Old Gods"
-
-	trigger = {
-		is_heretic = yes
-
-		owner = {
-			top_liege = {
-				is_parent_religion = ROOT
-
-				any_war = {
-					defender = { character = PREV }
-					using_cb = heretic_revolt
-					attacker = { religion = ROOT }
-				}
-			}
-		}
-
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-	}
 
 	immediate = {
 		add_province_modifier = {
@@ -739,7 +765,6 @@ character_event = {
 }
 
 # Royalist Nationalist Rebels rise up to create a kingdom (temporary rebel title created, with a leader and a war)
-# Triggered from "on_rebel_revolt"
 province_event = {
 	id = TOG.1040
 	desc = EVTDESC_TOG_1040
@@ -748,79 +773,18 @@ province_event = {
 
 	is_triggered_only = yes
 
-	has_dlc = "The Old Gods"
-
-	trigger = {
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-
-		owner = {
-			top_liege = {
-				NOT = { culture = ROOT }
-			}
-		}
-
-		kingdom = {
-			has_holder = no
-			culture = ROOT
-
-			# The de jure kingdom must have had an appropriate holder in the past
-			any_previous_holder = {
-				ROOT = {
-					owner = {
-						top_liege = {
-							NOT = { dynasty = PREVPREVPREV }
-
-							trigger_if = {
-								limit = { is_nomadic = yes }
-								NOT = { culture_group = ROOT }
-							}
-						}
-					}
-				}
-			}
-		}
-
-		# Heretic revolts have priority
-		trigger_if = {
-			limit = { is_heretic = yes }
-
-			owner = {
-				top_liege = {
-					NOT = { is_parent_religion = ROOT }
-				}
-			}
-		}
-
-		# Not if there is already an ongoing revolt
-		owner = {
-			top_liege = {
-				NOT = {
-					any_war = {
-						defender = { character = PREV }
-
-						trigger_if = {
-							limit = { using_cb = heretic_revolt }
-							attacker = { religion = ROOT }
-						}
-						trigger_else = {
-							using_cb = liberation_revolt
-
-							ROOT = {
-								de_jure_liege_or_above = thirdparty_title_scope
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	immediate = {
 		add_province_modifier = {
 			name = recent_county_uprising # -100% revolt risk
 			years = 5
+		}
+
+		top_liege = {
+			save_event_target_as = province_top_liege
+		}
+
+		kingdom = {
+			save_event_target_as = province_kingdom
 		}
 
 		create_character = {
@@ -919,26 +883,21 @@ province_event = {
 			}
 
 			# DoW on the province top liege
-			ROOT = {
-				owner = {
-					top_liege = {
-						reverse_war = {
-							target = PREVPREVPREV
-							casus_belli = liberation_revolt
-							thirdparty_title = ROOT # The province...
-							tier = KING # ... but really the de jure kingdom
-						}
+			war = {
+				target = event_target:province_top_liege
+				casus_belli = liberation_revolt
+				thirdparty_title = event_target:province_kingdom
+			}
 
-						reverse_opinion = {
-							name = opinion_evil_tyrant
-							who = PREVPREVPREV
-						}
-					}
+			opinion = {
+				name = opinion_evil_tyrant
+				who = event_target:province_top_liege
+			}
+		}
 
-					any_liege = { # Inform the lieges
-						character_event = { id = TOG.1041 }
-					}
-				}
+		owner = {
+			any_liege = { # Inform the lieges
+				character_event = { id = TOG.1041 }
 			}
 		}
 	}
@@ -1016,7 +975,6 @@ character_event = {
 }
 
 # Nationalist Rebels rise up to reinforce an ongoing revolt
-# Triggered from "on_rebel_revolt"
 province_event = {
 	id = TOG.1050
 	desc = EVTDESC_TOG_1050
@@ -1024,29 +982,6 @@ province_event = {
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
-
-	has_dlc = "The Old Gods"
-
-	trigger = {
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-
-		# There is already an ongoing nationalist revolt for the same kingdom
-		owner = {
-			top_liege = {
-				any_war = {
-					using_cb = liberation_revolt
-
-					defender = { character = PREV }
-
-					ROOT = {
-						de_jure_liege_or_above = thirdparty_title_scope
-					}
-				}
-			}
-		}
-	}
 
 	immediate = {
 		add_province_modifier = {
@@ -1059,12 +994,8 @@ province_event = {
 				any_war = {
 					limit = {
 						using_cb = liberation_revolt
-
 						defender = { character = PREV }
-
-						ROOT = {
-							de_jure_liege_or_above = thirdparty_title_scope
-						}
+						ROOT = { de_jure_liege_or_above = thirdparty_title_scope }
 					}
 
 					attacker = {
@@ -1137,7 +1068,6 @@ character_event = {
 }
 
 # Religious Rebels rise up (temporary rebel title created, with a leader and a war)
-# Triggered from "on_rebel_revolt"
 province_event = {
 	id = TOG.1060
 	desc = EVTDESC_TOG_1060
@@ -1146,83 +1076,18 @@ province_event = {
 
 	is_triggered_only = yes
 
-	has_dlc = "The Old Gods"
-
-	trigger = {
-		is_heretic = no
-
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-
-		owner = {
-			top_liege = {
-				NOR = {
-					religion_group = ROOT
-
-					# Not if there is already an ongoing revolt
-					any_war = {
-						defender = { character = PREV }
-
-						trigger_if = {
-							limit = { using_cb = peasant_revolt }
-							war_title = ROOT # The province
-						}
-						trigger_else = {
-							OR = {
-								using_cb = heretic_revolt
-								using_cb = religious_revolt
-							}
-
-							attacker = { religion = ROOT }
-						}
-					}
-				}
-			}
-		}
-
-		# Nationalist revolts have priority
-		OR = {
-			owner = {
-				top_liege = {
-					culture = ROOT
-				}
-			}
-
-			has_province_flag = force_peasant_revolt
-
-			kingdom = {
-				OR = {
-					has_holder = yes
-					NOT = { culture = ROOT }
-
-					NOT = {
-						# The de jure kingdom must have had an appropriate holder in the past
-						any_previous_holder = {
-							ROOT = {
-								owner = {
-									top_liege = {
-										NOT = { dynasty = PREVPREVPREV }
-
-										trigger_if = {
-											limit = { is_nomadic = yes }
-											NOT = { culture_group = ROOT }
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-		}
-	}
-
 	immediate = {
 		add_province_modifier = {
 			name = recent_county_uprising # -100% revolt risk
 			years = 5
+		}
+
+		top_liege = {
+			save_event_target_as = province_top_liege
+		}
+
+		duchy = {
+			save_event_target_as = province_duchy
 		}
 
 		create_character = {
@@ -1299,43 +1164,33 @@ province_event = {
 			}
 
 			# DoW on the province top liege
-			ROOT = {
-				owner = {
-					top_liege = {
-						reverse_war = {
-							target = PREVPREVPREV
-							casus_belli = religious_revolt
-							thirdparty_title = ROOT # The province...
-							tier = DUKE # ... but really the de jure duchy
-						}
+			war = {
+				target = event_target:province_top_liege
+				casus_belli = religious_revolt
+				thirdparty_title = event_target:province_duchy
+			}
 
-						reverse_opinion = {
-							name = opinion_evil_tyrant
-							who = PREVPREVPREV
-						}
-					}
+			opinion = {
+				name = opinion_evil_tyrant
+				who = event_target:province_top_liege
+			}
+		}
 
-					any_liege = { # Inform the lieges
-						character_event = { id = TOG.1061 }
-					}
-				}
+		owner = {
+			any_liege = { # Inform the lieges
+				character_event = { id = TOG.1061 }
 			}
 		}
 	}
 
 	option = {
-		name = EVTOPTA_TOG_1060
-
-		trigger = {
-			religion_group = owner
+		name = {
+			text = EVTOPTA_TOG_1060
+			trigger = { religion_group = owner }
 		}
-	}
-
-	option = {
-		name = EVTOPTB_TOG_1060
-
-		trigger = {
-			NOT = { religion_group = owner }
+		name = {
+			text = EVTOPTB_TOG_1060
+			trigger = { NOT = { religion_group = owner } }
 		}
 	}
 }
@@ -1351,18 +1206,13 @@ character_event = {
 	ai = no
 
 	option = {
-		name = EVTOPTA_TOG_1060
-
-		trigger = {
-			religion_group = FROM
+		name = {
+			text = EVTOPTA_TOG_1060
+			trigger = { religion_group = FROM }
 		}
-	}
-
-	option = {
-		name = EVTOPTB_TOG_1060
-
-		trigger = {
-			NOT = { religion_group = FROM }
+		name = {
+			text = EVTOPTB_TOG_1060
+			trigger = { NOT = { religion_group = FROM } }
 		}
 	}
 }
@@ -1421,29 +1271,6 @@ province_event = {
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
-
-	has_dlc = "The Old Gods"
-
-	trigger = {
-		is_heretic = no
-
-		any_province_holding = {
-			NOT = { holding_type = nomad }
-		}
-
-		owner = {
-			top_liege = {
-				any_war = {
-					using_cb = religious_revolt
-
-					defender = { character = PREV }
-					attacker = { religion = ROOT }
-				}
-
-				NOT = { religion_group = ROOT }
-			}
-		}
-	}
 
 	immediate = {
 		add_province_modifier = {
