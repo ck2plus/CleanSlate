@@ -185,8 +185,8 @@ character_event = {
 				save_event_target_as = chinese_envoy
 
 				opinion = {
-					who = ROOT
 					name = opinion_happy
+					who = ROOT
 					years = 15
 				}
 			}
@@ -389,20 +389,16 @@ character_event = {
 				else_if = {
 					limit = {
 						any_vassal = {
-							prisoner = no
 							in_command = no
-							is_incapable = no
-							is_inaccessible_trigger = no
+							is_inaccessible_or_incapable_trigger = no
 							NOT = { character = ROOT }
 						}
 					}
 
 					any_vassal = {
 						limit = {
-							prisoner = no
 							in_command = no
-							is_incapable = no
-							is_inaccessible_trigger = no
+							is_inaccessible_or_incapable_trigger = no
 							NOT = { character = ROOT }
 						}
 
@@ -641,7 +637,7 @@ character_event = {
 	}
 }
 
-# stolen goods
+# Stolen goods
 character_event = {
 	id = HL.5007
 	desc = EVTDESC_HL_5007
@@ -716,31 +712,15 @@ character_event = {
 		name = EVTOPTA_HL_5008
 
 		if = {
-			limit = {
-				NOT = { trait = deceitful }
+			limit = { has_character_flag = reimbursed_trader }
+
+			random = {
+				chance = 50
+				add_trait_fully_deceitful_effect = yes
 			}
-
-			if = {
-				limit = { has_character_flag = reimbursed_trader }
-
-				random = {
-					chance = 50
-
-					tooltip = {
-						remove_trait_silently_honest_effect = yes
-						add_trait = deceitful
-					}
-
-					hidden_effect = {
-						remove_trait_silently_honest_effect = yes
-						add_trait_deceitful_effect = yes
-					}
-				}
-			}
-			else = {
-				remove_trait_silently_honest_effect = yes
-				add_trait = deceitful
-			}
+		}
+		else = {
+			add_trait_fully_silently_deceitful_effect = yes
 		}
 
 		scaled_wealth = 0.5
@@ -754,24 +734,9 @@ character_event = {
 	option = {
 		name = EVTOPTB_HL_5008
 
-		if = {
-			limit = {
-				NOT = { trait = honest }
-			}
-
-			random = {
-				chance = 50
-
-				tooltip = {
-					remove_trait_silently_deceitful_effect = yes
-					add_trait = honest
-				}
-
-				hidden_effect = {
-					remove_trait_silently_deceitful_effect = yes
-					add_trait_honest_effect = yes
-				}
-			}
+		random = {
+			chance = 50
+			add_trait_fully_honest_effect = yes
 		}
 
 		if = {
@@ -791,14 +756,14 @@ character_event = {
 	border = GFX_event_normal_frame_diplomacy
 
 	desc = {
-		trigger = { character = event_target:dog_owner }
 		text = EVTDESC_HL_5011SELF
+		trigger = { character = event_target:dog_owner }
 	}
 	desc = {
+		text = EVTDESC_HL_5011OTHER
 		trigger = {
 			NOT = { character = event_target:dog_owner }
 		}
-		text = EVTDESC_HL_5011OTHER
 	}
 
 	is_triggered_only = yes
@@ -994,6 +959,7 @@ character_event = {
 	}
 }
 
+# Snake pet
 character_event = {
 	id = HL.5017
 	desc = EVTDESC_HL_5017
@@ -1211,10 +1177,7 @@ province_event = {
 		has_trade_post = yes
 
 		owner = {
-			is_adult = yes
-			prisoner = no
-			is_incapable = no
-			is_inaccessible_trigger = no
+			block_general_event_trigger = no
 			NOT = { trait = infirm }
 		}
 	}
@@ -1287,15 +1250,7 @@ province_event = {
 		owner = {
 			show_scope_change = no
 
-			if = {
-				limit = {
-					NOT = { trait = arbitrary }
-				}
-
-				remove_trait_silently_just_effect = yes
-				add_trait = arbitrary
-			}
-
+			add_trait_fully_silently_arbitrary_effect = yes
 			scaled_wealth = 0.5
 		}
 	}
@@ -1383,9 +1338,7 @@ character_event = {
 					combat_rating >= 30
 				}
 
-				death = {
-					death_reason = death_battle
-				}
+				death = { death_reason = death_battle }
 
 				liege = {
 					character_event = { id = HL.5053 }
@@ -1426,7 +1379,7 @@ character_event = {
 			}
 		}
 
-		ai_chance = { factor = 30 }
+		ai_chance = { factor = 2 }
 	}
 
 	option = {
@@ -1449,7 +1402,7 @@ character_event = {
 		}
 
 		ai_chance = {
-			factor = 15
+			factor = 1
 
 			trigger = {
 				NOT = { trait = brave }
@@ -1657,7 +1610,7 @@ character_event = {
 
 		random_list = {
 			30 = { # Success
-				modifier = {
+				mult_modifier = {
 					factor = 1.5
 					combat_rating >= 20
 				}
@@ -1676,7 +1629,7 @@ character_event = {
 					is_maimed_trigger = no
 				}
 
-				modifier = {
+				mult_modifier = {
 					factor = 0.5
 					combat_rating >= 20
 				}
@@ -1829,9 +1782,7 @@ character_event = {
 		name = EVTOPTB_HL_5060
 		tooltip_info = lunatic
 
-		trigger = {
-			trait = lunatic
-		}
+		trigger = { trait = lunatic }
 
 		random_list = {
 			80 = {
@@ -1932,7 +1883,7 @@ character_event = {
 			}
 		}
 
-		add_trait = cruel
+		add_trait_fully_silently_cruel_effect = yes
 
 		event_target:target_province = {
 			show_scope_change = no

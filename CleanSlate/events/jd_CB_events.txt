@@ -42,6 +42,7 @@ character_event = { # The target receives an event
 
 			diplomatic_immunity = yes
 		}
+
 		random_realm_character = {
 			limit = {
 				is_landed = no
@@ -182,6 +183,7 @@ character_event = { # The target receives an event
 					}
 				}
 			}
+
 			death = {
 				death_reason = death_execution_beheading
 				killer = ROOT
@@ -225,29 +227,31 @@ character_event = { # The target receives an event
 	}
 
 	after = {
-		any_realm_character = {
-			limit = {
-				is_landed = no
+		hidden_effect = {
+			any_realm_character = {
+				limit = {
+					is_landed = no
 
-				OR = {
-					is_friend = FROM
-					is_married = FROM
-					is_consort = FROM
-					is_close_relative = FROM
-					dynasty = FROM
-				}
+					OR = {
+						is_friend = FROM
+						is_married = FROM
+						is_consort = FROM
+						is_close_relative = FROM
+						dynasty = FROM
+					}
 
-				OR = {
-					prisoner = yes
+					OR = {
+						prisoner = yes
 
-					has_opinion_modifier = {
-						name = opinion_forced_consort
-						who = ROOT
+						has_opinion_modifier = {
+							name = opinion_forced_consort
+							who = ROOT
+						}
 					}
 				}
-			}
 
-			diplomatic_immunity = no
+				diplomatic_immunity = no
+			}
 		}
 	}
 }
@@ -298,6 +302,7 @@ character_event = { # Captives released, end war?
 							is_consort = yes
 							consort = { same_realm = PREV } # ...if they are taken by someone in the same realm of your target
 						}
+
 						consort = { remove_consort = PREV }
 					}
 					else_if = {
@@ -305,6 +310,7 @@ character_event = { # Captives released, end war?
 							is_married = yes
 							any_spouse = { same_realm = PREV }
 						}
+
 						remove_spouse = yes
 					}
 				}
@@ -316,17 +322,16 @@ character_event = { # Captives released, end war?
 
 				if = { # Move to the saviours court...
 					limit = {
-						# ...unless you are a concubine to a ruler ...
-						trigger_if = {
+						trigger_if = { # ...unless you are a concubine to a ruler ...
 							limit = { is_consort = yes }
 							consort = { is_ruler = no }
 						}
-						# ...or the wife to a ruler
-						trigger_else_if = {
+						trigger_else_if = { # ...or the wife to a ruler
 							limit = { is_married = yes }
 							spouse = { is_ruler = no }
 						}
 					}
+
 					move_character = ROOT
 				}
 
@@ -343,6 +348,7 @@ character_event = { # Captives released, end war?
 				attacker = { character = ROOT }
 				defender = { character = FROM }
 			}
+
 			end_war = invalid
 		}
 
@@ -564,7 +570,6 @@ character_event = { # Religious Liberation
 			}
 
 			trait = cynical
-
 			has_character_flag = had_liberate_opportunity
 			has_character_flag = declined_liberate_opportunity
 		}
@@ -603,7 +608,7 @@ character_event = { # Religious Liberation
 	}
 
 	weight_multiplier = {
-		days = 1
+		factor = 1
 
 		mult_modifier = {
 			factor = 3
@@ -648,6 +653,7 @@ character_event = { # Religious Liberation
 
 	option = {
 		name = EVTOPTA_JD_2100
+
 		custom_tooltip = { text = cb_opportunity_liberate }
 
 		set_character_flag = had_liberate_opportunity
@@ -655,6 +661,7 @@ character_event = { # Religious Liberation
 
 	option = {
 		name = EVTOPTB_JD_2100
+
 		custom_tooltip = { text = cb_opportunity_liberate_deny }
 
 		set_character_flag = declined_liberate_opportunity
@@ -696,6 +703,16 @@ character_event = {
 	option = { # We shall surrender now and save our people
 		name = evt_OPTA_JD_2500
 
+		event_target:tribute_war_suzerain = {
+			show_scope_change = no
+
+			letter_event = {
+				id = JD.2501
+				days = 1
+				tooltip = surrender_tributary_event_tt
+			}
+		}
+
 		ai_chance = {
 			factor = 10
 
@@ -719,6 +736,7 @@ character_event = {
 							NOT = {
 								any_attacker = { character = ROOT }
 							}
+
 							NOT = {
 								any_defender = { character = ROOT }
 							}
@@ -768,16 +786,6 @@ character_event = {
 				}
 			}
 		}
-
-		event_target:tribute_war_suzerain = {
-			show_scope_change = no
-
-			letter_event = {
-				id = JD.2501
-				days = 1
-				tooltip = surrender_tributary_event_tt
-			}
-		}
 	}
 
 	option = { # We will not give in so easily!
@@ -798,30 +806,6 @@ letter_event = {
 
 	option = { # A wise decision
 		name = evt_OPTA_JD_2501
-
-		ai_chance = {
-			factor = 70
-
-			trigger = {
-				NOR = {
-					trait = lunatic
-					trait = possessed
-				}
-			}
-
-			mult_modifier = {
-				factor = 0.1
-				trait = cruel
-			}
-			mult_modifier = {
-				factor = 0.5
-				trait = proud
-			}
-			mult_modifier = {
-				factor = 0.3
-				is_nomadic = yes
-			}
-		}
 
 		if = {
 			limit = { uses_decadence = yes }
@@ -925,6 +909,30 @@ letter_event = {
 				}
 			}
 		}
+
+		ai_chance = {
+			factor = 70
+
+			trigger = {
+				NOR = {
+					trait = lunatic
+					trait = possessed
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.1
+				trait = cruel
+			}
+			mult_modifier = {
+				factor = 0.5
+				trait = proud
+			}
+			mult_modifier = {
+				factor = 0.3
+				is_nomadic = yes
+			}
+		}
 	}
 
 	option = { # Haha let them cower as we pillage their lands
@@ -1015,6 +1023,7 @@ letter_event = {
 								using_cb = tributary_permanent_cb
 								defender = { character = event_target:tribute_war_target }
 							}
+
 							end_war = invalid
 						}
 					}
@@ -1036,6 +1045,7 @@ letter_event = {
 								using_cb = tributary_nomad_cb
 								defender = { character = event_target:tribute_war_target }
 							}
+
 							end_war = invalid
 						}
 					}
@@ -1057,6 +1067,7 @@ letter_event = {
 								using_cb = tributary_cb
 								defender = { character = event_target:tribute_war_target }
 							}
+
 							end_war = invalid
 						}
 					}

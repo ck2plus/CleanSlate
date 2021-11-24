@@ -1,0 +1,406 @@
+# unprotected_sex_effect
+# unprotected_sex_effect_event_target
+# venereal_disease_effect
+# venereal_disease_effect_event_target
+# impregnate_effect
+# impregnate_effect_event_target
+
+# Impregnation and venereal disease handling between FROM and ROOT
+unprotected_sex_effect = {
+	random = {
+		chance = 50
+		venereal_disease_effect = yes
+	}
+
+	if = {
+		limit = {
+			fertility > 0
+			FROM = { fertility > 0 }
+		}
+
+		random = {
+			chance = 0
+			from_root_fertility_score = yes
+
+			impregnate_effect = yes
+		}
+	}
+}
+
+# Impregnation and venereal disease handling between event_target:sex_partner and THIS
+unprotected_sex_effect_event_target = {
+	random = {
+		chance = 50
+		venereal_disease_effect_event_target = yes
+	}
+
+	if = {
+		limit = {
+			fertility > 0
+			event_target:sex_partner = { fertility > 0 }
+		}
+
+		random = {
+			chance = 0
+			event_target_fertility_score = yes
+
+			impregnate_effect_event_target = yes
+		}
+	}
+}
+
+# Transfers venereal diseases between FROM and ROOT
+venereal_disease_effect = {
+	# Great pox and Aztec disease for FROM
+	if = {
+		limit = {
+			FROM = {
+				NOR = {
+					has_flag = developing_illness
+					has_flag = disease_not_serious
+				}
+			}
+		}
+
+		if = {
+			limit = { trait = syphilitic }
+			FROM = { give_syphilitic_effect = yes }
+		}
+
+		if = {
+			limit = { trait = has_aztec_disease }
+			FROM = { give_has_aztec_disease_effect = yes }
+		}
+	}
+
+	# Great pox and Aztec disease for ROOT
+	if = {
+		limit = {
+			NOR = {
+				has_flag = developing_illness
+				has_flag = disease_not_serious
+			}
+		}
+
+		if = {
+			limit = { FROM = { trait = syphilitic } }
+			give_syphilitic_effect = yes
+		}
+
+		if = {
+			limit = { FROM = { trait = has_aztec_disease } }
+			give_has_aztec_disease_effect = yes
+		}
+	}
+
+	# Lover's pox
+	if = {
+		limit = {
+			OR = {
+				trait = lovers_pox
+				has_character_modifier = minor_disease_herpes
+			}
+
+			FROM = {
+				NOR = {
+					trait = lovers_pox
+					has_character_modifier = minor_disease_herpes
+				}
+			}
+		}
+
+		FROM = {
+			character_event = {
+				id = 6359
+				days = 15
+				random = 5
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			FROM = {
+				OR = {
+					trait = lovers_pox
+					has_character_modifier = minor_disease_herpes
+				}
+			}
+
+			NOR = {
+				trait = lovers_pox
+				has_character_modifier = minor_disease_herpes
+			}
+		}
+
+		character_event = {
+			id = 6359
+			days = 15
+			random = 5
+		}
+	}
+}
+
+# Transfers venereal diseases between event_target:sex_partner and THIS
+venereal_disease_effect_event_target = {
+	# Great pox and Aztec disease for sex_partner
+	if = {
+		limit = {
+			event_target:sex_partner = {
+				NOR = {
+					has_flag = developing_illness
+					has_flag = disease_not_serious
+				}
+			}
+		}
+
+		if = {
+			limit = { trait = syphilitic }
+			event_target:sex_partner = { give_syphilitic_effect = yes }
+		}
+
+		if = {
+			limit = { trait = has_aztec_disease }
+			event_target:sex_partner = { give_has_aztec_disease_effect = yes }
+		}
+	}
+
+	# Great pox and Aztec disease for THIS
+	if = {
+		limit = {
+			NOR = {
+				has_flag = developing_illness
+				has_flag = disease_not_serious
+			}
+		}
+
+		if = {
+			limit = { event_target:sex_partner = { trait = syphilitic } }
+			give_syphilitic_effect = yes
+		}
+
+		if = {
+			limit = { event_target:sex_partner = { trait = has_aztec_disease } }
+			give_has_aztec_disease_effect = yes
+		}
+	}
+
+	# Lover's pox
+	if = {
+		limit = {
+			OR = {
+				trait = lovers_pox
+				has_character_modifier = minor_disease_herpes
+			}
+
+			event_target:sex_partner = {
+				NOR = {
+					trait = lovers_pox
+					has_character_modifier = minor_disease_herpes
+				}
+			}
+		}
+
+		event_target:sex_partner = {
+			character_event = {
+				id = 6359
+				days = 15
+				random = 5
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			event_target:sex_partner = {
+				OR = {
+					trait = lovers_pox
+					has_character_modifier = minor_disease_herpes
+				}
+			}
+
+			NOR = {
+				trait = lovers_pox
+				has_character_modifier = minor_disease_herpes
+			}
+		}
+
+		character_event = {
+			id = 6359
+			days = 15
+			random = 5
+		}
+	}
+}
+
+# Tries to impregnate either ROOT or FROM if all conditions are met
+impregnate_effect = {
+	if = {
+		limit = { is_opposite_sex = FROM }
+
+		# If ROOT is a female who can get pregnant
+		if = {
+			limit = {
+				is_female = yes
+				is_adult = yes
+				practical_age < 45
+				is_pregnant = no
+				health >= 3
+
+				# FROM = {
+				#	 NOT = { trait = eunuch }
+				# }
+			}
+
+			# ROOT is consort/spouse of someone else other than FROM
+			if = {
+				limit = {
+					trigger_if = {
+						limit = { is_married = yes }
+					 	NOT = { is_married = FROM }
+					}
+					trigger_else = {
+						is_consort = yes
+						NOT = { is_consort = FROM }
+					}
+				}
+
+				FROM = {
+					show_scope_change = no
+					impregnate_cuckoo = ROOT
+				}
+			}
+			# ROOT is not consort/spouse of anyone or is consort/spouse of FROM
+			else = {
+				FROM = {
+					show_scope_change = no
+					impregnate = ROOT
+				}
+			}
+		}
+
+		# If FROM is a female who can get pregnant
+		else_if = {
+			limit = {
+				FROM = {
+					is_female = yes
+					is_adult = yes
+					practical_age < 45
+					is_pregnant = no
+					health >= 3
+				}
+
+				# NOT = { trait = eunuch }
+			}
+
+			# FROM is consort/spouse of someone else other than ROOT
+			if = {
+				limit = {
+					FROM = {
+						trigger_if = {
+							limit = { is_married = yes }
+							NOT = { is_married = ROOT }
+						}
+						trigger_else = {
+							is_consort = yes
+							NOT = { is_consort = ROOT }
+						}
+					}
+				}
+
+				impregnate_cuckoo = FROM
+			}
+			# FROM is not consort/spouse of anyone or is consort/spouse of ROOT
+			else = {
+				impregnate = FROM
+			}
+		}
+	}
+}
+
+# Tries to impregnate either event_target:sex_partner or THIS if all conditions are met
+impregnate_effect_event_target = {
+	if = {
+		limit = { is_opposite_sex = event_target:sex_partner }
+
+		# If THIS is a female who can get pregnant
+		if = {
+			limit = {
+				is_female = yes
+				is_adult = yes
+				practical_age < 45
+				is_pregnant = no
+				health >= 3
+
+				# event_target:sex_partner = {
+				#	 NOT = { trait = eunuch }
+				# }
+			}
+
+			# THIS is consort/spouse of someone else other than event_target:sex_partner
+			if = {
+				limit = {
+					trigger_if = {
+						limit = { is_married = yes }
+						NOT = { is_married = event_target:sex_partner }
+					}
+					trigger_else = {
+						is_consort = yes
+						NOT = { is_consort = event_target:sex_partner }
+					}
+				}
+
+				event_target:sex_partner = {
+					show_scope_change = no
+					impregnate_cuckoo = PREV
+				}
+			}
+			# THIS is not consort/spouse of anyone or is consort/spouse of event_target:sex_partner
+			else = {
+				event_target:sex_partner = {
+					show_scope_change = no
+					impregnate = PREV
+				}
+			}
+		}
+
+		# If event_target:sex_partner is a female who can get pregnant
+		if = {
+			limit = {
+				event_target:sex_partner = {
+					is_female = yes
+					is_adult = yes
+					practical_age < 45
+					is_pregnant = no
+					health >= 3
+
+					# PREV = {
+					#	 NOT = { trait = eunuch }
+					# }
+				}
+			}
+
+			# event_target:sex_partner is consort/spouse of someone else other than THIS
+			if = {
+				limit = {
+					event_target:sex_partner = {
+						trigger_if = {
+							limit = { is_married = yes }
+							NOT = { is_married = PREV }
+						}
+						trigger_else = {
+							is_consort = yes
+							NOT = { is_consort = PREV }
+						}
+					}
+				}
+
+				impregnate_cuckoo = event_target:sex_partner
+			}
+			# event_target:sex_partner is not consort/spouse of anyone or is consort/spouse of THIS
+			else = {
+				impregnate = event_target:sex_partner
+			}
+		}
+	}
+}
