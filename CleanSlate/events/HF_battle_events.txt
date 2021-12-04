@@ -9,7 +9,7 @@ namespace = HFP
 character_event = { # on_death event to log commander deaths in game.
 	id = HFP.10997
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_death
 	hide_window = yes
 
 	has_character_flag = commanders_have_died_for_me
@@ -26,16 +26,10 @@ character_event = { # on_death event to log commander deaths in game.
 character_event = {
 	id = HFP.11000
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_combat_pulse, random_events
 	hide_window = yes
 
 	trigger = {
-		# Quick fix to reduce the amount of time the AI gets the events
-		trigger_if = {
-			limit = { ai = yes }
-			random < 25 # 25% chance
-		}
-
 		is_alive = yes
 		NOT = { has_character_flag = battle_event_in_progess }
 
@@ -107,6 +101,15 @@ character_event = {
 	#			}
 	#		}
 	#	}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 0.25
+			ai = yes # Quick fix to reduce the amount of time the AI gets the events
+		}
 	}
 
 	immediate = {
@@ -625,11 +628,11 @@ character_event = {
 			50 = {
 				trigger = {
 					primary_title = {
-						mercenary = yes
 						NOT = { has_title_flag = ze_dyn_merc }
 					}
 
 					has_character_flag = is_mercenary_leader
+					mercenary = yes
 
 					trigger_if = {
 						limit = { has_character_flag = fought_great_commander }
@@ -657,10 +660,10 @@ character_event = {
 			50 = {
 				trigger = {
 					has_character_flag = is_mercenary_leader
+					mercenary = yes
 					trait = craven
 
 					primary_title = {
-						mercenary = yes
 						NOT = { has_title_flag = ze_dyn_merc }
 					}
 				}
@@ -1017,7 +1020,6 @@ character_event = {
 	option = {
 		name = {
 			text = ALAS
-
 			trigger = {
 				trigger_if = {
 					limit = { event_target:random_rival_target = { always = yes } }
@@ -1048,7 +1050,6 @@ character_event = {
 				}
 			}
 		}
-
 		name = {
 			text = EVTOPTA_HFP_10001_kind # I should've made peace with <Rival>
 			trigger = {
@@ -1280,9 +1281,7 @@ character_event = {
 	option = {
 		name = 253_lover # Nooo, my sweet love!
 
-		trigger = {
-			is_lover = event_target:home_commander
-		}
+		trigger = { is_lover = event_target:home_commander }
 
 		prestige = -10
 
@@ -1354,7 +1353,7 @@ character_event = {
 		}
 
 		ai_chance = {
-			factor = 10
+			factor = 1
 
 			mult_modifier = {
 				factor = 1.5
@@ -1401,7 +1400,7 @@ character_event = {
 		}
 
 		ai_chance = {
-			factor = 10
+			factor = 1
 
 			mult_modifier = {
 				factor = 1.5
@@ -1442,7 +1441,7 @@ character_event = {
 		}
 
 		ai_chance = {
-			factor = 10
+			factor = 1
 
 			mult_modifier = {
 				factor = 1.5
@@ -1499,7 +1498,7 @@ character_event = {
 		}
 
 		ai_chance = {
-			factor = 10
+			factor = 1
 
 			mult_modifier = {
 				factor = 1.5
@@ -1529,7 +1528,7 @@ character_event = {
 		piety = 30
 
 		ai_chance = {
-			factor = 10
+			factor = 1
 
 			mult_modifier = {
 				factor = 1.5
@@ -1614,10 +1613,12 @@ character_event = {
 		# For consistency between description and event options
 		random_list = {
 			33 = { set_character_flag = desc_A }
+
 			33 = {
 				trigger = { NOT = { event_target:enemy_commander = { always = yes } } }
 				set_character_flag = desc_B
 			}
+
 			33 = { set_character_flag = desc_C }
 		}
 
@@ -1684,7 +1685,7 @@ character_event = {
 		prestige = 15
 		pacifists_lose_piety_effect = yes
 
-		ai_chance = { factor = 300 }
+		ai_chance = { factor = 6 }
 	}
 
 	option = { # Special option: Duel enemy commander instead (if you have great combat rating)
@@ -1734,12 +1735,10 @@ character_event = {
 
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
-
-		add_trait_silently_brave_effect = yes
-		remove_trait_silently_craven_effect = yes
+		add_trait_partially_silently_brave_effect = yes
 
 		ai_chance = {
-			factor = 50
+			factor = 1
 
 			trigger = {
 				event_target:enemy_commander = { ai = yes } # Don't do this to players
@@ -1756,20 +1755,6 @@ character_event = {
 		name = EVTOPT_HFP_11011_C
 		tooltip_info = brave
 
-		duel_enemy_commander_effect = yes
-		pacifists_lose_piety_effect = yes
-
-		add_trait_silently_brave_effect = yes
-		remove_trait_silently_craven_effect = yes
-
-		ai_chance = {
-			factor = 50
-
-			trigger = {
-				event_target:enemy_commander = { ai = yes } # Don't do this to players
-			}
-		}
-
 		trigger = {
 			has_character_flag = duel_enemy_opt_is_brave
 
@@ -1777,6 +1762,18 @@ character_event = {
 			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
+			}
+		}
+
+		duel_enemy_commander_effect = yes
+		pacifists_lose_piety_effect = yes
+		add_trait_partially_silently_brave_effect = yes
+
+		ai_chance = {
+			factor = 1
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
 			}
 		}
 	}
@@ -1794,6 +1791,7 @@ character_event = {
 			text = EVTOPT_HFP_11010_Bard_3 # I will write songs, mocking you!
 			trigger = { has_character_flag = desc_C }
 		}
+
 		tooltip_info_custom = because_bloodline_tt
 
 		trigger = {
@@ -1811,7 +1809,7 @@ character_event = {
 		prestige = 15
 		allow_new_battle_events_effect = yes
 
-		ai_chance = { factor = 100 }
+		ai_chance = { factor = 2 }
 	}
 
 	option = { # I accept injury
@@ -1823,14 +1821,13 @@ character_event = {
 
 		random = {
 			chance = 80
-			add_trait_brave_effect = yes
-			remove_trait_craven_effect = yes
+			add_trait_partially_brave_effect = yes
 		}
 
 		allow_new_battle_events_effect = yes
 
 		ai_chance = {
-			factor = 50
+			factor = 1
 
 			mult_modifier = {
 				factor = 3
@@ -1855,15 +1852,14 @@ character_event = {
 
 		random = {
 			chance = 50
-			add_trait_craven_effect = yes
-			remove_trait_brave_effect = yes
+			add_trait_partially_craven_effect = yes
 		}
 
 		prestige = -50
 		allow_new_battle_events_effect = yes
 
 		ai_chance = {
-			factor = 100
+			factor = 2
 
 			bad_soldier_outcome_score = yes
 		}
@@ -2074,9 +2070,7 @@ character_event = {
 
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
-
-		add_trait_silently_brave_effect = yes
-		remove_trait_silently_craven_effect = yes
+		add_trait_partially_silently_brave_effect = yes
 
 		ai_chance = {
 			factor = 50
@@ -2108,9 +2102,7 @@ character_event = {
 
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
-
-		add_trait_silently_brave_effect = yes
-		remove_trait_silently_craven_effect = yes
+		add_trait_partially_silently_brave_effect = yes
 
 		ai_chance = {
 			factor = 50
@@ -2387,6 +2379,7 @@ character_event = {
 					has_dlc = "Reapers"
 					NOT = { trait = disfigured }
 				}
+
 				set_character_flag = wounded_disfigured
 			}
 
@@ -2442,27 +2435,15 @@ character_event = {
 	option = {
 		name = EVTOPTB_HFP_11013
 
-		if = { # Because bragging
-			limit = {
-				NOT = { trait = proud }
-			}
-
-			remove_trait_silently_humble_effect = yes
-			add_trait = proud
-		}
+		# Because bragging
+		add_trait_fully_silently_proud_effect = yes
 	}
 
 	option = {
 		name = EVTOPTA_HFP_11013
 
-		if = { # Because not bragging
-			limit = {
-				NOT = { trait = humble }
-			}
-
-			remove_trait_silently_proud_effect = yes
-			add_trait = humble
-		}
+		# Because not bragging
+		add_trait_fully_silently_humble_effect = yes
 	}
 
 	after = {
@@ -2497,8 +2478,7 @@ character_event = {
 	option = {
 		name = EVTOPTB_HFP_11014
 
-		add_trait_silently_humble_effect = yes
-		remove_trait_silently_proud_effect = yes
+		add_trait_partially_silently_humble_effect = yes
 
 		if = {
 			limit = { is_landed = yes }
@@ -2735,6 +2715,7 @@ character_event = {
 				trait = desert_expert
 			}
 		}
+
 		add_trait = mountain_expert
 	}
 
@@ -2958,6 +2939,7 @@ character_event = {
 				trigger = { # To make sure you're not the cause of the war?
 					NOT = { character = event_target:home_liege }
 				}
+
 				set_character_flag = desc_C
 			}
 		}
@@ -2980,8 +2962,7 @@ character_event = {
 		trigger = { has_character_flag = desc_A }
 
 		add_trait_silently_drunkard_effect = yes
-		add_trait_silently_cynical_effect = yes
-		remove_trait_silently_zealous_effect = yes
+		add_trait_partially_silently_cynical_effect = yes
 	}
 
 	option = { # Try to cope (Scenario A: I can't be near my children)
@@ -3018,8 +2999,7 @@ character_event = {
 
 		trigger = { has_character_flag = desc_B }
 
-		add_trait_silently_lustful_effect = yes
-		remove_trait_silently_chaste_effect = yes
+		add_trait_partially_silently_lustful_effect = yes
 		add_trait_silently_drunkard_effect = yes
 	}
 
@@ -3037,16 +3017,14 @@ character_event = {
 
 		trigger = { has_character_flag = desc_C }
 
-		add_trait_silently_cynical_effect = yes
-		remove_trait_silently_zealous_effect = yes
+		add_trait_partially_silently_cynical_effect = yes
 		add_trait_silently_depressed_effect = yes
 	}
 
 	option = { # Act out in anger (A, B, or C)
 		name = EVTOPTD_HFP_11019 # Enough of these nonsense FEELINGS
 
-		add_trait_silently_wroth_effect = yes
-		remove_trait_silently_patient_effect = yes
+		add_trait_partially_silently_wroth_effect = yes
 		add_trait_silently_stressed_effect = yes
 		pacifists_lose_piety_effect = yes
 
@@ -3408,16 +3386,9 @@ character_event = {
 			years = 5
 		}
 
-		if = {
-			limit = { NOT = { trait = kind } }
-
-			random = {
-				chance = 50
-
-				remove_trait_silently_cruel_effect = yes
-				tooltip = { add_trait = kind }
-				hidden_effect = { add_trait_kind_effect = yes }
-			}
+		random = {
+			chance = 50
+			add_trait_fully_kind_effect = yes
 		}
 	}
 
@@ -3432,16 +3403,9 @@ character_event = {
 
 		prestige = -10
 
-		if = {
-			limit = { NOT = { trait = cruel } }
-
-			random = {
-				chance = 50
-
-				remove_trait_silently_kind_effect = yes
-				tooltip = { add_trait = cruel }
-				hidden_effect = { add_trait_cruel_effect = yes }
-			}
+		random = {
+			chance = 50
+			add_trait_fully_cruel_effect = yes
 		}
 	}
 
@@ -4321,20 +4285,13 @@ character_event = {
 			}
 		}
 
-		if = {
-			limit = { trait = cruel }
-			remove_trait = cruel
-		}
-		else_if = {
-			limit = { NOT = { trait = kind } }
-			add_trait = kind
-		}
+		add_trait_partially_silently_kind_effect = yes
 
 		trigger_switch = { # For prestige rewards
 			on_trigger = has_character_flag
 
 			fought_worse_warrior@event_target:enemy_commander = { prestige = 10 }
-			fought_even_warrior@event_target:enemy_commander = { prestige = 15 }
+			fought_even_warrior@event_target:enemy_commander  = { prestige = 15 }
 			fought_great_warrior@event_target:enemy_commander = { prestige = 25 }
 		}
 
@@ -4993,33 +4950,8 @@ character_event = {
 		}
 
 		random_list = {
-			50 = {
-				trigger = {
-					NOT = { trait = ambitious }
-				}
-
-				if = {
-					limit = { trait = content }
-					remove_trait = content
-				}
-				else = {
-					add_trait = ambitious
-				}
-			}
-
-			50 = {
-				trigger = {
-					NOT = { trait = envious }
-				}
-
-				if = {
-					limit = { trait = kind }
-					remove_trait = kind
-				}
-				else = {
-					add_trait = envious
-				}
-			}
+			50 = { add_trait_partially_ambitious_effect = yes }
+			50 = { add_trait_partially_envious_effect = yes }
 		}
 	}
 
@@ -6368,30 +6300,14 @@ character_event = {
 	option = { # We need to *take* the time to tend to our wounds
 		name = EVTOPTA_HFP_11049
 
-		if = {
-			limit = {
-				NOT = { trait = patient }
-			}
-
-			remove_trait_silently_wroth_effect = yes
-			add_trait = patient
-		}
-
+		add_trait_fully_silently_patient_effect = yes
 		piety = 10
 	}
 
 	option = { # This is war!
 		name = EVTOPTB_HFP_11049
 
-		if = {
-			limit = {
-				NOT = { trait = wroth }
-			}
-
-			remove_trait_silently_patient_effect = yes
-			add_trait = wroth
-		}
-
+		add_trait_fully_silently_wroth_effect = yes
 		prestige = 20
 	}
 
@@ -6466,8 +6382,7 @@ character_event = {
 
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
-		add_trait_silently_brave_effect = yes
-		remove_trait_silently_craven_effect = yes
+		add_trait_partially_silently_brave_effect = yes
 
 		ai_chance = {
 			factor = 50

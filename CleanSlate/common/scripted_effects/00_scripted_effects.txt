@@ -16,13 +16,6 @@
 # leave_council_position_effect
 # end_inaccessibility_effect
 
-# unprotected_sex_effect
-# unprotected_sex_effect_event_target
-# venereal_disease_effect
-# venereal_disease_effect_event_target
-# impregnate_effect
-# impregnate_effect_event_target
-
 # will_not_marry_effect
 
 # female_councilor_effect_1
@@ -163,24 +156,23 @@ prisoner_mutilate_effect = {
 		10 = { } # No effect
 	}
 
-	add_trait = severely_injured
-	resolve_severely_injured_effect = yes
+	add_severely_injured_effect = yes
 }
 
 jailor_mutilate_effect = {
 	random = {
 		chance = 20
-		add_trait_craven_effect = yes
+		add_trait_silently_craven_effect = yes
 	}
 
-	add_severely_injured_effect = yes
+	add_trait = severely_injured
 
 	custom_tooltip = {
 		text = might_affect_mental_health_tt
 
 		random_list = {
-			80 = { add_trait_stressed_effect = yes }
-			10 = { add_trait_lunatic_effect = yes }
+			80 = { add_trait_silently_stressed_effect = yes }
+			10 = { add_trait_silently_lunatic_effect = yes }
 			10 = { } # No effect
 		}
 	}
@@ -195,8 +187,8 @@ prisoner_torture_effect = {
 	random_list = {
 		80 = { add_trait_stressed_effect = yes }
 		10 = { add_trait_craven_effect = yes }
-		5 = { add_trait_lunatic_effect = yes }
-		5 = { } # Nothing
+		 5 = { add_trait_lunatic_effect = yes }
+		 5 = { } # Nothing
 	}
 }
 
@@ -248,9 +240,28 @@ jailor_torture_effect = {
 
 jailor_humiliation_effect = {
 	random_list = {
-		15 = { add_trait = stressed }
-		30 = { add_trait = humble }
-		30 = { add_trait = shy }
+		15 = {
+			trigger = {
+				NOT = { trait = stressed }
+			}
+
+			add_trait = stressed
+		}
+		30 = {
+			trigger = {
+				NOT = { trait = humble }
+			}
+
+			add_trait_fully_silently_humble_effect = yes
+		}
+		30 = {
+			trigger = {
+				NOT = { trait = shy }
+			}
+
+			add_trait_fully_silently_shy_effect = yes
+		}
+
 		25 = { } # Nothing happens
 	}
 }
@@ -270,7 +281,7 @@ prisoner_humiliation_effect = {
 				NOT = { trait = humble }
 			}
 
-			add_trait_humble_effect = yes
+			add_trait_fully_humble_effect = yes
 		}
 
 		30 = {
@@ -278,12 +289,10 @@ prisoner_humiliation_effect = {
 				NOT = { trait = shy }
 			}
 
-			add_trait_shy_effect = yes
+			add_trait_fully_shy_effect = yes
 		}
 
-		25 = {
-			# Nothing happens
-		}
+		25 = { } # Nothing happens
 	}
 }
 
@@ -488,420 +497,6 @@ end_inaccessibility_effect = {
 				}
 
 				force_host = liege
-			}
-		}
-	}
-}
-
-# Impregnation and venereal disease handling between FROM and ROOT
-unprotected_sex_effect = {
-	random = {
-		chance = 50
-		venereal_disease_effect = yes
-	}
-
-	random = {
-		chance = 10
-
-		mult_modifier = {
-			factor = 2
-			is_fertile_trigger = yes
-		}
-
-		mult_modifier = {
-			factor = 2
-			FROM = { is_fertile_trigger = yes }
-		}
-
-		mult_modifier = {
-			factor = 0.5
-			is_infertile_trigger = yes
-		}
-
-		mult_modifier = {
-			factor = 0.5
-			FROM = { is_infertile_trigger = yes }
-		}
-
-		impregnate_effect = yes
-	}
-}
-
-# Impregnation and venereal disease handling between event_target:sex_partner and THIS
-unprotected_sex_effect_event_target = {
-	random = {
-		chance = 50
-		venereal_disease_effect_event_target = yes
-	}
-
-	random = {
-		chance = 10
-
-		mult_modifier = {
-			factor = 2
-			is_fertile_trigger = yes
-		}
-
-		mult_modifier = {
-			factor = 2
-			event_target:sex_partner = { is_fertile_trigger = yes }
-		}
-
-		mult_modifier = {
-			factor = 0.5
-			is_infertile_trigger = yes
-		}
-
-		mult_modifier = {
-			factor = 0.5
-			event_target:sex_partner = { is_infertile_trigger = yes }
-		}
-
-		impregnate_effect_event_target = yes
-	}
-}
-
-# Transfers venereal diseases between FROM and ROOT
-venereal_disease_effect = {
-	# Great pox and Aztec disease for FROM
-	if = {
-		limit = {
-			FROM = {
-				NOR = {
-					has_flag = developing_illness
-					has_flag = disease_not_serious
-				}
-			}
-		}
-
-		if = {
-			limit = { trait = great_pox }
-			FROM = { give_great_pox_effect = yes }
-		}
-
-		if = {
-			limit = { trait = aztec_disease }
-			FROM = { give_aztec_disease_effect = yes }
-		}
-	}
-
-	# Great pox and Aztec disease for ROOT
-	if = {
-		limit = {
-			NOR = {
-				has_flag = developing_illness
-				has_flag = disease_not_serious
-			}
-		}
-
-		if = {
-			limit = { FROM = { trait = great_pox } }
-			give_great_pox_effect = yes
-		}
-
-		if = {
-			limit = { FROM = { trait = aztec_disease } }
-			give_aztec_disease_effect = yes
-		}
-	}
-
-	# Lover's pox
-	if = {
-		limit = {
-			OR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-
-			FROM = {
-				NOR = {
-					trait = lovers_pox
-					has_character_modifier = minor_disease_herpes
-				}
-			}
-		}
-
-		FROM = {
-			character_event = {
-				id = 6359
-				days = 15
-				random = 5
-			}
-		}
-	}
-
-	if = {
-		limit = {
-			FROM = {
-				OR = {
-					trait = lovers_pox
-					has_character_modifier = minor_disease_herpes
-				}
-			}
-
-			NOR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-		}
-
-		character_event = {
-			id = 6359
-			days = 15
-			random = 5
-		}
-	}
-}
-
-# Transfers venereal diseases between event_target:sex_partner and THIS
-venereal_disease_effect_event_target = {
-	# Great pox and Aztec disease for sex_partner
-	if = {
-		limit = {
-			event_target:sex_partner = {
-				NOR = {
-					has_flag = developing_illness
-					has_flag = disease_not_serious
-				}
-			}
-		}
-
-		if = {
-			limit = { trait = great_pox }
-			event_target:sex_partner = { give_great_pox_effect = yes }
-		}
-
-		if = {
-			limit = { trait = aztec_disease }
-			event_target:sex_partner = { give_aztec_disease_effect = yes }
-		}
-	}
-
-	# Great pox and Aztec disease for THIS
-	if = {
-		limit = {
-			NOR = {
-				has_flag = developing_illness
-				has_flag = disease_not_serious
-			}
-		}
-
-		if = {
-			limit = { event_target:sex_partner = { trait = great_pox } }
-			give_great_pox_effect = yes
-		}
-
-		if = {
-			limit = { event_target:sex_partner = { trait = aztec_disease } }
-			give_aztec_disease_effect = yes
-		}
-	}
-
-	# Lover's pox
-	if = {
-		limit = {
-			OR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-
-			event_target:sex_partner = {
-				NOR = {
-					trait = lovers_pox
-					has_character_modifier = minor_disease_herpes
-				}
-			}
-		}
-
-		event_target:sex_partner = {
-			character_event = {
-				id = 6359
-				days = 15
-				random = 5
-			}
-		}
-	}
-
-	if = {
-		limit = {
-			event_target:sex_partner = {
-				OR = {
-					trait = lovers_pox
-					has_character_modifier = minor_disease_herpes
-				}
-			}
-
-			NOR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-		}
-
-		character_event = {
-			id = 6359
-			days = 15
-			random = 5
-		}
-	}
-}
-
-# Tries to impregnate either ROOT or FROM if all conditions are met
-impregnate_effect = {
-	if = {
-		limit = { is_opposite_sex = FROM }
-
-		# If ROOT is a female who can get pregnant
-		if = {
-			limit = {
-				is_female = yes
-				is_adult = yes
-				practical_age < 45
-				is_pregnant = no
-				health >= 3
-
-				FROM = {
-					NOT = { trait = eunuch }
-				}
-			}
-
-			# ROOT is consort/spouse of someone else than FROM
-			if = {
-				limit = {
-					trigger_if = {
-						limit = { is_married = yes }
-						NOT = { is_married = FROM }
-					}
-					trigger_else = {
-						is_consort = yes
-						NOT = { is_consort = FROM }
-					}
-				}
-
-				FROM = { impregnate_cuckoo = ROOT }
-			}
-			# ROOT is not consort/spouse of anyone or is consort/spouse of FROM
-			else = {
-				FROM = { impregnate = ROOT }
-			}
-		}
-
-		# If FROM is a female who can get pregnant
-		if = {
-			limit = {
-				FROM = {
-					is_female = yes
-					is_adult = yes
-					practical_age < 45
-					is_pregnant = no
-					health >= 3
-
-					ROOT = {
-						NOT = { trait = eunuch }
-					}
-				}
-			}
-
-			# FROM is consort/spouse of someone else than ROOT
-			if = {
-				limit = {
-					FROM = {
-						trigger_if = {
-							limit = { is_married = yes }
-							NOT = { is_married = ROOT }
-						}
-						trigger_else = {
-							is_consort = yes
-							NOT = { is_consort = ROOT }
-						}
-					}
-				}
-
-				impregnate_cuckoo = FROM
-			}
-			# FROM is not consort/spouse of anyone or is consort/spouse of ROOT
-			else = {
-				impregnate = FROM
-			}
-		}
-	}
-}
-
-# Tries to impregnate either event_target:sex_partner or THIS if all conditions are met
-impregnate_effect_event_target = {
-	if = {
-		limit = { is_opposite_sex = event_target:sex_partner }
-
-		# If THIS is a female who can get pregnant
-		if = {
-			limit = {
-				is_female = yes
-				is_adult = yes
-				practical_age < 45
-				is_pregnant = no
-				health >= 3
-
-				event_target:sex_partner = {
-					NOT = { trait = eunuch }
-				}
-			}
-
-			# THIS is consort/spouse of someone else than event_target:sex_partner
-			if = {
-				limit = {
-					trigger_if = {
-						limit = { is_married = yes }
-						NOT = { is_married = event_target:sex_partner }
-					}
-					trigger_else = {
-						is_consort = yes
-						NOT = { is_consort = event_target:sex_partner }
-					}
-				}
-
-				event_target:sex_partner = { impregnate_cuckoo = PREV }
-			}
-			# THIS is not consort/spouse of anyone or is consort/spouse of event_target:sex_partner
-			else = {
-				event_target:sex_partner = { impregnate = PREV }
-			}
-		}
-
-		# If event_target:sex_partner is a female who can get pregnant
-		if = {
-			limit = {
-				event_target:sex_partner = {
-					is_female = yes
-					is_adult = yes
-					practical_age < 45
-					is_pregnant = no
-					health >= 3
-
-					PREV = {
-						NOT = { trait = eunuch }
-					}
-				}
-			}
-
-			# event_target:sex_partner is consort/spouse of someone else than THIS
-			if = {
-				limit = {
-					event_target:sex_partner = {
-						trigger_if = {
-							limit = { is_married = yes }
-							NOT = { is_married = PREV }
-						}
-						trigger_else = {
-							is_consort = yes
-							NOT = { is_consort = PREV }
-						}
-					}
-				}
-
-				impregnate_cuckoo = event_target:sex_partner
-			}
-			# event_target:sex_partner is not consort/spouse of anyone or is consort/spouse of THIS
-			else = {
-				impregnate = event_target:sex_partner
 			}
 		}
 	}
