@@ -18,6 +18,8 @@
 # has_vodouns_prerequisites
 # has_bacchants_prerequisites
 
+# has_assassins_prerequisites
+
 # higher_society_rank_than_prev_trigger
 # higher_society_rank_than_root_trigger
 
@@ -159,6 +161,55 @@ has_bacchants_prerequisites = {
 		AND = {
 			has_global_flag = flag_started_roman_renaissance
 			top_liege = { has_landed_title = e_roman_empire } # Historically a plague for the Empire
+		}
+	}
+}
+
+has_assassins_prerequisites = {
+	is_adult = yes
+
+	trigger_if = {
+		limit = { is_female = yes }
+
+		has_game_rule = {
+			name = gender
+			value = all
+		}
+	}
+
+	trigger_if = { # Recruitment decision
+		limit = {
+			ai = yes
+
+			FROM = {
+				character = yes # Keep error.log sane, FROM is not a character in society triggers
+				society_member_of = the_assassins
+				ai = yes
+			}
+		}
+
+		religion_group = muslim
+	}
+	trigger_else = { # Showing interest via interface
+		OR = {
+			true_religion = shiite
+			religion_group = muslim
+
+			trigger_if = {
+				limit = {
+					ai = no
+					NOT = { trait = zealous }
+				}
+
+				trait = sympathy_islam
+				trait = deceitful
+
+				OR = {
+					trait = master_schemer
+					trait = elusive_shadow
+					intrigue >= 18
+				}
+			}
 		}
 	}
 }

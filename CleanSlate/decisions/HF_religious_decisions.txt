@@ -1,9 +1,10 @@
 targeted_decisions = {
 
 	vassal_generic_sacrifice_decision = {
+		diplomacy_icon = GFX_sacrifice_decision
+
 		ai_target_filter = home_court
 		ai_check_interval = 8
-		diplomacy_icon = GFX_sacrifice_decision
 
 		only_playable = yes
 
@@ -22,12 +23,8 @@ targeted_decisions = {
 		allow = {
 			show_only_failed_conditions = yes
 
-			ROOT = {
-				show_scope_change = no
-
-				NOT = { religion = FROM } # Only on infidels
-				diplomatic_immunity = no
-			}
+			NOT = { religion = FROM } # Only on infidels
+			diplomatic_immunity = no
 		}
 
 		effect = {
@@ -40,20 +37,19 @@ targeted_decisions = {
 				character_event = { id = HF.23001 } # Notify of ritual sacrifice
 			}
 
-			hidden_effect = {
-				FROM = {
-					character_event = { id = HF.23002 }
+			FROM = {
+				character_event = { id = HF.23002 }
+			}
+
+			if = {
+				limit = {
+					FROM = { ai = no }
+					controls_religion = yes
+					is_ironman = yes
+					religion_openly_aztec_or_reformed_trigger = no
 				}
 
-				if = {
-					limit = {
-						FROM = { ai = no }
-						controls_religion = yes
-						is_ironman = yes
-						religion_openly_aztec_or_reformed_trigger = no
-					}
-					FROM = { set_character_flag = achievement_holy_smoke }
-				}
+				FROM = { set_character_flag = achievement_holy_smoke }
 			}
 
 			death = {
@@ -94,11 +90,11 @@ targeted_decisions = {
 	}
 
 	stable_attribute_improvement_decision = {
-		ai_check_interval = 50
 		diplomacy_icon = GFX_stable_prestige_icon_decision
 
 		filter = court_including_me
 		ai_target_filter = court_including_me
+		ai_check_interval = 50
 
 		only_playable = yes
 
@@ -116,11 +112,6 @@ targeted_decisions = {
 		}
 
 		potential = {
-			OR = {
-				character = FROM
-				vassal_of = FROM
-			}
-
 			prisoner = no
 			is_incapable = no
 			is_adult = yes
@@ -283,19 +274,17 @@ targeted_decisions = {
 				}
 
 				hidden_effect = {
-					ROOT = {
-						# Other AI shouldn't target a recent target
-						add_character_modifier = {
-							name = stable_attribute_improvement_target_cooldown
-							years = 5
-							hidden = yes
-						}
-
-						character_event = {
-							id = HF.23772 # Delayed safety flag clean-up
-							days = 75
-						}
+					# Other AI shouldn't target a recent target
+					add_character_modifier = {
+						name = stable_attribute_improvement_target_cooldown
+						years = 5
+						hidden = yes
 					}
+				}
+
+				character_event = {
+					id = HF.23772 # Delayed safety flag clean-up
+					days = 75
 				}
 			}
 		}
@@ -319,20 +308,14 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 2
-
-				FROM = {
-					character = ROOT
-					trait = ambitious
-				}
+				character = FROM
+				FROM = { trait = ambitious }
 			}
 
 			mult_modifier = {
 				factor = 2
-
-				ROOT = {
-					is_councillor = yes
-					NOT = { character = FROM }
-				}
+				is_councillor = yes
+				NOT = { character = FROM }
 
 				FROM = {
 					OR = {
@@ -345,11 +328,8 @@ targeted_decisions = {
 
 			mult_modifier = {
 				factor = 2
-
-				ROOT = {
-					is_close_relative = FROM
-					NOT = { character = FROM }
-				}
+				is_close_relative = FROM
+				NOT = { character = FROM }
 
 				FROM = {
 					OR = {
@@ -406,8 +386,9 @@ targeted_decisions = {
 
 decisions = {
 	syncretic_sympathy_decision = {
-		is_high_prio = yes
 		ai_check_interval = 20
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -419,16 +400,8 @@ decisions = {
 
 			is_adult = yes
 			is_incapable = no
-
-			NOR = {
-				trait = sympathy_christendom
-				trait = sympathy_islam
-				trait = sympathy_pagans
-				trait = sympathy_zoroastrianism
-				trait = sympathy_judaism
-				trait = sympathy_indian
-				has_character_flag = flag_picking_sympathy
-			}
+			has_any_sympathy_trait_trigger = no
+			NOT = { has_character_flag = flag_picking_sympathy }
 		}
 
 		allow = {
@@ -971,8 +944,9 @@ decisions = {
 	}
 
 	pagan_branch_decision = {
-		is_high_prio = yes
 		ai_check_interval = 70
+
+		is_high_prio = yes
 
 		potential = {
 			has_religion_feature = religion_no_leader
@@ -1073,21 +1047,8 @@ decisions = {
 				has_religion_feature = religion_astrology
 			}
 
-			NOR = {
-				trait = zodiac_aquarius
-				trait = zodiac_aries
-				trait = zodiac_cancer
-				trait = zodiac_capricorn
-				trait = zodiac_gemini
-				trait = zodiac_leo
-				trait = zodiac_libra
-				trait = zodiac_pisces
-				trait = zodiac_sagittarius
-				trait = zodiac_scorpio
-				trait = zodiac_taurus
-				trait = zodiac_virgo
-				has_character_flag = flag_child_forsaken_zodiac
-			}
+			has_any_astrology_trait_trigger = no
+			NOT = { has_character_flag = flag_child_forsaken_zodiac }
 		}
 
 		allow = {
@@ -1121,8 +1082,9 @@ decisions = {
 	}
 
 	delve_into_classics_decision = {
-		is_high_prio = yes
 		ai_check_interval = 400
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -1215,9 +1177,11 @@ decisions = {
 
 	# Create Myrmidons - Hellenic Holy Order
 	create_myrmidons = {
-		only_playable = yes
-		is_high_prio = yes
 		ai_check_interval = 120
+
+		is_high_prio = yes
+
+		only_playable = yes
 
 		potential = {
 			religion = hellenic_pagan_reformed
@@ -1287,77 +1251,32 @@ decisions = {
 					set_government_type = order_government
 					save_event_target_as = leader_of_myrmidons
 
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = no
-						age = 16
+					while = {
+						count = 7
+
+						create_character = {
+							random_traits = yes
+							dynasty = random
+							religion = ROOT
+							culture = greek
+							female = no
+							min_age = 16
+							max_age = 28
+						}
 					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = no
-						age = 18
-					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = no
-						age = 18
-					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = no
-						age = 20
-					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = no
-						age = 25
-					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = no
-						age = 26
-					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = no
-						age = 28
-					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = yes
-						age = 16
-					}
-					create_character = {
-						random_traits = yes
-						dynasty = random
-						religion = ROOT
-						culture = greek
-						female = yes
-						age = 17
+
+					while = {
+						count = 2
+
+						create_character = {
+							random_traits = yes
+							dynasty = random
+							religion = ROOT
+							culture = greek
+							female = yes
+							min_age = 16
+							max_age = 18
+						}
 					}
 				}
 
@@ -1381,8 +1300,9 @@ decisions = {
 
 	# Create Bacchants - Hellenic Satanists
 	create_bacchants = {
-		is_high_prio = yes
 		ai_check_interval = 120
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -1391,7 +1311,7 @@ decisions = {
 
 			OR = {
 				hellenic_pagan = {
-					has_flag = has_been_reformed # No point in secrecy, there are other ways to convert
+					has_flag = has_been_reformed
 				}
 
 				has_global_flag = flag_started_roman_renaissance # Required cultural basis in order for them to take root
@@ -1517,8 +1437,9 @@ decisions = {
 
 	# Create Stoics - Hellenic Monks
 	create_stoics = {
-		is_high_prio = yes
 		ai_check_interval = 120
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -1662,8 +1583,9 @@ decisions = {
 	}
 
 	bloodthirsty_games_decision = {
-		is_high_prio = yes
 		ai_check_interval = 240
+
+		is_high_prio = yes
 
 		only_independent = yes
 
@@ -1679,7 +1601,6 @@ decisions = {
 			higher_real_tier_than = COUNT
 			is_landed = yes
 			is_adult = yes
-			is_inaccessible_trigger = no
 			is_incapable = no
 
 			NOR = {
@@ -1697,6 +1618,7 @@ decisions = {
 
 			piety >= 100
 			prisoner = no
+			is_inaccessible_trigger = no
 
 			trigger_if = {
 				limit = { has_character_modifier = bloodthirsty_games_cooldown }
@@ -1778,24 +1700,24 @@ decisions = {
 	}
 
 	bloodthirsty_mass_sacrifice_decision = {
-		is_high_prio = yes
 		ai_check_interval = 150
+
+		is_high_prio = yes
 
 		only_independent = yes
 
 		potential = {
 			has_dlc = "Holy Fury"
-			independent = yes
 
 			OR = {
 				religion_openly_aztec_or_reformed_trigger = yes
 				has_religion_feature = religion_ritual_sacrifice
 			}
 
+			independent = yes
 			higher_real_tier_than = COUNT
 			is_landed = yes
 			is_adult = yes
-			is_inaccessible_trigger = no
 			is_incapable = no
 
 			# Aztecs could reform as Peaceful
@@ -1811,6 +1733,7 @@ decisions = {
 			piety >= 200
 			war = yes
 			prisoner = no
+			is_inaccessible_trigger = no
 			NOT = { trait = cynical }
 
 			trigger_if = {
@@ -1846,10 +1769,7 @@ decisions = {
 				# I could use some help winning this war
 				any_war = {
 					is_primary_war_defender = yes
-
-					attacker = {
-						war_score < 50
-					}
+					attacker = { war_score < 50 }
 				}
 			}
 
@@ -1868,9 +1788,7 @@ decisions = {
 
 				any_war = {
 					defender = { character = ROOT }
-					attacker = {
-						war_score = -50
-					}
+					attacker = { war_score >= -50 }
 				}
 			}
 		}
@@ -1888,7 +1806,6 @@ title_decisions = {
 			has_dlc = "Mystics"
 			society_member_of = monastic_order_stoics
 			society_rank == 4
-			is_ruler = yes
 		}
 
 		potential = {
@@ -1938,12 +1855,13 @@ title_decisions = {
 				}
 			}
 
-			hidden_effect = {
-				holder_scope = {
-					if = { # Notify county owner
-						limit = { NOT = { character = FROM } }
-						character_event = { id = HF.23125 }
+			holder_scope = {
+				if = { # Notify county owner
+					limit = {
+						NOT = { character = FROM }
 					}
+
+					character_event = { id = HF.23125 }
 				}
 			}
 		}
@@ -1954,8 +1872,9 @@ title_decisions = {
 	hellenic_dedicate_temple = {
 		filter = sub_realm_owned
 		ai_target_filter = vassal_owned
-		is_high_prio = yes
 		ai_check_interval = 120
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -1998,7 +1917,7 @@ title_decisions = {
 		allow = {
 			FROM = {
 				wealth >= 250
-				piety >= 200
+				piety  >= 200
 
 				trigger_if = {
 					limit = { has_character_modifier = recently_dedicated_temple_cooldown }
@@ -2043,7 +1962,20 @@ title_decisions = {
 			trigger = {
 				# Better to have the AI only dedicate one per lifetime, otherwise it might leave the player out of options
 				FROM = {
-					ruler_has_dedicated_temple_trigger = no
+					NOR = {
+						has_character_modifier = dedicated_to_zeus
+						has_character_modifier = dedicated_to_poseidon
+						has_character_modifier = dedicated_to_hades
+						has_character_modifier = dedicated_to_hermes
+						has_character_modifier = dedicated_to_demeter
+						has_character_modifier = dedicated_to_athena
+						has_character_modifier = dedicated_to_apollo
+						has_character_modifier = dedicated_to_arthemis
+						has_character_modifier = dedicated_to_ares
+						has_character_modifier = dedicated_to_aphrodite
+						has_character_modifier = dedicated_to_ephaestus
+						has_character_modifier = dedicated_to_hestia
+					}
 				}
 			}
 		}
@@ -2052,9 +1984,10 @@ title_decisions = {
 
 settlement_decisions = {
 	tribal_build_great_pillar = {
-		ai_check_interval = 200
-		filter = owned
+		# filter = owned # CleanSlate: Nonfunctional
 		ai_target_filter = owned
+		ai_check_interval = 200
+
 		is_high_prio = yes
 
 		only_independent = yes
@@ -2121,7 +2054,7 @@ settlement_decisions = {
 		allow = {
 			FROM = {
 				wealth >= 350
-				piety >= 150
+				piety  >= 150
 			}
 
 			location = { religion = FROM } # Locals must already worship your gods
@@ -2159,7 +2092,7 @@ settlement_decisions = {
 				show_scope_change = no
 
 				wealth = -350
-				piety = -150
+				piety  = -150
 
 				character_event = {
 					id = HF.23470
@@ -2170,9 +2103,11 @@ settlement_decisions = {
 			hidden_effect = {
 				if = {
 					limit = { FROM = { religion = norse_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_norse
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_norse } }
 						add_building = tb_great_pillar_norse
@@ -2180,9 +2115,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = tengri_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_tengri
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_tengri } }
 						add_building = tb_great_pillar_tengri
@@ -2190,9 +2127,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = slavic_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_slavic
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_slavic } }
 						add_building = tb_great_pillar_slavic
@@ -2200,9 +2139,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = baltic_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_baltic
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_baltic } }
 						add_building = tb_great_pillar_baltic
@@ -2210,9 +2151,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = finnish_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_finnish
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_finnish } }
 						add_building = tb_great_pillar_finnish
@@ -2220,9 +2163,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = west_african_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_west_african
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_west_african } }
 						add_building = tb_great_pillar_west_african
@@ -2230,9 +2175,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = aztec_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_aztec
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_aztec } }
 						add_building = tb_great_pillar_aztec
@@ -2240,9 +2187,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = zun_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_zun
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_zun } }
 						add_building = tb_great_pillar_zun
@@ -2250,9 +2199,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = bon_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_bon
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_bon } }
 						add_building = tb_great_pillar_bon
@@ -2260,9 +2211,11 @@ settlement_decisions = {
 				}
 				else_if = {
 					limit = { FROM = { religion = hellenic_pagan } }
+
 					location = {
 						set_province_flag = flag_great_pillar_hellenic
 					}
+
 					if = {
 						limit = { NOT = { has_building = tb_great_pillar_hellenic } }
 						add_building = tb_great_pillar_hellenic
@@ -2296,9 +2249,10 @@ settlement_decisions = {
 	}
 
 	destroy_great_pillar = {
-		ai_check_interval = 30
-		filter = owned
+		# filter = owned # CleanSlate: Nonfunctional
 		ai_target_filter = owned
+		ai_check_interval = 30
+
 		is_high_prio = yes
 
 		only_playable = yes

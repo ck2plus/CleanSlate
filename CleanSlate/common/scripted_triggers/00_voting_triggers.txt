@@ -1,0 +1,147 @@
+# this_is_warrior_culture_trigger
+# this_is_diplomatic_culture_trigger
+# this_is_spiritual_culture_trigger
+
+# parent_for_elective_succession_trigger
+
+# Not really about culture - Used in AI voting logic
+this_is_warrior_culture_trigger = {
+	pacifist = no
+
+	OR = {
+		religion_group = muslim
+		religion = norse_pagan
+		religion = tengri_pagan
+		religion = aztec_pagan
+		has_religion_feature = religion_warlike
+		is_tribal = yes
+		is_nomadic = yes
+
+		trigger_if = {
+			limit = {
+				NOT = { has_dlc = "Holy Fury" }
+			}
+
+			OR = {
+				religion = norse_pagan_reformed
+				religion = tengri_pagan_reformed
+				religion = aztec_pagan_reformed
+			}
+		}
+	}
+}
+
+# Not really about culture - Used in AI voting logic
+this_is_diplomatic_culture_trigger = {
+	OR = {
+		is_feudal = yes
+		is_patrician = yes
+	}
+
+	OR = {
+		religion_group = christian
+		religion_group = jewish_group
+		religion_group = zoroastrian_group
+		religion = hellenic_pagan
+		has_religion_feature = religion_cosmopolitan
+
+		trigger_if = {
+			limit = {
+				NOT = { has_dlc = "Holy Fury" }
+			}
+
+			religion = hellenic_pagan_reformed
+		}
+	}
+}
+
+# Not really about culture - Used in AI voting logic
+this_is_spiritual_culture_trigger = {
+	OR = {
+		religion_group = indian_group
+		religion = bon_pagan
+		has_religion_feature = religion_peaceful
+
+		trigger_if = {
+			limit = {
+				NOT = { has_dlc = "Holy Fury" }
+			}
+
+			religion = bon_pagan_reformed
+		}
+	}
+}
+
+# Used in succession voting to decide valid candidates
+parent_for_elective_succession_trigger = {
+	OR = {
+		has_claim = ROOT_FROMFROM
+
+		trigger_if = {
+			limit = { is_close_relative = ROOT }
+
+			OR = {
+				dynasty = ROOT
+
+				AND = {
+					is_landed = yes
+					higher_real_tier_than = BARON
+				}
+			}
+		}
+
+		trigger_if = {
+			limit = { higher_real_tier_than = COUNT }
+
+			# Either defacto direct vassal, or independent ruler who is dejure vassal
+			OR = {
+				vassal_of = ROOT
+
+				AND = {
+					independent = yes
+
+					any_dejure_liege = {
+						title = FROMFROM
+					}
+				}
+			}
+		}
+	}
+
+	# Candidate should not be a landless Courtier who is about to inherit a Theocracy or Republic
+	trigger_if = {
+		limit = {
+			any_heir_title = {
+				OR = {
+					is_republic = yes
+					is_theocracy = yes
+				}
+			}
+		}
+
+		is_landed = yes
+		is_republic = no
+		is_theocracy = no
+	}
+
+	# If the title controls the religion, candidates must be of the same religion
+	trigger_if = {
+		limit = { ROOT = { controls_religion = yes } }
+		religion = ROOT
+	}
+
+	is_ascetic_trigger = no
+	is_theocracy = no
+	is_republic = no
+
+	NOR = {
+		trait = disinherited
+		trait = eunuch
+		trait = bastard
+		trait = cat
+		trait = horse
+		trait = crusader_king
+		trait = crusader_queen
+		character = ROOT # Not the current ruler
+	}
+}
