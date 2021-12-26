@@ -1408,7 +1408,56 @@ character_event = {
 				trait = imbecile
 			}
 
-			count >= 2
+			any_sibling = {
+				age >= 5
+				is_adult = no
+				is_incapable = no
+				prisoner = no
+				host = { character = ROOT }
+
+				OR = {
+					trigger_if = {
+						limit = { is_female = no }
+
+						ROOT = {
+							OR = {
+								has_law = agnatic_succession
+								has_law = cognatic_succession
+							}
+						}
+					}
+					trigger_else = {
+						ROOT = {
+							OR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
+							}
+						}
+					}
+
+					is_primary_heir = ROOT
+					ROOT = { has_law = true_cognatic_succession }
+				}
+
+				OR = {
+					personal_opinion = {
+						who = PREV
+						value < 50
+					}
+
+					reverse_personal_opinion = {
+						who = PREV
+						value < 50
+					}
+				}
+
+				NOR = {
+					trait = inbred
+					trait = imbecile
+					character = PREV
+					is_friend = PREV
+				}
+			}
 		}
 	}
 
@@ -1533,9 +1582,6 @@ character_event = {
 				chance = 33
 				character_event = { id = WoL.3000 } # Chance to "level up"
 			}
-		}
-		else = {
-			break = yes
 		}
 	}
 
