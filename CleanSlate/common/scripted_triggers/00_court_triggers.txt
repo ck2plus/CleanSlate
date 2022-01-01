@@ -1,0 +1,152 @@
+# important_character_to_root_trigger
+
+# court_is_min_crowded_trigger
+# court_is_mid_crowded_trigger
+# court_is_max_crowded_trigger
+
+# courtier_is_mass_expellable
+# courtier_is_preferred_for_mass_expulsion
+
+# can_be_asked_to_leave_court_trigger
+
+important_character_to_root_trigger = {
+	OR = {
+		is_important_character_to = ROOT
+		is_immune_to_pruning = yes
+		historical = yes
+	}
+}
+
+# For checking how many courtiers you have left before they start costing Court Expenses.
+court_is_min_crowded_trigger = {
+	free_court_slots < -1
+}
+
+court_is_mid_crowded_trigger = {
+	free_court_slots < -5
+}
+
+court_is_max_crowded_trigger = {
+	free_court_slots < -10
+}
+
+courtier_is_mass_expellable = {
+	is_adult = yes
+	prisoner = no
+	is_ruler = no
+	is_councillor = no
+	has_minor_title = no
+	is_heir = no
+	important_character_to_root_trigger = no
+
+	NOR = {
+		has_character_flag = eternal_life_mystic
+		has_character_flag = originated_from_chinese_court
+		dynasty = ROOT
+		is_close_relative = ROOT
+		is_lover = ROOT
+		is_friend = ROOT
+		is_consort = ROOT
+	}
+}
+
+courtier_is_preferred_for_mass_expulsion = {
+	has_nickname = no
+	is_married = no
+	in_seclusion = no
+	immortal = no
+	num_of_claims < 1
+
+	trigger_if = {
+		limit = { is_lowborn = no }
+		num_of_dynasty_members < 2
+	}
+
+	NOR = {
+		is_rival = ROOT
+		trait = horse
+		has_character_modifier = elder_long_life_modifier
+	}
+}
+
+can_be_asked_to_leave_court_trigger = {
+	NOR = {
+		custom_tooltip = { # To avoid double negation
+			text = is_a_child_tt
+			is_adult = no
+		}
+
+		is_ruler = yes
+		has_job_title = yes
+		prisoner = yes
+		is_incapable = yes
+
+		custom_tooltip = {
+			text = is_regent_commander_or_physician_tt
+
+			OR = {
+				has_minor_title = title_regent
+				has_minor_title = title_appointed_regent
+				has_minor_title = title_commander
+				has_minor_title = title_court_physician
+			}
+		}
+
+		custom_tooltip = {
+			text = is_spouse_consort_or_of_your_dynasty
+
+			OR = {
+				is_married = FROM
+				is_consort = FROM
+				is_close_relative = FROM
+				sibling = FROM
+			}
+		}
+
+		is_primary_heir = yes
+
+		trigger_if = {
+			limit = { has_dlc = "Reapers" }
+			in_seclusion = yes
+		}
+
+		custom_tooltip = {
+			text = is_inaccessible_tt
+
+			OR = {
+				has_character_flag = flag_holding_great_tribal_festival
+				trait = in_hiding
+				trait = troubled_pregnancy
+				trait = pregnancy_finishing
+				is_pilgrim = yes
+				has_character_modifier = mother_minor_rest
+				has_character_modifier = in_meditation
+				has_character_modifier = doing_penance
+				has_character_modifier = out_traveling
+			}
+		}
+
+		custom_tooltip = {
+			text = is_character_in_important_chain_of_events_tt
+
+			OR = {
+				has_character_flag = eternal_life_mystic
+				has_character_flag = immortal_rival
+				has_character_flag = flag_special_event_character
+				has_character_flag = is_death
+				is_immune_to_pruning = yes
+				historical = yes
+			}
+		}
+
+		trigger_if = {
+			limit = { trait = horse }
+			trait = horse # Glitterhoof
+		}
+
+		trigger_if = {
+			limit = { trait = cat }
+			trait = cat # Mittens
+		}
+	}
+}

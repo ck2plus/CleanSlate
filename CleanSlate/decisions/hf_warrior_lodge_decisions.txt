@@ -3,9 +3,11 @@
 
 targeted_decisions = {
 	duel_decision = {
-		is_high_prio = yes
 		diplomacy_icon = GFX_duel_decision
+
 		ai_check_interval = 10
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -30,7 +32,6 @@ targeted_decisions = {
 			is_adult = yes
 			prisoner = no
 			has_regent = no
-			is_inaccessible_trigger = no
 
 			trigger_if = {
 				limit = {
@@ -61,10 +62,10 @@ targeted_decisions = {
 			}
 
 			prisoner = no
-			is_inaccessible_trigger = no
 		}
 
 		allow = {
+
 			# Won't show ANY reqs. if you have "Unrestricted" duels...
 			trigger_if = {
 				limit = {
@@ -127,6 +128,10 @@ targeted_decisions = {
 				}
 			}
 
+			# TODO: Custom tooltip?
+			FROM = { is_inaccessible_trigger = no }
+			is_inaccessible_trigger = no
+
 			# Both are healthy
 			custom_tooltip = {
 				text = duel_tooltip_sickness
@@ -139,12 +144,10 @@ targeted_decisions = {
 					}
 				}
 
-				ROOT = {
-					NOR = { # Not in sickly in bed, but sick if well treated is okay
-						has_character_modifier = bedridden_illness
-						has_character_modifier = severe_illness
-						is_incapable = yes
-					}
+				NOR = { # Not in sickly in bed, but sick if well treated is okay
+					has_character_modifier = bedridden_illness
+					has_character_modifier = severe_illness
+					is_incapable = yes
 				}
 			}
 
@@ -152,7 +155,7 @@ targeted_decisions = {
 				text = duel_tooltip_pregnant
 
 				FROM = { is_pregnant = no }
-				ROOT = { is_pregnant = no }
+				is_pregnant = no
 			}
 
 			####### You won't want to fight someone who is badly injured, and if you are hurt yourself, you will want to wait...
@@ -245,10 +248,11 @@ targeted_decisions = {
 	########################################
 
 	claim_duel_decision = {
-		is_high_prio = yes
 		diplomacy_icon = GFX_duel_decision
 
 		ai_check_interval = 10
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -259,7 +263,6 @@ targeted_decisions = {
 			is_adult = yes
 			prisoner = no
 			has_regent = no
-			is_inaccessible_trigger = no
 
 			trigger_if = {
 				limit = {
@@ -306,7 +309,6 @@ targeted_decisions = {
 			}
 
 			prisoner = no
-			is_inaccessible_trigger = no
 		}
 
 		allow = {
@@ -330,14 +332,16 @@ targeted_decisions = {
 					}
 				}
 
-				ROOT = {
-					NOR = { # Not in sickly in bed, but sick if well treated is okay
-						has_character_modifier = bedridden_illness
-						has_character_modifier = severe_illness
-						is_incapable = yes
-					}
+				NOR = { # Not in sickly in bed, but sick if well treated is okay
+					has_character_modifier = bedridden_illness
+					has_character_modifier = severe_illness
+					is_incapable = yes
 				}
 			}
+
+			# TODO: custom tooltip?
+			FROM = { is_inaccessible_trigger = no }
+			is_inaccessible_trigger = no
 
 			custom_tooltip = {
 				text = duel_tooltip_recent_duel
@@ -474,11 +478,13 @@ targeted_decisions = {
 
 	### Recruit/Induct your child into your warrior lodge ###
 	recruit_child_decision = {
-		is_high_prio = yes
 		diplomacy_icon = GFX_duel_decision
-		filter = close_relatives
+
+		filter = close_relative
 		ai_target_filter = close_relatives
 		ai_check_interval = 36
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -489,7 +495,6 @@ targeted_decisions = {
 			is_adult = yes
 			prisoner = no
 			has_regent = no
-			is_inaccessible_trigger = no
 		}
 
 		potential = {
@@ -497,9 +502,11 @@ targeted_decisions = {
 			prisoner = no
 			NOT = { has_character_flag = flag_child_abandoned_lodge }
 
-			trigger_if = {
-				limit = { FROM = { ai = yes } }
-				is_primary_heir = FROM
+			FROM = {
+				trigger_if = {
+					limit = { ai = yes }
+					player_heir = { character = ROOT }
+				}
 			}
 		}
 
@@ -574,6 +581,7 @@ targeted_decisions = {
 									bloodline_is_active_for = PREV
 								}
 							}
+
 							any_owned_bloodline = {
 								has_bloodline_flag = bloodline_legendary_warrior
 								bloodline_is_active_for = PREV
@@ -598,6 +606,7 @@ targeted_decisions = {
 				}
 			}
 
+			FROM = { is_inaccessible_trigger = no }
 			is_inaccessible_trigger = no
 
 			custom_tooltip = {
@@ -920,8 +929,7 @@ targeted_decisions = {
 			detract_society_currency_minor_effect = yes
 
 			hidden_effect = {
-				add_trait_silently_wroth_effect = yes
-				remove_trait_silently_patient_effect = yes
+				add_trait_partially_silently_wroth_effect = yes # TODO: Make not silent or visible?
 
 				if = {
 					limit = { trait = defensive_leader }
@@ -970,12 +978,12 @@ targeted_decisions = {
 
 	# Power, rank 4: Call to Glory
 	warrior_lodge_call_to_glory = {
-		is_high_prio = yes
-		is_mercenary = yes
-
 		filter = self
 		ai_target_filter = self
 		ai_check_interval = 12
+
+		is_high_prio = yes
+		is_mercenary = yes
 
 		is_in_society = yes
 		only_playable = yes
@@ -1034,6 +1042,7 @@ targeted_decisions = {
 society_decisions = {
 	warrior_lodge_legendary_gathering = {
 		ai_check_interval = 36
+
 		is_high_prio = yes
 
 		only_playable = yes
@@ -1252,22 +1261,7 @@ society_decisions = {
 					remove_trait = slow
 					remove_trait = imbecile
 					remove_trait = dull
-					remove_trait = mystic
-					remove_trait = socializer
-					remove_trait = game_master
-					remove_trait = hedonist
-					remove_trait = duelist
-					remove_trait = hunter
-					remove_trait = strategist
-					remove_trait = administrator
-					remove_trait = architect
-					remove_trait = gardener
-					remove_trait = master_schemer
-					remove_trait = impaler
-					remove_trait = master_seducer
-					remove_trait = master_seductress
-					remove_trait = theologian
-					remove_trait = scholar
+					remove_lifestyle_trait_effect = yes
 
 					if = {
 						limit = {
@@ -1277,6 +1271,7 @@ society_decisions = {
 								NOR = {
 									has_religion_feature = religion_matriarchal
 									has_religion_feature = religion_patriarchal
+
 									has_game_rule = {
 										name = gender
 										value = all
@@ -1298,6 +1293,7 @@ society_decisions = {
 						 5 = { change_martial = 4 }
 						 5 = { add_trait = shrewd }
 						 3 = { add_trait = giant }
+
 						 5 = {
 							if = {
 								limit = { has_dlc = "Reapers" }
@@ -1401,6 +1397,7 @@ society_decisions = {
 
 	warrior_lodge_suomenusko_summon_warriors = {
 		ai_check_interval = 20
+
 		is_high_prio = yes
 		is_mercenary = yes
 
@@ -1462,6 +1459,7 @@ society_decisions = {
 
 	warrior_lodge_slavic_stand_together = {
 		ai_check_interval = 20
+
 		is_high_prio = yes
 		is_mercenary = yes
 
@@ -1548,6 +1546,7 @@ society_decisions = {
 
 	warrior_lodge_tengri_call_of_the_steppe = {
 		ai_check_interval = 50
+
 		is_high_prio = yes
 
 		only_playable = yes
@@ -1609,8 +1608,8 @@ society_decisions = {
 
 			trigger = {
 				trigger_if = {
-					limit = { is_nomadic = yes }
-					war = yes # No need for levy reinforcement for non-nomads when at peace
+					limit = { war = yes }
+					is_nomadic = yes # No need for levy reinforcement for non-nomads when at peace
 				}
 
 				# I could use some help winning this war
@@ -1857,8 +1856,9 @@ society_decisions = {
 	}
 
 	warrior_lodge_west_african_create_fetish = {
-		is_high_prio = yes
 		ai_check_interval = 150
+
+		is_high_prio = yes
 
 		only_playable = yes
 
@@ -1977,13 +1977,15 @@ society_decisions = {
 decisions = {
 	# Create Hellenic Warrior Lodge - Dead at start
 	create_warrior_lodge_hellenic = {
-		is_high_prio = yes
 		ai_check_interval = 120
+
+		is_high_prio = yes
 
 		only_playable = yes
 
 		potential = {
 			has_dlc = "Holy Fury"
+			religion_openly_hellenic_or_reformed_trigger = yes
 
 			NOR = {
 				has_global_flag = flag_restored_warrior_lodge_hellenic
@@ -1994,8 +1996,6 @@ decisions = {
 					value = random
 				}
 			}
-
-			religion_openly_hellenic_or_reformed_trigger = yes
 
 			warrior_lodge_hellenic = {
 				society_has_members = no
@@ -2081,9 +2081,9 @@ decisions = {
 settlement_decisions = {
 	# Power, rank 3: Inspire Warriors
 	warrior_lodge_inspire_warriors = {
-		ai_check_interval = 80
 		# filter = owned # CleanSlate: Nonfunctional
 		ai_target_filter = owned
+		ai_check_interval = 80
 
 		is_in_society = yes
 		only_playable = yes
@@ -2115,6 +2115,7 @@ settlement_decisions = {
 
 			FROM = {
 				show_scope_change = no
+
 				set_character_flag = inspiring_warriors
 				detract_society_currency_minor_effect = yes
 				character_event = { id = HF.10059 } # Handle actual effect
@@ -2151,9 +2152,10 @@ settlement_decisions = {
 
 	# Power, rank 3: Baltic Holds
 	warrior_lodge_romuva_baltic_holds = {
-		ai_check_interval = 80
 		# filter = owned # CleanSlate: Nonfunctional
 		ai_target_filter = owned
+		ai_check_interval = 80
+
 		is_high_prio = yes
 
 		is_in_society = yes
@@ -2212,124 +2214,100 @@ settlement_decisions = {
 		}
 
 		allow = { # Now it's going to get ugly...
-		#	show_only_failed_conditions = yes
-
 			FROM = { has_society_currency_minor_trigger = yes }
 
 			trigger_if = {
 				trigger = { holding_type = tribal }
 
-				# Prioritize hillfort first, as is more important
-				trigger_if = {
-					limit = {
-						NOR = {
-							has_building = tb_hillfort_4
-							is_building = tb_hillfort_4
-						}
-					}
-
-					OR = {
-						custom_tooltip = {
-							text = tooltip_can_build_tb_hillfort_1
-
-							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
-
+				OR = {
+					trigger_if = {
+						limit = {
 							NOR = {
-								is_building = tb_hillfort_1
-								has_building = tb_hillfort_1
-							}
-						}
-
-						custom_tooltip = {
-							text = tooltip_can_build_tb_hillfort_2
-
-							has_building = tb_hillfort_1
-							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
-
-							NOR = {
-								is_building = tb_hillfort_2
-								has_building = tb_hillfort_2
-							}
-						}
-
-						custom_tooltip = {
-							text = tooltip_can_build_tb_hillfort_3
-
-							has_building = tb_hillfort_2
-							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
-
-							NOR = {
-								is_building = tb_hillfort_3
-								has_building = tb_hillfort_3
-							}
-						}
-
-						custom_tooltip = {
-							text = tooltip_can_build_tb_hillfort_4
-
-							has_building = tb_hillfort_3
-							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
-
-							NOR = {
-								is_building = tb_hillfort_4
 								has_building = tb_hillfort_4
+								is_building = tb_hillfort_4
+							}
+						}
+
+						trigger_if = {
+							limit = { has_building = tb_hillfort_3 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_tb_hillfort_4
+								location = { TECH_CASTLE_CONSTRUCTION >= 1 }
+							}
+						}
+						trigger_else_if = {
+							limit = { has_building = tb_hillfort_2 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_tb_hillfort_3
+
+								NOT = { is_building = tb_hillfort_3 }
+								location = { TECH_CASTLE_CONSTRUCTION >= 1 }
+							}
+						}
+						trigger_else_if = {
+							limit = { has_building = tb_hillfort_1 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_tb_hillfort_2
+
+								NOT = { is_building = tb_hillfort_2 }
+								# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
+							}
+						}
+						trigger_else = {
+							custom_tooltip = {
+								text = tooltip_can_build_tb_hillfort_1
+
+								NOT = { is_building = tb_hillfort_1 }
+								# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
 							}
 						}
 					}
-				}
-				trigger_else_if = {
-					limit = {
-						NOR = {
-							is_building = tb_defensive_fortifications_4
-							has_building = tb_defensive_fortifications_4
-						}
-					}
 
-					OR = {
-						custom_tooltip = {
-							text = tooltip_can_build_tb_defensive_fortifications_1
-
-							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
-
-							NOR = {
-								is_building = tb_defensive_fortifications_1
-								has_building = tb_defensive_fortifications_1
-							}
-						}
-
-						custom_tooltip = {
-							text = tooltip_can_build_tb_defensive_fortifications_2
-
-							has_building = tb_defensive_fortifications_1
-							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
-
-							NOR = {
-								is_building = tb_defensive_fortifications_2
-								has_building = tb_defensive_fortifications_2
-							}
-						}
-
-						custom_tooltip = {
-							text = tooltip_can_build_tb_defensive_fortifications_3
-
-							has_building = tb_defensive_fortifications_2
-							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
-
-							NOR = {
-								is_building = tb_defensive_fortifications_3
-								has_building = tb_defensive_fortifications_3
-							}
-						}
-
-						custom_tooltip = {
-							text = tooltip_can_build_tb_defensive_fortifications_4
-
-							has_building = tb_defensive_fortifications_3
-							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
-
+					trigger_if = {
+						limit = {
 							NOR = {
 								is_building = tb_defensive_fortifications_4
 								has_building = tb_defensive_fortifications_4
+							}
+						}
+
+						trigger_if = {
+							limit = { has_building = tb_defensive_fortifications_3 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_tb_defensive_fortifications_4
+								location = { TECH_CASTLE_CONSTRUCTION >= 1 }
+							}
+						}
+						trigger_else_if = {
+							limit = { has_building = tb_defensive_fortifications_2 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_tb_defensive_fortifications_3
+
+								NOT = { is_building = tb_defensive_fortifications_3 }
+								location = { TECH_CASTLE_CONSTRUCTION >= 1 }
+							}
+						}
+						trigger_else_if = {
+							limit = { has_building = tb_defensive_fortifications_1 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_tb_defensive_fortifications_2
+
+								NOT = { is_building = tb_defensive_fortifications_2 }
+								# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
+							}
+						}
+						trigger_else = {
+							custom_tooltip = {
+								text = tooltip_can_build_tb_defensive_fortifications_1
+
+								NOT = { is_building = tb_defensive_fortifications_1 }
+								# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
 							}
 						}
 					}
@@ -2338,129 +2316,116 @@ settlement_decisions = {
 			trigger_else_if = {
 				limit = { holding_type = castle }
 
-				trigger_if = {
-					limit = {
-						NOR = {
-							has_building = ca_wall_5
-							is_building = ca_wall_5
+				OR = {
+					trigger_if = {
+						limit = {
+							NOR = {
+								has_building = ca_wall_5
+								is_building = ca_wall_5
+							}
 						}
-					}
-
-					# Prioritize walls first, as they give more benefits
-					custom_tooltip = {
-						text = tooltip_can_build_ca_wall_1
 
 						trigger_if = {
-							limit = {
-								NOR = {
-									is_building = ca_wall_1
-									has_building = ca_wall_1
-								}
+							limit = { has_building = ca_wall_4 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_5
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 8 }
 							}
-							# location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 0 }
 						}
 						trigger_else_if = {
-							limit = {
-								has_building = ca_wall_1
+							limit = { has_building = ca_wall_3 }
 
-								NOR = {
-									is_building = ca_wall_2
-									has_building = ca_wall_2
-								}
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_4
+
+								NOT = { is_building = ca_wall_4 }
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 6 }
 							}
-
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 2 }
 						}
 						trigger_else_if = {
-							limit = {
-								has_building = ca_wall_2
+							limit = { has_building = ca_wall_2 }
 
-								NOR = {
-									is_building = ca_wall_3
-									has_building = ca_wall_3
-								}
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_3
+
+								NOT = { is_building = ca_wall_3 }
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 4 }
 							}
-
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 4 }
 						}
 						trigger_else_if = {
-							limit = {
-								has_building = ca_wall_3
+							limit = { has_building = ca_wall_1 }
 
-								NOR = {
-									is_building = ca_wall_4
-									has_building = ca_wall_4
-								}
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_2
+
+								NOT = { is_building = ca_wall_2 }
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 2 }
 							}
-
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 6 }
 						}
 						trigger_else = {
-							has_building = ca_wall_4
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 8 }
-						}
-					}
-				}
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_1
 
-				trigger_else_if = {
-					limit = {
-						NOR = {
-							is_building = ca_wall_q_5
-							has_building = ca_wall_q_5
-						}
-					}
-
-					custom_tooltip = {
-						text = tooltip_can_build_ca_wall_q_1
-
-						trigger_if = {
-							limit = {
-								NOR = {
-									is_building = ca_wall_q_1
-									has_building = ca_wall_q_1
-								}
+								NOT = { is_building = ca_wall_1 }
 								# location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 0 }
 							}
 						}
-						trigger_else_if = {
-							limit = {
-								has_building = ca_wall_q_1
+					}
 
-								NOR = {
-									is_building = ca_wall_q_2
-									has_building = ca_wall_q_2
-								}
+					trigger_if = {
+						limit = {
+							NOR = {
+								is_building = ca_wall_q_5
+								has_building = ca_wall_q_5
 							}
+						}
 
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 1 }
+						trigger_if = {
+							limit = { has_building = ca_wall_q_4 }
+
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_q_5
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 7 }
+							}
 						}
 						trigger_else_if = {
-							limit = {
-								has_building = ca_wall_q_2
+							limit = { has_building = ca_wall_q_3 }
 
-								NOR = {
-									is_building = ca_wall_q_3
-									has_building = ca_wall_q_3
-								}
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_q_4
+
+								NOT = { is_building = ca_wall_q_4 }
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 5 }
 							}
-
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 3 }
 						}
 						trigger_else_if = {
-							limit = {
-								has_building = ca_wall_q_3
+							limit = { has_building = ca_wall_q_2 }
 
-								NOR = {
-									is_building = ca_wall_q_4
-									has_building = ca_wall_q_4
-								}
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_q_3
+
+								NOT = { is_building = ca_wall_q_3 }
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 3 }
 							}
+						}
+						trigger_else_if = {
+							limit = { has_building = ca_wall_q_1 }
 
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 5 }
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_q_2
+
+								NOT = { is_building = ca_wall_q_2 }
+								location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 1 }
+							}
 						}
 						trigger_else = {
-							has_building = ca_wall_q_4
-							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 7 }
+							custom_tooltip = {
+								text = tooltip_can_build_ca_wall_q_1
+
+								NOT = { is_building = ca_wall_q_1 }
+								# location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 0 }
+							}
 						}
 					}
 				}
@@ -2485,11 +2450,42 @@ settlement_decisions = {
 			if = {
 				limit = { holding_type = castle }
 
+				# Prioritize walls first, as they give more benefits
 				if = {
 					limit = {
 						NOR = {
 							has_building = ca_wall_5
 							is_building = ca_wall_5
+						}
+
+						# Ensure walls can be improved before attempting
+						trigger_if = {
+							limit = { has_building = ca_wall_4 }
+							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 8 }
+						}
+						trigger_else_if = {
+							limit = { has_building = ca_wall_3 }
+
+							NOT = { is_building = ca_wall_4 }
+							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 6 }
+						}
+						trigger_else_if = {
+							limit = { has_building = ca_wall_2 }
+
+							NOT = { is_building = ca_wall_3 }
+							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 4 }
+						}
+						trigger_else_if = {
+							limit = { has_building = ca_wall_1 }
+
+							NOT = { is_building = ca_wall_2 }
+							location = { TECH_FORTIFICATIONS_CONSTRUCTION >= 2 }
+						}
+						trigger_else = {
+							NOR = {
+								has_building = ca_wall_1
+								is_building = ca_wall_1
+							}
 						}
 					}
 
@@ -2639,11 +2635,34 @@ settlement_decisions = {
 			else_if = {
 				limit = { holding_type = tribal }
 
+				# Prioritize hillfort first, as is more important
 				if = {
 					limit = {
 						NOR = {
 							has_building = tb_hillfort_4
 							is_building = tb_hillfort_4
+						}
+
+						# Ensure the hillfort can be improved before attempting
+						trigger_if = {
+							limit = { has_building = tb_hillfort_3 }
+							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
+						}
+						trigger_else_if = {
+							limit = { has_building = tb_hillfort_2 }
+
+							NOT = { is_building = tb_hillfort_3 }
+							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
+						}
+						trigger_else_if = {
+							limit = { has_building = tb_hillfort_1 }
+
+							NOT = { is_building = tb_hillfort_2 }
+							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
+						}
+						trigger_else = {
+							NOT = { is_building = tb_hillfort_1 }
+							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
 						}
 					}
 
@@ -2663,7 +2682,7 @@ settlement_decisions = {
 						limit = {
 							has_building = tb_hillfort_2
 							NOT = { is_building = tb_hillfort_3 }
-							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
+							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
 						}
 
 						add_building = tb_hillfort_3
@@ -2687,10 +2706,7 @@ settlement_decisions = {
 					}
 					else_if = {
 						limit = {
-							NOR = {
-								is_building = tb_hillfort_1
-								has_building = tb_hillfort_1
-							}
+							NOT = { is_building = tb_hillfort_1 }
 							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
 						}
 
@@ -2701,7 +2717,6 @@ settlement_decisions = {
 						}
 					}
 				}
-
 				else_if = {
 					limit = {
 						NOR = {
@@ -2713,7 +2728,6 @@ settlement_decisions = {
 					if = {
 						limit = {
 							has_building = tb_defensive_fortifications_3
-							NOT = { is_building = tb_defensive_fortifications_4 }
 							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
 						}
 
@@ -2727,7 +2741,7 @@ settlement_decisions = {
 						limit = {
 							has_building = tb_defensive_fortifications_2
 							NOT = { is_building = tb_defensive_fortifications_3 }
-							# location = { TECH_CASTLE_CONSTRUCTION >= 0 }
+							location = { TECH_CASTLE_CONSTRUCTION >= 1 }
 						}
 
 						add_building = tb_defensive_fortifications_3

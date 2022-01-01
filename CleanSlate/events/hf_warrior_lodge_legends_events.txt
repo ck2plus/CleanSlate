@@ -121,6 +121,7 @@ province_event = {
 				clr_flag = block_society_progress
 				set_society_progress = 0
 			}
+
 			# log = "[LEGENDARY JOURNEY]: [This.GetName] got event HF.12000, but found out that [event_target:legendary_society.GetName] has no members left, so stopped chain before it started."
 		}
 	}
@@ -138,6 +139,7 @@ province_event = {
 					}
 				}
 			}
+
 			event_target:legendary_society = {
 				random_society_member = {
 					limit = {
@@ -150,10 +152,12 @@ province_event = {
 					# log = "[LEGENDARY JOURNEY]: Event HF.12000 fired and [This.GetTitledFirstName] is the original hero, who starts it all!"
 				}
 			}
+
 			clr_province_flag = initiating_legendary_journey
 		}
 		else = {
 			# log = "[LEGENDARY JOURNEY]: Event HF.12000 fired, but there were not enough members. Checking back in max 265 days."
+
 			province_event = {
 				id = HF.12000 # Check back in a while...
 				days = 165
@@ -218,6 +222,7 @@ character_event = {
 			}
 
 			save_event_target_as = target_ruler
+
 			primary_title = {
 				save_event_target_as = target_title
 			}
@@ -238,10 +243,12 @@ character_event = {
 						society_rank == 4
 						NOT = { character = ROOT }
 					}
+
 					set_character_flag = do_not_disturb
 					set_character_flag = call_to_legend_active
 					save_event_target_as = fellow_hero_1
 				}
+
 				random_society_member = {
 					limit = {
 						society_rank == 4
@@ -251,10 +258,12 @@ character_event = {
 							character = event_target:fellow_hero_1
 						}
 					}
+
 					set_character_flag = do_not_disturb
 					set_character_flag = call_to_legend_active
 					save_event_target_as = fellow_hero_2
 				}
+
 				random_society_member = {
 					limit = {
 						society_rank == 4
@@ -265,6 +274,7 @@ character_event = {
 							character = event_target:fellow_hero_2
 						}
 					}
+
 					set_character_flag = do_not_disturb
 					set_character_flag = call_to_legend_active
 					save_event_target_as = fellow_hero_3
@@ -311,6 +321,7 @@ character_event = {
 
 	option = { # (AI's don't get this option)
 		name = EVTOPTB_HF_12001 # I'd rather not start anything...
+
 		trigger = { ai = no } # Because the ai will never refuse...
 
 		set_character_flag = rank_up_blocked
@@ -331,6 +342,7 @@ character_event = {
 					}
 				}
 			}
+
 			stop_society_progress = yes # To prevent things from breaking
 		}
 
@@ -348,6 +360,7 @@ character_event = {
 					has_character_flag = call_to_legend_active
 					NOT = { character = ROOT }
 				}
+
 				character_event = { id = HF.12002 } # Give them the choice to back out...
 			}
 		}
@@ -361,6 +374,7 @@ character_event = {
 	title = legendary_prep_title
 	picture = GFX_evt_camaraderie
 	border = GFX_event_normal_frame_war
+
 	is_triggered_only = yes
 
 	immediate = {
@@ -371,6 +385,7 @@ character_event = {
 	option = {
 		name = EVTOPTA_HF_12002 # Let's go!
 		show_portrait = event_target:target_ruler
+
 		custom_tooltip = { text = EVTOPTA_HF_12002_TT }
 
 		hidden_effect = {
@@ -394,13 +409,16 @@ character_event = {
 					character = ROOT
 				}
 			}
+
 			character_event = { id = HF.12011 } # Let other society members know what is going on
 		}
 	}
 
 	option = {
 		name = EVTOPTB_HF_12001 # I'd rather stay here.
+
 		trigger = { ai = no }
+
 		custom_tooltip = { text = EVTOPTB_HF_12002_TT }
 
 		clr_character_flag = do_not_disturb
@@ -428,6 +446,7 @@ character_event = {
 					}
 				}
 			}
+
 			stop_society_progress = yes # To prevent things from breaking
 		}
 
@@ -499,6 +518,7 @@ character_event = {
 
 		if = { # Back up, in case the ruler we are talking about is dead...
 			limit = { persistent_event_target:target_ruler = { is_alive = no } }
+
 			persistent_event_target:target_title = {
 				holder_scope = {
 					top_liege = {
@@ -538,14 +558,47 @@ character_event = {
 					has_character_flag = call_it_a_day
 					has_killed_at_least_1_trigger = yes
 				}
+
 				died_founding_a_bloodline_effect = yes
 			}
-			else_if = { # You successfully reached the end of the chain...
+			else_if = { # You successfully reached the end of the chain... Found a bloodline
 				limit = {
 					is_alive = yes
 					has_character_flag = call_it_a_day
 				}
-				found_a_bloodline_effect = yes # sets flag for quality and sends conclusion event...
+
+				if = {
+					limit = {
+						has_killed_at_least_1_trigger = yes
+						has_killed_at_least_3_trigger = no
+					}
+
+					set_character_flag = bloodline_quality_1
+				}
+				else_if = {
+					limit = {
+						has_killed_at_least_3_trigger = yes
+						has_killed_at_least_5_trigger = no
+					}
+
+					set_character_flag = bloodline_quality_2
+				}
+				else_if = {
+					limit = {
+						has_killed_at_least_5_trigger = yes
+					}
+
+					set_character_flag = bloodline_quality_3
+				}
+
+				save_event_target_as = bloodline_founder
+
+				narrative_event = {
+					id = HF.12300
+					days = 3
+				}
+
+				clr_XYZ_desc_flag_effect = yes
 			}
 			else = { # means you are just dying... :D
 				died_before_achieveing_greatness_effect = yes
@@ -562,6 +615,7 @@ character_event = {
 							has_character_flag = call_to_legend_active
 							ai = yes
 						}
+
 						set_character_flag = player_was_involved
 					}
 				}
@@ -814,6 +868,7 @@ character_event = {
 
 		if = { # Back up, in case the ruler we are talking about is dead...
 			limit = { persistent_event_target:target_ruler = { is_alive = no } }
+
 			persistent_event_target:target_title = {
 				holder_scope = {
 					top_liege = {
@@ -821,6 +876,7 @@ character_event = {
 					}
 				}
 			}
+
 			save_persistent_event_target = { # also saves the same as a persistent target, for safety (on_death)
 				name = target_ruler
 				scope = event_target:target_ruler
@@ -833,6 +889,7 @@ character_event = {
 				has_character_flag = call_it_a_day
 				has_killed_at_least_1_trigger = yes
 			}
+
 			died_founding_a_bloodline_effect = yes
 		}
 		else = { # means you are just dying... :D
@@ -850,6 +907,7 @@ character_event = {
 						has_character_flag = call_to_legend_active
 						ai = yes
 					}
+
 					set_character_flag = player_was_involved
 				}
 			}
@@ -885,6 +943,7 @@ character_event = {
 							}
 						}
 					}
+
 					save_event_target_as = giving_member
 
 					any_artifact = {
@@ -894,10 +953,12 @@ character_event = {
 								has_artifact_flag = armor
 							}
 						}
+
 						score_value = { # Prioritizes selecting an appropriate artifact...
 							value = 10
 							artifact_selection_score = yes
 						}
+
 						save_event_target_as = artifact_gift
 					}
 				}
@@ -1006,6 +1067,7 @@ character_event = {
 	immediate = {
 		# Find someone to talk to...
 		save_fellow_member_effect = yes
+
 #		random_list = {
 #			10 = { # the least interesting choice...
 #				trigger = {
@@ -1059,10 +1121,12 @@ character_event = {
 							persistent_event_target:local_fearsome_commander_target = { character = ROOT }
 						}
 					}
+
 					set_character_flag = i_was_fearsome_commander
 				}
 				else = {
 					set_character_flag = remember_fearsome_commander
+
 					event_target:home_capital = {
 						persistent_event_target:local_fearsome_commander_target = { save_event_target_as = target }
 					}
@@ -1114,9 +1178,11 @@ character_event = {
 					artifact_type = rival_skull
 				}
 			}
+
 			preferred_limit = {
 				artifact_type = enemy_skull
 			}
+
 			save_event_target_as = target_artifact
 		}
 
@@ -1126,6 +1192,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HF_12007 # Yes!
+
 		# custom_tooltip = { text = EVTOPTA_HF_12007_TT }
 
 		scaled_wealth = {
@@ -1150,6 +1217,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTB_HF_12007 # Nah...
+
 		# custom_tooltip = { text = EVTOPTB_HF_12007_TT }
 
 		add_1_point_to_legendary_progress_effect = yes # Good progress on journey...
@@ -1313,6 +1381,7 @@ character_event = {
 	option = {
 		name = EVTOPTA_HF_12012_diplo # Brilliant idea (for free)!
 		tooltip_info = diplomacy
+
 		trigger = { diplomacy >= 12 }
 
 		if = { # Make sure it upgrades into the correct item...
@@ -1437,6 +1506,7 @@ character_event = {
 					NOT = { character = ROOT }
 					has_character_flag = call_to_legend_active
 				}
+
 				character_event = { id = HF.12009 days = 1 } # Runs this event for those who don't have the modifier yet (so everyone's on the same page)...
 			}
 		}
@@ -1474,6 +1544,7 @@ character_event = {
 							}
 						}
 					}
+
 					if = { # if there is anyone who fits the base bill...
 						limit = { # base requirements
 							any_realm_character = {
@@ -1491,6 +1562,7 @@ character_event = {
 								}
 							}
 						}
+
 						any_realm_character = {
 							limit = { # same base requirements
 								ai = yes
@@ -1506,6 +1578,7 @@ character_event = {
 									character = event_target:target_ruler # Should not be the ruler themselves...
 								}
 							}
+
 							score_value = { # Prioritizes selecting a good warrior, if it can...
 								value = 10
 								good_soldier_outcome_score = yes # Prioritizes selecting a good warrior, if it can...
@@ -1515,6 +1588,7 @@ character_event = {
 									same_sex = ROOT
 								}
 							}
+
 							save_event_target_as = my_duel_target
 							set_character_flag = fought_duel_against@ROOT
 
@@ -1565,6 +1639,7 @@ character_event = {
 						# REQUIRED event targets for setting up duel evaluation!
 						save_event_target_as = combatant_2 # the target of the duel...
 					}
+
 					ROOT = { save_event_target_as = combatant_1 } # the person issuing the duel...
 				}
 
@@ -1815,6 +1890,7 @@ character_event = {
 						has_character_flag = WL_desc_Z
 					}
 				}
+
 				randomize_ABCDEF_desc_flag_effect = yes # Get a random desc
 			}
 		}
@@ -1899,6 +1975,7 @@ character_event = {
 
 		trigger_switch = { # To set/display effects properly...
 			on_trigger = has_character_flag
+
 			WL_desc_A = { custom_tooltip = { text = EVTOPTA_HF_12010_A_TT } }
 			# WL_desc_B = { custom_tooltip = { text = EVTOPTA_HF_12010_B_TT } }
 			# WL_desc_C = { custom_tooltip = { text = EVTOPTA_HF_12010_C_TT } }
@@ -1957,6 +2034,7 @@ character_event = {
 
 		trigger_switch = { # To set/display effects properly...
 			on_trigger = has_character_flag
+
 			WL_desc_A = { custom_tooltip = { text = EVTOPTB_HF_12010_A_TT } }
 			# WL_desc_B = { custom_tooltip = { text = EVTOPTB_HF_12010_B_TT } }
 			# WL_desc_C = { custom_tooltip = { text = EVTOPTB_HF_12010_C_TT } }
@@ -2020,6 +2098,7 @@ character_event = {
 					}
 				}
 			}
+
 			custom_tooltip = {
 				text = EVTOPTC_HF_12103_TT
 				stop_society_progress = yes
@@ -2041,8 +2120,7 @@ character_event = {
 			any_realm_character = {
 				limit = {
 					ai = yes
-					is_adult = yes
-					is_inaccessible_or_incapable_trigger = no
+					block_general_event_trigger = no
 					is_theocracy = no # preferably not, really. It feels weird.
 
 					NOR = {
@@ -2054,10 +2132,12 @@ character_event = {
 						character = event_target:target_ruler # Should not be the ruler themselves...
 					}
 				}
+
 				score_value = { # Prioritizes selecting a good warrior, if it can...
 					value = 10
 					matching_soldier_score = yes
 				}
+
 				save_event_target_as = my_duel_target
 				set_character_flag = fought_duel_against@ROOT
 
@@ -2136,12 +2216,14 @@ character_event = {
 					NOT = { character = ROOT }
 				}
 			}
+
 			# send event to player...
 			any_player = {
 				limit = {
 					same_society_as = ROOT
 					NOT = { character = ROOT }
 				}
+
 				character_event = { id = HF.12102 days = 1 } # my friend was captured (+ how)..!
 			}
 		}
@@ -2163,6 +2245,7 @@ character_event = {
 						}
 					}
 				}
+
 				stop_society_progress = yes
 			}
 		}
@@ -2514,6 +2597,7 @@ character_event = {
 				limit = {
 					event_target:combatant_1 = { has_character_flag = WL_desc_Z }
 				}
+
 				event_target:combatant_2 = {
 					set_graphical_culture = bear
 				}
@@ -2524,14 +2608,17 @@ character_event = {
 			 5 = { # You will be injured somehow (flags already set)...
 				bad_soldier_outcome_score = yes # Increases risk, if you are bad at this...
 			}
+
 			10 = { # ONLY gives the Severely Injured trait, but no maiming...
 				set_character_flag = severely_injured
 				bad_soldier_outcome_score = yes # Increases risk, if you are bad at this...
 			}
+
 			20 = { # ONLY gives bruises, etc...
 				set_character_flag = mildly_injured
 				good_soldier_outcome_score = yes # Increases chance, if you are good at this...
 			}
+
 			20 = { # You are completely safe...
 				good_soldier_outcome_score = yes # Increases chance, if you are good at this...
 				set_character_flag = ignore_damage
@@ -2923,6 +3010,7 @@ character_event = {
 
 		if = {
 			limit = { multiplayer = no }
+
 			if = {
 				limit = { character = event_target:combatant_1 } # if you instigated this...
 
@@ -2963,6 +3051,7 @@ character_event = {
 		name = EVTOPTA_HFP_10107 # Look at them run!
 
 		custom_tooltip = { text = you_win_the_duel_tt }
+
 		apply_generic_duel_victory_effect = yes
 		clean_up_after_duel_effect = yes
 	}
@@ -3008,6 +3097,7 @@ character_event = {
 				}
 			}
 		}
+
 		custom_tooltip = { text = you_lose_the_duel_tt }
 
 		set_character_flag = skip_blood_effect
@@ -3030,19 +3120,23 @@ narrative_event = {
 		hidden_effect = {
 			if = { # Back up, in case the ruler we are talking about is dead...
 				limit = { event_target:target_ruler = { is_alive = no } }
+
 				event_target:target_title = {
 					holder_scope = { top_liege = { save_event_target_as = target_ruler } }
 				}
 			}
+
 			any_courtier_or_vassal = {
 				limit = {
 					is_inaccessible_or_incapable_trigger = no
 					age >= 14
 				}
+
 				score_value = { # Prioritizes selecting some kind of loved person...
 					value = 1
 					beloved_target_selection_score = yes
 				}
+
 				# Effect:
 				save_event_target_as = my_beloved
 			}
@@ -3063,6 +3157,7 @@ narrative_event = {
 				ai = no
 				is_ironman = yes
 			}
+
 			set_character_flag = achievement_zero_to_hero
 		}
 
@@ -3084,6 +3179,7 @@ narrative_event = {
 				limit = {
 					NOT = { character = ROOT }
 				}
+
 				narrative_event = { id = HF.12302 } # News event to fellow society members...
 			}
 		}
@@ -3103,6 +3199,7 @@ narrative_event = {
 					}
 				}
 			}
+
 			custom_tooltip = {
 				text = EVTOPTC_HF_12103_TT
 				stop_society_progress = yes
@@ -3114,7 +3211,74 @@ narrative_event = {
 		}
 
 		clean_up_after_legendary_showdown_effect = yes
-		stop_slow_AIs_effect = yes # To make sure this thing does not go on forever...
+
+		# To make sure this thing does not go on forever...
+		hidden_effect = {
+			if = {
+				limit = { is_in_society = yes }
+
+				society = {
+					random_society_member = {
+						limit = {
+							OR = {
+								has_character_flag = call_to_legend_active
+								has_character_flag = completed_call_to_legend
+							}
+
+							check_variable = {
+								which = legendary_event_progress
+								value < 8
+							}
+
+							NOT = { character = PREVPREV }
+							ai = yes
+						}
+
+						clean_up_after_legendary_showdown_effect = yes
+					}
+
+					random_society_member = {
+						limit = {
+							OR = {
+								has_character_flag = call_to_legend_active
+								has_character_flag = completed_call_to_legend
+							}
+
+							check_variable = {
+								which = legendary_event_progress
+								value < 8
+							}
+
+							NOT = { character = PREVPREV }
+							ai = yes
+						}
+
+						clean_up_after_legendary_showdown_effect = yes
+					}
+				}
+
+				# if = {
+				#	limit = { ai = no }
+				#	character_event = { id = HF.12104 }
+				# }
+
+				if = { # To make sure the progress bar properly resets.
+					limit = {
+						NOT = {
+							society = {
+								any_society_member = {
+									has_character_flag = call_to_legend_active
+									NOT = { character = PREVPREV }
+									ai = yes
+								}
+							}
+						}
+					}
+
+					stop_society_progress = yes
+				}
+			}
+		}
 	}
 }
 
@@ -3136,10 +3300,12 @@ narrative_event = {
 			}
 		}
 	}
+
 	option = {
 		name = EVTOPTA_HF_12301
 
 		sound_effect = bloodline_added
+
 		event_target:bloodline_founder = {
 			custom_tooltip = { text = found_bloodline_tt }
 		}
@@ -3238,6 +3404,7 @@ character_event = {
 				NOT = { has_character_modifier = pet_hunting_eagle }
 				any_owned_bloodline = { has_bloodline_flag = bloodline_pet_eagle }
 			}
+
 			character_event = {
 				id = HF.12400 # Check back if you have yet not received a new bird...
 				years = 1
@@ -3252,6 +3419,7 @@ character_event = {
 				has_bloodline_flag = bloodline_pet_eagle
 				founder = { NOT = { character = ROOT } }
 			}
+
 			founder = {
 				save_event_target_as = bloodline_founder
 			}
@@ -3305,6 +3473,7 @@ character_event = {
 	# B. Dismiss
 	option = { # I'm going back to sleep
 		name = EVTOPTC_HF_12400
+
 		custom_tooltip = { text = EVTOPTC_HF_12400_TT }
 	}
 }
@@ -3332,6 +3501,7 @@ character_event = {
 				NOT = { has_character_modifier = pet_hunting_dog }
 				any_owned_bloodline = { has_bloodline_flag = bloodline_pet_dog }
 			}
+
 			character_event = {
 				id = HF.12400 # Check back if you have yet not received a new dog...
 				years = 1
@@ -3346,6 +3516,7 @@ character_event = {
 				has_bloodline_flag = bloodline_pet_dog
 				founder = { NOT = { character = ROOT } }
 			}
+
 			founder = {
 				save_event_target_as = bloodline_founder
 			}
@@ -3377,6 +3548,7 @@ character_event = {
 	# A.2
 	option = { # My ancestor would be approve
 		name = EVTOPTB_HF_12401
+
 		trigger = {
 			event_target:bloodline_founder = { always = yes }  #(Means you are NOT the founder)
 		}
@@ -3398,6 +3570,7 @@ character_event = {
 	# B. Dismiss
 	option = { # I'm going back to sleep
 		name = EVTOPTC_HF_12401
+
 		custom_tooltip = { text = EVTOPTC_HF_12401_TT }
 	}
 }
@@ -3413,6 +3586,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_HF_12402
+
 		custom_tooltip = { text = EVTOPTA_HF_12402_TT }
 
 		remove_character_modifier = pet_hunting_dog
