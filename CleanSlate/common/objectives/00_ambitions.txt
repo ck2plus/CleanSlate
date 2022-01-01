@@ -944,13 +944,7 @@ obj_get_married = {
 
 		trigger_if = {
 			limit = { is_ruler = yes }
-
-			OR = {
-				is_feudal = yes
-				is_tribal = yes
-				is_nomadic = yes
-				is_patrician = yes
-			}
+			is_theocracy = no
 		}
 
 		is_marriage_adult = yes
@@ -958,13 +952,7 @@ obj_get_married = {
 		is_consort = no
 		prisoner = no
 		is_incapable = no
-		is_ascetic_trigger = no
-
-		NOR = {
-			trait = celibate
-			trait = eunuch
-			has_landed_title = k_papacy
-		}
+		NOT = { trait = celibate }
 	}
 
 	success = {
@@ -999,14 +987,16 @@ obj_get_married = {
 				practical_age >= 40
 			}
 
+			trigger_if = {
+				limit = { is_ruler = yes }
+				is_theocracy = yes
+			}
+
 			can_marry = no
 			is_consort = yes
 			is_incapable = yes
 			prisoner = yes
 			trait = celibate
-			trait = eunuch
-			is_ascetic_trigger = yes
-			has_landed_title = k_papacy
 		}
 	}
 
@@ -1382,11 +1372,21 @@ obj_wants_landed_title = {
 
 		trigger_if = {
 			limit = { is_female = yes }
+
 			practical_age < 45
-			has_religion_feature = religion_matriarchal
+
+			OR = {
+				has_law = enatic_succession
+				has_law = enatic_cognatic_succession
+				has_law = true_cognatic_succession
+			}
 		}
 		trigger_else = {
-			NOT = { has_religion_feature = religion_matriarchal }
+			OR = {
+				has_law = agnatic_succession
+				has_law = cognatic_succession
+				has_law = true_cognatic_succession
+			}
 		}
 
 		liege = {
@@ -1409,12 +1409,8 @@ obj_wants_landed_title = {
 
 		prisoner = no
 		is_incapable = no
-		is_ascetic_trigger = no
-
-		NOR = {
-			trait = eunuch
-			has_minor_title = title_guru
-		}
+		has_inheritance_blocker = no
+		NOT = { has_minor_title = title_guru }
 	}
 
 	success = {
@@ -1451,14 +1447,13 @@ obj_wants_landed_title = {
 			is_married = liege
 			is_incapable = yes
 			prisoner = yes
-			trait = eunuch
-			is_ascetic_trigger = yes
+			has_inheritance_blocker = yes
 			has_minor_title = title_guru
 
 			AND = {
 				is_child_of = liege
 				has_law = succ_gavelkind
-				is_primary_heir	= liege
+				is_primary_heir = liege
 			}
 
 			liege = {
