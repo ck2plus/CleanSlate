@@ -163,7 +163,6 @@ character_event = {
 
 		set_character_flag = hedge_knights_visiting
 		prestige = 10
-		add_trait_fully_silently_gregarious_effect = yes
 
 		if = {
 			limit = { trait = greedy }
@@ -174,6 +173,8 @@ character_event = {
 		else = {
 			scaled_wealth = -0.2
 		}
+
+		add_trait_fully_silently_gregarious_effect = yes
 
 		ai_chance = {
 			factor = 10
@@ -200,9 +201,9 @@ character_event = {
 	option = {
 		name = EVTOPTB71000 # Welcome them reluctantly
 
+		set_character_flag = hedge_knights_visiting
 		prestige = 1
 		scaled_wealth = -0.05
-		set_character_flag = hedge_knights_visiting
 
 		ai_chance = {
 			factor = 10
@@ -238,6 +239,147 @@ character_event = {
 			trigger = { trait = greedy }
 		}
 	}
+
+	after = {
+		if = {
+			limit = { has_character_flag = hedge_knights_visiting }
+
+			character_event = {
+				id = 71007 # Tombola 1st time
+				days = 10
+				random = 10
+			}
+
+			character_event = {
+				id = 71007 # Tombola 2nd time
+				days = 21
+				random = 10
+			}
+
+			character_event = {
+				id = 71005 # Hedge knights leaving
+				days = 35
+				random = 10
+			}
+		}
+	}
+}
+
+# Hedge Knight Tombola
+character_event = {
+	id = 71007
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	only_playable = yes
+	has_character_flag = hedge_knights_visiting
+	prisoner = no
+
+	fail_trigger_effect = {
+		clr_character_flag = hedge_knights_visiting
+		clr_character_flag = hedge_knight_recruited
+		clr_character_flag = hedge_knight_woman_seduced
+	}
+
+	immediate = {
+		random_list = {
+			30 = { } # Nothing
+
+			30 = { # Minor Tournament Hedge Knight Injured
+				trigger = {
+					NOR = {
+						has_character_flag = hedge_knight_recruited
+						has_character_flag = hedge_knight_woman_seduced
+					}
+				}
+
+				character_event = { id = 71001 }
+			}
+
+			6 = { # One hedge knight distinguishes himself
+				trigger = {
+					ai = no
+
+					NOR = {
+						has_character_flag = hedge_knight_recruited
+						has_character_flag = hedge_knight_woman_seduced
+					}
+				}
+
+				mult_modifier = {
+					factor = 2
+					trait = gregarious
+				}
+
+				character_event = { id = 71002 }
+			}
+
+			20 = { # Male courtier insulted by hedge knights
+				trigger = {
+					any_courtier = {
+						is_adult = yes
+						is_female = no
+
+						OR = {
+							trait = cruel
+							trait = proud
+							trait = wroth
+							trait = zealous
+							trait = envious
+							prestige >= 100
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 1.11
+					trait = arbitrary
+				}
+
+				mult_modifier = {
+					factor = 0.2
+					has_character_flag = hedge_knight_recruited
+				}
+
+				mult_modifier = {
+					factor = 0.2
+					has_character_flag = hedge_knight_woman_seduced
+				}
+
+				character_event = { id = 71003 }
+			}
+
+			30 = { # A young woman has been seduced by a hedge knight
+				trigger = {
+					ai = no
+
+					any_courtier = {
+						is_female = yes
+						is_adult = yes
+						age < 20
+						fertility >= 0.3
+						is_married = no
+						is_pregnant = no
+						has_lover = no
+						NOT = { trait = homosexual }
+					}
+
+					NOR = {
+						has_character_flag = hedge_knight_recruited
+						has_character_flag = hedge_knight_woman_seduced
+					}
+				}
+
+				mult_modifier = {
+					factor = 2
+					trait = gregarious
+				}
+
+				character_event = { id = 71004 }
+			}
+		}
+	}
 }
 
 # Minor Tournament Hedge Knight Injured
@@ -246,22 +388,7 @@ character_event = {
 	desc = EVTDESC71001
 	picture = GFX_evt_joust
 
-	only_playable = yes
-	has_character_flag = hedge_knights_visiting
-	religion = catholic
-	min_age = 16
-	prisoner = no
-
-	trigger = {
-		NOR = {
-			has_character_flag = hedge_knight_recruited
-			has_character_flag = hedge_knight_woman_seduced
-		}
-	}
-
-	mean_time_to_happen = {
-		days = 20
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		clr_character_flag = hedge_knights_visiting
@@ -295,30 +422,10 @@ character_event = {
 	desc = EVTDESC71002
 	picture = GFX_evt_joust
 
-	ai = no
-	has_character_flag = hedge_knights_visiting
-	religion = catholic
-	min_age = 16
-	prisoner = no
-
-	trigger = {
-		NOR = {
-			has_character_flag = hedge_knight_recruited
-			has_character_flag = hedge_knight_woman_seduced
-		}
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		set_character_flag = hedge_knight_recruited
-	}
-
-	mean_time_to_happen = {
-		days = 100
-
-		mult_modifier = {
-			factor = 0.5
-			trait = gregarious
-		}
 	}
 
 	option = {
@@ -347,6 +454,14 @@ character_event = {
 
 		prestige = 5
 	}
+
+	after = {
+		character_event = {
+			id = 71005 # Hedge knights leaving
+			days = 2
+			random = 2
+		}
+	}
 }
 
 # Male courtier insulted by hedge knights
@@ -355,46 +470,7 @@ character_event = {
 	desc = EVTDESC71003
 	picture = GFX_evt_joust
 
-	only_playable = yes
-	has_character_flag = hedge_knights_visiting
-	religion = catholic
-	min_age = 16
-	prisoner = no
-
-	trigger = {
-	 	any_courtier = {
-	 		is_adult = yes
-	 		is_female = no
-
-	 		OR = {
-	 			trait = cruel
-	 			trait = proud
-	 			trait = wroth
-	 			trait = zealous
-	 			trait = envious
-	 			prestige >= 100
-	 		}
-	 	}
-	}
-
-	mean_time_to_happen = {
-		months = 1
-
-		mult_modifier = {
-			factor = 0.9
-			trait = arbitrary
-		}
-
-		mult_modifier = {
-			factor = 5
-			has_character_flag = hedge_knight_recruited
-		}
-
-		mult_modifier = {
-			factor = 5
-			has_character_flag = hedge_knight_woman_seduced
-		}
-	}
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA71003 # Throw them out
@@ -408,24 +484,24 @@ character_event = {
 	option = {
 		name = EVTOPTB71003 # Ignore the complaints
 
-	 	any_courtier = {
+		any_courtier = {
 			show_scope_change = no
 
-	 		limit = {
-	 			is_adult = yes
-	 			is_female = no
+			limit = {
+				is_adult = yes
+				is_female = no
 
-	 			OR = {
-		 			trait = cruel
-		 			trait = proud
-		 			trait = wroth
-		 			trait = zealous
-		 			trait = envious
-		 			prestige >= 100
-		 		}
-		 	}
+				OR = {
+					trait = cruel
+					trait = proud
+					trait = wroth
+					trait = zealous
+					trait = envious
+					prestige >= 100
+				}
+			}
 
-		 	score_value = {
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
@@ -435,7 +511,7 @@ character_event = {
 				who = ROOT
 				years = 5
 			}
-	 	}
+		}
 	}
 }
 
@@ -445,28 +521,7 @@ character_event = {
 	desc = EVTDESC71004
 	picture = GFX_evt_lovers
 
-	ai = no
-	has_character_flag = hedge_knights_visiting
-	religion = catholic
-	min_age = 16
-	prisoner = no
-
-	trigger = {
-		any_courtier = {
-	 		is_female = yes
-	 		is_adult = yes
-	 		practical_age < 20
-			fertility >= 0.3
-	 		is_married = no
-	 		is_pregnant = no
-			has_lover = no
-	 	}
-
-		NOR = {
-			has_character_flag = hedge_knight_recruited
-			has_character_flag = hedge_knight_woman_seduced
-		}
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		set_character_flag = hedge_knight_woman_seduced
@@ -477,38 +532,30 @@ character_event = {
 			fertility = 0.6
 			female = no
 			age = 24
-	 	}
+		}
 
 		new_character = {
 			save_event_target_as = hedge_knight
 		}
 
 		any_courtier = {
-	 		limit = {
-	 			is_female = yes
-	 			is_adult = yes
-	 			practical_age < 20
+			limit = {
+				is_female = yes
+				is_adult = yes
+				age < 20
 				fertility >= 0.3
-	 			is_married = no
-	 			is_pregnant = no
+				is_married = no
+				is_pregnant = no
 				has_lover = no
-	 		}
+				NOT = { trait = homosexual }
+			}
 
-	 		score_value = {
+			score_value = {
 				value = 10
 				interesting_courtier_selection_score = yes
 			}
 
-	 		save_event_target_as = seduced_courtier
-	 	}
-	}
-
-	mean_time_to_happen = {
-		days = 20
-
-		mult_modifier = {
-			factor = 5
-			has_character_flag = hedge_knight_recruited
+			save_event_target_as = seduced_courtier
 		}
 	}
 
@@ -518,17 +565,17 @@ character_event = {
 		event_target:seduced_courtier = {
 			show_scope_change = no
 
-	 		add_trait_fully_silently_lustful_effect = yes
+			add_trait_fully_silently_lustful_effect = yes
 		}
 
 		event_target:hedge_knight = {
 			show_scope_change = no
 
 			add_trait_fully_silently_lustful_effect = yes
-	 		impregnate_cuckoo = event_target:seduced_courtier
-	 	}
+			impregnate_cuckoo = event_target:seduced_courtier
+		}
 
-	 	piety = -10
+		piety = -10
 	}
 
 	option = {
@@ -537,16 +584,16 @@ character_event = {
 		event_target:seduced_courtier = {
 			show_scope_change = no
 
-	 		add_trait_fully_silently_lustful_effect = yes
+			add_trait_fully_silently_lustful_effect = yes
 		}
 
 		event_target:hedge_knight = {
 			show_scope_change = no
 
 			add_trait_fully_silently_lustful_effect = yes
-	 		impregnate_cuckoo = event_target:seduced_courtier
+			impregnate_cuckoo = event_target:seduced_courtier
 			imprison = ROOT
-	 	}
+		}
 
 		ai_chance = {
 			factor = 1
@@ -569,25 +616,21 @@ character_event = {
 	desc = EVTDESC71005
 	picture = GFX_evt_feast
 
-	only_playable = yes
+	is_triggered_only = yes
+
 	has_character_flag = hedge_knights_visiting
-	religion = catholic
-	min_age = 16
 	prisoner = no
 
-	immediate = {
+	fail_trigger_effect = {
 		clr_character_flag = hedge_knights_visiting
 		clr_character_flag = hedge_knight_woman_seduced
 		clr_character_flag = hedge_knight_recruited
 	}
 
-	mean_time_to_happen = {
-		days = 40
-
-		mult_modifier = {
-			factor = 0.1
-			has_character_flag = hedge_knight_recruited
-		}
+	immediate = {
+		clr_character_flag = hedge_knights_visiting
+		clr_character_flag = hedge_knight_woman_seduced
+		clr_character_flag = hedge_knight_recruited
 	}
 
 	option = {

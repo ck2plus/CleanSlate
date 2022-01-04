@@ -11,15 +11,17 @@ namespace = SSI
 
 # First Contact - Beads and Feathers
 # (There is another version of this event: SoA.3081 - triggered by a Demon Child.)
-province_event = {
+character_event = {
 	id = SSI.1
 
+	is_triggered_only = yes
 	hide_window = yes
 
-	has_flag = pulse_province
+	only_playable = yes
 	has_dlc = "Sunset Invasion"
 
 	trigger = {
+		owns = event_target:pulse_province
 		year < 1350
 
 		trigger_if = {
@@ -29,6 +31,7 @@ province_event = {
 					value = historical
 				}
 			}
+
 			year >= 1250
 		}
 		trigger_else_if = {
@@ -38,6 +41,7 @@ province_event = {
 					value = random
 				}
 			}
+
 			total_years_played >= 50
 		}
 		trigger_else = {
@@ -61,16 +65,16 @@ province_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		years = 60
+	weight_multiplier = {
+		factor = 1
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			year >= 1320
 		}
 
 		mult_modifier = {
-			factor = 4
+			factor = 0.25
 
 			has_game_rule = {
 				name = aztec_invasion
@@ -79,7 +83,7 @@ province_event = {
 		}
 
 		mult_modifier = {
-			factor = 3
+			factor = 0.33
 
 			has_game_rule = {
 				name = aztec_invasion
@@ -89,7 +93,7 @@ province_event = {
 
 		# Prevent the randomized invasions from firing immediately after 50 years of game, see 'immediate' below
 		mult_modifier = {
-			factor = 1.6667 # Equivalent to 40% chance of misfiring
+			factor = 0.6 # Equivalent to 40% chance of misfiring
 
 			year < 1300
 			total_years_played >= 50
@@ -109,7 +113,7 @@ province_event = {
 		}
 
 		mult_modifier = {
-			factor = 1.4286 # Equivalent to 30% chance of misfiring
+			factor = 0.7 # Equivalent to 30% chance of misfiring
 
 			year < 1300
 			total_years_played >= 100
@@ -129,7 +133,7 @@ province_event = {
 		}
 
 		mult_modifier = {
-			factor = 1.1765 # Equivalent to 15% chance of misfiring
+			factor = 0.85 # Equivalent to 15% chance of misfiring
 
 			year < 1300
 			total_years_played >= 150
@@ -149,7 +153,7 @@ province_event = {
 		}
 
 		mult_modifier = {
-			factor = 1.0386 # Equivalent to 3.75% chance of misfiring
+			factor = 0.9625 # Equivalent to 3.75% chance of misfiring
 
 			year < 1300
 			total_years_played >= 200
@@ -169,45 +173,6 @@ province_event = {
 	}
 
 	immediate = {
-	#	if = {
-	#		limit = {
-	#			year < 1300 # Always fire after this date
-	#
-	#			OR = {
-	#				has_game_rule = {
-	#					name = aztec_invasion
-	#					value = random
-	#				}
-	#
-	#				has_game_rule = {
-	#					name = aztec_invasion
-	#					value = delayed_random
-	#				}
-	#			}
-	#		}
-	#
-	#		random = {
-	#			chance = 40
-	#
-	#			mult_modifier = {
-	#				factor = 0.75 # 30%
-	#				total_years_played >= 100
-	#			}
-	#
-	#			mult_modifier = {
-	#				factor = 0.50 # 15%
-	#				total_years_played >= 150
-	#			}
-	#
-	#			mult_modifier = {
-	#				factor = 0.25 # 3.75%
-	#				total_years_played >= 200
-	#			}
-	#
-	#			break = yes # Chance of misfire to prevent the randomized invasions from firing immediately after 50 years of game.
-	#		}
-	#	}
-
 		log = "AZTEC INVASION IMMEDIATE SSI.1"
 		set_global_flag = aztec_explorers
 
@@ -235,6 +200,12 @@ province_event = {
 
 			set_province_flag = aztec_explorers
 			save_global_event_target_as = first_aztec_invasion_target
+
+			province_event = {
+				id = SSI.3 # First Landing of the Aztecs
+				years = 2
+				random = 365
+			}
 
 			owner = {
 				character_event = { id = SSI.74 } # Notification
@@ -336,19 +307,12 @@ province_event = {
 	picture = GFX_evt_battle_mesoamerican
 	border = GFX_event_normal_frame_war
 
+	is_triggered_only = yes
+
 	has_flag = aztec_explorers
 
 	trigger = {
-		had_province_flag = {
-			flag = aztec_explorers
-			years >= 2
-		}
-
 		NOT = { has_global_flag = aztec_arrival }
-	}
-
-	mean_time_to_happen = {
-		months = 6
 	}
 
 	immediate = {
@@ -357,6 +321,12 @@ province_event = {
 		province_event = {
 			id = SSI.100 # Disband event fleet
 			years = 50
+		}
+
+		province_event = {
+			id = SSI.5 # Second Landing of the Aztecs
+			years = 1
+			random = 730
 		}
 
 		e_mexikha = {
@@ -561,17 +531,13 @@ narrative_event = {
 province_event = {
 	id = SSI.5
 
+	is_triggered_only = yes
 	hide_window = yes
 
-	has_flag = pulse_province
 	has_global_flag = aztec_arrival
 
 	trigger = {
 		NOT = { has_global_flag = aztec_arrival_2 }
-	}
-
-	mean_time_to_happen = {
-		years = 2
 	}
 
 	immediate = {
@@ -803,6 +769,7 @@ narrative_event = {
 	picture = GFX_evt_aztec_arrival
 	border = GFX_event_narrative_frame_war
 
+	is_triggered_only = yes # on_unlanded; on_battle_lost_owner; on_yearly_pulse
 	major = yes
 
 	only_independent = yes
@@ -817,10 +784,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		days = 1
 	}
 
 	immediate = {
@@ -845,6 +808,7 @@ narrative_event = {
 	picture = GFX_evt_throne_room_mesoamerican
 	border = GFX_event_narrative_frame_war
 
+	is_triggered_only = yes # on_five_year_pulse, random_events, sunset_invasion_flavour_events
 	major = yes
 
 	only_independent = yes
@@ -861,10 +825,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		months = 220
 	}
 
 	immediate = {
@@ -893,6 +853,7 @@ narrative_event = {
 	picture = GFX_evt_throne_room_mesoamerican
 	border = GFX_event_narrative_frame_war
 
+	is_triggered_only = yes # on_five_year_pulse, random_events, sunset_invasion_flavour_events
 	major = yes
 
 	only_independent = yes
@@ -909,10 +870,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		months = 220
 	}
 
 	immediate = {
@@ -941,6 +898,7 @@ narrative_event = {
 	picture = GFX_evt_aztec_explorers
 	border = GFX_event_narrative_frame_war
 
+	is_triggered_only = yes # on_five_year_pulse, random_events, sunset_invasion_flavour_events
 	major = yes
 
 	only_independent = yes
@@ -957,10 +915,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		months = 220
 	}
 
 	immediate = {
@@ -1084,7 +1038,6 @@ character_event = {
 	trigger = {
 		has_landed_title = e_mexikha
 		NOT = { has_global_flag = aztec_britain }
-
 		completely_controls_region = world_europe_west_great_britain
 	}
 
@@ -1501,6 +1454,7 @@ narrative_event = {
 	picture = GFX_evt_aztec_explorers
 	border = GFX_event_narrative_frame_war
 
+	is_triggered_only = yes # on_five_year_pulse, random_events, sunset_invasion_flavour_events
 	major = yes
 
 	only_independent = yes
@@ -1517,10 +1471,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		months = 150
 	}
 
 	immediate = {
@@ -1550,6 +1500,7 @@ narrative_event = {
 	picture = GFX_evt_throne_room_mesoamerican
 	border = GFX_event_narrative_frame_war
 
+	is_triggered_only = yes # on_five_year_pulse, random_events, sunset_invasion_flavour_events
 	major = yes
 
 	only_independent = yes
@@ -1566,10 +1517,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		months = 150
 	}
 
 	immediate = {
@@ -1608,12 +1555,12 @@ character_event = {
 			trigger_switch = {
 				on_trigger = real_tier
 
-				BARON =    { ROOT = { show_scope_change = no piety = 15 } }
-				COUNT =    { ROOT = { show_scope_change = no piety = 30 } }
-				DUKE =     { ROOT = { show_scope_change = no piety = 75 } }
+				BARON =    { ROOT = { show_scope_change = no piety =  15 } }
+				COUNT =    { ROOT = { show_scope_change = no piety =  30 } }
+				DUKE =     { ROOT = { show_scope_change = no piety =  75 } }
 				KING =     { ROOT = { show_scope_change = no piety = 150 } }
 				EMPEROR =  { ROOT = { show_scope_change = no piety = 250 } }
-				fallback = { ROOT = { show_scope_change = no piety = 5 } }
+				fallback = { ROOT = { show_scope_change = no piety =   5 } }
 			}
 		}
 	}

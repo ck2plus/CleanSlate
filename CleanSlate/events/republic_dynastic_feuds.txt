@@ -17,6 +17,8 @@ narrative_event = {
 	picture = GFX_evt_courtiers_talking
 	portrait = event_target:feuding_patrician
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
+
 	ai = no
 	is_patrician = yes
 	has_dlc = "The Republic"
@@ -65,10 +67,6 @@ narrative_event = {
 				}
 			}
 		}
-	}
-
-	mean_time_to_happen = {
-		months = 320
 	}
 
 	immediate = {
@@ -168,6 +166,14 @@ narrative_event = {
 		}
 
 		custom_tooltip = { text = feud_begins_tooltip }
+
+		character_event = { id = REP.109 } # AI gets Feuding opinion modifier
+
+		narrative_event = {
+			id = REP.104
+			months = 40
+			random = 2400 # 80 months
+		}
 	}
 }
 
@@ -177,6 +183,8 @@ narrative_event = {
 	title = EVTNAME_REP_104
 	desc = EVTDESC_REP_104
 	picture = GFX_evt_courtiers_talking
+
+	is_triggered_only = yes
 
 	ai = no
 	is_patrician = yes
@@ -222,8 +230,50 @@ narrative_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 80
+	fail_trigger_effect = {
+		if = {
+			limit = {
+				ai = no
+				is_patrician = yes
+				has_character_flag = shamed_at_ball
+
+				trigger_if = {
+					limit = { is_merchant_republic = yes }
+
+					any_vassal = {
+						has_character_flag = shamed_player_at_ball
+						is_patrician = yes
+						ai = yes
+						NOT = { trait = infirm }
+
+						opinion = {
+							who = ROOT
+							value < 0
+						}
+					}
+				}
+				trigger_else = {
+					liege = {
+						any_vassal = {
+							has_character_flag = shamed_player_at_ball
+							is_patrician = yes
+							ai = yes
+							NOT = { trait = infirm }
+
+							opinion = {
+								who = ROOT
+								value < 0
+							}
+						}
+					}
+				}
+			}
+
+			repeat_event = {
+				id = REP.104
+				months = 2
+			}
+		}
 	}
 
 	immediate = {
@@ -307,23 +357,18 @@ narrative_event = {
 	}
 }
 
-# AI gets Feuding opinion modifier (AI only)
+# AI gets Feuding opinion modifier (AI only) # TODO: should the player's dynasty also dislike the feuding dynasty head?
 character_event = {
 	id = REP.109
 
+	is_triggered_only = yes # above; on_chronicle_owner_change
 	hide_window = yes
 
 	ai = no
 	is_patrician = yes
 	has_dlc = "The Republic"
 
-	trigger = {
-		has_dynasty_flag = the_victims
-	}
-
-	mean_time_to_happen = {
-		days = 1
-	}
+	trigger = { has_dynasty_flag = the_victims }
 
 	immediate = {
 		# Find feuding patrician house
@@ -390,6 +435,11 @@ character_event = {
 				}
 			}
 		}
+
+		repeat_event = {
+			id = REP.109
+			days = 1
+		}
 	}
 }
 
@@ -401,6 +451,8 @@ narrative_event = {
 	title = EVTNAME_REP_151
 	desc = EVTDESC_REP_151
 	picture = GFX_evt_busy_trading_dock_republic
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
 
 	ai = no
 	is_patrician = yes
@@ -445,10 +497,6 @@ narrative_event = {
 				}
 			}
 		}
-	}
-
-	mean_time_to_happen = {
-		months = 520
 	}
 
 	immediate = {
@@ -638,12 +686,26 @@ narrative_event = {
 
 ### Romeo & Juliet
 
-# A Nightly Visit... (Daughter)
+# A Nightly Visit...
 narrative_event = {
 	id = REP.161
 	title = EVTNAME_REP_161
-	desc = EVTDESC_REP_161
 	picture = GFX_evt_family_feud_republic
+
+	desc = {
+		text = EVTDESC_REP_161
+		trigger = {
+			event_target:my_kid = { is_female = yes }
+		}
+	}
+	desc = {
+		text = EVTDESC_REP_163
+		trigger = {
+			event_target:my_kid = { is_female = no }
+		}
+	}
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
 
 	ai = no
 	is_patrician = yes
@@ -659,7 +721,6 @@ narrative_event = {
 		is_inaccessible_trigger = no
 
 		any_child = {
-			is_female = yes
 			is_married = no
 			practical_age >= 15
 			practical_age < 30
@@ -668,56 +729,59 @@ narrative_event = {
 			NOR = {
 				trait = homosexual
 				trait = infirm
+				trait = eunuch
 			}
-		}
 
-		trigger_if = {
-			limit = { is_merchant_republic = yes }
+			ROOT = {
+				trigger_if = {
+					limit = { is_merchant_republic = yes }
 
-			any_vassal = {
-				has_dynasty_flag = the_feuders
-				is_patrician = yes
-				in_command = no
-				is_inaccessible_or_incapable_trigger = no
-
-				any_child = {
-					is_female = no
-					is_married = no
-					has_dynasty_flag = the_feuders
-					practical_age >= 15
-					practical_age < 30
-					in_command = no
-					is_inaccessible_or_incapable_trigger = no
-
-					NOR = {
-						trait = homosexual
-						trait = infirm
-						trait = eunuch
-					}
-				}
-			}
-		}
-		trigger_else = {
-			liege = {
-				any_vassal = {
-					has_dynasty_flag = the_feuders
-					is_patrician = yes
-					in_command = no
-					is_inaccessible_or_incapable_trigger = no
-
-					any_child = {
-						is_female = no
-						is_married = no
+					any_vassal = {
 						has_dynasty_flag = the_feuders
-						practical_age >= 15
-						practical_age < 30
+						is_patrician = yes
 						in_command = no
 						is_inaccessible_or_incapable_trigger = no
 
-						NOR = {
-							trait = homosexual
-							trait = infirm
-							trait = eunuch
+						any_child = {
+							is_opposite_sex = PREVPREVPREV
+							is_married = no
+							has_dynasty_flag = the_feuders
+							practical_age >= 15
+							practical_age < 30
+							in_command = no
+							is_inaccessible_or_incapable_trigger = no
+
+							NOR = {
+								trait = homosexual
+								trait = infirm
+								trait = eunuch
+							}
+						}
+					}
+				}
+				trigger_else = {
+					liege = {
+						any_vassal = {
+							has_dynasty_flag = the_feuders
+							is_patrician = yes
+							in_command = no
+							is_inaccessible_or_incapable_trigger = no
+
+							any_child = {
+								is_opposite_sex = PREVPREVPREVPREV
+								is_married = no
+								has_dynasty_flag = the_feuders
+								practical_age >= 15
+								practical_age < 30
+								in_command = no
+								is_inaccessible_or_incapable_trigger = no
+
+								NOR = {
+									trait = homosexual
+									trait = infirm
+									trait = eunuch
+								}
+							}
 						}
 					}
 				}
@@ -725,16 +789,11 @@ narrative_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 100
-	}
-
 	immediate = {
 		set_dynasty_flag = romeo_juliet_feud
 
 		random_child = {
 			limit = {
-				is_female = yes
 				is_married = no
 				practical_age >= 15
 				practical_age < 30
@@ -743,10 +802,73 @@ narrative_event = {
 				NOR = {
 					trait = infirm
 					trait = homosexual
+					trait = eunuch
+				}
+
+				ROOT = {
+					trigger_if = {
+						limit = { is_merchant_republic = yes }
+
+						any_vassal = {
+							has_dynasty_flag = the_feuders
+							is_patrician = yes
+							in_command = no
+							is_inaccessible_or_incapable_trigger = no
+
+							any_child = {
+								is_opposite_sex = PREVPREVPREV
+								is_married = no
+								has_dynasty_flag = the_feuders
+								practical_age >= 15
+								practical_age < 30
+								in_command = no
+								is_inaccessible_or_incapable_trigger = no
+
+								NOR = {
+									trait = homosexual
+									trait = infirm
+									trait = eunuch
+								}
+							}
+						}
+					}
+					trigger_else = {
+						liege = {
+							any_vassal = {
+								has_dynasty_flag = the_feuders
+								is_patrician = yes
+								in_command = no
+								is_inaccessible_or_incapable_trigger = no
+
+								any_child = {
+									is_opposite_sex = PREVPREVPREVPREV
+									is_married = no
+									has_dynasty_flag = the_feuders
+									practical_age >= 15
+									practical_age < 30
+									in_command = no
+									is_inaccessible_or_incapable_trigger = no
+
+									NOR = {
+										trait = homosexual
+										trait = infirm
+										trait = eunuch
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 
-			save_event_target_as = julia
+			if = {
+				limit = { is_female = yes }
+				save_event_target_as = julia
+			}
+			else = {
+				save_event_target_as = romeo
+			}
+
 			save_event_target_as = my_kid
 		}
 
@@ -761,7 +883,7 @@ narrative_event = {
 					is_inaccessible_or_incapable_trigger = no
 
 					any_child = {
-						is_female = no
+						is_opposite_sex = event_target:my_kid
 						is_married = no
 						has_dynasty_flag = the_feuders
 						practical_age >= 15
@@ -779,7 +901,7 @@ narrative_event = {
 
 				random_child = {
 					limit = {
-						is_female = no
+						is_opposite_sex = event_target:my_kid
 						is_married = no
 						has_dynasty_flag = the_feuders
 						practical_age >= 15
@@ -794,7 +916,14 @@ narrative_event = {
 						}
 					}
 
-					save_event_target_as = romeo
+					if = {
+						limit = { is_female = yes }
+						save_event_target_as = julia
+					}
+					else = {
+						save_event_target_as = romeo
+					}
+
 					save_event_target_as = rival_kid
 				}
 			}
@@ -809,7 +938,7 @@ narrative_event = {
 						is_inaccessible_or_incapable_trigger = no
 
 						any_child = {
-							is_female = no
+							is_opposite_sex = event_target:my_kid
 							is_married = no
 							has_dynasty_flag = the_feuders
 							practical_age >= 15
@@ -827,7 +956,7 @@ narrative_event = {
 
 					random_child = {
 						limit = {
-							is_female = no
+							is_opposite_sex = event_target:my_kid
 							is_married = no
 							has_dynasty_flag = the_feuders
 							practical_age >= 15
@@ -842,7 +971,14 @@ narrative_event = {
 							}
 						}
 
-						save_event_target_as = romeo
+						if = {
+							limit = { is_female = yes }
+							save_event_target_as = julia
+						}
+						else = {
+							save_event_target_as = romeo
+						}
+
 						save_event_target_as = rival_kid
 					}
 				}
@@ -852,6 +988,10 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTA_REP_161
+
+		trigger = {
+			event_target:my_kid = { is_female = yes }
+		}
 
 		show_portrait = event_target:julia
 		show_portrait = event_target:romeo
@@ -871,239 +1011,11 @@ narrative_event = {
 	}
 
 	option = {
-		name = EVTOPTB_REP_161
-
-		show_portrait = event_target:julia
-		show_portrait = event_target:romeo
-
-		custom_tooltip = {
-			text = permit_love_tooltip
-
-			random_list = {
-				60 = {
-					narrative_event = { id = REP.164 days = 46 }
-				}
-
-				40 = {
-					narrative_event = { id = REP.166 days = 46 }
-				}
-			}
-		}
-	}
-}
-
-# A Nightly Visit... (Son)
-narrative_event = {
-	id = REP.163
-	title = EVTNAME_REP_161
-	desc = EVTDESC_REP_163
-	picture = GFX_evt_family_feud_republic
-
-	ai = no
-	is_patrician = yes
-	has_dlc = "The Republic"
-	only_capable = yes
-	prisoner = no
-	in_command = no
-
-	trigger = {
-		has_dynasty_flag = the_victims
-		has_dynasty_flag = feud_phase_two
-		NOT = { has_dynasty_flag = romeo_juliet_feud }
-		is_inaccessible_trigger = no
-
-		any_child = {
-			is_female = no
-			is_married = no
-			practical_age >= 15
-			practical_age < 30
-			is_inaccessible_or_incapable_trigger = no
-
-			NOR = {
-				trait = homosexual
-				trait = infirm
-				trait = eunuch
-			}
-		}
-
-		trigger_if = {
-			limit = { is_merchant_republic = yes }
-
-			any_vassal = {
-				has_dynasty_flag = the_feuders
-				is_patrician = yes
-				in_command = no
-				is_inaccessible_or_incapable_trigger = no
-
-				any_child = {
-					is_female = yes
-					is_married = no
-					has_dynasty_flag = the_feuders
-					practical_age >= 15
-					practical_age < 30
-					in_command = no
-					is_inaccessible_or_incapable_trigger = no
-
-					NOR = {
-						trait = homosexual
-						trait = infirm
-					}
-				}
-			}
-		}
-		trigger_else = {
-			liege = {
-				any_vassal = {
-					has_dynasty_flag = the_feuders
-					is_patrician = yes
-					in_command = no
-					is_inaccessible_or_incapable_trigger = no
-
-					any_child = {
-						is_female = yes
-						is_married = no
-						has_dynasty_flag = the_feuders
-						practical_age >= 15
-						practical_age < 30
-						in_command = no
-						is_inaccessible_or_incapable_trigger = no
-
-						NOR = {
-							trait = homosexual
-							trait = infirm
-						}
-					}
-				}
-			}
-		}
-	}
-
-	immediate = {
-		set_dynasty_flag = romeo_juliet_feud
-
-		random_child = {
-			limit = {
-				is_female = no
-				is_married = no
-				practical_age >= 15
-				practical_age < 30
-				is_inaccessible_or_incapable_trigger = no
-
-				NOR = {
-					trait = infirm
-					trait = homosexual
-					trait = eunuch
-				}
-			}
-
-			save_event_target_as = romeo
-			save_event_target_as = my_kid
-		}
-
-		if = {
-			limit = { is_merchant_republic = yes }
-
-			random_vassal = {
-				limit = {
-					has_dynasty_flag = the_feuders
-					is_patrician = yes
-					prisoner = no
-					in_command = no
-					is_incapable = no
-					is_inaccessible_trigger = no
-
-					any_child = {
-						is_female = yes
-						is_married = no
-						has_dynasty_flag = the_feuders
-						practical_age >= 15
-						practical_age < 30
-						in_command = no
-						is_inaccessible_or_incapable_trigger = no
-
-						NOR = {
-							trait = homosexual
-							trait = infirm
-						}
-					}
-				}
-
-				random_child = {
-					limit = {
-						is_female = yes
-						is_married = no
-						has_dynasty_flag = the_feuders
-						practical_age >= 15
-						practical_age < 30
-						in_command = no
-						is_inaccessible_or_incapable_trigger = no
-
-						NOR = {
-							trait = homosexual
-							trait = infirm
-						}
-					}
-
-					save_event_target_as = julia
-					save_event_target_as = rival_kid
-				}
-			}
-		}
-		else = {
-			liege = {
-				random_vassal = {
-					limit = {
-						has_dynasty_flag = the_feuders
-						is_patrician = yes
-						in_command = no
-						is_inaccessible_or_incapable_trigger = no
-
-						any_child = {
-							is_female = yes
-							is_married = no
-							has_dynasty_flag = the_feuders
-							practical_age >= 15
-							practical_age < 30
-							in_command = no
-							is_inaccessible_or_incapable_trigger = no
-
-							NOR = {
-								trait = homosexual
-								trait = infirm
-							}
-						}
-					}
-
-					random_child = {
-						limit = {
-							is_female = yes
-							is_married = no
-							has_dynasty_flag = the_feuders
-							practical_age >= 15
-							practical_age < 30
-							in_command = no
-							is_inaccessible_or_incapable_trigger = no
-
-							NOR = {
-								trait = homosexual
-								trait = infirm
-							}
-						}
-
-						save_event_target_as = julia
-						save_event_target_as = rival_kid
-					}
-				}
-			}
-		}
-	}
-
-	mean_time_to_happen = {
-		months = 100
-	}
-
-	option = {
 		name = EVTOPTA_REP_163
+
+		trigger = {
+			event_target:my_kid = { is_female = no }
+		}
 
 		show_portrait = event_target:julia
 		show_portrait = event_target:romeo
@@ -1133,12 +1045,19 @@ narrative_event = {
 
 			random_list = {
 				60 = {
-					narrative_event = { id = REP.165 days = 46 }
+					if = {
+						limit = {
+							event_target:my_kid = { is_female = yes }
+						}
+
+						narrative_event = { id = REP.164 days = 46 }
+					}
+					else = {
+						narrative_event = { id = REP.165 days = 46 }
+					}
 				}
 
-				40 = {
-					narrative_event = { id = REP.166 days = 46 }
-				}
+				40 = { narrative_event = { id = REP.166 days = 46 } }
 			}
 		}
 	}
@@ -1348,6 +1267,8 @@ narrative_event = {
 	desc = EVTDESC_REP_182
 	picture = GFX_evt_family_feud_republic
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
+
 	ai = no
 	is_patrician = yes
 	has_dlc = "The Republic"
@@ -1376,8 +1297,8 @@ narrative_event = {
 			any_vassal = {
 				is_patrician = yes
 				has_dynasty_flag = the_feuders
-				practical_age >= 30
-				wealth = 200
+				age >= 30
+				wealth >= 200
 				in_command = no
 				prisoner = no
 				is_incapable = no
@@ -1389,8 +1310,8 @@ narrative_event = {
 				any_vassal = {
 					is_patrician = yes
 					has_dynasty_flag = the_feuders
-					practical_age >= 30
-					wealth = 200
+					age >= 30
+					wealth >= 200
 					in_command = no
 					prisoner = no
 					is_incapable = no
@@ -1398,10 +1319,6 @@ narrative_event = {
 				}
 			}
 		}
-	}
-
-	mean_time_to_happen = {
-		years = 35
 	}
 
 	immediate = {
@@ -1431,8 +1348,8 @@ narrative_event = {
 				limit = {
 					is_patrician = yes
 					has_dynasty_flag = the_feuders
-					practical_age >= 30
-					wealth = 200
+					age >= 30
+					wealth >= 200
 					in_command = no
 					prisoner = no
 					is_incapable = no
@@ -1448,8 +1365,8 @@ narrative_event = {
 					limit = {
 						is_patrician = yes
 						has_dynasty_flag = the_feuders
-						practical_age >= 30
-						wealth = 200
+						age >= 30
+						wealth >= 200
 						in_command = no
 						prisoner = no
 						is_incapable = no
@@ -1571,6 +1488,8 @@ narrative_event = {
 	desc = EVTDESC_REP_191
 	picture = GFX_evt_busy_trading_dock_republic
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
+
 	ai = no
 	is_patrician = yes
 	has_dlc = "The Republic"
@@ -1621,10 +1540,6 @@ narrative_event = {
 				}
 			}
 		}
-	}
-
-	mean_time_to_happen = {
-		years = 60
 	}
 
 	immediate = {
@@ -1805,6 +1720,8 @@ narrative_event = {
 	desc = EVTDESC_REP_201
 	picture = GFX_evt_doge_republic
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
+
 	ai = no
 	is_patrician = yes
 	has_dlc = "The Republic"
@@ -1822,10 +1739,6 @@ narrative_event = {
 			prisoner = no
 			is_incapable = no
 		}
-	}
-
-	mean_time_to_happen = {
-		months = 320
 	}
 
 	immediate = {
@@ -1858,6 +1771,8 @@ narrative_event = {
 	desc = EVTDESC_REP_203
 	picture = GFX_evt_doge_republic
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
+
 	ai = no
 	is_patrician = yes
 	has_dlc = "The Republic"
@@ -1877,10 +1792,6 @@ narrative_event = {
 			prisoner = no
 			is_incapable = no
 		}
-	}
-
-	mean_time_to_happen = {
-		months = 320
 	}
 
 	immediate = {
@@ -1923,6 +1834,8 @@ narrative_event = {
 	desc = EVTDESC_REP_206
 	picture = GFX_evt_family_feud_republic
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, republic_dynastic_feud_events
+
 	ai = no
 	is_patrician = yes
 	has_dlc = "The Republic"
@@ -1948,10 +1861,6 @@ narrative_event = {
 				}
 			}
 		}
-	}
-
-	mean_time_to_happen = {
-		years = 35
 	}
 
 	immediate = {
