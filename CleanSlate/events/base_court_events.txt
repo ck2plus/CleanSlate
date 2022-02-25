@@ -2262,54 +2262,40 @@ character_event = {
 	prisoner = no
 
 	trigger = {
-		NOT = { religion_group = muslim }
+		NOR = {
+			religion_group = muslim
+			# Won't claim to be a better chaplain than your religious head...
+			rightful_religious_head = job_spiritual
+		}
 
-		trigger_if = {
-			limit = {
-				OR = {
-					religion = orthodox
-					is_heresy_of = orthodox
-					religion = miaphysite
-					is_heresy_of = miaphysite
-				}
+		job_spiritual = {
+			NOT = { has_minor_title = title_regent }
+		}
+
+		any_courtier_or_vassal = {
+			can_hold_title = job_spiritual
+			NOT = { has_character_flag = asked_for_job }
+			is_councillor = no
+			is_adult = yes
+
+			trigger_if = {
+				limit = { is_ruler = yes }
+				is_theocracy = yes
 			}
 
-			any_vassal = {
-				can_hold_title = job_spiritual
-				religion = ROOT
-				is_theocracy = yes
-				NOT = { has_character_flag = asked_for_job }
-				is_councillor = no
-				is_adult = yes
-				is_incapable = no
-				prisoner = no
-
-				ROOT = {
-					job_spiritual = {
-						learning < PREVPREV
-
-						NOR = {
-							has_minor_title = title_regent
-
-							ROOT = {
-								rightful_religious_head_scope = {
-									character = PREVPREV # Won't claim to be a better chaplain than your religious head...
-								}
-							}
-						}
-					}
-				}
+			ROOT = {
+				job_spiritual = { learning < PREVPREV }
 			}
 		}
-		trigger_else = {
-			any_courtier_or_vassal = {
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = {
 				can_hold_title = job_spiritual
-				religion = ROOT
 				NOT = { has_character_flag = asked_for_job }
 				is_councillor = no
 				is_adult = yes
-				is_incapable = no
-				prisoner = no
 
 				trigger_if = {
 					limit = { is_ruler = yes }
@@ -2317,85 +2303,15 @@ character_event = {
 				}
 
 				ROOT = {
-					job_spiritual = {
-						learning < PREVPREV
-
-						NOR = {
-							has_minor_title = title_regent
-
-							ROOT = {
-								rightful_religious_head_scope = {
-									character = PREVPREV # Won't claim to be a better chaplain than your religious head...
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				OR = {
-					religion = orthodox
-					is_heresy_of = orthodox
-					religion = miaphysite
-					is_heresy_of = miaphysite
+					job_spiritual = { learning < PREVPREV }
 				}
 			}
 
-			random_vassal = {
-				limit = {
-					can_hold_title = job_spiritual
-					religion = ROOT
-					is_theocracy = yes
-					NOT = { has_character_flag = asked_for_job }
-					is_councillor = no
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
+			preferred_limit = { trait = ambitious }
 
-					ROOT = {
-						job_spiritual = { learning < PREVPREV }
-					}
-				}
+			set_character_flag = asked_for_job
 
-				preferred_limit = { trait = ambitious }
-
-				set_character_flag = asked_for_job
-
-				character_event = { id = 73220 }
-			}
-		}
-		else = {
-			random_courtier_or_vassal = {
-				limit = {
-					can_hold_title = job_spiritual
-					religion = ROOT
-					NOT = { has_character_flag = asked_for_job }
-					is_councillor = no
-					is_adult = yes
-					is_incapable = no
-					prisoner = no
-
-					trigger_if = {
-						limit = { is_ruler = yes }
-						is_theocracy = yes
-					}
-
-					ROOT = {
-						job_spiritual = { learning < PREVPREV }
-					}
-				}
-
-				preferred_limit = { trait = ambitious }
-
-				set_character_flag = asked_for_job
-
-				character_event = { id = 73230 }
-			}
+			character_event = { id = 73230 }
 		}
 	}
 }
