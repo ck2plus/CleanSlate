@@ -27,6 +27,7 @@ narrative_event = {
 		trigger = { society_member_of = the_assassins }
 	}
 
+	is_triggered_only = yes # on_yearly_pulse
 	major = yes
 	hide_from = yes
 
@@ -78,8 +79,8 @@ narrative_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 6
+	major_trigger = {
+		ai = no
 	}
 
 	immediate = {
@@ -207,6 +208,7 @@ narrative_event = {
 		trigger = { society_member_of = the_assassins }
 	}
 
+	is_triggered_only = yes # on_yearly_pulse
 	major = yes
 
 	only_playable = yes
@@ -241,10 +243,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		months = 6
 	}
 
 	option = {
@@ -300,6 +298,7 @@ narrative_event = {
 		trigger = { society_member_of = the_assassins }
 	}
 
+	is_triggered_only = yes # on_unlanded
 	major = yes
 
 	only_rulers = yes
@@ -324,10 +323,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		days = 1
 	}
 
 	option = {
@@ -376,6 +371,7 @@ narrative_event = {
 		trigger = { society_member_of = the_assassins }
 	}
 
+	is_triggered_only = yes # on_decade_pulse, random_events
 	hide_from = yes
 	major = yes
 
@@ -394,10 +390,6 @@ narrative_event = {
 
 	major_trigger = {
 		ai = no
-	}
-
-	mean_time_to_happen = {
-		months = 860
 	}
 
 	immediate = {
@@ -513,6 +505,7 @@ narrative_event = {
 		trigger = { society_member_of = the_assassins }
 	}
 
+	is_triggered_only = yes # on_unlanded
 	major = yes
 
 	only_rulers = yes
@@ -534,10 +527,6 @@ narrative_event = {
 		ai = no
 	}
 
-	mean_time_to_happen = {
-		days = 1
-	}
-
 	option = {
 		name = OK
 
@@ -550,9 +539,7 @@ narrative_event = {
 			status = no
 		}
 
-		death = {
-			death_reason = death_battle
-		}
+		death = { death_reason = death_battle }
 	}
 
 	option = {
@@ -757,12 +744,14 @@ narrative_event = {
 # Assassins strike at decadent ruler #
 ######################################
 
-# Decadent ruler is warned
+# Decadent player is warned
 character_event = {
 	id = 88010
 	desc = EVTDESC88010
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, hashshashin_order_events
 
 	ai = no
 	only_independent = yes
@@ -785,10 +774,6 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 160
-	}
-
 	option = {
 		name = EVTOPTA88010
 
@@ -796,12 +781,14 @@ character_event = {
 	}
 }
 
-# Assassins kill random courtier
+# Assassins kill decadent player's random courtier
 character_event = {
 	id = 88011
 	desc = EVTDESC88011
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, hashshashin_order_events
 
 	ai = no
 	only_independent = yes
@@ -852,10 +839,6 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 22
-	}
-
 	option = {
 		name = EVTOPTA88011
 
@@ -869,12 +852,14 @@ character_event = {
 	}
 }
 
-# Assassins kill ruler
+# Assassins kill decadent player
 character_event = {
 	id = 88013
 	desc = EVTDESC88012
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, hashshashin_order_events
 
 	ai = no
 	religion_group = muslim
@@ -901,14 +886,25 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		years = 40
+	immediate = {
+		if = {
+			limit = { multiplayer = yes }
+			death = { death_reason = death_hashshashin }
+		}
 	}
 
 	option = {
 		name = EVTOPTA88012
 
-		death = { death_reason = death_hashshashin }
+		if = {
+			limit = { multiplayer = no }
+			death = { death_reason = death_hashshashin }
+		}
+		else = {
+			tooltip = {
+				death = { death_reason = death_hashshashin }
+			}
+		}
 	}
 }
 
@@ -920,30 +916,31 @@ character_event = {
 character_event = {
 	id = 88015
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, hashshashin_order_events
 	hide_window = yes
 
-	ai = yes
-	min_age = 16
+	only_independent = yes
+	religion_group = muslim
+	has_global_flag = assassins_founded
+	war = yes
 	only_capable = yes
 	prisoner = no
-	has_global_flag = assassins_founded
 
 	trigger = {
-		is_ruler = no
-		NOT = { society_member_of = the_assassins }
-
-		employer = {
-			d_hashshashin = {
-				holder_scope = {
-					war_with = PREVPREV
-				}
+		d_hashshashin = {
+			holder_scope = {
+				war_with = PREVPREV
 			}
+		}
 
-			war = yes
-			is_playable = yes
-			independent = yes
+		any_courtier = {
+			is_ruler = no
+			is_primary_heir = no
+			is_pretender = no
+			is_adult = yes
+			is_incapable = no
 			prisoner = no
-			religion_group = muslim
+			in_command = no
 
 			NOR = {
 				is_married = ROOT
@@ -951,38 +948,50 @@ character_event = {
 			}
 		}
 
-		is_primary_heir = no
-		is_pretender = no
-		in_command = no
+		NOR = {
+			society_member_of = the_assassins
+			has_global_flag = assassins_destroyed
+		}
 
 		trigger_if = {
 			limit = { has_global_flag = assassins_scatter }
 			has_global_flag = assassins_resurface
 		}
-
-		NOT = { has_global_flag = assassins_destroyed }
-	}
-
-	mean_time_to_happen = {
-		months = 880
 	}
 
 	immediate = {
-		liege = {
-			if = {
-				limit = { is_inaccessible_trigger = no }
+		random_courtier = {
+			limit = {
+				is_ruler = no
+				is_primary_heir = no
+				is_pretender = no
+				is_adult = yes
+				is_incapable = no
+				prisoner = no
+				in_command = no
 
-				random_list = {
-					33 = { character_event = { id = 88016 } }
-					33 = { character_event = { id = 88017 } }
-					33 = { character_event = { id = 88018 } }
+				NOR = {
+					is_married = ROOT
+					society_member_of = the_assassins
 				}
 			}
-			else = {
-				random_list = {
-					50 = { character_event = { id = 88016 } }
-					50 = { character_event = { id = 88017 } }
-				}
+
+			save_event_target_as = assassin_target
+		}
+
+		if = {
+			limit = { is_inaccessible_trigger = no }
+
+			random_list = {
+				33 = { character_event = { id = 88016 } }
+				33 = { character_event = { id = 88017 } }
+				33 = { character_event = { id = 88018 } }
+			}
+		}
+		else = {
+			random_list = {
+				50 = { character_event = { id = 88016 } }
+				50 = { character_event = { id = 88017 } }
 			}
 		}
 	}
@@ -994,13 +1003,14 @@ character_event = {
 	desc = EVTDESC88016
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:assassin_target
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA88016
 
-		FROM = {
+		event_target:assassin_target = {
 			show_scope_change = no
 
 			death = { death_reason = death_hashshashin }
@@ -1014,6 +1024,7 @@ character_event = {
 	desc = EVTDESC88017
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:assassin_target
 
 	is_triggered_only = yes
 
@@ -1024,7 +1035,7 @@ character_event = {
 			NOT = { trait = cannibal }
 		}
 
-		FROM = {
+		event_target:assassin_target = {
 			show_scope_change = no
 
 			death = { death_reason = death_hashshashin }
@@ -1033,10 +1044,11 @@ character_event = {
 
 	option = {
 		name = 88017.cannibal
+		tooltip_info = cannibal
 
 		trigger = { trait = cannibal }
 
-		FROM = {
+		event_target:assassin_target = {
 			show_scope_change = no
 
 			death = { death_reason = death_hashshashin }
@@ -1046,7 +1058,7 @@ character_event = {
 			limit = {
 				ai = no
 				is_ironman = yes
-				FROM = { religion = bon_pagan }
+				event_target:assassin_target = { religion = bon_pagan }
 			}
 
 			set_character_flag = achievement_bon_appetit
@@ -1060,13 +1072,14 @@ character_event = {
 	desc = EVTDESC88018
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:assassin_target
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA88018
 
-		FROM = {
+		event_target:assassin_target = {
 			show_scope_change = no
 
 			death = { death_reason = death_hashshashin }
@@ -1081,10 +1094,13 @@ character_event = {
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, hashshashin_order_events
+
 	ai = no
 	only_independent = yes
 	religion_group = muslim
 	war = yes
+	has_global_flag = assassins_founded
 
 	trigger = {
 		d_hashshashin = {
@@ -1094,10 +1110,6 @@ character_event = {
 		}
 
 		NOT = { has_character_flag = warned_by_assassins }
-	}
-
-	mean_time_to_happen = {
-		months = 160
 	}
 
 	option = {
@@ -1114,11 +1126,14 @@ character_event = {
 	picture = GFX_evt_shadow
 	border = GFX_event_normal_frame_intrigue
 
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, hashshashin_order_events
+
 	only_rulers = yes
 	prisoner = no
 	min_age = 16
+	war = yes
 	religion_group = muslim
-	has_character_flag = warned_by_assassins
+	has_global_flag = assassins_founded
 
 	trigger = {
 		d_hashshashin = {
@@ -1128,16 +1143,32 @@ character_event = {
 		}
 
 		is_inaccessible_trigger = no
+
+		trigger_if = {
+			limit = { ai = no }
+			has_character_flag = warned_by_assassins
+		}
 	}
 
-	mean_time_to_happen = {
-		months = 1400
+	immediate = {
+		if = {
+			limit = { multiplayer = yes }
+			death = { death_reason = death_hashshashin }
+		}
 	}
 
 	option = {
 		name = EVTOPTA88012
 
-		death = { death_reason = death_hashshashin }
+		if = {
+			limit = { multiplayer = no }
+			death = { death_reason = death_hashshashin }
+		}
+		else = {
+			tooltip = {
+				death = { death_reason = death_hashshashin }
+			}
+		}
 	}
 }
 
@@ -1148,43 +1179,43 @@ character_event = {
 # Courtier is killed
 character_event = {
 	id = 88025
-	desc = EVTDESC88016
-	picture = GFX_evt_shadow
-	border = GFX_event_normal_frame_intrigue
 
-	ai = yes
-	min_age = 16
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, hashshashin_order_events
+	hide_window = yes
+
+	only_playable = yes
 	only_capable = yes
 	prisoner = no
 	has_global_flag = assassins_founded
 
 	trigger = {
-		host = {
-			is_liege_of = ROOT
+		any_courtier = {
+			is_ruler = no
+			is_primary_heir = no
+			is_pretender = no
+			is_adult = yes
+			is_incapable = no
 			prisoner = no
+			in_command = no
 
 			NOR = {
 				is_married = ROOT
 				society_member_of = the_assassins
 			}
-		}
 
-		trigger_if = {
-			limit = {
-				NOT = { religion_group = muslim }
-			}
+			trigger_if = {
+				limit = {
+					NOT = { religion_group = muslim }
+				}
 
-			liege = {
-				OR = {
-					has_landed_title = e_byzantium
-					has_landed_title = k_jerusalem
+				ROOT = {
+					OR = {
+						has_landed_title = e_byzantium
+						has_landed_title = k_jerusalem
+					}
 				}
 			}
 		}
-
-		is_primary_heir = no
-		is_pretender = no
-		in_command = no
 
 		trigger_if = {
 			limit = { has_global_flag = assassins_scatter }
@@ -1197,63 +1228,91 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 5500
+	immediate = {
+		any_courtier = {
+			limit = {
+				is_ruler = no
+				is_primary_heir = no
+				is_pretender = no
+				is_adult = yes
+				is_incapable = no
+				prisoner = no
+				in_command = no
 
-		mult_modifier = {
-			factor = 0.5
-			trait = possessed
-		}
+				NOR = {
+					is_married = ROOT
+					society_member_of = the_assassins
+				}
 
-		mult_modifier = {
-			factor = 0.75
-			trait = cruel
-		}
+				trigger_if = {
+					limit = {
+						NOT = { religion_group = muslim }
+					}
 
-		mult_modifier = {
-			factor = 0.75
-			trait = impaler
-		}
-
-		mult_modifier = {
-			factor = 2.0
-			trait = kind
-		}
-
-		mult_modifier = {
-			factor = 2.0
-			trait = just
-		}
-
-		mult_modifier = {
-			factor = 2.0
-			trait = charitable
-		}
-
-		mult_modifier = {
-			factor = 2.0
-			is_female = yes
-		}
-	}
-
-	option = {
-		name = OK
-
-		liege = {
-			if = {
-				limit = { is_inaccessible_trigger = no }
-
-				random_list = {
-					33 = { character_event = { id = 88016 } }
-					33 = { character_event = { id = 88017 } }
-					33 = { character_event = { id = 88018 } }
+					ROOT = {
+						OR = {
+							has_landed_title = e_byzantium
+							has_landed_title = k_jerusalem
+						}
+					}
 				}
 			}
-			else = {
-				random_list = {
-					50 = { character_event = { id = 88016 } }
-					50 = { character_event = { id = 88017 } }
+
+			score_value = {
+				value = 100
+
+				mult_modifier = {
+					factor = 2
+					trait = possessed
 				}
+
+				mult_modifier = {
+					factor = 1.33
+					trait = cruel
+				}
+
+				mult_modifier = {
+					factor = 1.33
+					trait = impaler
+				}
+
+				mult_modifier = {
+					factor = 0.5
+					trait = kind
+				}
+
+				mult_modifier = {
+					factor = 0.5
+					trait = just
+				}
+
+				mult_modifier = {
+					factor = 0.5
+					trait = charitable
+				}
+
+				mult_modifier = {
+					factor = 0.5
+					is_female = yes
+				}
+			}
+
+			save_event_target_as = assassin_target
+		}
+
+		if = {
+			limit = { is_inaccessible_trigger = no }
+
+			random_list = {
+				33 = { character_event = { id = 88016 } }
+				33 = { character_event = { id = 88017 } }
+				33 = { character_event = { id = 88018 } }
+			}
+		}
+		else = {
+			random_list = {
+				50 = { character_event = { id = 88016 } }
+				50 = { character_event = { id = 88017 } }
 			}
 		}
 	}

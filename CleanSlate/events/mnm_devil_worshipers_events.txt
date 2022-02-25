@@ -7370,7 +7370,7 @@ character_event = {
 			limit = {
 				is_female = yes
 				practical_age < 45
-				fertility >= 0.4
+				fertility >= 0
 				is_pregnant = no
 
 				NOR = {
@@ -7382,28 +7382,30 @@ character_event = {
 					any_society_member = {
 						is_female = no
 						prisoner = no
-						fertility >= 1
 					}
 				}
 			}
 
 			hidden_effect = {
-				random = {
-					chance = 25
-
-					society = {
-						random_society_member = {
-							limit = {
-								is_female = no
-								prisoner = no
-								fertility >= 1
-							}
-
-							save_event_target_as = impregnator
+				society = {
+					random_society_member = {
+						limit = {
+							is_female = no
+							prisoner = no
 						}
-					}
 
-					impregnate_cuckoo = event_target:impregnator
+						preferred_limit = {
+							fertility >= 1
+						}
+
+						save_event_target_as = sex_partner
+					}
+				}
+
+				unprotected_sex_effect_event_target = yes
+
+				if = {
+					limit = { is_pregnant = yes }
 					set_character_flag = orgy_impregnated
 				}
 			}
@@ -7443,6 +7445,75 @@ character_event = {
 					death = {
 						death_reason = death_murder_unknown
 						killer = ROOT
+					}
+				}
+			}
+		}
+	}
+}
+
+# On-action event: A satanic orgy child is born. Hidden utility event. Cleanslate: Formerly event 335
+character_event = {
+	id = MNM.20005
+
+	hide_window = yes
+	is_triggered_only = yes # on_birth
+
+	has_dlc = "Mystics"
+
+	immediate = {
+		if = {
+			limit = {
+				mother = {
+					has_character_flag = orgy_impregnated
+				}
+			}
+
+			mother = {
+				clr_character_flag = orgy_impregnated
+			}
+
+			if = {
+				limit = {
+					random < 1 # 1% chance
+
+					NOT = {
+						has_game_rule = {
+							name = supernatural_events
+							value = off
+						}
+					}
+
+					trigger_if = {
+						limit = {
+							NOT = {
+								any_close_relative = {
+									is_parent_of = ROOT
+									ai = no
+								}
+							}
+						}
+
+						has_game_rule = {
+							name = supernatural_events
+							value = unrestricted
+						}
+					}
+
+					NOT = { event_target:demon_child_non_pagan = { is_alive = yes } }
+				}
+
+				save_global_event_target_as = demon_child_non_pagan
+
+				random_close_relative = {
+					limit = { is_parent_of = ROOT }
+
+					preferred_limit = { ai = no }
+					preferred_limit = { is_female = yes }
+
+					narrative_event = {
+						id = SoA.3002 # Demon child
+						years = 2
 					}
 				}
 			}

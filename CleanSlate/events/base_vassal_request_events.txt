@@ -18,6 +18,8 @@ character_event = {
 	picture = GFX_evt_council
 	border = GFX_event_normal_frame_intrigue
 
+	is_triggered_only = yes # on_yearly_pulse, random_events, vassal_requests
+
 	only_playable = yes
 	min_age = 16
 	only_capable = yes
@@ -41,26 +43,26 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		years = 40
+	weight_multiplier = {
+		factor = 1
 
 		mult_modifier = {
-			factor = 0.25
+			factor = 4
 			trait = greedy
 		}
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			trait = envious
 		}
 
 		mult_modifier = {
-			factor = 0.25
+			factor = 4
 			trait = ambitious
 		}
 
 		mult_modifier = {
-			factor = 10.0
+			factor = 0.1
 			trait = content
 		}
 	}
@@ -97,9 +99,7 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		is_liege_of = FROM # To make sure no titles have *just* been given away
-	}
+	trigger = { is_liege_of = FROM } # To make sure no titles have *just* been given away
 
 	fail_trigger_effect = {
 		FROM = { clr_character_flag = requested_vassal_transfer }
@@ -465,30 +465,23 @@ character_event = {
 	option = {
 		name = EVTOPTA63006 # I am pleased
 
-		trigger = { has_character_flag = vassal_for_favor }
-
 		set_defacto_vassal = FROM
 
-		tooltip = {
-			reverse_add_favor = liege
+		if = {
+			limit = { has_character_flag = vassal_for_favor }
+
+			tooltip = {
+				reverse_add_favor = liege
+			}
+
+			clr_character_flag = vassal_for_favor
 		}
-
-		clr_character_flag = vassal_for_favor
-	}
-
-	option = {
-		name = EVTOPTA63006 # I am pleased
-
-		trigger = {
-			NOT = { has_character_flag = vassal_for_favor }
-		}
-
-		set_defacto_vassal = FROM
-
-		opinion = {
-			name = opinion_vassal_transfer
-			who = liege
-			years = 10
+		else = {
+			opinion = {
+				name = opinion_vassal_transfer
+				who = liege
+				years = 10
+			}
 		}
 	}
 }
@@ -529,6 +522,9 @@ character_event = {
 	picture = GFX_evt_shadowy_cabal
 	border = GFX_event_normal_frame_intrigue
 
+	is_triggered_only = yes # on_yearly_pulse, random_events, vassal_requests
+
+	rivals = yes
 	only_playable = yes
 	only_capable = yes
 	prisoner = no
@@ -548,31 +544,31 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		years = 80
+	weight_multiplier = {
+		factor = 1
 
 		mult_modifier = {
-			factor = 0.25
+			factor = 4
 			trait = deceitful
 		}
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			trait = paranoid
 		}
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			trait = arbitrary
 		}
 
 		mult_modifier = {
-			factor = 4.0
+			factor = 0.25
 			trait = just
 		}
 
 		mult_modifier = {
-			factor = 10.0
+			factor = 0.1
 			trait = honest
 		}
 	}
@@ -1374,6 +1370,8 @@ character_event = {
 	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_diplomacy
 
+	is_triggered_only = yes # on_yearly_pulse, random_events, vassal_requests
+
 	only_playable = yes
 	only_capable = yes
 	prisoner = no
@@ -1407,31 +1405,31 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		years = 40
+	weight_multiplier = {
+		factor = 1
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			trait = greedy
 		}
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			trait = envious
 		}
 
 		mult_modifier = {
-			factor = 2.0
+			factor = 0.5
 			trait = kind
 		}
 
 		mult_modifier = {
-			factor = 2.0
+			factor = 0.5
 			trait = charitable
 		}
 
 		mult_modifier = {
-			factor = 2.0
+			factor = 0.5
 			trait = content
 		}
 	}
@@ -1707,8 +1705,30 @@ letter_event = {
 
 ####################################################################
 # An imprisoned character asks another vassal to intercede on his behalf
-# 63050 - 63059
+# 63049 - 63059
 ####################################################################
+
+# An imprisoned character asks a friend to intervene - Setup
+character_event = {
+	id = 63049
+
+	is_triggered_only = yes # on_become_imprisoned_any_reason
+	hide_window = yes
+
+	trigger = {
+		host = { is_liege_of = ROOT }
+	}
+
+	immediate = {
+		clear_delayed_event = { id = 63050 }
+
+		character_event = {
+			id = 63050
+			months = 1
+			random = 6475 # 15 years
+		}
+	}
+}
 
 # An imprisoned character asks a friend to intervene
 character_event = {
@@ -1725,9 +1745,7 @@ character_event = {
 	trigger = {
 		host = {
 			is_liege_of = ROOT
-		}
 
-		liege = {
 			any_vassal = {
 				OR = {
 					is_friend = ROOT
@@ -1832,7 +1850,6 @@ letter_event = {
 		name = EVTOPTB63051 # Better not
 	}
 }
-
 
 # Vassal requests the release of a prisoner
 letter_event = {
@@ -2097,6 +2114,8 @@ character_event = {
 	picture = GFX_evt_carriage
 	border = GFX_event_normal_frame_economy
 
+	is_triggered_only = yes # on_decade_pulse, random_events, city_taxes
+
 	only_rulers = yes
 	lacks_dlc = "Conclave"
 	min_age = 16
@@ -2120,21 +2139,21 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 2000
+	weight_multiplier = {
+		factor = 1
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			wealth < -10
 		}
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			wealth = -100
 		}
 
 		mult_modifier = {
-			factor = 0.5
+			factor = 2
 			trait = greedy
 		}
 	}
