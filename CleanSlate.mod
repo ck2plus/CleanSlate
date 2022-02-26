@@ -60,13 +60,11 @@ replace_path = "common/wonder_upgrades"
 replace_path = "common/wonders"
 
 replace_path = "decisions"
-#replace_path = "dlc_metadata"
-#replace_path = "dlc_metadata/dlc_characters"
-#replace_path = "dlc_metadata/dlc_recommendations"
+replace_path = "dlc_metadata"
+replace_path = "dlc_metadata/dlc_characters"
+replace_path = "dlc_metadata/dlc_recommendations"
+replace_path = "dlc_metadata/suggested_characters"
 replace_path = "events"
-
-#replace_path = "gfx"
-replace_path = "gfx/ambitions"
 
 #replace_path = "interface" # Do not uncomment this line. Overriding the base interface folder breaks portraits
 #replace_path = "interface/portraits" # Portraits are being left alone due to DLC issues.
