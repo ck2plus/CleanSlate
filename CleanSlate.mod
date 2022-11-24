@@ -74,6 +74,7 @@ replace_path = "localisation/customizable_localisation"
 
 # replace_path = "history"
 replace_path = "history/characters"
+replace_path = "history/offmap_powers"
 replace_path = "history/provinces"
 replace_path = "history/technology"
 replace_path = "history/titles"
