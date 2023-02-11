@@ -37,6 +37,8 @@ replace_path = "common/modifier_definitions"
 replace_path = "common/nicknames"
 replace_path = "common/objectives"
 replace_path = "common/offmap_powers"
+replace_path = "common/offmap_powers/policies"
+replace_path = "common/offmap_powers/statuses"
 replace_path = "common/on_actions"
 replace_path = "common/opinion_modifiers"
 replace_path = "common/religion_features"
@@ -72,7 +74,6 @@ replace_path = "events"
 replace_path = "localisation"
 replace_path = "localisation/customizable_localisation"
 
-# replace_path = "history"
 replace_path = "history/characters"
 replace_path = "history/offmap_powers"
 replace_path = "history/provinces"
@@ -80,4 +81,4 @@ replace_path = "history/technology"
 replace_path = "history/titles"
 replace_path = "history/wars"
 
-# To replace later: gfx, history, interface, launcher, map, songs
+# To replace later: gfx, launcher, map, songs
