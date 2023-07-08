@@ -501,53 +501,6 @@ crusader_commander_counter_positive_effect = {
 	if = {
 		limit = {
 			OR = {
-				AND = {
-					has_pledged_crusade_participation = yes
-
-					any_war = {
-						using_cb = new_crusade
-					}
-				}
-
-				any_liege = {
-					has_pledged_crusade_participation = yes
-
-					any_war = {
-						using_cb = new_crusade
-					}
-				}
-			}
-
-			event_target:enemy_commander = {
-				NOT = { religion = ROOT }
-
-				OR = {
-					any_war = {
-						using_cb = new_crusade
-					}
-
-					any_liege = {
-						any_war = {
-							using_cb = new_crusade
-						}
-					}
-				}
-			}
-
-			check_variable = {
-				which = crusadeCommander
-				value < 0
-			}
-		}
-
-		change_variable = {
-			which = crusadeCommander
-			value = 1
-		}
-	}
-	else_if = {
-		limit = {
-			OR = {
 				trigger_if = {
 					limit = {
 						any_war = {
@@ -559,8 +512,10 @@ crusader_commander_counter_positive_effect = {
 				}
 
 				any_liege = {
-					any_war = {
-						using_cb = new_crusade
+					limit = {
+						any_war = {
+							using_cb = new_crusade
+						}
 					}
 
 					has_pledged_crusade_participation = yes
@@ -584,31 +539,46 @@ crusader_commander_counter_positive_effect = {
 			}
 		}
 
-		set_variable = {
-			which = crusadeCommander
-			value = 1
-		}
-	}
-
-	if = {
-		limit = {
-			check_variable = {
-				which = crusadeCommander
-				value >= 20
+		if = {
+			limit = {
+				check_variable = {
+					which = crusadeCommander
+					value >= 1
+				}
 			}
 
-			NOT = {
-				any_owned_bloodline = {
-					has_bloodline_flag = battle_survivor_bloodline
+			change_variable = {
+				which = crusadeCommander
+				value = 1
+			}
+		}
+		else = {
+			set_variable = {
+				which = crusadeCommander
+				value = 1
+			}
+		}
 
-					ROOT = {
-						is_bloodline_founder_of = PREV
+		if = {
+			limit = {
+				check_variable = {
+					which = crusadeCommander
+					value >= 20
+				}
+
+				NOT = {
+					any_owned_bloodline = {
+						has_bloodline_flag = battle_survivor_bloodline
+
+						ROOT = {
+							is_bloodline_founder_of = PREV
+						}
 					}
 				}
 			}
-		}
 
-		narrative_event = { id = HF.49021 }
+			narrative_event = { id = HF.49021 }
+		}
 	}
 }
 
@@ -627,8 +597,10 @@ crusader_commander_counter_negative_effect = {
 				}
 
 				any_liege = {
-					any_war = {
-						using_cb = new_crusade
+					limit = {
+						any_war = {
+							using_cb = new_crusade
+						}
 					}
 
 					has_pledged_crusade_participation = yes
@@ -650,16 +622,20 @@ crusader_commander_counter_negative_effect = {
 					}
 				}
 			}
-
-			check_variable = {
-				which = crusadeCommander
-				value < 0
-			}
 		}
 
-		change_variable = {
-			which = crusadeCommander
-			value = -1
+		if = {
+			limit = {
+				check_variable = {
+					which = crusadeCommander
+					value >= 1
+				}
+			}
+
+			change_variable = {
+				which = crusadeCommander
+				value = -1
+			}
 		}
 	}
 }
@@ -1647,7 +1623,7 @@ reconquista_win_effect = {
 					limit = {
 						check_variable = {
 							which = reconquista_attacker
-							value > 1
+							value >= 1
 						}
 					}
 
