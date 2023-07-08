@@ -16219,6 +16219,10 @@ character_event = {
 	is_triggered_only = yes
 	hide_window = yes
 
+	trigger = {
+		NOT = { has_character_flag = dealing_with_inherited_ingredients }
+	}
+
 	immediate = {
 		# FROMFROM = { save_event_target_as = previous_ingredient_owner } # does this work on dead folk?
 
@@ -16228,27 +16232,7 @@ character_event = {
 		}
 		else = {
 			set_character_flag = dealing_with_inherited_ingredients
-
-			if = {
-				limit = {
-					NOT = { has_character_flag = owns_inherited_ingredients }
-				}
-
-				set_character_flag = owns_inherited_ingredients
-				repeat_event = { id = MNM.5108 days = 10 } # if this is the first instance of this event, send this event again to check if you ever inherited more than one ingredient...
-			}
-			else_if = { # run second time around
-				limit = {
-					has_character_flag = owns_inherited_ingredients
-
-					any_artifact = {
-						count >= 2
-						has_artifact_flag = ingredient
-					}
-				}
-
-				repeat_event = { id = MNM.5109 } # send visible event
-			}
+			character_event = { id = MNM.5109 days = 10 } # send visible event
 		}
 	}
 }
@@ -16281,6 +16265,17 @@ character_event = {
 
 	is_triggered_only = yes
 
+	trigger = {
+		any_artifact = {
+			count >= 2
+			has_artifact_flag = ingredient
+		}
+	}
+
+	fail_trigger_effect = {
+		clr_character_flag = dealing_with_inherited_ingredients
+	}
+
 	immediate = {
 		select_random_hermetic_ingredient_effect = yes
 		select_random_hermetic_ingredient_effect = yes
@@ -16307,7 +16302,6 @@ character_event = {
 
 	after = {
 		remove_selection_of_ingredients_effect = yes
-		clr_character_flag = owns_inherited_ingredients
 		clr_character_flag = dealing_with_inherited_ingredients
 	}
 }
