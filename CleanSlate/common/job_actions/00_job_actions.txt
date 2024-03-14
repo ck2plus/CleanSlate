@@ -84,12 +84,92 @@ action_fabricate_claims = {
 		has_owner = yes
 		is_within_diplo_range = FROM
 
-		owner = {
-			NOT = { character = FROM }
+		OR = {
+			county = {
+				NOT = { claimed_by = FROM } # liege
 
-			FROM = {
-				job_chancellor = {
-					NOT = { character = PREVPREV } # Not the chancellor's own titles
+				holder_scope = {
+					NOR = {
+						character = FROM
+
+						FROM = {
+							job_chancellor = {
+								character = PREVPREV # Not the chancellor's own titles
+							}
+						}
+
+						# Not the Pope if liege is catholic
+						trigger_if = {
+							limit = { controls_religion = yes }
+							religion = catholic
+							religion = FROM
+						}
+					}
+				}
+			}
+
+			trigger_if = {
+				limit = {
+					FROM = {
+						job_chancellor = { diplomacy >= 15 }
+					}
+				}
+
+				duchy = {
+					NOT = { claimed_by = FROM } # liege
+
+					holder_scope = {
+						NOR = {
+							character = FROM
+
+							FROM = {
+								job_chancellor = {
+									character = PREVPREV # Not the chancellor's own titles
+								}
+							}
+
+							# Not the Pope if liege is catholic
+							trigger_if = {
+								limit = { controls_religion = yes }
+								religion = catholic
+								religion = FROM
+							}
+						}
+					}
+				}
+			}
+
+			trigger_if = {
+				limit = {
+					FROM = {
+						has_ambition = obj_become_king
+						NOT = { has_character_flag = kingdom_claimed_with_ambition }
+					}
+				}
+
+				kingdom = {
+					NOT = { claimed_by = FROM }
+
+					holder_scope = {
+						owns = ROOT
+
+						NOR = {
+							character = FROM
+
+							FROM = {
+								job_chancellor = {
+									character = PREVPREV # Not the chancellor's own titles
+								}
+							}
+
+							# Not the Pope if liege is catholic
+							trigger_if = {
+								limit = { controls_religion = yes }
+								religion = catholic
+								religion = FROM
+							}
+						}
+					}
 				}
 			}
 		}
