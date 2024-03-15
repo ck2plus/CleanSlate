@@ -3,6 +3,7 @@
 # wonder_name_change_effect
 # wonder_desc_change_effect
 # add_random_book_effect
+# generate_looted_wonder_artifact_effect
 
 # Find someone to reference... (event_target:drinking_buddy)
 save_drinking_character_effect = {
@@ -45,10 +46,12 @@ wonder_stage_completion_sound_effect = {
 					}
 
 					if = {
-						limit = { event_target:target_wonder = { has_wonder = wonder_statue_horse } }
+						limit = { event_target:target_wonder = { has_wonder_flag = statue_horse } }
 						sound_effect = wonder_complete_final_tier_horse
 					}
-					else = { sound_effect = wonder_complete_final_tier }
+					else = {
+						sound_effect = wonder_complete_final_tier
+					}
 				}
 			}
 
@@ -205,6 +208,55 @@ add_random_book_effect = {
 			50 = { add_artifact = cookbook_3_roman }
 			50 = { add_artifact = cookbook_3_arabic }
 			50 = { add_artifact = a_history_of_churches }
+		}
+	}
+}
+
+generate_looted_wonder_artifact_effect = {
+	if = {
+		limit = {
+			OR = {
+				has_wonder_flag = gives_artifact_bells
+				has_wonder_upgrade_flag = gives_artifact_bells
+			}
+		}
+
+		PREV = {
+			add_artifact = wonder_artifact_bells
+
+			new_artifact = {
+				set_name = looted_wonder_artifact_bells_rename
+				set_description = looted_wonder_artifact_bells_desc
+				set_creation_date = 1.1.1
+				save_event_target_as = looted_artifact
+			}
+		}
+
+		if = {
+			limit = { has_wonder_upgrade = upgrade_bells }
+			destroy_wonder_upgrade = upgrade_bells
+		}
+
+		if = {
+			limit = { has_wonder_upgrade = upgrade_bells_golden }
+			destroy_wonder_upgrade = upgrade_bells_golden
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_wonder_flag = gives_artifact_book
+				has_wonder_upgrade_flag = gives_artifact_book
+			}
+		}
+
+		PREV = {
+			add_random_book_effect = yes
+
+			new_artifact = {
+				set_creation_date = 1.1.1
+				save_event_target_as = looted_artifact
+			}
 		}
 	}
 }
