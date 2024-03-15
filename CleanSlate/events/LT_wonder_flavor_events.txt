@@ -1345,12 +1345,7 @@ character_event = {
 	option = { # invite the scholars to court
 		name = EVTOPTB_LT_20040
 
-		trigger = {
-			OR = {
-				has_wonder = wonder_house_of_wisdom
-				has_wonder = wonder_library
-			}
-		}
+		trigger = { realm_wonder_or_upgrade_has_flag_grand_library_trigger = yes }
 
 		custom_tooltip = { text = EVTOPT_LT_20040_TT }
 
@@ -1598,22 +1593,12 @@ character_event = {
 
 	trigger = {
 		is_inaccessible_trigger = no
-
-		OR = {
-			has_wonder = wonder_house_of_wisdom
-			has_wonder = wonder_library
-		}
+		realm_wonder_or_upgrade_has_flag_grand_library_trigger = yes
 	}
 
 	fail_trigger_effect = {
 		if = {
-			limit = {
-				NOR = {
-					has_wonder = wonder_house_of_wisdom
-					has_wonder = wonder_library
-				}
-			}
-
+			limit = { realm_wonder_or_upgrade_has_flag_grand_library_trigger = no }
 			clr_character_flag = looking_for_a_book
 			clear_flags_with_prefix = book_theme_
 		}
@@ -3997,7 +3982,7 @@ character_event = {
 	is_triggered_only = yes # on_wonder_upgrade_finish
 
 	trigger = {
-		FROMFROM = { has_wonder_upgrade = upgrade_strategic_exclaves }
+		FROMFROM = { has_wonder_upgrade_flag = strategic_exclaves }
 	}
 
 	immediate = {
@@ -4085,7 +4070,13 @@ character_event = {
 
 	trigger = {
 		NOT = { has_character_flag = looted_wonder_artifact }
-		FROM = { has_wonder_flag = gives_artifact }
+
+		FROM = {
+			OR = {
+				has_wonder_flag = gives_artifact
+				has_wonder_upgrade_flag = gives_artifact
+			}
+		}
 	}
 
 	immediate = {
@@ -4114,7 +4105,11 @@ character_event = {
 		NOT = { has_character_flag = looted_wonder_artifact }
 
 		event_target:target_wonder = {
-			has_wonder_flag = gives_artifact
+			OR = {
+				has_wonder_flag = gives_artifact
+				has_wonder_upgrade_flag = gives_artifact
+			}
+
 			NOT = { has_wonder_flag = artifact_was_looted }
 			wonder_owner = { character = ROOT }
 		}
@@ -4142,43 +4137,7 @@ character_event = {
 			save_event_target_as = target_courtier
 
 			event_target:target_wonder = {
-				trigger_switch = {
-					on_trigger = has_wonder_flag
-
-					gives_artifact_bells = {
-						PREV = {
-							add_artifact = wonder_artifact_bells
-
-							new_artifact = {
-								set_name = looted_wonder_artifact_bells_rename
-								set_description = looted_wonder_artifact_bells_desc
-								set_creation_date = 1.1.1
-								save_event_target_as = looted_artifact
-							}
-						}
-
-						if = {
-							limit = { has_wonder_upgrade = upgrade_bells }
-							destroy_wonder_upgrade = upgrade_bells
-						}
-
-						if = {
-							limit = { has_wonder_upgrade = upgrade_bells_golden }
-							destroy_wonder_upgrade = upgrade_bells_golden
-						}
-					}
-
-					gives_artifact_book = {
-						PREV = {
-							add_random_book_effect = yes
-
-							new_artifact = {
-								set_creation_date = 1.1.1
-								save_event_target_as = looted_artifact
-							}
-						}
-					}
-				}
+				generate_looted_wonder_artifact_effect = yes
 			}
 		}
 	}
