@@ -1560,7 +1560,107 @@ targeted_decisions = {
 			}
 		}
 
-		# CleanSlate: No ai_will_do block??? Should we copy that of order_to_take_vows?
+		# CleanSlate: Copied from order_to_take_vows, because that's better than pure randomness
+		ai_will_do = {
+			factor = 1
+
+			trigger = {
+				FROM = {
+					opinion = {
+						who = ROOT
+						value < 50
+					}
+
+					# If I'm a good ruler...
+					trigger_if = {
+						limit = { is_benevolent_trigger = yes }
+
+						# ...you must not be a dynastic heir
+						NAND = {
+							is_parent_of = ROOT
+							dynasty = ROOT
+
+							opinion = {
+								who = ROOT
+								value >= 0
+							}
+						}
+					}
+					trigger_else = {
+						# Otherwise I must not hate you enough to just send you off
+						OR = {
+							ROOT = { prisoner = no }
+							is_parent_of = ROOT
+
+							opinion = {
+								who = ROOT
+								value >= -20
+							}
+						}
+					}
+				}
+			}
+
+			# Must protect the line
+			mult_modifier = {
+				factor = 5
+
+				ROOT = {
+					is_child_of = FROM
+					NOT = { dynasty = FROM }
+				}
+			}
+
+			# Hate you
+			mult_modifier = {
+				factor = 5
+
+				ROOT = {
+					is_child_of = FROM
+					is_rival = FROM
+				}
+			}
+
+			# There are better spares
+			mult_modifier = {
+				factor = 20
+
+				ROOT = {
+					is_child_of = FROM
+
+					OR = {
+						has_negative_congenital_trigger = yes
+						has_infertile_trait_trigger = yes
+						has_severe_disability_trigger = yes
+					}
+				}
+
+				FROM = {
+					any_child = {
+						is_alive = yes
+						has_negative_congenital_trigger = no
+						has_infertile_trait_trigger = no
+						has_severe_disability_trigger = no
+					}
+				}
+			}
+
+			# Must keep the realm from falling to evil
+			mult_modifier = {
+				factor = 5
+
+				ROOT = { is_evil_trigger = yes }
+
+				FROM = {
+					is_benevolent_trigger = yes
+
+					any_child = {
+						is_alive = yes
+						is_evil_trigger = no
+					}
+				}
+			}
+		}
 	}
 
 	ask_teutonic_for_help_teutonic = {
