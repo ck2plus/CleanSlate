@@ -6197,3 +6197,55 @@ character_event = {
 		}
 	}
 }
+
+# Switch succession laws for viceroyalties who convert religion
+# Doesn't happen automatically and cannot be done manually due to hardcoding around viceroyalties
+character_event = {
+	id = CK2.691
+
+	is_triggered_only = yes # on_character_convert_religion
+	hide_window = yes
+
+	only_rulers = yes
+
+	trigger = {
+		any_demesne_title = {
+			is_vice_royalty = yes
+			title = succ_law_title
+
+			trigger_if = {
+				limit = { has_law = succ_primogeniture }
+				NOT = { is_law_potential = succ_primogeniture }
+			}
+			trigger_else = {
+				has_law = succ_turkish_succession
+				NOT = { is_law_potential = succ_turkish_succession }
+			}
+		}
+	}
+
+	immediate = {
+		any_demesne_title = {
+			limit = { title = succ_law_title }
+
+			if = {
+				limit = {
+					has_law = succ_primogeniture
+					NOT = { is_law_potential = succ_primogeniture }
+				}
+
+				add_law = succ_turkish_succession
+				log = "[This.GetID] - [This.GetFullBaseName] was changed from Primogeniture to Open because [Root.GetBestName] converted from [From.GetName] to [Root.Religion.GetName]"
+			}
+			else_if = {
+				limit = {
+					has_law = succ_turkish_succession
+					NOT = { is_law_potential = succ_turkish_succession }
+				}
+
+				add_law = succ_primogeniture
+				log = "[This.GetID] - [This.GetFullBaseName] was changed from Open to Primogeniture because [Root.GetBestName] converted from [From.GetName] to [Root.Religion.GetName]"
+			}
+		}
+	}
+}
