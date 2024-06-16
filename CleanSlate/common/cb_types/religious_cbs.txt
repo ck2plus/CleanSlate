@@ -841,38 +841,12 @@ new_crusade = {
 				character_event = { id = HFP.41007 } # Beneficiary event - AI only
 			}
 
-			# Should we give the seized land to the Official Crusade Recipient?
+			# A selfish main contributor of the Crusade seizes the land for him/herself or his/her Beneficiary
 			if = {
 				limit = {
 					most_participating_crusader = {
-						official_crusade_recipient = {
-							is_alive = yes
-							religion = attacker
-						}
-
-						NOR = {
-							has_character_flag = crusade_selfish_stance
-							has_character_flag = crusade_beneficiary_stance
-						}
-					}
-				}
-
-				most_participating_crusader = {
-					official_crusade_recipient = {
-						set_crusader_king = THIS
-						set_character_flag = crusader_king_flag
-					}
-				}
-			}
-
-			# Give the seized land to the main contributor of the Crusade or his/her Beneficiary
-			else_if = {
-				limit = {
-					most_participating_crusader = {
 						trigger_if = {
-							limit = {
-								has_character_flag = crusade_beneficiary_stance
-							}
+							limit = { has_character_flag = crusade_beneficiary_stance }
 
 							crusade_beneficiary = {
 								is_alive = yes
@@ -885,10 +859,8 @@ new_crusade = {
 								}
 							}
 						}
-
-						OR = {
+						trigger_else = {
 							has_character_flag = crusade_selfish_stance
-							has_character_flag = crusade_beneficiary_stance
 						}
 
 						holy_order = no
@@ -904,9 +876,7 @@ new_crusade = {
 				most_participating_crusader = {
 					# Give the title to your Beneficiary
 					if = {
-						limit = {
-							has_character_flag = crusade_beneficiary_stance
-						}
+						limit = { has_character_flag = crusade_beneficiary_stance }
 
 						crusade_beneficiary = {
 							set_crusader_king = THIS
@@ -922,69 +892,79 @@ new_crusade = {
 				}
 			}
 
+			# Should we give the seized land to the Official Crusade Recipient?
+			else_if = {
+				limit = {
+					official_crusade_recipient = {
+						is_alive = yes
+						religion = attacker
+					}
+				}
+
+				official_crusade_recipient = {
+					set_crusader_king = THIS
+					set_character_flag = crusader_king_flag
+				}
+			}
+
 			# If not applicable, find someone else to take the title
 			else = {
 				# Find a random Beneficiary within certain limits
 				if = {
 					limit = {
-						most_participating_crusader = {
-							any_crusade_participant = {
+						any_crusade_participant = {
+							is_alive = yes
+							is_landed = yes
+							holy_order = no
+							mercenary = no
+
+							crusade_beneficiary = {
 								is_alive = yes
-								is_landed = yes
-								holy_order = no
-								mercenary = no
+								is_dying = no
+								is_ruler = no
+								age >= 12
 
-								crusade_beneficiary = {
-									is_alive = yes
-									is_dying = no
-									is_ruler = no
-									age >= 12
-
-									NOT = {
-										any_heir_title = {
-											always = yes
-										}
+								NOT = {
+									any_heir_title = {
+										always = yes
 									}
 								}
 							}
 						}
 					}
 
-					most_participating_crusader = {
-						random_crusade_participant = {
-							limit = {
-								is_alive = yes
-								is_landed = yes
-								holy_order = no
-								mercenary = no
-
-								crusade_beneficiary = {
-									is_alive = yes
-									is_dying = no
-									is_ruler = no
-									age >= 12
-
-									NOT = {
-										any_heir_title = {
-											always = yes
-										}
-									}
-
-								}
-							}
-
-							preferred_limit = {
-								real_tier = EMPEROR
-							}
-
-							preferred_limit = {
-								real_tier = KING
-							}
+					random_crusade_participant = {
+						limit = {
+							is_alive = yes
+							is_landed = yes
+							holy_order = no
+							mercenary = no
 
 							crusade_beneficiary = {
-								set_crusader_king = THIS
-								set_character_flag = crusader_king_flag
+								is_alive = yes
+								is_dying = no
+								is_ruler = no
+								age >= 12
+
+								NOT = {
+									any_heir_title = {
+										always = yes
+									}
+								}
 							}
+						}
+
+						preferred_limit = {
+							real_tier = EMPEROR
+						}
+
+						preferred_limit = {
+							real_tier = KING
+						}
+
+						crusade_beneficiary = {
+							set_crusader_king = THIS
+							set_character_flag = crusader_king_flag
 						}
 					}
 				}
@@ -992,41 +972,37 @@ new_crusade = {
 				# Find any random Beneficiary, if possible
 				else_if = {
 					limit = {
-						most_participating_crusader = {
-							any_crusade_participant = {
-								crusade_beneficiary = {
-									is_alive = yes
-									is_ruler = no
+						any_crusade_participant = {
+							crusade_beneficiary = {
+								is_alive = yes
+								is_ruler = no
 
-									NOT = {
-										any_heir_title = {
-											always = yes
-										}
+								NOT = {
+									any_heir_title = {
+										always = yes
 									}
 								}
 							}
 						}
 					}
 
-					most_participating_crusader = {
-						random_crusade_participant = {
-							limit = {
-								crusade_beneficiary = {
-									is_alive = yes
-									is_ruler = no
+					random_crusade_participant = {
+						limit = {
+							crusade_beneficiary = {
+								is_alive = yes
+								is_ruler = no
 
-									NOT = {
-										any_heir_title = {
-											always = yes
-										}
+								NOT = {
+									any_heir_title = {
+										always = yes
 									}
 								}
 							}
+						}
 
-							crusade_beneficiary = {
-								set_crusader_king = THIS
-								set_character_flag = crusader_king_flag
-							}
+						crusade_beneficiary = {
+							set_crusader_king = THIS
+							set_character_flag = crusader_king_flag
 						}
 					}
 				}
@@ -1128,21 +1104,22 @@ new_crusade = {
 
 					# If every other option fails, make the Holy Order Grandmaster the Crusader King
 					else = {
-						# Need to find a holy order!
-						set_crusader_king = THIS
+						most_participating_crusader = {
+							set_crusader_king = THIS
+						}
 					}
 				}
 			}
 
+			crusade_target_title = {
+				save_event_target_as = new_crusade_title
+			}
+
+			crusade_target_char = {
+				save_event_target_as = new_crusade_target_char
+			}
+
 			most_participating_crusader = {
-				crusade_target_title = {
-					save_event_target_as = new_crusade_title
-				}
-
-				crusade_target_char = {
-					save_event_target_as = new_crusade_target_char
-				}
-
 				save_event_target_as = new_crusade_most_participating_member
 			}
 
