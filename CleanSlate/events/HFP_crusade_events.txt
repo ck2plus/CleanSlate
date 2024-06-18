@@ -8,7 +8,7 @@ namespace = HFP
 character_event = {
 	id = HFP.41000
 
-	is_triggered_only = yes # on_crusade_preparation_starts, on_crusade_target_changes
+	is_triggered_only = yes # on_crusade_preparation_starts, on_crusade_target_changes, HFP.41001, HFP.41002
 	hide_window = yes
 
 	religion_group = christian
@@ -24,6 +24,7 @@ character_event = {
 			}
 		}
 
+		# Find a new recipient if the current one has somehow already become emperor
 		trigger_if = {
 			limit = {
 				has_global_flag = 4th_crusade_official
@@ -88,6 +89,11 @@ character_event = {
 						NOT = { trait = excommunicated }
 
 						current_heir = {
+							religion = ROOT
+							is_incapable = no
+							is_dying = no
+							NOT = { trait = excommunicated }
+
 							any_heir_title = {
 								title = PREVPREVPREV
 							}
@@ -276,31 +282,23 @@ character_event = {
 	hide_window = yes
 
 	trigger = {
-		OR = {
-			catholic = {
-				official_crusade_recipient = {
-					character = ROOT
-					NOT = { religion = catholic }
-				}
-			}
-
-			fraticelli = {
-				official_crusade_recipient = {
-					character = ROOT
-					NOT = { religion = fraticelli }
-				}
+		FROM = { # The official crusade recipient's old religion
+			official_crusade_recipient = {
+				character = ROOT
+				NOT = { has_character_flag = fourth_crusade_recipient }
 			}
 		}
-
-		NOT = { has_character_flag = fourth_crusade_recipient }
 	}
 
 	immediate = {
-		trigger_switch = {
-			on_trigger = religion
+		# Select a new recipient
+		FROM = {
+			trigger_switch = {
+				on_trigger = religion
 
-			catholic = { k_papacy = { holder_scope = { character_event = { id = HFP.41000 days = 1 } } } }
-			fraticelli = { d_fraticelli = { holder_scope = { character_event = { id = HFP.41000 days = 1 } } } }
+				catholic = { k_papacy = { holder_scope = { character_event = { id = HFP.41000 days = 1 } } } }
+				fraticelli = { d_fraticelli = { holder_scope = { character_event = { id = HFP.41000 days = 1 } } } }
+			}
 		}
 	}
 }
@@ -314,23 +312,15 @@ character_event = {
 
 	trigger = {
 		OR = {
-			catholic = {
-				official_crusade_recipient = {
-					character = ROOT
-				}
-			}
-
-			fraticelli = {
-				official_crusade_recipient = {
-					character = ROOT
-				}
-			}
-
+			character = official_crusade_recipient
 			has_character_flag = fourth_crusade_recipient
 		}
 	}
 
 	immediate = {
+		# CleanSlate: This is likely so that the pope doesn't inform the other crusaders
+		# about the support for a new claimant (HFP.41120/HFP.41121, fired through HFP.41000 below),
+		# since the pope doesn't agree with this crusade.
 		if = {
 			limit = { has_character_flag = fourth_crusade_recipient }
 
@@ -343,11 +333,9 @@ character_event = {
 			}
 		}
 
-		trigger_switch = {
-			on_trigger = religion
-			catholic = { k_papacy = { holder_scope = { character_event = { id = HFP.41000 } } } }
-			fraticelli = { d_fraticelli = { holder_scope = { character_event = { id = HFP.41000 } } } }
-		}
+		# Select a new recipient
+		catholic = { k_papacy = { holder_scope = { character_event = { id = HFP.41000 } } } }
+		fraticelli = { d_fraticelli = { holder_scope = { character_event = { id = HFP.41000 } } } }
 	}
 }
 
@@ -3522,18 +3510,6 @@ character_event = {
 							is_sick_or_injured_trigger = yes
 							trait = monk
 							trait = nun
-
-							trigger_if = {
-								limit = { is_female = yes }
-
-								PREV = {
-									NOR = {
-										has_law = true_cognatic_succession
-										has_law = enatic_succession
-										has_law = enatic_cognatic_succession
-									}
-								}
-							}
 
 							any_heir_title = {
 								always = yes
