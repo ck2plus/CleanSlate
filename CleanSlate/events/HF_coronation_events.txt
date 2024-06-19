@@ -33,6 +33,18 @@ character_event = {
 				random = 5
 				tooltip = EVTTOOLTIPHF20201
 			}
+
+			opinion = {
+				name = opinion_prospective_coronation_priest
+				who = ROOT
+				months = 2
+			}
+
+			reverse_opinion = {
+				name = opinion_prospective_coronation_priest
+				who = ROOT
+				months = 2
+			}
 		}
 
 		ai_chance = {
@@ -229,6 +241,18 @@ character_event = {
 				days = 30
 				random = 5
 			}
+
+			opinion = {
+				name = opinion_prospective_coronation_priest
+				who = ROOT
+				months = 2
+			}
+
+			reverse_opinion = {
+				name = opinion_prospective_coronation_priest
+				who = ROOT
+				months = 2
+			}
 		}
 
 		ai_chance = { factor = 30 }
@@ -365,6 +389,18 @@ character_event = {
 				id = HF.20201
 				days = 30
 				random = 5
+			}
+
+			opinion = {
+				name = opinion_prospective_coronation_priest
+				who = ROOT
+				months = 2
+			}
+
+			reverse_opinion = {
+				name = opinion_prospective_coronation_priest
+				who = ROOT
+				months = 2
 			}
 		}
 
@@ -2242,7 +2278,7 @@ letter_event = {
 				mult_modifier = {
 					factor = 10
 
-					NAND = {
+					NOR = {
 						completely_controls = d_latium
 						completely_controls = d_spoleto
 						completely_controls = d_ancona
@@ -5555,6 +5591,42 @@ character_event = {
 	}
 }
 
+# Added by CleanSlate
+# on_death of the prospective coronation_priest. Set hidden opinion to ping back to the coronation_ruler.
+character_event = {
+	id = HF.20234
+
+	is_triggered_only = yes # on_death
+	hide_window = yes
+
+	only_rulers = yes
+	min_age = 16
+
+	trigger = {
+		has_any_opinion_modifier = opinion_prospective_coronation_priest
+	}
+
+	immediate = {
+		any_opinion_modifier_target = {
+			limit = {
+				has_opinion_modifier = {
+					name = opinion_prospective_coronation_priest
+					who = ROOT
+				}
+
+				NOT = { # No agreement has been made yet
+					has_opinion_modifier = {
+						name = opinion_supposed_to_crown
+						who = ROOT
+					}
+				}
+			}
+
+			clr_character_flag = do_not_disturb
+		}
+	}
+}
+
 # Ruler to be crowned: your coronation_priest has died. The ceremony is cancelled
 character_event = {
 	id = HF.20232
@@ -5569,6 +5641,7 @@ character_event = {
 		remove_character_modifier = out_traveling
 		set_variable = { which = coronation_count value = 0 }
 
+		clr_character_flag = do_not_disturb
 		clr_character_flag = flag_preparing_coronation # Still used when after waging wars
 		clr_character_flag = flag_antipope_for_coronation
 		clr_character_flag = flag_excommunicated_for_coronation
@@ -5620,7 +5693,23 @@ character_event = {
 					who = ROOT
 				}
 
+				reverse_remove_opinion = {
+					name = opinion_coronation_guest
+					who = ROOT
+				}
+
+				remove_opinion = {
+					name = opinion_prospective_coronation_priest
+					who = ROOT
+				}
+
+				reverse_remove_opinion = {
+					name = opinion_prospective_coronation_priest
+					who = ROOT
+				}
+
 				remove_trait = travelling
+				clr_character_flag = do_not_disturb
 				character_event = { id = HF.20233 }
 			}
 		}
@@ -6327,6 +6416,8 @@ character_event = {
 			religion = catholic
 			religion = fraticelli
 		}
+
+		event_target:coronation_priest = { is_alive =  yes }
 	}
 
 	immediate = {
@@ -6587,10 +6678,18 @@ letter_event = {
 			who = FROM
 		}
 
+		reverse_opinion = {
+			name = opinion_coronation_guest
+			months = 4
+			who = FROM
+		}
+
 		add_character_modifier = {
 			name = out_traveling # Vassal travel is short, so no regent needed
 			days = 45
 		}
+
+		set_character_flag = do_not_disturb
 
 		ai_chance = { factor = 70 }
 	}
@@ -6724,7 +6823,14 @@ letter_event = {
 			months = 4
 		}
 
+		reverse_opinion = {
+			name = opinion_coronation_guest
+			who = FROM
+			months = 4
+		}
+
 		add_trait = travelling # Foreign Ruler's travel is longer, it needs a regent, as if it were a pilgrimage
+		set_character_flag = do_not_disturb
 
 		# add_character_modifier = {
 		#	name = out_traveling
@@ -7186,6 +7292,7 @@ character_event = {
 	desc = EVTDESCHFA20310
 	picture = GFX_evt_fancy_feast
 	border = GFX_event_normal_frame_diplomacy
+	portrait = event_target:potential_friend
 
 	is_triggered_only = yes
 	hide_new = yes
@@ -11807,7 +11914,6 @@ character_event = {
 		}
 	}
 
-
 	immediate = {
 		if = {
 			limit = {
@@ -12193,10 +12299,10 @@ character_event = {
 	}
 
 	trigger = {
-		# Check if the priest supposed to be crowning you is still alive
+		# Check if you're still a guest
 		has_opinion_modifier = {
 			name = opinion_coronation_guest
-			who = event_target:coronation_ruler
+			who = FROM
 		}
 	}
 
@@ -12444,8 +12550,15 @@ character_event = {
 			remove_character_modifier = out_traveling
 		}
 
+		clr_character_flag = do_not_disturb
+
 		hidden_effect = {
 			remove_opinion = {
+				name = opinion_coronation_guest
+				who = FROM
+			}
+
+			reverse_remove_opinion = {
 				name = opinion_coronation_guest
 				who = FROM
 			}
@@ -14819,6 +14932,7 @@ character_event = {
 	}
 
 	immediate = {
+		clr_character_flag = do_not_disturb
 		clr_character_flag = flag_preparing_coronation
 		clr_character_flag = flag_crowned_by_priest
 		clr_character_flag = flag_crowned_by_bishop
@@ -14858,16 +14972,9 @@ character_event = {
 			}
 		}
 
-		clr_character_flag = flag_preparing_coronation # Still used when after waging wars
-		clr_character_flag = flag_antipope_for_coronation
-		clr_character_flag = flag_excommunicated_for_coronation
-		clr_character_flag = flag_pepin_for_coronation
 		clr_character_flag = flag_extravagant_coronation
 		clr_character_flag = flag_regular_coronation
 		clr_character_flag = flag_secluded_coronation
-		clr_character_flag = flag_crowned_by_priest
-		clr_character_flag = flag_crowned_by_bishop
-		clr_character_flag = flag_crowned_by_pope
 
 		clr_character_flag = flag_coronation_foreign_friendship
 		clr_character_flag = flag_coronation_vassal_friendship
@@ -14894,7 +15001,6 @@ character_event = {
 		clr_character_flag = flag_coronation_secluded_proud
 		clr_character_flag = flag_coronation_secluded_steward
 
-
 		hidden_effect = {
 			any_opinion_modifier_target = {
 				limit = {
@@ -14906,9 +15012,15 @@ character_event = {
 
 				remove_trait = travelling
 				remove_character_modifier = out_traveling
+				clr_character_flag = do_not_disturb
 				character_event = { id = HF.20409 }
 
 				remove_opinion = {
+					name = opinion_coronation_guest
+					who = ROOT
+				}
+
+				reverse_remove_opinion = {
 					name = opinion_coronation_guest
 					who = ROOT
 				}
