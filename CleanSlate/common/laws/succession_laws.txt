@@ -8,9 +8,13 @@ succession_laws = {
 		vassal_opinion = 5
 
 		potential = {
-			temporary = no
-			NOT = { is_law_potential = succ_byzantine_elective }
-			secular_religion_head_trigger = yes
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
+				is_law_potential = succ_byzantine_elective
+			}
 
 			holder_scope = {
 				OR = {
@@ -77,9 +81,13 @@ succession_laws = {
 		dynasty_opinion = 5
 
 		potential = {
-			temporary = no
-			NOT = { is_law_potential = succ_byzantine_elective }
-			secular_religion_head_trigger = yes
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
+				is_law_potential = succ_byzantine_elective
+			}
 
 			holder_scope = {
 				OR = {
@@ -134,9 +142,14 @@ succession_laws = {
 
 		potential = {
 			has_dlc = "Holy Fury"
-			temporary = no
-			NOT = { is_law_potential = succ_byzantine_elective }
-			secular_religion_head_trigger = yes
+
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
+				is_law_potential = succ_byzantine_elective
+			}
 
 			holder_scope = {
 				OR = {
@@ -210,9 +223,13 @@ succession_laws = {
 		dynasty_opinion = 5
 
 		potential = {
-			temporary = no
-			NOT = { is_law_potential = succ_byzantine_elective }
-			secular_religion_head_trigger = yes
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
+				is_law_potential = succ_byzantine_elective
+			}
 
 			holder_scope = {
 				trigger_if = {
@@ -305,9 +322,13 @@ succession_laws = {
 		dynasty_opinion = -5
 
 		potential = {
-			temporary = no
-			NOT = { is_law_potential = succ_byzantine_elective }
-			secular_religion_head_trigger = yes
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
+				is_law_potential = succ_byzantine_elective
+			}
 
 			holder_scope = {
 				is_feudal = yes
@@ -391,11 +412,13 @@ succession_laws = {
 		vassal_opinion = 10
 
 		potential = {
-			temporary = no
 			higher_real_tier_than = BARON
-			secular_religion_head_trigger = yes
 
-			NOR = { # Has special elective law instead
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
 				is_law_potential = succ_hre_elective
 				is_law_potential = succ_byzantine_elective
 			}
@@ -610,10 +633,15 @@ succession_laws = {
 		vassal_opinion = 5
 
 		potential = {
-			temporary = no
 			higher_real_tier_than = BARON
-			NOT = { is_law_potential = succ_byzantine_elective }
-			secular_religion_head_trigger = yes
+
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
+				is_law_potential = succ_byzantine_elective
+			}
 
 			holder_scope = {
 				OR = {
@@ -678,9 +706,13 @@ succession_laws = {
 		dynasty_opinion = -5
 
 		potential = {
-			temporary = no
-			NOT = { is_law_potential = succ_byzantine_elective }
-			secular_religion_head_trigger = yes
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
+
+				# Has special elective law instead
+				is_law_potential = succ_byzantine_elective
+			}
 
 			holder_scope = {
 				trigger_if = {
@@ -778,10 +810,11 @@ succession_laws = {
 		# dynasty_opinion = 10
 
 		potential = {
-			temporary = no
-			secular_religion_head_trigger = yes
+			NOR = {
+				# Check for possible secular religion head, and not being temporary
+				is_law_potential = succ_open_elective
 
-			NOR = { # Has special elective law instead
+				# Has special elective law instead
 				is_law_potential = succ_hre_elective
 				is_law_potential = succ_byzantine_elective
 			}
@@ -862,60 +895,37 @@ succession_laws = {
 
 	succ_open_elective = {
 		potential = {
-			NOT = { is_law_potential = succ_byzantine_elective }
-
 			OR = {
-				is_primary_type_title = yes
 				holy_order = yes
+				mercenary = yes
 				temporary = yes
 
+				trigger_if = {
+					limit = {
+						is_primary_type_title = yes
+						controls_religion = yes
+					}
+
+					# Non-landless religion head titles can have normal succession laws
+					# Also see event 670 in base_on_action_events.txt
+					is_landless_type_title = yes
+				}
+
 				holder_scope = {
-					OR = {
-						is_republic = yes
+					trigger_if = {
+						limit = { is_republic = yes }
+						is_patrician = no
+					}
+					trigger_else = {
 						is_theocracy = yes
 					}
 				}
 			}
 
-			holder_scope = {
-				trigger_if = {
-					limit = { is_offmap_governor = yes }
-
-					# Use Offmap succession instead
-					ROOT = {
-						NOT = { is_law_potential = succ_offmap_succession }
-					}
-				}
-
-				trigger_if = {
-					limit = { is_theocracy = yes }
-
-					# Use Investiture and Papal succession instead
-					ROOT = {
-						NOR = {
-							is_law_potential = succ_papal_succession
-							is_law_potential = succ_catholic_bishopric
-						}
-					}
-				}
-				trigger_else_if = {
-					limit = { is_republic = yes }
-					is_patrician = no
-				}
-			}
-
-			trigger_if = {
-				limit = { controls_religion = yes }
-
-				holder_scope = {
-					trigger_if = {
-						limit = { has_dlc = "Holy Fury" }
-						NOT = { has_religion_feature = religion_temporal_head }
-					}
-					trigger_else = {
-						NOT = { religion = norse_pagan_reformed }
-					}
-				}
+			NOR = {
+				is_law_potential = succ_papal_succession
+				is_law_potential = succ_catholic_bishopric
+				is_law_potential = succ_offmap_succession
 			}
 		}
 
@@ -933,8 +943,7 @@ succession_laws = {
 
 	succ_catholic_bishopric = {
 		potential = {
-			is_primary_type_title = no
-			is_landless_type_title = no
+			NOT = { is_law_potential = succ_papal_succession }
 
 			holder_scope = {
 				is_theocracy = yes
