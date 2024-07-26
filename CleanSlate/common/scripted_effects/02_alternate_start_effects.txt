@@ -419,6 +419,7 @@ spawn_hre_effect = {
 			empire = {
 				grant_title = event_target:target_ruler
 				set_title_flag = alternate_hre
+				save_global_event_target_as = alternate_hre
 				set_name = ALT_HRE
 				adjective = ALT_HRE_ADJ
 				set_short_name = yes
@@ -488,7 +489,6 @@ spawn_hre_effect = {
 
 				any_title_under = {
 					limit = { real_tier = KING }
-
 					unsafe_destroy_landed_title = THIS
 				}
 			}
@@ -513,11 +513,6 @@ spawn_hre_effect = {
 
 				empire = {
 					has_holder = yes
-
-					NOR = {
-						has_title_flag = alternate_hre
-						has_title_flag = alternate_byz
-					}
 				}
 
 				holder_scope = {
@@ -544,11 +539,6 @@ spawn_hre_effect = {
 
 				empire = {
 					has_holder = yes
-
-					NOR = {
-						has_title_flag = alternate_hre
-						has_title_flag = alternate_byz
-					}
 				}
 
 				holder_scope = {
@@ -655,20 +645,6 @@ spawn_hre_effect = {
 				}
 			}
 
-			empire = {
-				any_direct_de_jure_vassal_title = {
-					de_jure_liege = e_hre
-				}
-
-				save_event_target_as = title_coa
-				destroy_landed_title = THIS
-
-				activate_title = {
-					title = THIS
-					status = no
-				}
-			}
-
 			holder_scope = {
 				save_event_target_as = target_ruler
 			}
@@ -676,6 +652,7 @@ spawn_hre_effect = {
 			empire = {
 				grant_title = event_target:target_ruler
 				set_title_flag = alternate_hre
+				save_global_event_target_as = alternate_hre
 				set_name = ALT_HRE
 				adjective = ALT_HRE_ADJ
 				set_short_name = yes
@@ -810,9 +787,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -842,9 +817,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -872,9 +845,7 @@ spawn_byz_effect = {
 				holder_scope = {
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -905,9 +876,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -934,9 +903,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -958,6 +925,19 @@ spawn_byz_effect = {
 			}
 
 			preferred_limit = {
+				holder_scope = {
+					NOT = {
+						any_independent_ruler = {
+							has_landed_title = event_target:alternate_hre
+
+							distance = {
+								who = PREV
+								value < 1000
+							}
+						}
+					}
+				}
+
 				empire = {
 					NOT = {
 						any_de_jure_vassal_title = {
@@ -1045,6 +1025,18 @@ spawn_byz_effect = {
 					is_feudal = yes
 				}
 
+				empire = {
+					NOT = {
+						any_de_jure_vassal_title = {
+							holder_scope = {
+								is_nomadic = yes
+							}
+						}
+					}
+				}
+			}
+
+			preferred_limit = {
 				empire = {
 					NOT = {
 						any_de_jure_vassal_title = {
@@ -1061,22 +1053,9 @@ spawn_byz_effect = {
 			}
 
 			empire = {
-				any_direct_de_jure_vassal_title = {
-					de_jure_liege = e_byzantium
-				}
-
-				save_event_target_as = title_coa
-
-				activate_title = {
-					title = THIS
-					status = no
-				}
-			}
-
-			e_byzantium = {
 				grant_title = event_target:target_ruler
 				set_title_flag = alternate_byz
-				set_coa = event_target:title_coa
+				save_global_event_target_as = alternate_byz
 				set_name = ALT_BYZ
 				adjective = ALT_BYZ_ADJ
 
@@ -1097,8 +1076,6 @@ spawn_byz_effect = {
 					limit = { has_dlc = "Conclave" }
 
 					add_law = ze_administration_laws_2
-					add_law = vice_royalty_2
-					add_law = centralization_3
 					add_law = law_voting_power_0
 					add_law = war_voting_power_0
 					add_law = revoke_title_voting_power_0
@@ -1111,17 +1088,16 @@ spawn_byz_effect = {
 				else = {
 					add_law = crown_authority_4
 					add_law = imperial_administration
-					add_law = vice_royalty_2
-					add_law = centralization_3
 				}
 
+				add_law = vice_royalty_2
+				add_law = centralization_3
 				add_law = succ_byzantine_elective
 			}
 
 			event_target:target_ruler = {
 				wealth = 1000
 				prestige = 1000
-
 				add_trait = born_in_the_purple
 
 				any_child = {
@@ -1169,7 +1145,8 @@ spawn_byz_effect = {
 					unsafe_destroy_landed_title = THIS
 				}
 
-				any_realm_character = {
+				# Take duchy titles to hand out as viceroyalties after game start
+				any_realm_lord = {
 					limit = { is_feudal = yes }
 
 					any_demesne_title = {
@@ -1204,11 +1181,7 @@ spawn_byz_effect = {
 
 				empire = {
 					has_holder = yes
-
-					NOR = {
-						has_title_flag = alternate_hre
-						has_title_flag = alternate_byz
-					}
+					NOT = { title = event_target:alternate_hre }
 				}
 
 				holder_scope = {
@@ -1234,11 +1207,7 @@ spawn_byz_effect = {
 
 				empire = {
 					has_holder = yes
-
-					NOR = {
-						has_title_flag = alternate_hre
-						has_title_flag = alternate_byz
-					}
+					NOT = { title = event_target:alternate_hre }
 				}
 
 				holder_scope = {
@@ -1253,9 +1222,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -1285,9 +1252,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -1315,9 +1280,7 @@ spawn_byz_effect = {
 				holder_scope = {
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -1348,9 +1311,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -1377,9 +1338,7 @@ spawn_byz_effect = {
 
 					NOT = {
 						any_independent_ruler = {
-							primary_title = {
-								has_title_flag = alternate_hre
-							}
+							has_landed_title = event_target:alternate_hre
 
 							distance = {
 								who = PREV
@@ -1401,6 +1360,19 @@ spawn_byz_effect = {
 			}
 
 			preferred_limit = {
+				holder_scope = {
+					NOT = {
+						any_independent_ruler = {
+							has_landed_title = event_target:alternate_hre
+
+							distance = {
+								who = PREV
+								value < 1000
+							}
+						}
+					}
+				}
+
 				empire = {
 					NOT = {
 						any_de_jure_vassal_title = {
@@ -1488,6 +1460,18 @@ spawn_byz_effect = {
 					is_feudal = yes
 				}
 
+				empire = {
+					NOT = {
+						any_de_jure_vassal_title = {
+							holder_scope = {
+								is_nomadic = yes
+							}
+						}
+					}
+				}
+			}
+
+			preferred_limit = {
 				empire = {
 					NOT = {
 						any_de_jure_vassal_title = {
@@ -1504,23 +1488,9 @@ spawn_byz_effect = {
 			}
 
 			empire = {
-				any_direct_de_jure_vassal_title = {
-					de_jure_liege = e_byzantium
-				}
-
-				save_event_target_as = title_coa
-				destroy_landed_title = THIS
-
-				activate_title = {
-					title = THIS
-					status = no
-				}
-			}
-
-			e_byzantium = {
 				grant_title = event_target:target_ruler
 				set_title_flag = alternate_byz
-				set_coa = event_target:title_coa
+				save_global_event_target_as = alternate_byz
 				set_name = ALT_BYZ
 				adjective = ALT_BYZ_ADJ
 
@@ -1541,8 +1511,6 @@ spawn_byz_effect = {
 					limit = { has_dlc = "Conclave" }
 
 					add_law = ze_administration_laws_2
-					add_law = vice_royalty_2
-					add_law = centralization_3
 					add_law = law_voting_power_0
 					add_law = war_voting_power_0
 					add_law = revoke_title_voting_power_0
@@ -1555,17 +1523,16 @@ spawn_byz_effect = {
 				else = {
 					add_law = crown_authority_4
 					add_law = imperial_administration
-					add_law = vice_royalty_2
-					add_law = centralization_3
 				}
 
+				add_law = vice_royalty_2
+				add_law = centralization_3
 				add_law = succ_primogeniture
 			}
 
 			event_target:target_ruler = {
 				wealth = 1000
 				prestige = 1000
-
 				add_trait = born_in_the_purple
 
 				any_child = {
@@ -1616,7 +1583,8 @@ spawn_byz_effect = {
 					unsafe_destroy_landed_title = THIS
 				}
 
-				any_realm_character = {
+				# Take duchy titles to hand out as viceroyalties after game start
+				any_realm_lord = {
 					limit = { is_feudal = yes }
 
 					any_demesne_title = {
@@ -1973,8 +1941,8 @@ rename_titles_altstart = {
 			clan = no
 
 			NOR = {
-				has_title_flag = alternate_hre
-				has_title_flag = alternate_byz
+				title = event_target:alternate_hre
+				title = event_target:alternate_byz
 			}
 		}
 
@@ -2078,8 +2046,8 @@ rename_titles_altstart_duchies = {
 			clan = no
 
 			NOR = {
-				has_title_flag = alternate_hre
-				has_title_flag = alternate_byz
+				title = event_target:alternate_hre
+				title = event_target:alternate_byz
 			}
 		}
 
@@ -2271,13 +2239,8 @@ spawn_one_bloodline_effect = {
 					}
 				}
 
-				primary_title = {
-					OR = {
-						has_title_flag = alternate_hre
-						has_title_flag = alternate_byz
-					}
-				}
-
+				has_landed_title = event_target:alternate_hre
+				has_landed_title = event_target:alternate_byz
 				has_character_flag = random_world_bloodline
 
 				any_independent_ruler = {
