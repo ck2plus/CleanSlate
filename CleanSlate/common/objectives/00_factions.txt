@@ -106,22 +106,20 @@ faction_succ_seniority = {
 	allow = {
 		is_law_potential = succ_seniority
 		is_law_allowed = succ_seniority
+		NOT = { has_law = succ_seniority }
 
 		OR = {
 			is_primary_holder_title = yes
 			higher_real_tier_than = DUKE
 		}
 
-		NOR = {
-			has_law = succ_seniority
+		# Isn't locked into elective succession
+		trigger_if = {
+			limit = { holder_scope = { has_law = succession_voting_power_1 } }
 
-			AND = {
-				has_law = succession_voting_power_1
-
-				OR = {
-					has_law = succ_feudal_elective
-					has_law = succ_hre_elective
-				}
+			NOR = {
+				has_law = succ_feudal_elective
+				has_law = succ_hre_elective
 			}
 		}
 
@@ -828,22 +826,20 @@ faction_succ_primogeniture = {
 	allow = {
 		is_law_potential = succ_primogeniture
 		is_law_allowed = succ_primogeniture
+		NOT = { has_law = succ_primogeniture }
 
 		OR = {
 			is_primary_holder_title = yes
 			higher_real_tier_than = DUKE
 		}
 
-		NOR = {
-			has_law = succ_primogeniture
+		# Isn't locked into elective succession
+		trigger_if = {
+			limit = { holder_scope = { has_law = succession_voting_power_1 } }
 
-			trigger_if = {
-				limit = { has_law = succession_voting_power_1 }
-
-				OR = {
-					has_law = succ_feudal_elective
-					has_law = succ_hre_elective
-				}
+			NOR = {
+				has_law = succ_feudal_elective
+				has_law = succ_hre_elective
 			}
 		}
 
@@ -1537,22 +1533,20 @@ faction_succ_gavelkind = {
 	allow = {
 		is_law_potential = succ_gavelkind
 		is_law_allowed = succ_gavelkind
+		NOT = { has_law = succ_gavelkind }
 
 		OR = {
 			is_primary_holder_title = yes
 			higher_real_tier_than = DUKE
 		}
 
-		NOR = {
-			has_law = succ_gavelkind
+		# Isn't locked into elective succession
+		trigger_if = {
+			limit = { holder_scope = { has_law = succession_voting_power_1 } }
 
-			AND = {
-				has_law = succession_voting_power_1
-
-				OR = {
-					has_law = succ_feudal_elective
-					has_law = succ_hre_elective
-				}
+			NOR = {
+				has_law = succ_feudal_elective
+				has_law = succ_hre_elective
 			}
 		}
 
@@ -2228,7 +2222,6 @@ faction_succ_feudal_elective = {
 	potential = {
 		is_landed = yes
 		higher_real_tier_than = BARON
-		NOT = { religion_group = muslim }
 		is_adult = yes
 		independent = no
 		prisoner = no
@@ -2251,27 +2244,6 @@ faction_succ_feudal_elective = {
 			is_feudal = yes
 			is_vice_royalty = no
 			NOT = { government = chinese_imperial_government }
-
-			trigger_if = {
-				limit = { has_dlc = "Conclave" }
-
-				primary_title = {
-					OR = {
-						title = e_hre
-						title = event_target:alternate_hre
-
-						AND = {
-							has_law = law_voting_power_1
-							has_law = banish_voting_power_1
-							has_law = execution_voting_power_1
-							has_law = revoke_title_voting_power_1
-							has_law = grant_title_voting_power_1
-							has_law = imprison_voting_power_1
-							has_law = war_voting_power_1
-						}
-					}
-				}
-			}
 
 			# Hordes should have less problems with this type of faction until ca 1350
 			trigger_if = {
@@ -2302,12 +2274,9 @@ faction_succ_feudal_elective = {
 						is_council_content = no
 						NOT = { has_law = war_voting_power_1 }
 
-						primary_title = {
-							OR = {
-								title = e_hre
-								title = event_target:alternate_hre
-							}
-						}
+						# Easier to restore elective to the HRE
+						has_landed_title = e_hre
+						has_landed_title = event_target:alternate_hre
 					}
 				}
 			}
@@ -2346,24 +2315,39 @@ faction_succ_feudal_elective = {
 			AND = {
 				is_law_potential = succ_feudal_elective
 				is_law_allowed = succ_feudal_elective
+				NOT = { has_law = succ_feudal_elective }
 			}
 
 			AND = {
 				is_law_potential = succ_hre_elective
 				is_law_allowed = succ_hre_elective
+				NOT = { has_law = succ_hre_elective }
+			}
+
+			AND = {
+				is_law_potential = succ_byzantine_elective
+				is_law_allowed = succ_byzantine_elective
+				NOT = { has_law = succ_byzantine_elective }
 			}
 		}
 
-		NOR = {
-			has_law = succ_feudal_elective
-			has_law = succ_hre_elective
+		# Easier to restore elective to the HRE,
+		# all other titles require full council power laws
+		trigger_if = {
+			limit = { has_dlc = "Conclave" }
 
-			AND = {
-				has_law = succession_voting_power_1
+			OR = {
+				title = e_hre
+				title = event_target:alternate_hre
 
-				OR = {
-					has_law = succ_feudal_elective
-					has_law = succ_hre_elective
+				holder_scope = {
+					has_law = law_voting_power_1
+					has_law = banish_voting_power_1
+					has_law = execution_voting_power_1
+					has_law = revoke_title_voting_power_1
+					has_law = grant_title_voting_power_1
+					has_law = imprison_voting_power_1
+					has_law = war_voting_power_1
 				}
 			}
 		}
@@ -2376,14 +2360,12 @@ faction_succ_feudal_elective = {
 				}
 			}
 		}
-
 	}
 
 	# Faction member scope (ROOT = joiner, FROM = target)
 	allow_join = {
 		ROOT = {
 			is_landed = yes
-			NOT = { religion_group = muslim }
 			independent = no
 			is_adult = yes
 			prisoner = no
@@ -2414,12 +2396,9 @@ faction_succ_feudal_elective = {
 							is_council_content = no
 							NOT = { has_law = war_voting_power_1 }
 
-							primary_title = {
-								OR = {
-									title = e_hre
-									title = event_target:alternate_hre
-								}
-							}
+							# Easier to restore elective to the HRE
+							has_landed_title = e_hre
+							has_landed_title = event_target:alternate_hre
 						}
 					}
 				}
@@ -3048,6 +3027,7 @@ faction_succ_feudal_elective = {
 		OR = {
 			has_law = succ_feudal_elective
 			has_law = succ_hre_elective
+			has_law = succ_byzantine_elective
 		}
 	}
 
