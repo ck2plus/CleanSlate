@@ -14,8 +14,8 @@ NDefines = {
 		PAPAL_INVEST_PIETY_COST_MULT = 0.5, 											-- The effect of Papal investiture on the piety cost of the special Papal actions
 		SHORT_REIGN_YEARS_END = 9,
 		LONG_REIGN_YEARS_START = 10,
-		MAX_LONG_REIGN_BONUS = 100,                 									-- Max bonus in opinion you can get from long reign
-		LONG_REIGN_PENALTY = -2,       													-- Penalty ticking down every year from long reign bonus
+		MAX_LONG_REIGN_BONUS = 100,														-- Max bonus in opinion you can get from long reign
+		LONG_REIGN_PENALTY = -2,														-- Penalty ticking down every year from long reign bonus
 		LONG_REIGN_PENALTY_START = 3, 													-- What year penalty tick should start
 		SHORT_REIGN_OPINION_MULT = 1.0,													-- Opinion penalty multiplier to short reign years
 		LONG_REIGN_OPINION_MULT = 0.5,													-- Opinion penalty boost to long reign years
@@ -78,7 +78,7 @@ NDefines = {
 		CROWN_LAW_CHANGE_PIETY_COST = 100,												-- Piety cost for Iqta government when changing Crown laws
 		LAW_CHANGE_PRESTIGE_COST = 100,													-- Prestige cost for Nomadic government when changing normal demesne laws
 		CROWN_LAW_CHANGE_PRESTIGE_COST = 200,											-- Prestige cost for Nomadic government when changing Crown laws
-		INTER_MUSLIM_WAR_MONTHLY_PIETY_COST = 2,  										-- Monthly Piety cost for Muslims who are primary attackers against a ruler of the same religion (not civil wars)
+		INTER_MUSLIM_WAR_MONTHLY_PIETY_COST = 2,										-- Monthly Piety cost for Muslims who are primary attackers against a ruler of the same religion (not civil wars)
 		MUSLIM_TEMPLE_HOLDING_MONTHLY_PIETY = 0.2, 										-- Monthly Piety for Muslims for each Temple holding in the demesne
 		DOWRY_MULTIPLIER = 1.0,															-- The Dowry cost for a government that uses the bride price is prestige gain from marriage * this
 		PAGAN_PEACE_MONTHS = 24,														-- Months before the Peace Prestige loss kicks in for certain Pagan religions
@@ -695,7 +695,7 @@ NDefines = {
 		FORCE_JOIN_FACTION_INTERACTION_PIETY = 0,
 		FORCE_JOIN_FACTION_INTERACTION_PRESTIGE = 0,
 		FORCE_JOIN_FACTION_INTERACTION_THRESHOLD_FOR_NO = 0,						-- useless since this is an auto accepted interaction.
-		FORCE_JOIN_FACTION_INTERACTION_THRESHOLD_FOR_YES = 0,   					-- useless since this is an auto accepted interaction.
+		FORCE_JOIN_FACTION_INTERACTION_THRESHOLD_FOR_YES = 0,						-- useless since this is an auto accepted interaction.
 		FORCE_JOIN_FACTION_INTERACTION_MUST_HAVE_COST = 0,							-- Is having prestige/piety >= cost required for this action?
 		FORCE_JOIN_FACTION_INTERACTION_ENABLED = 1,									-- Should this action be used at all?
 
@@ -703,7 +703,7 @@ NDefines = {
 		ASK_REALM_PEACE_INTERACTION_PIETY = 0,
 		ASK_REALM_PEACE_INTERACTION_PRESTIGE = 0,
 		ASK_REALM_PEACE_INTERACTION_THRESHOLD_FOR_NO = 0,							-- useless since this is an auto accepted interaction.
-		ASK_REALM_PEACE_INTERACTION_THRESHOLD_FOR_YES = 0,  						-- useless since this is an auto accepted interaction.
+		ASK_REALM_PEACE_INTERACTION_THRESHOLD_FOR_YES = 0,							-- useless since this is an auto accepted interaction.
 		ASK_REALM_PEACE_INTERACTION_MUST_HAVE_COST = 0,								-- Is having prestige/piety >= cost required for this action?
 		ASK_REALM_PEACE_INTERACTION_ENABLED = 1,									-- Should this action be used at all?
 
@@ -711,7 +711,7 @@ NDefines = {
 		ASK_COUNCIL_POSITION_INTERACTION_PIETY = 0,
 		ASK_COUNCIL_POSITION_INTERACTION_PRESTIGE = 0,
 		ASK_COUNCIL_POSITION_INTERACTION_THRESHOLD_FOR_NO = 0,						-- useless since this is an auto accepted interaction.
-		ASK_COUNCIL_POSITION_INTERACTION_THRESHOLD_FOR_YES = 0,     				-- useless since this is an auto accepted interaction.
+		ASK_COUNCIL_POSITION_INTERACTION_THRESHOLD_FOR_YES = 0,						-- useless since this is an auto accepted interaction.
 		ASK_COUNCIL_POSITION_INTERACTION_MUST_HAVE_COST = 0,						-- Is having prestige/piety >= cost required for this action?
 		ASK_COUNCIL_POSITION_INTERACTION_ENABLED = 1,								-- Should this action be used at all?
 
@@ -719,7 +719,7 @@ NDefines = {
 		OFFER_CONSORT_INTERACTION_PIETY = 0,
 		OFFER_CONSORT_INTERACTION_PRESTIGE = 0,
 		OFFER_CONSORT_INTERACTION_THRESHOLD_FOR_NO = 0,								-- useless since this is an auto accepted interaction.
-		OFFER_CONSORT_INTERACTION_THRESHOLD_FOR_YES = 0,   	 						-- useless since this is an auto accepted interaction.
+		OFFER_CONSORT_INTERACTION_THRESHOLD_FOR_YES = 0,							-- useless since this is an auto accepted interaction.
 		OFFER_CONSORT_INTERACTION_MUST_HAVE_COST = 0,								-- Is having prestige/piety >= cost required for this action?
 		OFFER_CONSORT_INTERACTION_ENABLED = 1,										-- Should this action be used at all?
 
@@ -727,7 +727,7 @@ NDefines = {
 		GIVE_ARTIFACT_INTERACTION_PIETY = 0,
 		GIVE_ARTIFACT_INTERACTION_PRESTIGE = 0,
 		GIVE_ARTIFACT_INTERACTION_THRESHOLD_FOR_NO = 0,								-- useless since this is an auto accepted interaction.
-		GIVE_ARTIFACT_INTERACTION_THRESHOLD_FOR_YES = 0,   	 						-- useless since this is an auto accepted interaction.
+		GIVE_ARTIFACT_INTERACTION_THRESHOLD_FOR_YES = 0,							-- useless since this is an auto accepted interaction.
 		GIVE_ARTIFACT_INTERACTION_MUST_HAVE_COST = 0,								-- Is having prestige/piety >= cost required for this action?
 		GIVE_ARTIFACT_INTERACTION_ENABLED = 1,										-- Should this action be used at all?
 
@@ -816,9 +816,9 @@ NDefines = {
 		REALM_SIZE_GROWTH_MODIFIER = 0.125,											-- The bigger you are, the more dangerous you are, modifier for when nation is growing
 		REALM_SIZE_SHRINK_MODIFIER = 0.1,											-- The bigger you are, the more dangerous you are, modifier for when nation is shrinking
 		WAR_REALM_CHANGE_VALUE = 0.55, 												-- How much base value for realm growth/shrink is worth in a war.
-		INDEPENDENCE_REALM_CHANGE_VALUE = 10.0,	 									-- How much base value for realm growth/shrink is worth when giving a vassal independence.
-		INHERITANCE_CHANGE_VALUE = 0.15,	 										-- How much base value for realm growth/shrink is worth when inheriting titles.
-		VASSAL_CHANGE_VALUE = 0.3,	 												-- How much base value for realm growth/shrink is worth when inheriting titles.
+		INDEPENDENCE_REALM_CHANGE_VALUE = 10.0,										-- How much base value for realm growth/shrink is worth when giving a vassal independence.
+		INHERITANCE_CHANGE_VALUE = 0.15,											-- How much base value for realm growth/shrink is worth when inheriting titles.
+		VASSAL_CHANGE_VALUE = 0.3,													-- How much base value for realm growth/shrink is worth when inheriting titles.
 		INFAMY_DECAY_BASE = 0.8,													-- How many percent that decay each month as base.
 		MIN_INFAMY_DECAY = 0.21,													-- The minimum infamy decay regardless of troop strength.
 		MAX_INFAMY_DECAY = 0.4,														-- The maximum infamy decay regardless of troop strength.
@@ -1422,7 +1422,7 @@ NDefines = {
 		GALLEYS_PHASE_PURSUE_DEFENSE = 1,
 		GALLEYS_GRAPHICAL_FACTOR = 1,
 
-		COMMAND_MODIFIER_MARTIAL_MULTIPLIER = 0.05,	  								-- How much positive command modifiers are increased, and negative modifiers decreased (capped to 100% for negative), per point of martial
+		COMMAND_MODIFIER_MARTIAL_MULTIPLIER = 0.05,									-- How much positive command modifiers are increased, and negative modifiers decreased (capped to 100% for negative), per point of martial
 
 		MAX_RIVER_MOVEMENT_FORT_LEVEL = 10.0,
 		BOTTLENECK_SIZE_MODIFIER = 1.0,
@@ -1443,7 +1443,7 @@ NDefines = {
 		OUT_OF_SUPPLY_ATTRITION_BASE = 0.001,										-- The attrition a unit that is out of supply takes.
 		OUT_OF_SUPPLY_ATTRITION_INCREASE = 0.0001,									-- The increase per tick of attrition a unit that is out of supply takes.
 		OUT_OF_SUPPLY_ATTRITION_TICK = 1,											-- The amount of days per tick for increase of attrition.
-		FORAGING_PILLAGE_MODIFIER = 0.15,											-- Modifies how much loot the army takes when re-supplying itself in enemy territory},
+		FORAGING_PILLAGE_MODIFIER = 0.15,											-- Modifies how much loot the army takes when re-supplying itself in enemy territory,
 
 		MONTHS_OF_UNDECIDED_WAR = 36,												-- Number of months before a war can be won by an attacker unless a major battle is won
 		MAJOR_BATTLE_WARSCORE = 5.0,												-- The minimum warscore gain needed for a battle to be considered major
@@ -1467,16 +1467,16 @@ NDefines = {
 		SHATTERED_RETREAT_WAR_FRIEND_UNIT_MULTIPLIER = 0.025, 						-- Multiplier of war friend units in province when evaluating retreat provinces
 		SHATTERED_RETREAT_ENEMY_UNIT_MULTIPLIER = -0.3, 							-- Multiplier of war friend units in province when evaluating retreat provinces
 		SHATTERED_RETREAT_NEIGHBOUR_UNIT_MULTIPLIER = 0.3, 							-- Multiplier for all unit bonuses/penalties in neighbouring provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_OCCUPIED = -20,			            					-- Added for occupied provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_OWN_REALM = 200,			            					-- Added for own realm controlled provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_OWN_CAPITAL = 30,			            					-- Added for own realm controlled provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_WAR_FRIEND = 150,			            					-- Added for war friend controlled provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_ENEMY = -250,				            					-- Added for enemy controlled provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_SAME_RELIGION	= 30,		            					-- Added for same religion controlled provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_SAME_CULTURE = 10,		            					-- Added for same culture controlled provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_SAME_GOVERNMENT = 15,		            					-- Added for same government controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_OCCUPIED = -20,											-- Added for occupied provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_OWN_REALM = 200,											-- Added for own realm controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_OWN_CAPITAL = 30,											-- Added for own realm controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_WAR_FRIEND = 150,											-- Added for war friend controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_ENEMY = -250,												-- Added for enemy controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_SAME_RELIGION	= 30,										-- Added for same religion controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_SAME_CULTURE = 10,										-- Added for same culture controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_SAME_GOVERNMENT = 15,										-- Added for same government controlled provinces when evaluating retreat provinces
 		SHATTERED_RETREAT_MAX_DISTANCE_DIVIDER = 4,									-- The previous values are now divided by distance away from the prefered distance, but won't be divided by more than this
-		SHATTERED_RETREAT_RANDOM = 10,				            					-- Added random factor when evaluating shattered retreat provinces
+		SHATTERED_RETREAT_RANDOM = 10,												-- Added random factor when evaluating shattered retreat provinces
 		SHATTERED_RETREAT_BOAT_ADJACENCY_COASTAL_BONUS = 20, 						-- Bonus added to coastal provinces adjacent to boats the unit can board
 		MERCENARY_CREATE_LEVY_RATIO = 0.25,											-- Amount of max levies used to calculate the maximum size of non-nomadic dynamic mercenaries.
 		SHATTERED_RETREAT_BIG_PROVINCE_LIMIT = 100.0, 								-- Province movement cost value above which a province will be considered "big" for purpose of distance computation when choosing a target for shattered retreat.
@@ -1547,7 +1547,7 @@ NDefines = {
 		INFECTION_CHANCE_BASE_PROVINCES_NUMBER = 1,									-- How many provinces get infected, as a percentage of the outbreak size, multiplied by contagiousness (ie total = current_size * contagiousness * INFECTION_CHANCE_BASE_PROVINCES_NUMBER)
 
 		INFECTION_CHANCE_MOST_LIKELY_PERCENTAGE = 0.1,								-- How many provinces are considered when picking which ones get infected, as a percentage of how many provinces are infectable
-																					-- For example, if you have an outbreak province that is 45 provinces big, and has 30 provinces adjacent to those, only the 7 (30 * 0.25, rounded down) most likely provinces  would be considered
+																					-- For example, if you have an outbreak province that is 45 provinces big, and has 30 provinces adjacent to those, only the 7 (30 * 0.25, rounded down) most likely provinces would be considered
 
 		INFECTION_CHANCE_COASTAL_SEAS_ARE_COUNTED = 0,								-- Exclude coastal seas from the number of infected provinces (they still get infected but don't change the number of "real" provinces that get infected each tick)
 
@@ -1729,7 +1729,7 @@ NDefines = {
 		CAMERA_END_X = 790.0,														-- Move to position in main menu
 		CAMERA_END_Y = 500.0,
 		CAMERA_END_Z = 600.0,
-		TIME_FROZEN = 1.0,						 									-- Time before initial animation starts (some delay here so it should NOT be 0, then the animation starts before you can see it)
+		TIME_FROZEN = 1.0,															-- Time before initial animation starts (some delay here so it should NOT be 0, then the animation starts before you can see it)
 		GUI_MOVE_SPEED = 800,														-- How fast sliding gui objects move ( pixels/s )
 		MAX_ZOOM_LEVEL = 2500,														-- How far out the player can zoom. Warning: At very high zoom levels, the ground will no longer render
 
