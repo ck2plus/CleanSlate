@@ -1885,5 +1885,4 @@ NDefines = {
 		CONVERTER_IGNORE_HISTORICAL_WONDERS = 1,	-- If set to 1 then the historical wonders will not be transfered through the EU4 converter even if they have finished the final stage of construction.
 		NON_CONCLAVE_COST_MULTIPLIER = 0.6			-- Without Conclave tax laws independent rulers will have significantly less income.
 	}
-
 }
