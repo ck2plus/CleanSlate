@@ -1472,7 +1472,7 @@ NDefines = {
 		SHATTERED_RETREAT_OWN_CAPITAL = 30,											-- Added for own realm controlled provinces when evaluating retreat provinces
 		SHATTERED_RETREAT_WAR_FRIEND = 150,											-- Added for war friend controlled provinces when evaluating retreat provinces
 		SHATTERED_RETREAT_ENEMY = -250,												-- Added for enemy controlled provinces when evaluating retreat provinces
-		SHATTERED_RETREAT_SAME_RELIGION	= 30,										-- Added for same religion controlled provinces when evaluating retreat provinces
+		SHATTERED_RETREAT_SAME_RELIGION = 30,										-- Added for same religion controlled provinces when evaluating retreat provinces
 		SHATTERED_RETREAT_SAME_CULTURE = 10,										-- Added for same culture controlled provinces when evaluating retreat provinces
 		SHATTERED_RETREAT_SAME_GOVERNMENT = 15,										-- Added for same government controlled provinces when evaluating retreat provinces
 		SHATTERED_RETREAT_MAX_DISTANCE_DIVIDER = 4,									-- The previous values are now divided by distance away from the prefered distance, but won't be divided by more than this
@@ -1700,7 +1700,7 @@ NDefines = {
 		GO_AGAINST_COUNCIL_GREED_MODIFIER = 0.0,									-- Modifier on the greed value to go against the council
 		GO_AGAINST_COUNCIL_ZEAL_MODIFIER = 0.0,										-- Modifier on the zeal value to go against the council
 		GO_AGAINST_COUNCIL_OPINION_MODIFIER = 2.0,									-- Modifier on the average opinion value of vassals to go against the council
-		RAISE_FORCES_ENEMY_TROOP_AMOUNT	= 1.25,										-- Threshold that checks if AI should employ holy order or raise controlled/uncontrolled landless forces if AI has less troops than threshold multiplied by raised enemy troop
+		RAISE_FORCES_ENEMY_TROOP_AMOUNT = 1.25,										-- Threshold that checks if AI should employ holy order or raise controlled/uncontrolled landless forces if AI has less troops than threshold multiplied by raised enemy troop
 
 		ASK_FOR_COUNCIL_POSITION_BASE_DESIRE = 25,									-- Base score for the AI to use the AskForCouncilPosition interaction when they have a favor on their liege
 		ASK_FOR_COUNCIL_POSITION_DESIRE_MULTIPLIER = 2,								-- Multiplier to the "goodness" value of the AI for the position, added as extra incentive to the AskForCouncilPosition desire
