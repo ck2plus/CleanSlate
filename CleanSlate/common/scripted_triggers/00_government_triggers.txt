@@ -148,30 +148,11 @@ confucian_government_allow_trigger = {} # Special snowflake government. Doesn't 
 merchant_republic_government_potential_trigger = {
 	republic_group_potential_trigger = yes
 
-	# Patrician and Doge requirements
-	trigger_if = {
-		limit = { is_patrician = yes }
-
-		OR = {
-			has_game_started = no # History isn't initiated until after game starts
-
-			# Liege must be MR
-			liege_before_war = {
-				is_merchant_republic = yes
-
-				# MR can't be under MR
-				trigger_if = {
-					limit = { independent = no }
-
-					liege_before_war = {
-						is_merchant_republic = no
-					}
-				}
-			}
+	trigger_if = { # Established MR requiremends
+		limit = {
+			is_merchant_republic = yes
+			has_game_started = yes
 		}
-	}
-	trigger_else = { # Does not require being a patrician, to allow creation of new Merchant Republics
-		capital_scope = { is_coastal = yes }
 
 		# Require at least one province and be Duke tier or higher
 		higher_real_tier_than = COUNT
@@ -183,6 +164,48 @@ merchant_republic_government_potential_trigger = {
 
 			liege_before_war = {
 				is_merchant_republic = no
+			}
+		}
+	}
+	trigger_else_if = { # Established Patrician requirements
+		limit = {
+			is_patrician = yes
+			has_game_started = yes
+		}
+
+		# Liege must be MR
+		liege_before_war = {
+			is_merchant_republic = yes
+
+			# MR can't be under MR
+			trigger_if = {
+				limit = { independent = no }
+
+				liege_before_war = {
+					is_merchant_republic = no
+				}
+			}
+		}
+	}
+	trigger_else = { # Pre-game and new MR requirements
+		OR = {
+			is_patrician = yes
+
+			trigger_if = {
+				limit = { capital_scope = { is_coastal = yes } }
+
+				# Require at least one province and be Duke tier or higher
+				higher_real_tier_than = COUNT
+				num_of_count_titles >= 1
+
+				# MR can't be under MR
+				trigger_if = {
+					limit = { independent = no }
+
+					liege_before_war = {
+						is_merchant_republic = no
+					}
+				}
 			}
 		}
 	}
