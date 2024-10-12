@@ -2163,6 +2163,10 @@ religious = {
 				limit = { religion = buddhist }
 				piety >= 250
 			}
+			trigger_else_if = {
+				limit = { religion_group = pagan_group }
+				piety >= 100
+			}
 		}
 	}
 
@@ -2175,7 +2179,6 @@ religious = {
 			mercenary = no
 
 			NOR = {
-				religion_group = pagan_group
 				religion = taoist
 				same_realm = FROM
 			}
@@ -2203,6 +2206,16 @@ religious = {
 
 				FROM = { has_character_modifier = known_satanist }
 				NOT = { has_character_modifier = known_satanist }
+			}
+
+			# Pagan check
+			trigger_if = {
+				religion_group = pagan_group
+
+				OR = {
+					is_reformed_religion = yes
+					religion = aztec_pagan
+				}
 			}
 
 			# Requirements for holy war in same religion group
@@ -2356,9 +2369,15 @@ religious = {
 	is_valid = {
 		# Attacker
 		ROOT = {
-			NOR = {
-				religion_group = pagan_group
-				same_realm = FROM
+			NOT = { same_realm = FROM }
+
+			trigger_if = {
+				limit = { religion_group = pagan_group }
+
+				OR = {
+					is_reformed_religion = yes
+					religion = aztec_pagan
+				}
 			}
 
 			pacifist = no
@@ -2414,6 +2433,10 @@ religious = {
 				limit = { religion = buddhist }
 				piety = -250
 			}
+			else_if = {
+				limit = { religion_group = pagan_group }
+				piety = -100
+			}
 		}
 
 		fire_haruspicy_event_effect = yes
@@ -2444,6 +2467,24 @@ religious = {
 					change_variable = {
 						which = strengthen_religion
 						value = 1
+					}
+				}
+
+				if = {
+					limit = {
+						religion_group = pagan_group # Originally only in pagan_holy_war
+						trigger_if = {
+							limit = { has_nickname = yes }
+							this_has_lame_nickname_trigger = yes
+						}
+					}
+
+					random_list = {
+						10 = { give_nickname = nick_the_dragon }
+						10 = { give_nickname = nick_the_holy }
+						10 = { give_nickname = nick_bloodaxe }
+						10 = { give_nickname = nick_the_great }
+						40 = { give_nickname = nick_the_sword_of_god }
 					}
 				}
 			}
@@ -2701,6 +2742,12 @@ religious = {
 
 		coronation_factor = yes
 
+		mult_factor = { # Prefer using CB's without on_add costs
+			factor = 0.9
+
+			attacker = { religion_group = pagan_group }
+		}
+
 		# Try to guide the Hordes in the right direction
 		mult_modifier = {
 			factor = 0.1
@@ -2777,6 +2824,28 @@ religious = {
 				OR = {
 					title = e_persia
 					title = e_rajastan
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.1
+
+			ROOT = {
+				culture = hungarian
+
+				primary_title = {
+					OR = {
+						title = k_hungary
+						title = e_carpathia
+					}
+				}
+			}
+
+			empire = {
+				OR = {
+					title = e_tartaria
+					title = e_rus
 				}
 			}
 		}
