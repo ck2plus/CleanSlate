@@ -2159,58 +2159,24 @@ religious = {
 	can_use_gui = {
 		# Attacker
 		ROOT = {
+			# General Requirements
+			is_nomadic = no
+			pacifist = no
+			mercenary = no
+			NOT = { same_realm = FROM }
+
 			trigger_if = {
-				limit = { religion = buddhist }
-				piety >= 250
+				limit = { religion_group = indian_group }
+
+				NOT = { religion = taoist }
+				trigger_if = {
+					limit = { religion = buddhist }
+					piety >= 250
+				}
 			}
 			trigger_else_if = {
 				limit = { religion_group = pagan_group }
 				piety >= 100
-			}
-		}
-	}
-
-	can_use = {
-		# Attacker
-		ROOT = {
-			# General requirements
-			is_nomadic = no
-			pacifist = no
-			mercenary = no
-
-			NOR = {
-				religion = taoist
-				same_realm = FROM
-			}
-
-			# Northern Crusade
-			trigger_if = {
-				limit = { has_global_flag = northern_crusades_active }
-
-				NOR = {
-					has_landed_title = k_teutonic_state
-					has_landed_title = d_teutonic_order
-				}
-			}
-
-			# Reconquista check
-			reconquista_check_trigger = no
-			NOT = { has_character_flag = currently_reconquering_iberia }
-
-			# Hindu check
-			trigger_if = {
-				limit = {
-					religion = hindu
-					FROM = { has_dharmic_religion_trigger = yes }
-				}
-
-				FROM = { has_character_modifier = known_satanist }
-				NOT = { has_character_modifier = known_satanist }
-			}
-
-			# Pagan check
-			trigger_if = {
-				religion_group = pagan_group
 
 				OR = {
 					is_reformed_religion = yes
@@ -2218,7 +2184,7 @@ religious = {
 				}
 			}
 
-			# Requirements for holy war in same religion group
+			# Requirements for Holy War in the same religion group
 			trigger_if = {
 				limit = { religion_group = FROM }
 
@@ -2227,9 +2193,20 @@ religious = {
 					is_heresy_of = FROM
 					is_parent_religion = FROM
 
+					# Can holy war known demon worshippers in he same religion group
+					trigger_if = {
+						limit = {
+							NOT = { has_character_modifier = known_satanist }
+						}
+						FROM = { has_character_modifier = known_satanist }
+					}
+
 					# Dharmics can fight Taoists
 					trigger_if = {
-						limit = { has_dharmic_religion_trigger = yes }
+						limit = {
+							religion_group = indian_group # Not strictly necessary, but I like the consistency
+							has_dharmic_religion_trigger = yes
+						}
 						FROM = { religion = taoist }
 					}
 
@@ -2246,36 +2223,57 @@ religious = {
 						}
 					}
 
-					# Can holy war known demon worshippers in he same religion group
-					trigger_if = {
-						limit = { FROM = { has_character_modifier = known_satanist } }
-						NOT = { has_character_modifier = known_satanist }
+					# Pagans also fight amongst themselves
+					trigger_else_if = {
+						limit = { religion_group = pagan }
+						NOT = { religion = FROM }
 					}
 				}
 			}
 
-			top_liege = {
-				religion_group = ROOT
+			# Northern Crusade
+			trigger_if = {
+				limit = { has_global_flag = northern_crusades_active }
 
-				# Can holy war known devil worshippers of top liege's religion
-				trigger_if = {
-					limit = { religion = FROM }
-
-					FROM = { has_character_modifier = known_satanist }
-					NOT = { has_character_modifier = known_satanist }
-
-					ROOT = {
-						NOT = { has_character_modifier = known_satanist }
-					}
+				NOR = {
+					has_landed_title = k_teutonic_state
+					has_landed_title = d_teutonic_order
 				}
+			}
 
-				# Religion must match, or neither is a heretic
-				OR = {
-					religion = ROOT
+			# Reconquista check
+			reconquista_check_trigger = no
+			NOT = { has_character_flag = currently_reconquering_iberia }
 
-					AND = {
-						is_heretic = no
-						ROOT = { is_heretic = no }
+			trigger_if = {
+				limit = { independent = no }
+
+				top_liege = {
+					religion_group = ROOT
+
+					# Religion must match, or neither is a heretic
+					trigger_if = {
+						limit = {
+							NOT = { religion = ROOT }
+						}
+
+						NOR = {
+							religion_group = pagan_group
+							is_heretic = yes
+							ROOT = { is_heretic = yes }
+						}
+					}
+
+					# Can holy war known devil worshippers of top liege's religion
+					trigger_if = {
+						limit = { religion = FROM }
+
+						FROM = { has_character_modifier = known_satanist }
+						NOT = { has_character_modifier = known_satanist }
+
+						ROOT = {
+							NOT = { has_character_modifier = known_satanist }
+						}
 					}
 				}
 			}
