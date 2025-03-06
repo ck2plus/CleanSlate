@@ -6,7 +6,6 @@
 # The succession law factions have hard coded elements to ensure that the correct heir is shown in Plot and
 # Faction interfaces and that AI faction members vote for laws in accordance with the faction goal.
 # The valid tags correspond to the law name: faction_succ_seniority, faction_succ_primogeniture, etc.
-# (faction_succ_ultimogeniture is fully supported by the code, but not currently implemented)
 
 ###############
 # FACTIONS
@@ -30,9 +29,10 @@ faction_succ_seniority = {
 		holy_order = no
 
 		NOR = {
-			in_faction = faction_succ_primogeniture
-			in_faction = faction_succ_feudal_elective
 			in_faction = faction_succ_gavelkind
+			in_faction = faction_succ_primogeniture
+			in_faction = faction_succ_ultimogeniture
+			in_faction = faction_succ_feudal_elective
 			has_character_modifier = faction_succ_seniority_ultimatum_timer
 
 			has_opinion_modifier = {
@@ -146,9 +146,10 @@ faction_succ_seniority = {
 			is_incapable = no
 
 			NOR = {
-				in_faction = faction_succ_primogeniture
-				in_faction = faction_succ_feudal_elective
 				in_faction = faction_succ_gavelkind
+				in_faction = faction_succ_primogeniture
+				in_faction = faction_succ_ultimogeniture
+				in_faction = faction_succ_feudal_elective
 				has_character_modifier = faction_succ_seniority_ultimatum_timer
 
 				has_opinion_modifier = {
@@ -406,9 +407,10 @@ faction_succ_seniority = {
 			trigger_if = {
 				limit = {
 					OR = {
-						in_faction = faction_succ_feudal_elective
-						in_faction = faction_succ_primogeniture
 						in_faction = faction_succ_gavelkind
+						in_faction = faction_succ_primogeniture
+						in_faction = faction_succ_ultimogeniture
+						in_faction = faction_succ_feudal_elective
 
 						# I'm the current heir
 						is_heir = FROMFROM
@@ -750,9 +752,10 @@ faction_succ_primogeniture = {
 		holy_order = no
 
 		NOR = {
-			in_faction = faction_succ_seniority
-			in_faction = faction_succ_feudal_elective
 			in_faction = faction_succ_gavelkind
+			in_faction = faction_succ_seniority
+			in_faction = faction_succ_ultimogeniture
+			in_faction = faction_succ_feudal_elective
 			has_character_modifier = faction_succ_primogeniture_ultimatum_timer
 
 			has_opinion_modifier = {
@@ -866,9 +869,10 @@ faction_succ_primogeniture = {
 			is_incapable = no
 
 			NOR = {
-				in_faction = faction_succ_seniority
-				in_faction = faction_succ_feudal_elective
 				in_faction = faction_succ_gavelkind
+				in_faction = faction_succ_seniority
+				in_faction = faction_succ_ultimogeniture
+				in_faction = faction_succ_feudal_elective
 				has_character_modifier = faction_succ_primogeniture_ultimatum_timer
 
 				has_opinion_modifier = {
@@ -1112,9 +1116,10 @@ faction_succ_primogeniture = {
 			trigger_if = {
 				limit = {
 					OR = {
-						in_faction = faction_succ_feudal_elective
-						in_faction = faction_succ_seniority
 						in_faction = faction_succ_gavelkind
+						in_faction = faction_succ_seniority
+						in_faction = faction_succ_ultimogeniture
+						in_faction = faction_succ_feudal_elective
 
 						# Hordes should have less problems with this type of faction until ca 1350
 						liege = {
@@ -1439,6 +1444,717 @@ faction_succ_primogeniture = {
 	}
 }
 
+# Institute Succession by Ultimogeniture
+faction_succ_ultimogeniture = {
+	type = liege_titles
+
+	warning_level = 0.70
+
+	# Plotter scope
+	potential = {
+		always = no # CleanSlate: Added by CleanSlate, therefore disabled. Remove this line to enable.
+		is_landed = yes
+		NOT = { religion_group = muslim }
+		higher_real_tier_than = BARON
+		is_adult = yes
+		independent = no
+		prisoner = no
+		is_incapable = no
+		holy_order = no
+
+		NOR = {
+			in_faction = faction_succ_gavelkind
+			in_faction = faction_succ_seniority
+			in_faction = faction_succ_primogeniture
+			in_faction = faction_succ_feudal_elective
+			has_character_modifier = faction_succ_ultimogeniture_ultimatum_timer
+
+			has_opinion_modifier = {
+				name = opinion_coerced_into_leaving_faction
+				who = liege
+			}
+		}
+
+		liege = {
+			is_feudal = yes
+			is_vice_royalty = no
+
+			# Hordes should have less problems with this type of faction until ca 1350
+			trigger_if = {
+				limit = {
+					has_horde_culture = yes
+					culture = ROOT
+					religion = ROOT
+				}
+
+				year >= 1350
+			}
+
+			NOT = {
+				any_demesne_title = {
+					temporary = yes
+				}
+			}
+		}
+
+		trigger_if = {
+			limit = {
+				has_dlc = "Conclave"
+				is_voter = yes
+				is_tribal = no
+				is_nomadic = no
+			}
+
+			liege = {
+				OR = {
+					has_council = no
+					is_council_content = no
+					has_law = war_voting_power_0
+				}
+			}
+		}
+		trigger_else_if = {
+			limit = {
+				# If affected by a Crown Law title not held by my liege
+				crownlaw_title = {
+					holder_scope = {
+						NOT = { is_liege_of = ROOT }
+					}
+				}
+			}
+
+			crownlaw_title = {
+				# The Crown Law title allows vassal infighting
+				NOR = {
+					has_law = crown_authority_2
+					has_law = crown_authority_3
+					has_law = crown_authority_4
+				}
+			}
+		}
+	}
+
+	# Target scope
+	# ROOT is title
+	# FROM is faction creator
+	allow = {
+		is_law_potential = succ_ultimogeniture
+		is_law_allowed = succ_ultimogeniture
+		NOT = { has_law = succ_ultimogeniture }
+
+		OR = {
+			is_primary_holder_title = yes
+			higher_real_tier_than = DUKE
+		}
+
+		# Isn't locked into elective succession
+		trigger_if = {
+			limit = { holder_scope = { has_law = succession_voting_power_1 } }
+
+			NOR = {
+				has_law = succ_feudal_elective
+				has_law = succ_hre_elective
+			}
+		}
+
+		holder_scope = {
+			NOT = {
+				any_war = {
+					war_title = ROOT
+					using_cb = change_ultimogeniture_succession_law
+				}
+			}
+		}
+	}
+
+	# Faction member scope
+	# ROOT = joiner
+	# FROM = target
+	allow_join = {
+		ROOT = {
+			is_landed = yes
+			NOT = { religion_group = muslim }
+			is_adult = yes
+			independent = no
+			prisoner = no
+			is_incapable = no
+
+			NOR = {
+				in_faction = faction_succ_gavelkind
+				in_faction = faction_succ_seniority
+				in_faction = faction_succ_primogeniture
+				in_faction = faction_succ_feudal_elective
+				has_character_modifier = faction_succ_ultimogeniture_ultimatum_timer
+
+				has_opinion_modifier = {
+					name = opinion_coerced_into_leaving_faction
+					who = liege
+				}
+			}
+
+			trigger_if = {
+				limit = {
+					has_dlc = "Conclave"
+					is_voter = yes
+					is_tribal = no
+					is_nomadic = no
+				}
+
+				liege = {
+					OR = {
+						has_council = no
+						is_council_content = no
+						has_law = war_voting_power_0
+					}
+				}
+			}
+		}
+	}
+
+	# AI creation weight
+	# FROM is faction creator
+	# ROOT is title scope
+	chance = {
+		factor = 1
+
+		trigger = {
+			would_be_heir_under_law = {
+				who = FROM
+				law = ultimogeniture
+			}
+
+			FROM = {
+				in_seclusion = no
+				preparing_invasion = no
+				NOT = { is_married = liege }
+
+				# To stay in the faction
+				trigger_if = {
+					limit = { leads_faction = faction_succ_ultimogeniture }
+
+					opinion = {
+						who = liege
+						value < 75
+					}
+				}
+				# To join the faction
+				trigger_else = {
+					opinion = {
+						who = liege
+						value < 50
+					}
+				}
+
+				trigger_if = {
+					limit = {
+						OR = {
+							trait = envious
+							trait = deceitful
+							trait = ambitious
+						}
+					}
+
+					opinion = {
+						who = liege
+						value < 50
+					}
+				}
+				trigger_else = {
+					opinion = {
+						who = liege
+						value < 25
+					}
+				}
+			}
+
+			current_heir = {
+				NOT = { character = FROM }
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.2
+			FROM = { pacifist = yes }
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			holder_scope = {
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_less_factions
+					bloodline_is_active_for = PREV
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 1.5
+
+			FROM = {
+				opinion = {
+					who = liege
+					value < 0
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 2.0
+
+			FROM = {
+				opinion = {
+					who = liege
+					value < -50
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 4.0
+
+			FROM = {
+				opinion = {
+					who = liege
+					value < -75
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			FROM = { trait = content }
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			FROM = { trait = imbecile }
+		}
+
+		mult_modifier = {
+			factor = 0.1
+			FROM = { trait = inbred }
+		}
+
+		mult_modifier = {
+			factor = 0.1
+			FROM = { trait = craven }
+		}
+
+		mult_modifier = {
+			factor = 0.2
+			FROM = { is_dumb_trigger = yes }
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			FROM = { trait = kind }
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			FROM = { trait = charitable }
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			FROM = { trait = honest }
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			FROM = { trait = humble }
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			FROM = { trait = just }
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			FROM = { trait = proud }
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			FROM = { trait = brave }
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			FROM = { trait = arbitrary }
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			FROM = { trait = envious }
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			FROM = { trait = greedy }
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			FROM = { trait = impaler }
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			FROM = { trait = deceitful }
+		}
+
+		mult_modifier = {
+			factor = 4.0
+			FROM = { trait = ambitious }
+		}
+	}
+
+	# AI membership weight
+	# ROOT is the prospective member
+	# FROM is the faction leader
+	# FROMFROM is the target title or character
+	membership = {
+		factor = 1
+
+		trigger = {
+			in_seclusion = no
+			preparing_invasion = no
+
+			# The following require spymaster coercion to overrule
+			trigger_if = {
+				limit = {
+					OR = {
+						in_faction = faction_succ_feudal_elective
+						in_faction = faction_succ_seniority
+						in_faction = faction_succ_primogeniture
+						in_faction = faction_succ_gavelkind
+
+						# Hordes should have less problems with this type of faction until ca 1350
+						liege = {
+							year < 1350
+							has_horde_culture = yes
+							culture = ROOT
+							religion = ROOT
+						}
+
+						# I'm the current heir
+						is_heir = FROMFROM
+
+						FROMFROM = {
+							heir_under_ultimogeniture_law = {
+								ROOT = {
+									# To stay in the faction
+									trigger_if = {
+										limit = { in_faction = faction_succ_ultimogeniture }
+
+										opinion_diff = {
+											first = liege
+											second = PREV
+											value >= 10
+											as_if_liege = yes
+										}
+									}
+									# To join the faction
+									trigger_else = {
+										opinion_diff = {
+											first = liege
+											second = PREV
+											value >= -10 # I don't like the pretender enough
+											as_if_liege = yes
+										}
+									}
+								}
+							}
+						}
+
+						# To stay in the faction
+						trigger_if = {
+							limit = { in_faction = faction_succ_ultimogeniture }
+
+							opinion = {
+								who = liege
+								value >= 75
+							}
+						}
+						# To join the faction
+						trigger_else = {
+							opinion = {
+								who = liege
+								value >= 50
+							}
+						}
+
+						trigger_if = {
+							limit = {
+								OR = {
+									trait = envious
+									trait = deceitful
+									trait = ambitious
+								}
+							}
+
+							opinion = {
+								who = liege
+								value >= 50
+							}
+						}
+						trigger_else = {
+							opinion = {
+								who = liege
+								value >= 25
+							}
+						}
+
+						# Try to exclude people who should rather support a claimant
+						# Remember: the faction leader is also the person who would inherit under this law
+						AND = {
+							FROMFROM = {
+								heir_under_ultimogeniture_law = {
+									NAND = {
+										culture = ROOT
+										religion = ROOT
+									}
+								}
+							}
+
+							liege = {
+								any_demesne_title = {
+									OR = {
+										is_primary_holder_title = yes
+										higher_real_tier_than = DUKE
+									}
+
+									ROOT = {
+										primary_title = {
+											de_jure_liege_or_above = PREVPREV
+										}
+									}
+
+									any_claimant = {
+										culture = ROOT
+										religion = ROOT
+									}
+								}
+							}
+						}
+					}
+				}
+
+				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
+					who = FROM
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 1000
+
+			has_opinion_modifier = {
+				name = opinion_coerced_into_joining_faction
+				who = FROM
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			liege = {
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_less_factions
+					bloodline_is_active_for = PREV
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.2
+
+			pacifist = yes
+
+			NOT = {
+				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
+					who = FROM
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+
+			# I like the ultmogeniture heir a LOT more than my liege
+			FROMFROM = {
+				heir_under_ultimogeniture_law = {
+					ROOT = {
+						opinion_diff = {
+							first = PREV
+							second = liege
+							value >= 25
+							as_if_liege = yes
+						}
+					}
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.01
+
+			trait = content
+
+			NOT = {
+				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
+					who = FROM
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.01
+
+			trait = imbecile
+
+			NOT = {
+				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
+					who = FROM
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.1
+
+			trait = inbred
+
+			NOT = {
+				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
+					who = FROM
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.1
+
+			trait = craven
+
+			NOT = {
+				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
+					who = FROM
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.2
+
+			is_dumb_trigger = yes
+
+			NOT = {
+				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
+					who = FROM
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			trait = kind
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			trait = charitable
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			trait = honest
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			trait = humble
+		}
+
+		mult_modifier = {
+			factor = 0.75
+			trait = just
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = proud
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = brave
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = arbitrary
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = envious
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = greedy
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = impaler
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = deceitful
+		}
+
+		mult_modifier = {
+			factor = 4.0
+			trait = ambitious
+		}
+	}
+
+	success = {
+		has_law = succ_ultimogeniture
+	}
+
+	effect = {
+		FROM = {
+			any_faction_backer = {
+				faction = faction_succ_ultimogeniture
+
+				reverse_opinion = {
+					name = opinion_grateful
+					who = FROM
+					years = 5
+				}
+			}
+		}
+	}
+
+	abort = {
+		always = no	# Factions will abort if the Potential or Allow trigger is no longer valid
+	}
+}
+
 # Institute Succession by Gavelkind
 faction_succ_gavelkind = {
 	type = liege_titles
@@ -1459,6 +2175,7 @@ faction_succ_gavelkind = {
 		NOR = {
 			in_faction = faction_succ_seniority
 			in_faction = faction_succ_primogeniture
+			in_faction = faction_succ_ultimogeniture
 			in_faction = faction_succ_feudal_elective
 			has_character_modifier = faction_succ_gavelkind_ultimatum_timer
 
@@ -1575,6 +2292,7 @@ faction_succ_gavelkind = {
 			NOR = {
 				in_faction = faction_succ_seniority
 				in_faction = faction_succ_primogeniture
+				in_faction = faction_succ_ultimogeniture
 				in_faction = faction_succ_feudal_elective
 				has_character_modifier = faction_succ_gavelkind_ultimatum_timer
 
@@ -1913,9 +2631,10 @@ faction_succ_gavelkind = {
 			trigger_if = {
 				limit = {
 					OR = {
-						in_faction = faction_succ_feudal_elective
 						in_faction = faction_succ_seniority
 						in_faction = faction_succ_primogeniture
+						in_faction = faction_succ_ultimogeniture
+						in_faction = faction_succ_feudal_elective
 
 						# I'm the current heir
 						is_heir = FROMFROM
@@ -2233,9 +2952,10 @@ faction_succ_feudal_elective = {
 		holy_order = no
 
 		NOR = {
+			in_faction = faction_succ_gavelkind
 			in_faction = faction_succ_seniority
 			in_faction = faction_succ_primogeniture
-			in_faction = faction_succ_gavelkind
+			in_faction = faction_succ_ultimogeniture
 			has_character_modifier = faction_succ_feudal_elective_ultimatum_timer
 
 			has_opinion_modifier = {
@@ -2376,9 +3096,10 @@ faction_succ_feudal_elective = {
 			is_incapable = no
 
 			NOR = {
+				in_faction = faction_succ_gavelkind
 				in_faction = faction_succ_seniority
 				in_faction = faction_succ_primogeniture
-				in_faction = faction_succ_gavelkind
+				in_faction = faction_succ_ultimogeniture
 				has_character_modifier = faction_succ_feudal_elective_ultimatum_timer
 
 				has_opinion_modifier = {
@@ -2735,9 +3456,10 @@ faction_succ_feudal_elective = {
 			trigger_if = {
 				limit = {
 					OR = {
+						in_faction = faction_succ_gavelkind
 						in_faction = faction_succ_seniority
 						in_faction = faction_succ_primogeniture
-						in_faction = faction_succ_gavelkind
+						in_faction = faction_succ_ultimogeniture
 
 						# I'm the current heir
 						is_heir = FROMFROM

@@ -266,6 +266,139 @@ plot_decisions = {
 		}
 	}
 
+	faction_succ_ultimogeniture_ultimatum = {
+		ai_check_interval = 3
+
+		is_high_prio = yes
+
+		only_playable = yes
+
+		potential = {
+			leads_faction = faction_succ_ultimogeniture
+
+			trigger_if = {
+				limit = { has_character_flag = faction_succ_ultimogeniture_ultimatum_taken }
+
+				had_character_flag = {
+					flag = faction_succ_ultimogeniture_ultimatum_taken
+					days >= 7
+				}
+			}
+		}
+
+		allow = {
+			show_only_failed_conditions = yes
+
+			war = no
+			prisoner = no
+
+			NOR = {
+				war_with = liege
+				has_truce = liege
+			}
+
+			liege = {
+				in_revolt = no
+
+				trigger_if = {
+					limit = { independent = no }
+
+					liege = {
+						will_liege_enforce_peace = no
+						has_liege_enforced_peace = no
+					}
+				}
+			}
+
+			custom_tooltip = {
+				text = tt_no_occupied_titles_in_realm
+
+				NOT = {
+					any_realm_title = {
+						lower_tier_than = DUKE
+						is_occupied = yes
+					}
+				}
+			}
+		}
+
+		effect = {
+			set_character_flag = faction_succ_ultimogeniture_ultimatum_taken
+
+			liege = {
+				show_scope_change = no
+
+				letter_event = {
+					id = 8011
+					days = 3
+					tooltip = tt_faction_ultimatum
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+
+			trigger = {
+				faction_power = {
+					faction = faction_succ_ultimogeniture
+					power >= 0.75
+				}
+
+				liege = {
+					NOT = {
+						any_war = {
+							trigger_if = {
+								limit = {
+									defender = { character = PREVPREV }
+								}
+
+								NOR = {
+									using_cb = depose_liege
+									using_cb = overthrow_ruler
+									using_cb = overthrow_ruler_no_calls
+								}
+							}
+
+							trigger_else = {
+								attacker = { character = PREVPREV }
+
+								OR = {
+									using_cb = invasion
+									using_cb = religious
+									using_cb = tribal_invasion
+									using_cb = muslim_invasion
+									using_cb = viking_invasion
+									using_cb = claim_all
+									using_cb = claim
+									using_cb = other_claim
+								}
+							}
+						}
+					}
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.1
+
+				faction_power = {
+					faction = faction_succ_ultimogeniture
+					power < 1
+				}
+			}
+
+			mult_modifier = {
+				factor = 0.1
+
+				faction_power = {
+					faction = faction_succ_ultimogeniture
+					power < 1.5
+				}
+			}
+		}
+	}
+
 	faction_succ_feudal_elective_ultimatum = {
 		ai_check_interval = 3
 
