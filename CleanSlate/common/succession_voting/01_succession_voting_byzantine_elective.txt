@@ -7,42 +7,36 @@
 
 byzantine_elective = {
 	elector_selection = {
-		days = -5
+		days = 1
 
 		trigger = {
 			# The title must currently exist
 			FROMFROM = {
 				has_holder = yes
 			}
-		}
-
-		additive_modifier = { # Emperor is always an Elector
-			value = 30
-
-			has_landed_title = FROMFROM
-		}
-
-		additive_modifier = { # Then the Councilors
-			value = 10
-
-			vassal_of = FROMFROM
 
 			OR = {
-				has_job_title = job_chancellor
-				has_job_title = job_marshal
-				has_job_title = job_treasurer
-				has_job_title = job_spymaster
-				has_job_title = job_spiritual
-				has_minor_title = title_councilmember_king
-				has_minor_title = title_councilmember_emperor
+				# Emperor is always an Elector
+				has_landed_title = FROMFROM
+
+				trigger_if = {
+					limit = { vassal_of = FROMFROM }
+
+					OR = {
+						# Then the Councilors
+						has_job_title = job_chancellor
+						has_job_title = job_marshal
+						has_job_title = job_treasurer
+						has_job_title = job_spymaster
+						has_job_title = job_spiritual
+						has_minor_title = title_councilmember_king
+						has_minor_title = title_councilmember_emperor
+
+						# And finally the generals
+						has_minor_title = title_commander
+					}
+				}
 			}
-		}
-
-		additive_modifier = { # And finally the generals
-			value = 10
-
-			vassal_of = FROMFROM
-			has_minor_title = title_commander
 		}
 	}
 
@@ -955,12 +949,7 @@ byzantine_elective = {
 
 			has_job_title = job_spiritual
 			controls_religion = yes
-
-			FROMFROM = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
+			religion = FROMFROM
 		}
 
 		# Spouse Bonus
@@ -1171,25 +1160,7 @@ byzantine_elective = {
 		}
 
 		FROM = {
-			# Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance
-			OR = {
-				is_vassal_or_below_of = ROOT
-				is_ruler = no
-
-				ROOT_FROMFROM = {
-					OR = {
-						holder_scope = {
-							independent = yes
-						}
-
-						NOR = {
-							has_law = out_of_realm_inheritance_law_1
-							has_law = crown_authority_3
-							has_law = crown_authority_4
-						}
-					}
-				}
-			}
+			# CleanSlate: Always independent, protected realm inheritance checks removed - for reference, see feudal elective
 
 			# Must have a claim, be closely related to the current ruler, or be a landed marshal/commander
 			OR = {
