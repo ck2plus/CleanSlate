@@ -204,7 +204,6 @@ eldership_rules = {
 
 		additive_modifier = { # Ruler is also always an Elector
 			value = 200
-
 			has_landed_title = FROMFROM
 		}
 
@@ -343,13 +342,8 @@ eldership_rules = {
 
 			vassal_of = FROMFROM
 			age >= 37
-
-			FROMFROM = {
-				holder_scope = {
-					culture = ROOT
-					religion = ROOT
-				}
-			}
+			culture = FROMFROM
+			religion = FROMFROM
 
 			OR = {
 				has_job_title = job_chancellor
@@ -359,12 +353,7 @@ eldership_rules = {
 
 		additive_modifier = {
 			value = -5
-
-			FROMFROM = {
-				holder_scope = {
-					NOT = { culture = ROOT }
-				}
-			}
+			NOT = { culture = FROMFROM }
 		}
 
 		additive_modifier = {
@@ -384,12 +373,7 @@ eldership_rules = {
 
 		additive_modifier = {
 			value = -10
-
-			FROMFROM = {
-				holder_scope = {
-					NOT = { culture_group = ROOT }
-				}
-			}
+			NOT = { culture_group = FROMFROM }
 		}
 
 		additive_modifier = {
@@ -460,24 +444,22 @@ eldership_rules = {
 		FROM = {
 			dynasty = ROOT
 
-			# Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance
-			OR = {
-				same_realm = ROOT
-				is_ruler = no
+			# Protected realm inheritance checks
+			trigger_if = {
+				limit = {
+					is_ruler = yes
+					NOT = { is_vassal_or_below_of = ROOT }
 
-				ROOT_FROMFROM = {
-					OR = {
-						holder_scope = {
-							independent = yes
-						}
-
-						NOR = {
+					ROOT_FROMFROM = {
+						OR = {
 							has_law = out_of_realm_inheritance_law_1
 							has_law = crown_authority_3
 							has_law = crown_authority_4
 						}
 					}
 				}
+
+				ROOT = { independent = yes }
 			}
 
 			# Candidate should not be a landless Courtier who is about to inherit a Theocracy or Republic
