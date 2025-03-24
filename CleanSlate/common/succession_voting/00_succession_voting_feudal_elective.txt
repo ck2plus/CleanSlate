@@ -11,209 +11,46 @@ feudal_elective = {
 	}
 
 	elector_selection = {
-		days = -5
+		days = 1
 
 		trigger = {
+			# The title must currently exist
 			FROMFROM = {
 				has_holder = yes
 			}
-		}
 
-		additive_modifier = { # Current ruler is always an elector
-			value = 10
-
-			FROMFROM = { # Either title is higher than Duke-tier, or must be primary
-				holder = ROOT
-
-				OR = {
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
-		}
-
-		additive_modifier = {
-			value = 10
-
-			# Either title is higher than Duke-tier, or must be primary
-			FROMFROM = {
-				OR = {
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
-
-			# If the Elector Title is a Duchy or County, any vassal is an elector, otherwise only Dukes and above
-			trigger_if = {
-				limit = { FROMFROM = { real_tier = COUNT } }
-				real_tier = BARON
-			}
-			trigger_else_if = {
-				limit = { FROMFROM = { real_tier = DUKE } }
-				higher_real_tier_than = BARON
-			}
-			trigger_else = {
-				higher_real_tier_than = COUNT
-			}
-
-			# Either de facto direct vassal, or independent ruler who is dejure vassal
 			OR = {
-				vassal_of = FROMFROM
+				# Current ruler is always an elector
+				has_landed_title = FROMFROM
 
 				AND = {
-					independent = yes
+					# Either direct vassal, de jure if the title is not titular, or independent ruler who is de jure vassal
+					trigger_if = {
+						limit = { FROMFROM = { is_titular = no } }
 
-					any_dejure_liege = {
-						title = FROMFROM
+						FROMFROM = { de_jure_vassal_or_below = ROOT }
+
+						OR = {
+							vassal_of = FROMFROM
+							independent = yes
+						}
 					}
-				}
-			}
+					trigger_else = {
+						vassal_of = FROMFROM
+					}
 
-			# De jure vassal, or any vassal if title titular
-			trigger_if = {
-				limit = { FROMFROM = { is_titular = yes } }
-				vassal_of = FROMFROM
-			}
-			trigger_else = {
-				any_dejure_liege = {
-					title = FROMFROM
-				}
-			}
-		}
-
-		additive_modifier = {
-			value = -5
-			is_republic = yes
-		}
-
-		additive_modifier = {
-			value = -5
-			is_merchant_republic = yes
-		}
-
-		additive_modifier = {
-			value = -4
-			is_tribal = yes
-		}
-
-		additive_modifier = {
-			value = -4
-			is_nomadic = yes
-		}
-
-		additive_modifier = { # Theocracies favored over other government forms, feudalism left at base score
-			value = 4
-
-			FROMFROM = {
-				holder_scope = {
-					religion = ROOT # Tied to religion
-				}
-
-				OR = { # Either title is higher than Duke-tier, or must be primary
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
-
-			is_theocracy = yes
-			higher_real_tier_than = COUNT
-
-			# De jure vassal, or any vassal if title titular
-			trigger_if = {
-				limit = { FROMFROM = { is_titular = yes } }
-				vassal_of = FROMFROM
-			}
-			trigger_else = {
-				any_dejure_liege = {
-					title = FROMFROM
-				}
-			}
-		}
-
-		additive_modifier = { # Slight prioritization based on religion
-			value = 4
-
-			FROMFROM = {
-				holder_scope = {
-					religion = ROOT
-				}
-
-				OR = { # Either title is higher than Duke-tier, or must be primary
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
-
-			is_feudal = yes
-			higher_real_tier_than = COUNT
-
-			# De jure vassal, or any vassal if title titular
-			trigger_if = {
-				limit = { FROMFROM = { is_titular = yes } }
-				vassal_of = FROMFROM
-			}
-			trigger_else = {
-				any_dejure_liege = {
-					title = FROMFROM
-				}
-			}
-		}
-
-		additive_modifier = { # Slight prioritization based on religion group
-			value = 4
-
-			FROMFROM = {
-				holder_scope = {
-					NOT = { religion = ROOT }
-					religion_group = ROOT
-				}
-
-				OR = { # Either title is higher than Duke-tier, or must be primary
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
-
-			is_feudal = yes
-			higher_real_tier_than = COUNT
-
-			# De jure vassal, or any vassal if title titular
-			trigger_if = {
-				limit = { FROMFROM = { is_titular = yes } }
-				vassal_of = FROMFROM
-			}
-			trigger_else = {
-				any_dejure_liege = {
-					title = FROMFROM
-				}
-			}
-		}
-
-		additive_modifier = { # Slight prioritization based on culture
-			value = 4
-
-			FROMFROM = {
-				holder_scope = {
-					culture = ROOT
-				}
-
-				OR = { # Either title is higher than Duke-tier, or must be primary
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
-
-			is_feudal = yes
-			higher_real_tier_than = COUNT
-
-			# De jure vassal, or any vassal if title titular
-			trigger_if = {
-				limit = { FROMFROM = { is_titular = yes } }
-				vassal_of = FROMFROM
-			}
-			trigger_else = {
-				any_dejure_liege = {
-					title = FROMFROM
+					# If the Elector Title is a Duchy or County, any vassal is an elector, otherwise only Dukes and above
+					trigger_if = {
+						limit = { FROMFROM = { real_tier = COUNT } }
+						real_tier = BARON
+					}
+					trigger_else_if = {
+						limit = { FROMFROM = { real_tier = DUKE } }
+						higher_real_tier_than = BARON
+					}
+					trigger_else = {
+						higher_real_tier_than = COUNT
+					}
 				}
 			}
 		}
@@ -230,24 +67,22 @@ feudal_elective = {
 		}
 
 		FROM = {
-			# Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance
-			OR = {
-				is_vassal_or_below_of = ROOT
-				is_ruler = no
+			# Protected realm inheritance checks
+			trigger_if = {
+				limit = {
+					is_ruler = yes
+					NOT = { is_vassal_or_below_of = ROOT }
 
-				ROOT_FROMFROM = {
-					OR = {
-						holder_scope = {
-							independent = yes
-						}
-
-						NOR = {
+					ROOT_FROMFROM = {
+						OR = {
 							has_law = out_of_realm_inheritance_law_1
 							has_law = crown_authority_3
 							has_law = crown_authority_4
 						}
 					}
 				}
+
+				ROOT = { independent = yes }
 			}
 
 			OR = {
@@ -276,30 +111,22 @@ feudal_elective = {
 
 							AND = {
 								independent = yes
-
-								any_dejure_liege = {
-									title = ROOT_FROMFROM
-								}
+								ROOT_FROMFROM = { de_jure_vassal_or_below = PREV }
 							}
 						}
 					}
 
 					# Tier requirements
-					OR = {
-						# Or Duke-tier...
+					trigger_if = {
+						limit = { ROOT_FROMFROM = { real_tier = COUNT } }
+						real_tier = BARON
+					}
+					trigger_else_if = {
+						limit = { ROOT_FROMFROM = { real_tier = DUKE } }
+						higher_real_tier_than = BARON
+					}
+					trigger_else = {
 						higher_real_tier_than = COUNT
-
-						#...Or Count-tier under a Duchy...
-						trigger_if = {
-							limit = { ROOT = { real_tier = DUKE } }
-							higher_real_tier_than = BARON
-						}
-
-						#...Or Baron-tier under a County
-						trigger_if = {
-							limit = { ROOT = { lower_real_tier_than = DUKE } }
-							is_landed = yes
-						}
 					}
 				}
 			}

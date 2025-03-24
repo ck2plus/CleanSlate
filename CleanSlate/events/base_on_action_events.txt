@@ -3010,50 +3010,72 @@ diploresponse_event = {
 # new_character is the other spouse.
 character_event = {
 	id = 500
-	desc = EVTDESC500
-	picture = GFX_evt_marriage
 
-	is_triggered_only = yes # on_marriage
-
-	trigger = {
-		OR = {
-			character = FROM
-
-			AND = {
-				FROM = {
-					is_primary_heir = ROOT
-					dynasty = ROOT
-				}
-
-				NOT = { character = new_character }
+	desc = {
+		text = EVTDESCA500
+		picture = GFX_evt_marriage
+		trigger = {
+			NAND = {
+				FROM = { is_close_relative = new_character }
+				religion_has_incest = yes
 			}
 		}
-
-		trigger_if = {
-			limit = {
-				new_character = {
-					is_close_relative = FROM
-				}
-			}
-
-			religion_has_incest = no
+	}
+	desc = {
+		text = EVTDESCB500
+		picture = GFX_evt_marriage_zoroastrian_group
+		trigger = {
+			FROM = { is_close_relative = new_character }
+			religion = zoroastrian
 		}
-
-		NOR = {
-			religion_group = muslim
-			has_character_flag = recieved_royal_marriage_aid_duty
+	}
+	desc = {
+		text = EVTDESCC500
+		picture = GFX_evt_marriage
+		trigger = {
+			FROM = { is_close_relative = new_character }
+			religion = messalian
 		}
-
-		new_character = {
-			NOR = {
-				has_character_modifier = jd_prince
-				has_character_modifier = jd_princess
+	}
+	desc = {
+		text = EVTDESCD500
+		picture = GFX_evt_marriage_zoroastrian_group
+		trigger = {
+			FROM = { is_close_relative = new_character }
+			OR = {
+				has_religion_feature = religion_feature_zun
+				has_religion_feature = religion_holy_family
 			}
 		}
 	}
 
-	immediate = {
-		set_character_flag = recieved_royal_marriage_aid_duty
+	is_triggered_only = yes # on_marriage
+
+ 	trigger = {
+ 		OR = {
+ 			character = FROM # I'm getting married
+
+ 			player_heir = { # or my heir is getting married
+ 				character = FROM
+ 				NOT = { character = new_character } # but not to me
+ 			}
+ 		}
+
+ 		NOR = {
+ 			religion_group = muslim
+ 			has_character_flag = recieved_royal_marriage_aid_duty
+ 		}
+
+ 		new_character = {
+ 			NOR = {
+ 				has_character_modifier = jd_prince
+ 				has_character_modifier = jd_princess
+ 			}
+ 		}
+ 	}
+
+ 	immediate = {
+ 		set_character_flag = recieved_royal_marriage_aid_duty
 	}
 
 	option = {
@@ -3094,188 +3116,20 @@ character_event = {
 			}
 		}
 	}
-}
 
-# On-action event: Zoroastrian Xwedodah marriage
-# Sent to employers of both spouses
-# ROOT is employer
-# FROM is employers "employee"
-# new_character is the other spouse.
-character_event = {
-	id = 501
-	desc = EVTDESC501
-	picture = GFX_evt_marriage_zoroastrian_group
-
-	is_triggered_only = yes # on_marriage
-
-	religion = zoroastrian
-
-	trigger = {
-		new_character = {
-			is_close_relative = FROM
-		}
-
-		OR = {
-			character = FROM
-
-			AND = {
-				FROM = {
-					is_primary_heir = ROOT
-					dynasty = ROOT
-				}
-
-				NOT = { character = new_character }
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTA500
-
-		scaled_wealth = {
-			value = 0.5
-			min = 10
-		}
-
-		trigger_switch = {
-			on_trigger = real_tier
-
-			BARON   = { piety =  25 }
-			COUNT   = { piety =  50 }
-			DUKE    = { piety = 100 }
-			KING    = { piety = 200 }
-			EMPEROR = { piety = 300 }
-		}
-	}
-
-	option = {
-		name = EVTOPTB500
-
+	after = {
 		if = {
-			limit = { yearly_income < 50 }
+			limit = { religion_has_incest = yes }
 
 			trigger_switch = {
 				on_trigger = real_tier
 
-				BARON   = { prestige =   6 }
-				COUNT   = { prestige =  13 }
-				DUKE    = { prestige =  25 }
-				KING    = { prestige =  50 }
-				EMPEROR = { prestige = 150 }
+				EMPEROR = { piety = 300 }
+				KING    = { piety = 200 }
+				DUKE    = { piety = 100 }
+				COUNT   = { piety =  50 }
+				BARON   = { piety =  25 }
 			}
-		}
-		else = {
-			trigger_switch = {
-				on_trigger = real_tier
-
-				BARON   = { prestige =  25 }
-				COUNT   = { prestige =  50 }
-				DUKE    = { prestige = 100 }
-				KING    = { prestige = 200 }
-				EMPEROR = { prestige = 300 }
-			}
-		}
-
-		trigger_switch = {
-			on_trigger = real_tier
-
-			BARON   = { piety =  25 }
-			COUNT   = { piety =  50 }
-			DUKE    = { piety = 100 }
-			KING    = { piety = 200 }
-			EMPEROR = { piety = 300 }
-		}
-	}
-}
-
-# On-action event: Messalian close kin marriage
-# Sent to employers of both spouses
-# ROOT is employer
-# FROM is employers "employee"
-# new_character is the other spouse.
-character_event = {
-	id = 502
-	desc = EVTDESC502
-	picture = GFX_evt_marriage
-
-	is_triggered_only = yes # on_marriage
-
-	religion = messalian
-
-	trigger = {
-		new_character = {
-			is_close_relative = FROM
-		}
-
-		OR = {
-			character = FROM
-
-			AND = {
-				FROM = {
-					dynasty = ROOT
-					is_primary_heir = ROOT
-				}
-
-				NOT = { character = new_character }
-			}
-		}
-	}
-
-	option = {
-		name = EVTOPTA500
-
-		scaled_wealth = {
-			value = 0.5
-			min = 10
-		}
-
-		trigger_switch = {
-			on_trigger = real_tier
-
-			BARON   = { piety =  25 }
-			COUNT   = { piety =  50 }
-			DUKE    = { piety = 100 }
-			KING    = { piety = 200 }
-			EMPEROR = { piety = 300 }
-		}
-	}
-
-	option = {
-		name = EVTOPTB500
-
-		if = {
-			limit = { yearly_income < 50 }
-
-			trigger_switch = {
-				on_trigger = real_tier
-
-				BARON   = { prestige =   6 }
-				COUNT   = { prestige =  13 }
-				DUKE    = { prestige =  25 }
-				KING    = { prestige =  50 }
-				EMPEROR = { prestige = 150 }
-			}
-		}
-		else = {
-			trigger_switch = {
-				on_trigger = real_tier
-
-				BARON   = { prestige =  25 }
-				COUNT   = { prestige =  50 }
-				DUKE    = { prestige = 100 }
-				KING    = { prestige = 200 }
-				EMPEROR = { prestige = 300 }
-			}
-		}
-
-		trigger_switch = {
-			on_trigger = real_tier
-
-			BARON   = { piety =  25 }
-			COUNT   = { piety =  50 }
-			DUKE    = { piety = 100 }
-			KING    = { piety = 200 }
-			EMPEROR = { piety = 300 }
 		}
 	}
 }

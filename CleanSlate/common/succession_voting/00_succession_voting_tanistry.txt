@@ -11,38 +11,35 @@ tanistry = {
 	}
 
 	elector_selection = {
-		days = -5
+		days = 1
 
 		trigger = {
 			# The title must currently exist
 			FROMFROM = {
 				has_holder = yes
 			}
-		}
 
-		additive_modifier = {
-			value = 10
+			OR = {
+				# Current ruler is always an elector
+				has_landed_title = FROMFROM
 
-			is_vassal_or_below_of = FROMFROM
+				# Any (sub)vassals of one or two lower tiers than the main title are valid electors
+				trigger_if = {
+					limit = { is_vassal_or_below_of = FROMFROM }
 
-			# Any vassals of one or two lower tiers than the main title are valid electors
-			trigger_if = {
-				limit = { FROMFROM = { real_tier = EMPEROR } }
-				higher_real_tier_than = COUNT # Dukes and Kings
+					trigger_if = {
+						limit = { FROMFROM = { real_tier = EMPEROR } }
+						higher_real_tier_than = COUNT # Dukes and Kings
+					}
+					trigger_else_if = {
+						limit = { FROMFROM = { real_tier = KING } }
+						higher_real_tier_than = BARON # Counts and Dukes
+					}
+					trigger_else = { # Duchies and Counties
+						is_ruler = yes # Barons and Counts
+					}
+				}
 			}
-			trigger_else_if = {
-				limit = { FROMFROM = { real_tier = KING } }
-				higher_real_tier_than = BARON # Counts and Dukes
-			}
-			trigger_else = { # Duchies and Counties
-				is_ruler = yes # Barons and Counts
-			}
-		}
-
-		additive_modifier = { # Current ruler is always an elector
-			value = 10
-
-			has_landed_title = FROMFROM
 		}
 	}
 

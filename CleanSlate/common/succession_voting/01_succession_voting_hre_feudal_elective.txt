@@ -45,15 +45,7 @@ hre_feudal_elective = {
 
 		additive_modifier = { # Current ruler can pick a preferred candidate
 			value = 100
-
-			FROMFROM = { # Either title is higher than Duke-tier, or must be primary
-				holder = ROOT
-
-				OR = {
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
+			has_landed_title = FROMFROM
 		}
 
 	#	additive_modifier = { # Papal influence
@@ -64,17 +56,6 @@ hre_feudal_elective = {
 	#
 	#		FROMFROM = {
 	#			has_law = investiture_law_0 # Pope gets a vote if Papal Succession is in place
-	#
-	#			# Either title is higher than Duke-tier, or must be primary
-	#			OR = {
-	#				higher_tier_than = DUKE
-	#
-	#				holder_scope = {
-	#					primary_title = {
-	#						title = PREVPREV
-	#					}
-	#				}
-	#			}
 	#		}
 	#	}
 
@@ -82,17 +63,7 @@ hre_feudal_elective = {
 			value = 75
 
 			is_alternate_start = no # Random worlds do whatever they want!
-
-			FROMFROM = {
-				holder_scope = { religion = ROOT }
-
-				# Either title is higher than Duke-tier, or must be primary
-				OR = {
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
-
+			religion = FROMFROM
 			NOT = { has_landed_title = e_hre }
 
 			OR = { # To make sure they are still de jure vassals of HRE
@@ -215,15 +186,7 @@ hre_feudal_elective = {
 		additive_modifier = { # Fallback Electors (same religion)
 			value = 30
 
-			FROMFROM = {
-				holder_scope = { religion = ROOT } # Tied to religion
-
-				# Either title is higher than Duke-tier, or must be primary
-				OR = {
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
+			religion = FROMFROM
 
 			# If the Elector Title is a Duchy, any vassal can be an elector, otherwise only Dukes and above
 			trigger_if = {
@@ -254,19 +217,8 @@ hre_feudal_elective = {
 		additive_modifier = { # Fallback Electors (same religious group)
 			value = 15
 
-			FROMFROM = {
-				# Tied to religion
-				holder_scope = {
-					NOT = { religion = ROOT }
-					religion_group = ROOT
-				}
-
-				# Either title is higher than Duke-tier, or must be primary
-				OR = {
-					higher_real_tier_than = DUKE
-					is_primary_holder_title = yes
-				}
-			}
+			religion_group = FROMFROM
+			NOT = { religion = FROMFROM }
 
 			# If the Elector Title is a Duchy, any vassal can be an elector, otherwise only Dukes and above
 			trigger_if = {
@@ -297,23 +249,7 @@ hre_feudal_elective = {
 	#	additive_modifier = { # Fallback Electors (any religion)
 	#		value = 10
 	#
-	#		FROMFROM = {
-	#			# Tied to religion
-	#			holder_scope = {
-	#				NOT = { religion_group = ROOT }
-	#			}
-	#
-	#			# Either title is higher than Duke-tier, or must be primary
-	#			OR = {
-	#				higher_tier_than = DUKE
-	#
-	#				holder_scope = {
-	#					primary_title = {
-	#						title = PREVPREV
-	#					}
-	#				}
-	#			}
-	#		}
+	#		NOT = { religion_group = FROMFROM }
 	#
 	#		# If the Elector Title is a Duchy, any vassal can be an elector, otherwise only Dukes and above
 	#		trigger_if = {
@@ -345,12 +281,7 @@ hre_feudal_elective = {
 			value = 4
 
 			is_theocracy = yes
-
-			FROMFROM = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
+			religion = FROMFROM
 		}
 
 		additive_modifier = {
@@ -385,25 +316,7 @@ hre_feudal_elective = {
 		}
 
 		FROM = {
-			# Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance
-			OR = {
-				is_vassal_or_below_of = ROOT
-				is_ruler = no
-
-				ROOT_FROMFROM = {
-					OR = {
-						holder_scope = {
-							independent = yes
-						}
-
-						NOR = {
-							has_law = out_of_realm_inheritance_law_1
-							has_law = crown_authority_3
-							has_law = crown_authority_4
-						}
-					}
-				}
-			}
+			# CleanSlate: Always independent, protected realm inheritance checks removed - for reference, see feudal elective
 
 			OR = {
 				has_claim = ROOT_FROMFROM
@@ -421,32 +334,13 @@ hre_feudal_elective = {
 					}
 				}
 
+				# Only de jure vassals
+				# CleanSlate: Tier requirements simplified, since HRE is always an empire - for reference, see feudal elective
 				trigger_if = {
-					limit = {
-						is_landed = yes
+					limit = { is_ruler = yes }
 
-						# Only de jure vassals
-						any_dejure_liege = {
-							holder = ROOT
-						}
-					}
-
-					OR = {
-						# Or Duke-tier...
-						higher_real_tier_than = COUNT
-
-						#...Or Count-tier under a Duchy...
-						trigger_if = {
-							limit = { ROOT = { real_tier = DUKE } }
-							higher_real_tier_than = BARON
-						}
-
-						#...Or Baron-tier under a County
-						trigger_if = {
-							limit = { ROOT = { lower_real_tier_than = DUKE } }
-							is_landed = yes
-						}
-					}
+					any_dejure_liege = { title = ROOT_FROMFROM }
+					higher_real_tier_than = COUNT
 				}
 			}
 
