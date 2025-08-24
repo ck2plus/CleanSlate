@@ -3096,15 +3096,19 @@ character_event = {
 				}
 			}
 
-			any_demesne_title = {
+			primary_title = {
 				add_law = {
-					law = enatic_succession
+					law = status_of_women_4
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
-					law = status_of_women_4
+					law = enatic_succession
 					cooldown = no
 					opinion_effect = no
 				}
@@ -3183,15 +3187,19 @@ character_event = {
 				}
 			}
 
-			any_demesne_title = {
+			primary_title = {
 				add_law = {
-					law = agnatic_succession
+					law = status_of_women_0
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
-					law = status_of_women_0
+					law = agnatic_succession
 					cooldown = no
 					opinion_effect = no
 				}
@@ -3280,15 +3288,19 @@ character_event = {
 				}
 			}
 
-			any_demesne_title = {
+			primary_title = {
 				add_law = {
-					law = true_cognatic_succession
+					law = status_of_women_4
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
-					law = status_of_women_4
+					law = true_cognatic_succession
 					cooldown = no
 					opinion_effect = no
 				}
@@ -3306,6 +3318,8 @@ character_event = {
 	is_triggered_only = yes # on_startup
 	hide_window = yes
 
+	only_rulers = yes
+
 	trigger = {
 		is_save_game = no
 	}
@@ -3314,12 +3328,16 @@ character_event = {
 		if = {
 			limit = { has_religion_feature = religion_matriarchal }
 
-			any_demesne_title = {
+			primary_title = {
 				add_law = {
 					law = status_of_women_4
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
 					law = enatic_succession
@@ -3331,12 +3349,16 @@ character_event = {
 		else_if = {
 			limit = { has_religion_feature = religion_patriarchal }
 
-			any_demesne_title = {
+			primary_title = {
 				add_law = {
 					law = status_of_women_0
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
 					law = agnatic_succession
@@ -3353,12 +3375,16 @@ character_event = {
 				}
 			}
 
-			any_demesne_title = {
+			primary_title = {
 				add_law = {
 					law = status_of_women_4
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
 					law = true_cognatic_succession
@@ -14271,69 +14297,68 @@ character_event = {
 
 ############################################################
 
-# on_new_holder: Check succession/women's status when creating new vassals
-# ROOT is the character
-# FROM is the title
-# FROMFROM is the old holder
+# Check succession/women's status when creating new vassals
+# Opening scope is the new vassal
+# ROOT is the title
+# FROM is the liege
 character_event = {
 	id = HF.23700
 
-	is_triggered_only = yes # on_new_holder
+	is_triggered_only = yes # GRANT_LANDED_TITLE_INTERACTION_ACCEPT_EVENT
 	hide_window = yes
 
 	trigger = {
-		trigger_if = {
-			limit = { has_religion_feature = religion_patriarchal }
-			FROMFROM = { has_religion_feature = religion_patriarchal }
-		}
-		trigger_else_if = {
-			limit = {
-				OR = {
-					has_religion_feature = religion_equal
-					has_religion_feature = religion_feature_bon
-				}
-			}
+		is_ruler = no # No titles are actually given out yet at this point, hence must be a new vassal
 
-			FROMFROM = {
-				OR = {
-					has_religion_feature = religion_equal
-					has_religion_feature = religion_feature_bon
-				}
-			}
-		}
-		trigger_else = {
+		OR = {
+			has_religion_feature = religion_patriarchal
+			has_religion_feature = religion_equal
+			has_religion_feature = religion_feature_bon
 			has_religion_feature = religion_matriarchal
-			FROMFROM = { has_religion_feature = religion_matriarchal }
 		}
 	}
 
 	immediate = {
-		character_event = {
-			id = HF.23701
-			days = 1
-		}
+		set_character_flag = handle_succession@ROOT
 	}
 }
 
 character_event = {
 	id = HF.23701
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_new_holder, fires one day after HF.23700
 	hide_window = yes
 
+	trigger = {
+		has_character_flag = handle_succession@FROM
+
+		OR = {
+			has_religion_feature = religion_patriarchal
+			has_religion_feature = religion_equal
+			has_religion_feature = religion_feature_bon
+			has_religion_feature = religion_matriarchal
+		}
+	}
+
 	immediate = {
+		clr_character_flag = handle_succession@FROM
+
 		if = {
 			limit = {
 				has_religion_feature = religion_matriarchal
 				is_patrician = no # Always use agnatic
 			}
 
-			FROMFROM = {
+			primary_title = {
 				add_law = {
 					law = status_of_women_4
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
 					law = enatic_succession
@@ -14345,12 +14370,16 @@ character_event = {
 		else_if = {
 			limit = { has_religion_feature = religion_patriarchal }
 
-			FROMFROM = {
+			primary_title = {
 				add_law = {
 					law = status_of_women_0
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
 					law = agnatic_succession
@@ -14369,12 +14398,16 @@ character_event = {
 				is_patrician = no # Always use agnatic
 			}
 
-			FROMFROM = {
+			primary_title = {
 				add_law = {
 					law = status_of_women_4
 					cooldown = no
 					opinion_effect = no
 				}
+			}
+
+			any_demesne_title = {
+				limit = { title = succ_law_title }
 
 				add_law = {
 					law = true_cognatic_succession
