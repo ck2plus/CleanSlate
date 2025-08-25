@@ -148,11 +148,38 @@ confucian_government_allow_trigger = {} # Special snowflake government. Doesn't 
 merchant_republic_government_potential_trigger = {
 	republic_group_potential_trigger = yes
 
-	trigger_if = { # Established MR requiremends
-		limit = {
-			is_merchant_republic = yes
-			has_game_started = yes
+	trigger_if = { # New game lobby screen
+		limit = { has_game_started = no }
+		is_patrician = yes # Family palace in title history
+	}
+	trigger_else_if = { # Established MR requiremends
+		limit = { is_patrician = yes }
+
+		OR = {
+			AND = {
+				# Can't check for being a merchant republic
+				# since that's not true when the leader of the republic changes
+				# Independent patricians and patricians under a non-patrician liege
+				# therefore must be leaders of merchant republics
+				trigger_if = {
+					limit = { independent = no }
+					liege_before_war = { is_patrician = no }
+				}
+
+				# Require at least one province and be Duke tier or higher
+				higher_real_tier_than = COUNT
+				num_of_count_titles >= 1
+
+				# Must always be coastal
+				capital_scope = { is_coastal = yes }
+			}
+
+			# Liege must be MR
+			liege_before_war = { is_merchant_republic = yes }
 		}
+	}
+	trigger_else = { # New MR requirements
+		capital_scope = { is_coastal = yes }
 
 		# Require at least one province and be Duke tier or higher
 		higher_real_tier_than = COUNT
@@ -161,52 +188,7 @@ merchant_republic_government_potential_trigger = {
 		# MR can't be under MR
 		trigger_if = {
 			limit = { independent = no }
-
-			liege_before_war = {
-				is_merchant_republic = no
-			}
-		}
-	}
-	trigger_else_if = { # Established Patrician requirements
-		limit = {
-			is_patrician = yes
-			has_game_started = yes
-		}
-
-		# Liege must be MR
-		liege_before_war = {
-			is_merchant_republic = yes
-
-			# MR can't be under MR
-			trigger_if = {
-				limit = { independent = no }
-
-				liege_before_war = {
-					is_merchant_republic = no
-				}
-			}
-		}
-	}
-	trigger_else = { # Pre-game and new MR requirements
-		OR = {
-			is_patrician = yes
-
-			trigger_if = {
-				limit = { capital_scope = { is_coastal = yes } }
-
-				# Require at least one province and be Duke tier or higher
-				higher_real_tier_than = COUNT
-				num_of_count_titles >= 1
-
-				# MR can't be under MR
-				trigger_if = {
-					limit = { independent = no }
-
-					liege_before_war = {
-						is_merchant_republic = no
-					}
-				}
-			}
+			liege_before_war = { is_merchant_republic = no}
 		}
 	}
 }
