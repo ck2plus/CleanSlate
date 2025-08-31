@@ -44,6 +44,7 @@ faction_succ_seniority = {
 		liege = {
 			is_feudal = yes
 			is_vice_royalty = no
+			in_revolt = no
 
 			# Hordes should have less problems with this type of faction until ca 1350
 			trigger_if = {
@@ -54,12 +55,6 @@ faction_succ_seniority = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 
@@ -767,6 +762,7 @@ faction_succ_primogeniture = {
 		liege = {
 			is_feudal = yes
 			is_vice_royalty = no
+			in_revolt = no
 
 			# Hordes should have less problems with this type of faction until ca 1350
 			trigger_if = {
@@ -777,12 +773,6 @@ faction_succ_primogeniture = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 
@@ -1478,6 +1468,7 @@ faction_succ_ultimogeniture = {
 		liege = {
 			is_feudal = yes
 			is_vice_royalty = no
+			in_revolt = no
 
 			# Hordes should have less problems with this type of faction until ca 1350
 			trigger_if = {
@@ -1488,12 +1479,6 @@ faction_succ_ultimogeniture = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 
@@ -2188,6 +2173,7 @@ faction_succ_gavelkind = {
 		liege = {
 			is_feudal = yes
 			is_vice_royalty = no
+			in_revolt = no
 
 			# Hordes should have less problems with this type of faction until ca 1350
 			trigger_if = {
@@ -2198,12 +2184,6 @@ faction_succ_gavelkind = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 
@@ -2967,6 +2947,7 @@ faction_succ_feudal_elective = {
 		liege = {
 			is_feudal = yes
 			is_vice_royalty = no
+			in_revolt = no
 			NOT = { government = chinese_imperial_government }
 
 			# Hordes should have less problems with this type of faction until ca 1350
@@ -2978,12 +2959,6 @@ faction_succ_feudal_elective = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 
@@ -3804,6 +3779,7 @@ faction_lower_crown_authority = {
 
 		liege = {
 			is_feudal = yes
+			in_revolt = no
 
 			# Hordes should have less problems with this type of faction until ca 1350
 			trigger_if = {
@@ -3814,12 +3790,6 @@ faction_lower_crown_authority = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 	}
@@ -4441,12 +4411,6 @@ faction_lower_tribal_organization = {
 		liege = {
 			is_tribal = yes
 			independent = yes
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
-			}
 		}
 
 		trigger_if = {
@@ -5077,19 +5041,9 @@ faction_independence = {
 			}
 		}
 
-		trigger_if = {
-			limit = { ai = no }
-
-			OR = {
-				is_feudal = yes
-				is_tribal = yes
-				is_nomadic = yes
-				higher_real_tier_than = COUNT
-			}
-		}
-
 		liege = {
 			independent = yes
+			in_revolt = no
 
 			NOT = {
 				any_war = {
@@ -5109,21 +5063,12 @@ faction_independence = {
 			}
 
 			# Not allowed to start factions like this if our capital borders the liege's capital
-			NOT = {
-				capital_scope = {
+			capital_scope = {
+				NOT = {
 					any_neighbor_province = {
-						ROOT = {
-							capital_scope = {
-								province = PREVPREV
-							}
-						}
+						owned_by = ROOT
+						is_capital = yes
 					}
-				}
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
 				}
 			}
 		}
@@ -5158,12 +5103,19 @@ faction_independence = {
 			}
 		}
 
-		# No independence factions in merchant republics
 		trigger_if = {
 			limit = { is_patrician = yes }
 
+			# No independence factions in merchant republics
+			is_merchant_republic = yes
+
+			# Can no longer be a merchant republic when becoming
+			# a direct vassal of another merchant republic
 			liege = {
-				is_merchant_republic = no
+				trigger_if = {
+					limit = { independent = no }
+					liege_before_war = { is_merchant_republic = no }
+				}
 			}
 		}
 	}
@@ -5228,8 +5180,15 @@ faction_independence = {
 			trigger_if = {
 				limit = { is_patrician = yes }
 
+				is_merchant_republic = yes
+
+				# Can no longer be a merchant republic when becoming
+				# a direct vassal of another merchant republic
 				liege = {
-					is_merchant_republic = no
+					trigger_if = {
+						limit = { independent = no }
+						liege_before_war = { is_merchant_republic = no }
+					}
 				}
 			}
 		}
@@ -5602,11 +5561,6 @@ faction_independence = {
 				}
 			}
 
-			trigger_if = {
-				limit = { is_patrician = yes }
-				is_merchant_republic = no
-			}
-
 			# The following require spymaster coercion to overrule
 			trigger_if = {
 				limit = {
@@ -5655,9 +5609,7 @@ faction_independence = {
 
 						AND = {
 							lower_real_tier_than = KING
-
 							is_not_unreformed_pagan_trigger = yes
-
 							culture_group = liege
 							religion_group = liege
 
@@ -6082,6 +6034,7 @@ faction_claimant = {
 
 		liege = {
 			is_vice_royalty = no
+			in_revolt = no
 
 			OR = {
 				is_feudal = yes
@@ -6098,12 +6051,6 @@ faction_claimant = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 
@@ -7552,11 +7499,7 @@ faction_antiking = {
 				is_antipope = yes
 			}
 
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
-			}
+			in_revolt = no
 		}
 
 		trigger_if = {
@@ -9111,6 +9054,7 @@ faction_increase_council_power = {
 
 		liege = {
 			is_nomadic = no
+			in_revolt = no
 
 			# Hordes should have less problems with this type of faction until ca 1350
 			trigger_if = {
@@ -9121,12 +9065,6 @@ faction_increase_council_power = {
 				}
 
 				year >= 1350
-			}
-
-			NOT = {
-				any_demesne_title = {
-					temporary = yes
-				}
 			}
 		}
 
@@ -9943,14 +9881,8 @@ faction_powerful_vassal_takeover = {
 		liege = {
 			is_feudal = yes
 			controls_religion = no
-
-			NOR = {
-				government = chinese_imperial_government
-
-				any_demesne_title = {
-					temporary = yes
-				}
-			}
+			in_revolt = no
+			NOT = { government = chinese_imperial_government }
 		}
 	}
 
