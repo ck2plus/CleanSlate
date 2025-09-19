@@ -6,10 +6,9 @@
 # contribute_to_crusade_pot_trigger
 # select_crusade_receiver_stance_trigger
 
-# check_if_crusader_trigger
-# check_if_alternate_crusades_trigger
-# check_if_fourth_crusade_trigger
-# check_if_not_fourth_crusade_trigger
+# not_fellow_crusader_trigger
+# in_alternate_crusade_trigger
+# fourth_crusade_trigger
 
 
 # Referenced by the "Join Crusade" button in the Crusade view for Crusades using the new Crusade system
@@ -35,8 +34,7 @@ pledge_crusade_trigger = {
 
 	custom_tooltip = {
 		text = pledge_crusade_alternate_crusades
-
-		check_if_alternate_crusades_trigger = yes
+		in_alternate_crusade_trigger = no
 	}
 }
 
@@ -45,7 +43,7 @@ unpledge_crusade_trigger = {
 	trigger_if = {
 		limit = {
 			has_character_flag = forced_to_crusade
-			check_if_not_fourth_crusade_trigger = yes
+			fourth_crusade_trigger = no
 		}
 
 		custom_tooltip = {
@@ -57,7 +55,7 @@ unpledge_crusade_trigger = {
 	trigger_if = {
 		limit = {
 			NOT = { has_character_flag = forced_to_crusade }
-			check_if_not_fourth_crusade_trigger = yes
+			fourth_crusade_trigger = no
 		}
 
 		custom_tooltip = {
@@ -76,7 +74,7 @@ unpledge_crusade_trigger = {
 			}
 
 			NOT = { has_character_flag = forced_to_crusade }
-			check_if_not_fourth_crusade_trigger = yes
+			fourth_crusade_trigger = no
 		}
 		custom_tooltip = {
 			text = recent_crusade_pledge_TT
@@ -139,60 +137,41 @@ select_crusade_receiver_stance_trigger = {
 	has_pledged_crusade_participation = yes
 }
 
-check_if_crusader_trigger = {
+not_fellow_crusader_trigger = {
 	trigger_if = {
-		trigger = {
+		limit = {
 			ROOT = {
+				uses_new_crusade = yes
+				religion = FROM
+
 				OR = {
-					religion = catholic
-					religion = fraticelli
+					controls_religion = yes
+					has_pledged_crusade_participation = yes
 				}
 
 				OR = {
-					has_pledged_crusade_participation = yes
+					religion_scope = { is_preparing_crusade = yes }
+					any_war = { using_cb = new_crusade }
+				}
+			}
 
-					any_war = {
-						using_cb = new_crusade
-					}
+			FROM = {
+				OR = {
+					controls_religion = yes
+					has_pledged_crusade_participation = yes
 				}
 			}
 		}
 
 		custom_tooltip = {
 			text = crusade_invalidate_other_wars_TT
-
-			NAND = {
-				ROOT = {
-					has_pledged_crusade_participation = yes
-				}
-
-				religion_scope = {
-					OR = {
-						is_preparing_crusade = yes
-
-						ROOT = {
-							any_war = {
-								using_cb = new_crusade
-							}
-						}
-					}
-				}
-
-				FROM = {
-					religion = ROOT
-
-					OR = {
-						controls_religion = yes
-						has_pledged_crusade_participation = yes
-					}
-				}
-			}
+			always = no
 		}
 	}
 }
 
-check_if_alternate_crusades_trigger = {
-	NOR = {
+in_alternate_crusade_trigger = {
+	OR = {
 		any_war = {
 			OR = {
 				using_cb = northern_crusade_war
@@ -208,7 +187,8 @@ check_if_alternate_crusades_trigger = {
 				has_landed_title = k_teutonic_state
 			}
 		}
-		trigger_else_if = {
+
+		trigger_if = {
 			limit = { has_global_flag = active_reconquista }
 
 			OR = {
@@ -218,11 +198,11 @@ check_if_alternate_crusades_trigger = {
 			}
 		}
 
-		reconquista_check_trigger = yes
+		in_reconquista_war_trigger = yes
 	}
 }
 
-check_if_fourth_crusade_trigger = {
+fourth_crusade_trigger = {
 	crusade_target_title = {
 		title = k_thrace
 	}
@@ -232,21 +212,5 @@ check_if_fourth_crusade_trigger = {
 	crusade_target_char = {
 		has_landed_title = e_byzantium
 		religion_group = ROOT
-	}
-}
-
-# TODO: Decide if useful, see above trigger. Might exist for better tooltips.
-check_if_not_fourth_crusade_trigger = {
-	NAND = {
-		crusade_target_title = {
-			title = k_thrace
-		}
-
-		has_global_flag = 4th_crusade_official
-
-		crusade_target_char = {
-			has_landed_title = e_byzantium
-			religion_group = ROOT
-		}
 	}
 }
