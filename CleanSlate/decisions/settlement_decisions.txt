@@ -1532,7 +1532,6 @@ settlement_decisions = {
 			has_dlc = "Horse Lords"
 			independent = yes
 			is_nomadic = yes
-			is_female = no
 
 			trigger_if = {
 				limit = { ai = no }
@@ -1548,7 +1547,7 @@ settlement_decisions = {
 			trigger_if = {
 				limit = { FROM = { ai = no } }
 
-				capital_scope = {
+				location = {
 					is_coastal = yes
 				}
 			}
@@ -1571,11 +1570,12 @@ settlement_decisions = {
 				}
 			}
 		}
+
 		allow = {
 			OR = {
 				is_capital = yes
 
-				capital_scope = {
+				location = {
 					owned_by = FROM
 				}
 			}
@@ -1776,17 +1776,17 @@ settlement_decisions = {
 
 					custom_tooltip = { text = TT_NEW_KHAN }
 				}
-			}
 
-			hidden_effect = {
 				if = {
 					limit = {
-						capital_scope = {
-							is_coastal = yes
+						# Check here instead of FROM for the tooltip,
+						# because at this point the capital hasn't changed yet
+						ROOT = {
+							location = { is_coastal = yes }
 						}
 					}
 
-					FROM = {
+					hidden_effect = {
 						primary_title = {
 							create_title = {
 								tier = DUKE
@@ -1797,7 +1797,34 @@ settlement_decisions = {
 							}
 						}
 
+						# Change to Absolute-Cognatic if eligible under normal circumstances
+						# since Agnatic/Enatic-Cognatic is unavailable for merchant republics
+						if = {
+							limit = {
+								OR = {
+									has_law = cognatic_succession
+									has_law = enatic_cognatic_succession
+								}
+
+								gender_equality_trigger = yes
+							}
+
+							any_demesne_title = {
+								limit = {
+									title = succ_law_title
+									is_law_potential = true_cognatic_succession
+								}
+
+								add_law = {
+									law = true_cognatic_succession
+									cooldown = no
+									opinion_effect = no
+								}
+							}
+						}
+
 						create_family_palace = yes
+						set_government_type = merchant_republic_government
 
 						if = {
 							limit = {
@@ -1817,7 +1844,6 @@ settlement_decisions = {
 									}
 
 									is_lowborn = no
-									is_female = no
 									is_patrician = no
 									prisoner = no
 									is_incapable = no
@@ -1889,54 +1915,61 @@ settlement_decisions = {
 									}
 								}
 
+								if = {
+									limit = {
+										OR = {
+											has_law = cognatic_succession
+											has_law = enatic_cognatic_succession
+										}
+
+										gender_equality_trigger = yes
+									}
+
+									any_demesne_title = {
+										limit = {
+											title = succ_law_title
+											is_law_potential = true_cognatic_succession
+										}
+
+										add_law = {
+											law = true_cognatic_succession
+											cooldown = no
+											opinion_effect = no
+										}
+									}
+								}
+
 								create_family_palace = yes
+								set_government_type = merchant_republic_government
 							}
 						}
+					}
 
+					tooltip = {
 						set_government_type = merchant_republic_government
 					}
-				}
-			}
 
-			if = {
-				limit = {
-					capital_scope = {
-						is_coastal = yes
+					if = {
+						limit = { ai = no }
+
+						chronicle = {
+							entry = CHRONICLE_NOMAD_FOUNDED_MERCHANT_REPUBLIC
+							picture = GFX_evt_busy_trading_dock_republic
+						}
 					}
 				}
-
-				FROM = {
-					show_scope_change = no
-
-					set_government_type = merchant_republic_government
-				}
-			}
-			else = {
-				FROM = {
-					show_scope_change = no
-
+				else = {
 					set_government_type = republic_government
 				}
 			}
 
-			FROM = {
-				show_scope_change = no
-
-				chronicle = {
-					entry = CHRONICLE_NOMAD_FOUNDED_MERCHANT_REPUBLIC
-					picture = GFX_evt_busy_trading_dock_republic
-				}
-
+			hidden_effect = {
 				any_player = {
-					limit = {
-						NOT = { character = ROOT_FROM }
-					}
-
+					limit = { NOT = { character = FROM } }
 					narrative_event = { id = HL.1 }
 				}
 			}
 		}
-
 
 		ai_will_do = {
 			factor = 1

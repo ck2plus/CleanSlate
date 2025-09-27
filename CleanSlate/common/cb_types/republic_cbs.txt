@@ -24,7 +24,11 @@ coastal_republic = {
 		# Attacker
 		ROOT = {
 			is_patrician = yes
-			NOT = { same_realm = FROM }
+
+			NOR = {
+				is_vassal_or_below_of = FROM
+				is_liege_or_above_of = FROM
+			}
 		}
 	}
 
@@ -36,7 +40,8 @@ coastal_republic = {
 		location = {
 			is_coastal = yes
 
-			OR = { # Must have a trade post there already (unclear comment, leaving this for later)
+			OR = {
+				# Must have a trade post there already
 				trade_post_owner = {
 					OR = {
 						character = ROOT
@@ -44,10 +49,15 @@ coastal_republic = {
 					}
 				}
 
+				# Or the city is in a rival republic (possibly in the same realm)
 				PREV = {
 					holder_scope = {
 						is_patrician = yes
-						NOT = { same_realm = ROOT }
+
+						NOR = {
+							is_vassal_or_below_of = ROOT
+							is_liege_or_above_of = ROOT
+						}
 					}
 				}
 			}
@@ -210,19 +220,20 @@ coastal_county_republic = {
 	can_use_title = {
 		real_tier = COUNT
 
-		location = {
-			is_coastal = yes
+		# Must control a city in this county
+		any_direct_de_jure_vassal_title = {
+			holding_type = city
 
-			county = { # city part of attacker's subrealm
-				any_direct_de_jure_vassal_title = {
-					holder_scope = {
-						OR = {
-							character = ROOT
-							is_vassal_or_below_of = ROOT
-						}
-					}
+			holder_scope = {
+				OR = {
+					character = ROOT
+					is_vassal_or_below_of = ROOT
 				}
 			}
+		}
+
+		location = {
+			is_coastal = yes
 
 			any_neighbor_province = {
 				trigger_if = { # part of attacker's realm
@@ -277,6 +288,8 @@ coastal_county_republic = {
 	is_valid_title = {
 		# Must control a city in this county at all times
 		any_direct_de_jure_vassal_title = {
+			holding_type = city
+
 			holder_scope = {
 				OR = {
 					character = ROOT
