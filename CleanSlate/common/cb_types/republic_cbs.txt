@@ -63,13 +63,10 @@ coastal_republic = {
 			}
 
 			# Not allowed to use this CB to take cities in the capital province of a rival merchant republic
-			FROM = {
+			owner = {
 				trigger_if = {
 					limit = { is_merchant_republic = yes }
-
-					capital_scope = {
-						NOT = { province = PREVPREV }
-					}
+					NOT = { is_capital = PREV }
 				}
 			}
 		}
@@ -79,6 +76,49 @@ coastal_republic = {
 		# Attacker
 		ROOT = {
 			is_patrician = yes
+
+			NOR = {
+				is_vassal_or_below_of = FROM
+				is_liege_or_above_of = FROM
+			}
+		}
+	}
+
+	is_valid_title = {
+		# CleanSlate: Needs to remain valid
+		location = {
+			OR = {
+				# Must have a trade post there already
+				trade_post_owner = {
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
+
+				# Or the city is in a rival republic (possibly in the same realm)
+				PREV = {
+					holder_scope = {
+						is_patrician = yes
+
+						NOR = {
+							is_vassal_or_below_of = ROOT
+							is_liege_or_above_of = ROOT
+						}
+					}
+				}
+			}
+
+			# Not allowed to use this CB to take cities in the capital province of a rival merchant republic
+			FROM = {
+				trigger_if = {
+					limit = { is_merchant_republic = yes }
+
+					capital_scope = {
+						NOT = { province = PREVPREV }
+					}
+				}
+			}
 		}
 	}
 
@@ -213,7 +253,11 @@ coastal_county_republic = {
 		# Attacker
 		ROOT = {
 			is_patrician = yes
-			NOT = { same_realm = FROM }
+
+			NOR = {
+				is_vassal_or_below_of = FROM
+				is_liege_or_above_of = FROM
+			}
 		}
 	}
 
@@ -282,6 +326,11 @@ coastal_county_republic = {
 		# Attacker
 		ROOT = {
 			is_patrician = yes
+
+			NOR = {
+				is_vassal_or_below_of = FROM
+				is_liege_or_above_of = FROM
+			}
 		}
 	}
 
@@ -440,6 +489,8 @@ embargo_cb = {
 				has_trade_post = yes
 
 				trade_post_owner = {
+					is_patrician = yes
+
 					OR = {
 						character = FROM
 						is_vassal_or_below_of = FROM
@@ -454,15 +505,17 @@ embargo_cb = {
 		ROOT = {
 			independent = yes
 			NOT = { has_embargo = FROM }
-		}
 
-		# Defender
-		FROM = {
-			OR = { # is (liege of) a merchant republic
-				is_merchant_republic = yes
+			any_realm_province = {
+				has_trade_post = yes
 
-				any_realm_lord = {
-					is_merchant_republic = yes
+				trade_post_owner = {
+					is_patrician = yes
+
+					OR = {
+						character = FROM
+						is_vassal_or_below_of = FROM
+					}
 				}
 			}
 		}
@@ -654,10 +707,14 @@ seize_trade_post = {
 				is_liege_or_above_of = FROM # and vassals
 			}
 
+			# We cannot overtly attack much weaker Patricians in the same republic
 			trigger_if = {
-				limit = { same_realm = FROM }
+				limit = {
+					same_liege = FROM
+					is_merchant_republic = no
+					FROM = { is_patrician = yes }
+				}
 
-				# We cannot overtly attack much weaker Patricians in the same republic
 				num_of_trade_post_diff = {
 					character = FROM
 					value < 3
