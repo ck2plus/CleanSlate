@@ -15,7 +15,7 @@ assignees: ''
 (e.g. 3.3.5 with Reaper’s Due, Conclave, Jade Dragon)
 
 **Other active mods:**  
-(List each or say 'All' or 'None')
+(List each or say 'None')
 
 ---
 
