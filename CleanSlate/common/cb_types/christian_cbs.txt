@@ -1690,12 +1690,10 @@ pepin_religious = {
 					is_theocracy = no
 					religion = ROOT
 
-					ROOT = {
-						religion_head = {
-							opinion = {
-								who = FROM
-								value < -50
-							}
+					religion_head = {
+						opinion = {
+							who = FROM
+							value < -50
 						}
 					}
 				}
@@ -1715,22 +1713,6 @@ pepin_religious = {
 			title = d_ancona
 			title = d_ferrara
 			title = d_benevento
-
-			dejure_liege_title = {
-				OR = {
-					title = d_latium
-					title = d_spoleto
-					title = d_ancona
-					title = d_ferrara
-					title = d_benevento
-				}
-			}
-		}
-
-		any_de_jure_vassal_title = {
-			location = {
-				region = world_europe_south_italy
-			}
 		}
 	}
 
@@ -1738,7 +1720,7 @@ pepin_religious = {
 		# Attacker
 		ROOT = {
 			OR = {
-				# has_character_flag = flag_pepin_for_coronation
+				has_character_flag = flag_pepin_for_coronation
 
 				trigger_if = {
 					limit = { religion = catholic }
@@ -1762,6 +1744,40 @@ pepin_religious = {
 			}
 
 			pacifist = no
+		}
+
+		# Defender
+		FROM = {
+			is_pope = no
+
+			# Target must either be a pagan or heretic of any government form, or it must be a disliked Catholic/Fraticelli who is not a bishop
+			OR = {
+				AND = {
+					is_theocracy = no
+					religion = ROOT
+
+					religion_head = {
+						opinion = {
+							who = PREV
+							value < -50
+						}
+					}
+				}
+
+				excommunicated_for = ROOT
+				NOT = { religion_group = ROOT }
+				is_heresy_of = ROOT
+			}
+		}
+	}
+
+	is_valid_title = {
+		# Defender
+		FROM = {
+			num_of_realm_counties = {
+				value >= 1
+				title = PREV
+			}
 		}
 	}
 
@@ -1902,7 +1918,7 @@ pepin_religious = {
 
 			if = {
 				limit = {
-					NOT = { has_character_modifier = known_satanist }
+					NOT = { religion = attacker }
 				}
 
 				religion_authority = {
@@ -1953,9 +1969,15 @@ pepin_religious = {
 			piety = -75
 			prestige = -150
 
-			religion_authority = {
-				name = lost_holy_war
-				years = 20
+			if = {
+				limit = {
+					NOT = { religion = attacker }
+				}
+
+				religion_authority = {
+					name = lost_holy_war
+					years = 20
+				}
 			}
 
 			if = {
@@ -1988,18 +2010,24 @@ pepin_religious = {
 				participation_scaled_decadence = -10
 			}
 
-			religion_authority = {
-				name = won_holy_war
-				years = 20
-			}
+			if = {
+				limit = {
+					NOT = { religion = attacker }
+				}
 
-			hidden_effect = {
-				if = {
-					limit = { has_ambition = obj_strengthen_religion }
+				religion_authority = {
+					name = lost_holy_war
+					years = 20
+				}
 
-					change_variable = {
-						which = strengthen_religion
-						value = 1
+				hidden_effect = {
+					if = {
+						limit = { has_ambition = obj_strengthen_religion }
+
+						change_variable = {
+							which = strengthen_religion
+							value = 1
+						}
 					}
 				}
 			}
@@ -2017,7 +2045,10 @@ pepin_religious = {
 				}
 
 				if = {
-					limit = { has_ambition = obj_strengthen_religion }
+					limit = {
+						has_ambition = obj_strengthen_religion
+						NOT = { religion = ROOT }
+					}
 
 					change_variable = {
 						which = strengthen_religion
@@ -2143,69 +2174,26 @@ pepin_religious = {
 			factor = 5
 
 			ROOT = {
-				NOT = { trait = cynical }
-			}
-
-			FROM = {
-				NOT = { religion = ROOT }
+				NOR = {
+					trait = cynical
+					religion = FROM
+				}
 			}
 		}
 
 		mult_modifier = { # The Papacy doesn't hold Rome, take action!
 			factor = 5
-
-			d_latium = {
-				OR = {
-					holder_scope = {
-						OR = {
-							character = FROM
-							is_vassal_or_below_of = FROM
-						}
-					}
-
-					any_de_jure_vassal_title = {
-						holder = FROM
-					}
-				}
-			}
+			title = d_latium
 		}
 
 		mult_modifier = {
 			factor = 2
-
-			d_spoleto = {
-				OR = {
-					holder_scope = {
-						OR = {
-							character = FROM
-							is_vassal_or_below_of = FROM
-						}
-					}
-
-					any_de_jure_vassal_title = {
-						holder = FROM
-					}
-				}
-			}
+			title = d_spoleto
 		}
 
 		mult_modifier = { # Historical tweaking
 			factor = 0.25
-
-			d_benevento = {
-				OR = {
-					holder_scope = {
-						OR = {
-							character = FROM
-							is_vassal_or_below_of = FROM
-						}
-					}
-
-					any_de_jure_vassal_title = {
-						holder = FROM
-					}
-				}
-			}
+			title = d_benevento
 		}
 
 		mult_modifier = {
