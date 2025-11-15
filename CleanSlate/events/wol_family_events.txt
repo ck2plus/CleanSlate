@@ -504,21 +504,27 @@ character_event = {
 			limit = { is_rival = event_target:target_sibling }
 			remove_rival = event_target:target_sibling
 		}
-		else = {
-			if = {
-				limit = {
-					reverse_personal_opinion = {
-						who = event_target:target_sibling
-						value < 50
-					}
+		else_if = {
+			limit = {
+				personal_opinion = {
+					who = event_target:target_sibling
+					value >= 50
 				}
 
-				reverse_opinion = {
-					name = opinion_family_love
+				reverse_personal_opinion = {
 					who = event_target:target_sibling
+					value >= 50
+				}
+
+				event_target:target_sibling = {
+					is_adult = yes
 				}
 			}
 
+			add_friend = event_target:target_sibling
+		#	log = "WoL.3022: [Root.GetTitledName] becomes friend with sibling [From.GetTitledName]."
+		}
+		else = {
 			if = {
 				limit = {
 					personal_opinion = {
@@ -533,45 +539,18 @@ character_event = {
 				}
 			}
 
-			if = { # CleanSlate: Makes sure the tooltip gets displayed in case the opinions added above push you over the threshold.
-				limit = {
-					personal_opinion = {
-						who = event_target:target_sibling
-						value >= 35
-					}
-
-					reverse_personal_opinion = {
-						who = event_target:target_sibling
-						value >= 35
-					}
-
-					event_target:target_sibling = {
-						is_adult = yes
-					}
-				}
-
-				tooltip = { add_friend = event_target:target_sibling }
-			}
-
 			if = {
 				limit = {
-					personal_opinion = {
-						who = event_target:target_sibling
-						value >= 50
-					}
-
 					reverse_personal_opinion = {
 						who = event_target:target_sibling
-						value >= 50
-					}
-
-					event_target:target_sibling = {
-						is_adult = yes
+						value < 50
 					}
 				}
 
-				add_friend = event_target:target_sibling
-			#	log = "WoL.3022: [Root.GetTitledName] becomes friend with sibling [From.GetTitledName]."
+				reverse_opinion = {
+					name = opinion_family_love
+					who = event_target:target_sibling
+				}
 			}
 		}
 	}
@@ -1147,38 +1126,55 @@ character_event = {
 	option = {
 		name = EVTOPTA_WOL_3051 # Good idea
 
-		if = {
-			limit = {
-				NOT = { is_rival = event_target:target_first }
-
-				personal_opinion = {
-					who = event_target:target_first
-					value < 50
-				}
+		tooltip = { # Actually happens in WoL.3056
+			if = {
+				limit = { is_rival = event_target:target_first }
+				remove_rival = event_target:target_first
 			}
+			else_if = {
+				limit = {
+					personal_opinion = {
+						who = event_target:target_first
+						value >= 35
+					}
 
-			opinion = {
-				name = opinion_family_love
-				who = event_target:target_first
-			}
-		}
-
-		if = { # CleanSlate: Makes sure the tooltip gets displayed in case the opinions added above push you over the threshold.
-			limit = {
-				NOT = { is_rival = event_target:target_first }
-
-				personal_opinion = {
-					who = event_target:target_first
-					value >= 35
+					reverse_personal_opinion = {
+						who = event_target:target_first
+						value >= 35
+					}
 				}
 
-				reverse_personal_opinion = {
-					who = event_target:target_first
-					value >= 35
+				add_friend = event_target:target_first
+			}
+			else = {
+				if = {
+					limit = {
+						personal_opinion = {
+							who = event_target:target_first
+							value < 50
+						}
+					}
+
+					opinion = {
+						name = opinion_family_love
+						who = event_target:target_first
+					}
+				}
+
+				if = {
+					limit = {
+						reverse_personal_opinion = {
+							who = event_target:target_first
+							value < 50
+						}
+					}
+
+					reverse_opinion = {
+						name = opinion_family_love
+						who = event_target:target_first
+					}
 				}
 			}
-
-			tooltip = { add_friend = event_target:target_first }
 		}
 
 		event_target:target_initiator = {
@@ -1281,7 +1277,22 @@ character_event = {
 			limit = { is_rival = event_target:target_second }
 			remove_rival = event_target:target_second
 		}
+		else_if = {
+			limit = {
+				personal_opinion = {
+					who = event_target:target_second
+					value >= 50
+				}
 
+				reverse_personal_opinion = {
+					who = event_target:target_second
+					value >= 50
+				}
+			}
+
+			add_friend = event_target:target_second
+		#	log = "WoL.3056: [Root.GetTitledName] becomes friend with dynasty member [From.GetTitledName]."
+		}
 		else = {
 			if = {
 				limit = {
@@ -1297,37 +1308,18 @@ character_event = {
 				}
 			}
 
-			if = { # CleanSlate: Makes sure the tooltip gets displayed in case the opinions added above push you over the threshold.
-				limit = {
-					personal_opinion = {
-						who = event_target:target_second
-						value >= 35
-					}
-
-					reverse_personal_opinion = {
-						who = event_target:target_second
-						value >= 35
-					}
-				}
-
-				tooltip = { add_friend = event_target:target_second }
-			}
-
 			if = {
 				limit = {
-					personal_opinion = {
-						who = event_target:target_second
-						value >= 50
-					}
-
 					reverse_personal_opinion = {
 						who = event_target:target_second
-						value >= 50
+						value < 50
 					}
 				}
 
-				add_friend = event_target:target_second
-			#	log = "WoL.3056: [Root.GetTitledName] becomes friend with dynasty member [From.GetTitledName]."
+				reverse_opinion = {
+					name = opinion_family_love
+					who = event_target:target_second
+				}
 			}
 		}
 	}
@@ -1585,58 +1577,8 @@ character_event = {
 
 	#	log = "WoL.3060: Fires, valid for [target_second.GetTitledName] and [target_first.GetTitledName]."
 
-		event_target:target_second = {
-			show_scope_change = no
-
-			if = {
-				limit = {
-					personal_opinion = {
-						who = event_target:target_first
-						value < 50
-					}
-				}
-
-				opinion = {
-					name = opinion_family_love
-					who = event_target:target_first
-					years = 30
-				}
-			}
-		}
-
 		event_target:target_first = {
 			show_scope_change = no
-
-			if = {
-				limit = {
-					personal_opinion = {
-						who = event_target:target_second
-						value < 50
-					}
-				}
-
-				opinion = {
-					name = opinion_family_love
-					who = event_target:target_second
-					years = 30
-				}
-			}
-
-			if = { # CleanSlate: Makes sure the tooltip gets displayed in case the opinions added above push you over the threshold.
-				limit = {
-					personal_opinion = {
-						who = event_target:target_second
-						value >= 35
-					}
-
-					reverse_personal_opinion = {
-						who = event_target:target_second
-						value >= 35
-					}
-				}
-
-				tooltip = { add_friend = event_target:target_second }
-			}
 
 			if = {
 				limit = {
@@ -1653,6 +1595,37 @@ character_event = {
 
 				add_friend = event_target:target_second
 			#	log = "WoL.3060: [target_second.GetTitledName] becomes friend with sibling [target_first.GetTitledName]."
+			}
+			else = {
+				if = {
+					limit = {
+						personal_opinion = {
+							who = event_target:target_second
+							value < 50
+						}
+					}
+
+					opinion = {
+						name = opinion_family_love
+						who = event_target:target_second
+						years = 30
+					}
+				}
+
+				if = {
+					limit = {
+						reverse_personal_opinion = {
+							who = event_target:target_second
+							value < 50
+						}
+					}
+
+					reverse_opinion = {
+						name = opinion_family_love
+						who = event_target:target_second
+						years = 30
+					}
+				}
 			}
 		}
 	}
