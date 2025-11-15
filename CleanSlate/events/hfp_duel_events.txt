@@ -1218,35 +1218,31 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		debug_battle_death_counter_effect = yes # for debug purposes
+		send_notifications_after_champion_stand_in_effect = yes
+
 		if = {
-			limit = { multiplayer = yes }
-
-			debug_battle_death_counter_effect = yes # for debug purposes
-			send_notifications_after_champion_stand_in_effect = yes
-
-			if = {
-				limit = {
-					event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
-				}
-
-				death = {
-					death_reason = death_mission_duel # For flavor
-					killer = event_target:combatant_2
-				}
+			limit = {
+				event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
 			}
-			else_if = {
-				limit = { has_character_flag = is_battlefield_duel }
 
-				death = {
-					death_reason = death_battle_duel
-					killer = event_target:combatant_2
-				}
+			death = {
+				death_reason = death_mission_duel # For flavor
+				killer = event_target:combatant_2
 			}
-			else = {
-				death = {
-					death_reason = death_duel # Regular duel death
-					killer = event_target:combatant_2
-				}
+		}
+		else_if = {
+			limit = { has_character_flag = is_battlefield_duel }
+
+			death = {
+				death_reason = death_battle_duel
+				killer = event_target:combatant_2
+			}
+		}
+		else = {
+			death = {
+				death_reason = death_duel # Regular duel death
+				killer = event_target:combatant_2
 			}
 		}
 	}
@@ -1278,16 +1274,9 @@ character_event = {
 
 				death = {
 					death_reason = death_duel
-					killer = ROOT
+					killer = event_target:combatant_1
 				}
 			}
-		}
-
-		if = {
-			limit = { multiplayer = no }
-
-			debug_battle_death_counter_effect = yes # For debug purposes
-			send_notifications_after_champion_stand_in_effect = yes
 
 			if = {
 				limit = {
@@ -1392,35 +1381,31 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		debug_battle_death_counter_effect = yes # For debug purposes
+		send_notifications_after_champion_stand_in_effect = yes
+
 		if = {
-			limit = { multiplayer = yes }
-
-			debug_battle_death_counter_effect = yes # For debug purposes
-			send_notifications_after_champion_stand_in_effect = yes
-
-			if = {
-				limit = {
-					event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
-				}
-
-				death = {
-					death_reason = death_mission_duel # For flavor
-					killer = event_target:combatant_1
-				}
+			limit = {
+				event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
 			}
-			else_if = {
-				limit = { has_character_flag = is_battlefield_duel }
 
-				death = {
-					death_reason = death_battle_duel
-					killer = event_target:combatant_1
-				}
+			death = {
+				death_reason = death_mission_duel # For flavor
+				killer = event_target:combatant_1
 			}
-			else = {
-				death = {
-					death_reason = death_duel # Regular duel death
-					killer = event_target:combatant_1
-				}
+		}
+		else_if = {
+			limit = { has_character_flag = is_battlefield_duel }
+
+			death = {
+				death_reason = death_battle_duel
+				killer = event_target:combatant_1
+			}
+		}
+		else = {
+			death = {
+				death_reason = death_duel # Regular duel death
+				killer = event_target:combatant_1
 			}
 		}
 	}
@@ -1447,16 +1432,9 @@ character_event = {
 
 				death = {
 					death_reason = death_duel
-					killer = ROOT
+					killer = event_target:combatant_2
 				}
 			}
-		}
-
-		if = {
-			limit = { multiplayer = no }
-
-			debug_battle_death_counter_effect = yes # For debug purposes
-			send_notifications_after_champion_stand_in_effect = yes
 
 			if = {
 				limit = {
@@ -2013,8 +1991,7 @@ character_event = {
 		set_loser_flags_and_save_opponent_effect = yes
 
 		if = {
-			limit = {
-				multiplayer = yes
+			limit = { # CleanSlate: After a claim duel, we need to transfer titles first, so can't kill anyone yet
 				NOT = { event_target:combatant_1 = { has_character_flag = claim_duel@event_target:combatant_2 } }
 			}
 
@@ -2091,12 +2068,10 @@ character_event = {
 			}
 		}
 
+		# Death
 		if = {
 			limit = {
-				OR = {
-					multiplayer = no
-					event_target:combatant_1 = { has_character_flag = claim_duel@event_target:combatant_2 }
-				}
+				event_target:combatant_1 = { has_character_flag = claim_duel@event_target:combatant_2 }
 			}
 
 			debug_battle_death_counter_effect = yes # For debug purposes
@@ -2113,47 +2088,50 @@ character_event = {
 			}
 
 			if = {
-				limit = {
-					event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
-				}
+				limit = { character = event_target:combatant_1 }
 
 				death = {
-					death_reason = death_mission_duel # For flavor
+					death_reason = death_claim_duel_attacker # For flavor
 					killer = event_target:other_combatant
 				}
 			}
-			else_if = {
-				limit = { has_character_flag = is_battlefield_duel }
-
+			else = {
 				death = {
-					death_reason = death_battle_duel
+					death_reason = death_claim_duel_defender # For flavor
 					killer = event_target:other_combatant
 				}
 			}
-			else_if = {
-				limit = {
-					event_target:combatant_1 = { has_character_flag = claim_duel@event_target:combatant_2 }
+		}
+		else = {
+			tooltip = {
+				if = { # CleanSlate: Already applied in immediate, so we can't use the same checks here
+					limit = { has_nickname = nick_the_headless }
+					give_nickname = nick_the_headless
 				}
 
 				if = {
-					limit = { character = event_target:combatant_1 }
+					limit = {
+						event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
+					}
 
 					death = {
-						death_reason = death_claim_duel_attacker # For flavor
+						death_reason = death_mission_duel # For flavor
+						killer = event_target:other_combatant
+					}
+				}
+				else_if = {
+					limit = { has_character_flag = is_battlefield_duel }
+
+					death = {
+						death_reason = death_battle_duel
 						killer = event_target:other_combatant
 					}
 				}
 				else = {
 					death = {
-						death_reason = death_claim_duel_defender # For flavor
+						death_reason = death_duel # Regular duel death
 						killer = event_target:other_combatant
 					}
-				}
-			}
-			else = {
-				death = {
-					death_reason = death_duel # Regular duel death
-					killer = event_target:other_combatant
 				}
 			}
 		}
@@ -2174,19 +2152,10 @@ character_event = {
 		hidden_effect = { event_target:other_combatant = { handle_claim_duel_result_effect = yes } }
 		handle_claim_duel_result_effect = yes # Claim duels only...
 
-		if = {
-			limit = { multiplayer = no }
-
-			debug_battle_death_counter_effect = yes # For debug purposes
-			send_notifications_after_champion_stand_in_effect = yes
-
-			if = {
-				limit = {
-					can_apply_average_nickname_trigger = yes
-					has_character_flag = injury_face
-					has_character_flag = desc_A
-				}
-
+		# Death
+		tooltip = {
+			if = { # CleanSlate: Already applied in immediate, so we can't use the same checks here
+				limit = { has_nickname = nick_the_headless }
 				give_nickname = nick_the_headless
 			}
 
@@ -2693,7 +2662,7 @@ character_event = {
 
 		if = {
 			limit = { NOT = { is_rival = FROM } }
-			add_rival = event_target:other_combatant
+			add_rival = FROM
 		}
 
 		clr_character_flag = they_were_mean_about_it
@@ -3693,35 +3662,32 @@ character_event = {
 	immediate = {
 		set_loser_flags_and_save_opponent_effect = yes
 
+		# Death
+		debug_battle_death_counter_effect = yes # For debug purposes
+		send_notifications_after_champion_stand_in_effect = yes
+
 		if = {
-			limit = { multiplayer = yes }
-
-			debug_battle_death_counter_effect = yes # For debug purposes
-			send_notifications_after_champion_stand_in_effect = yes
-
-			if = {
-				limit = {
-					event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
-				}
-
-				death = {
-					death_reason = death_mission_duel # For flavor
-					killer = event_target:other_combatant
-				}
+			limit = {
+				event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
 			}
-			else_if = {
-				limit = { has_character_flag = is_battlefield_duel }
 
-				death = {
-					death_reason = death_battle_duel
-					killer = event_target:other_combatant
-				}
+			death = {
+				death_reason = death_mission_duel # For flavor
+				killer = event_target:other_combatant
 			}
-			else = {
-				death = {
-					death_reason = death_duel # Regular duel death
-					killer = event_target:other_combatant
-				}
+		}
+		else_if = {
+			limit = { has_character_flag = is_battlefield_duel }
+
+			death = {
+				death_reason = death_battle_duel
+				killer = event_target:other_combatant
+			}
+		}
+		else = {
+			death = {
+				death_reason = death_duel # Regular duel death
+				killer = event_target:other_combatant
 			}
 		}
 	}
@@ -3731,12 +3697,7 @@ character_event = {
 
 		custom_tooltip = { text = you_lose_the_duel_tt }
 
-		if = {
-			limit = { multiplayer = no }
-
-			debug_battle_death_counter_effect = yes # For debug purposes
-			send_notifications_after_champion_stand_in_effect = yes
-
+		tooltip = {
 			if = {
 				limit = {
 					event_target:combatant_1 = { has_character_flag = deadly_duel@event_target:combatant_2 }
