@@ -801,7 +801,12 @@ character_event = {
 		}
 
 		if = {
-			limit = { has_religion_feature = religion_ritual_sacrifice }
+			limit = {
+				OR = {
+					has_religion_feature = religion_ritual_sacrifice
+					religion_openly_aztec_or_reformed_trigger = yes
+				}
+			}
 
 			random_courtier = {
 				limit = {
@@ -841,7 +846,10 @@ character_event = {
 		name = EVTOPTZHF23007
 
 		trigger = {
-			has_religion_feature = religion_ritual_sacrifice
+			OR = {
+				has_religion_feature = religion_ritual_sacrifice
+				religion_openly_aztec_or_reformed_trigger = yes
+			}
 			event_target:potential_victim = { always = yes }
 		}
 
@@ -895,6 +903,7 @@ character_event = {
 
 		trigger = {
 			NOT = { has_religion_feature = religion_ritual_sacrifice }
+			religion_openly_aztec_or_reformed_trigger = no
 		}
 
 		if = {
@@ -7627,11 +7636,31 @@ narrative_event = {
 
 		trigger = {
 			OR = {
-				religion_openly_norse_or_reformed_trigger = yes
+				religion = norse_pagan
 
-				AND = {
-					has_religion_feature = religion_adventuring
-					has_religion_feature = religion_seafaring
+				trigger_if = {
+					limit = { has_dlc = "Holy Fury" }
+
+					OR = {
+						has_religion_feature = religion_feature_norse
+
+						any_owned_bloodline = {
+							has_bloodline_flag = bloodline_viking
+							bloodline_is_active_for = PREV
+						}
+
+						trigger_if = {
+							limit = { has_religion_feature = religion_adventuring }
+
+							OR = {
+								has_religion_feature = religion_seafaring
+								has_religion_feature = religion_feature_aztec
+							}
+						}
+					}
+				}
+				trigger_else = {
+					religion = norse_pagan_reformed
 				}
 			}
 		}
@@ -7641,11 +7670,33 @@ narrative_event = {
 		name = EVTOPTBHF23213
 
 		trigger = {
-			religion_openly_norse_or_reformed_trigger = no
+			NOR = {
+				religion = norse_pagan
 
-			NAND = {
-				has_religion_feature = religion_adventuring
-				has_religion_feature = religion_seafaring
+				trigger_if = {
+					limit = { has_dlc = "Holy Fury" }
+
+					OR = {
+						has_religion_feature = religion_feature_norse
+
+						any_owned_bloodline = {
+							has_bloodline_flag = bloodline_viking
+							bloodline_is_active_for = PREV
+						}
+
+						trigger_if = {
+							limit = { has_religion_feature = religion_adventuring }
+
+							OR = {
+								has_religion_feature = religion_seafaring
+								has_religion_feature = religion_feature_aztec
+							}
+						}
+					}
+				}
+				trigger_else = {
+					religion = norse_pagan_reformed
+				}
 			}
 		}
 	}
@@ -9070,7 +9121,7 @@ narrative_event = {
 		controls_religion = yes
 
 		trigger_if = {
-			limit = { religion = hellenic_pagan_reformed } # Part of their features
+			limit = { religion_openly_hellenic_or_reformed_trigger = yes } # Part of their features
 			is_alternate_start = no
 		}
 		trigger_else = {
@@ -9664,16 +9715,15 @@ narrative_event = {
 			religion = ROOT
 		}
 
-		trigger_if = {
-			limit = { religion = hellenic_pagan_reformed } # Part of their features
+		has_religion_feature = religion_no_leader
 
-			has_religion_feature = religion_no_leader
+		trigger_if = {
+			limit = { religion_openly_hellenic_or_reformed_trigger = yes } # Part of their features
 			is_alternate_start = no
 		}
 		trigger_else = {
 			has_religion_feature = religion_haruspicy
 			has_religion_feature = religion_astrology
-			has_religion_feature = religion_no_leader
 		}
 
 		NOR = {
@@ -14478,7 +14528,22 @@ character_event = {
 	option = {
 		name = EVTOPTAHF23751
 
-		trigger = { has_religion_feature = religion_astrology } # Synergy
+		trigger = {
+			OR = { # Synergy
+				has_religion_feature = religion_astrology
+
+				trigger_if = {
+					limit = {
+						has_alternate_start_parameter = {
+							key = religion_features
+							value = historical
+						}
+					}
+
+					religion_openly_hellenic_or_reformed_trigger = yes
+				}
+			}
+		}
 
 		custom_tooltip = {
 			text = TT_EVTOPTAHF23751
@@ -14935,6 +15000,8 @@ character_event = {
 
 							OR = {
 								has_religion_feature = religion_meritocratic
+								has_religion_feature = religion_feature_bon
+								has_religion_feature = religion_feature_hellenic
 								has_religion_feature = religion_matriarchal
 								has_religion_feature = religion_patriarchal
 							}
@@ -14954,6 +15021,8 @@ character_event = {
 
 							OR = {
 								has_religion_feature = religion_meritocratic
+								has_religion_feature = religion_feature_bon
+								has_religion_feature = religion_feature_hellenic
 								has_religion_feature = religion_matriarchal
 								has_religion_feature = religion_patriarchal
 							}
@@ -14982,6 +15051,8 @@ character_event = {
 								event_target:scoped_improvement_ruler = {
 									OR = {
 										has_religion_feature = religion_meritocratic
+										has_religion_feature = religion_feature_bon
+										has_religion_feature = religion_feature_hellenic
 										has_religion_feature = religion_matriarchal
 										has_religion_feature = religion_patriarchal
 									}
@@ -15005,6 +15076,8 @@ character_event = {
 								event_target:scoped_improvement_ruler = {
 									OR = {
 										has_religion_feature = religion_meritocratic
+										has_religion_feature = religion_feature_bon
+										has_religion_feature = religion_feature_hellenic
 										has_religion_feature = religion_matriarchal
 										has_religion_feature = religion_patriarchal
 									}
@@ -15099,6 +15172,8 @@ character_event = {
 				event_target:scoped_improvement_ruler = {
 					OR = {
 						has_religion_feature = religion_meritocratic
+						has_religion_feature = religion_feature_bon
+						has_religion_feature = religion_feature_hellenic
 						has_religion_feature = religion_matriarchal
 						has_religion_feature = religion_patriarchal
 					}
@@ -15154,6 +15229,8 @@ character_event = {
 
 							OR = {
 								has_religion_feature = religion_meritocratic
+								has_religion_feature = religion_feature_bon
+								has_religion_feature = religion_feature_hellenic
 								has_religion_feature = religion_matriarchal
 								has_religion_feature = religion_patriarchal
 							}
@@ -15173,6 +15250,8 @@ character_event = {
 
 							OR = {
 								has_religion_feature = religion_meritocratic
+								has_religion_feature = religion_feature_bon
+								has_religion_feature = religion_feature_hellenic
 								has_religion_feature = religion_matriarchal
 								has_religion_feature = religion_patriarchal
 							}
@@ -15201,6 +15280,8 @@ character_event = {
 								event_target:scoped_improvement_ruler = {
 									OR = {
 										has_religion_feature = religion_meritocratic
+										has_religion_feature = religion_feature_bon
+										has_religion_feature = religion_feature_hellenic
 										has_religion_feature = religion_matriarchal
 										has_religion_feature = religion_patriarchal
 									}
@@ -15224,6 +15305,8 @@ character_event = {
 								event_target:scoped_improvement_ruler = {
 									OR = {
 										has_religion_feature = religion_meritocratic
+										has_religion_feature = religion_feature_bon
+										has_religion_feature = religion_feature_hellenic
 										has_religion_feature = religion_matriarchal
 										has_religion_feature = religion_patriarchal
 									}
