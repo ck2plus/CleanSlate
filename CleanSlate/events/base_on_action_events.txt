@@ -3042,10 +3042,7 @@ character_event = {
 		picture = GFX_evt_marriage_zoroastrian_group
 		trigger = {
 			FROM = { is_close_relative = new_character }
-			OR = {
-				has_religion_feature = religion_feature_zun
-				has_religion_feature = religion_holy_family
-			}
+			religion_has_holy_family_trigger = yes
 		}
 	}
 
@@ -3928,8 +3925,8 @@ narrative_event = {
 		if = {
 			limit = {
 				OR = {
-					has_religion_feature = religion_theocratic_head
-					has_religion_feature = religion_autocephaly
+					religion_has_theocratic_head_trigger = yes
+					religion_has_autocephaly_trigger = yes
 					AND = {
 						is_reformed_religion = yes
 						has_religion_features = no
@@ -3967,17 +3964,14 @@ narrative_event = {
 			rebuild_god_name_effect = yes
 			if = {
 				limit = {
-					OR = {
-						has_religion_feature = religion_holy_family
-						has_religion_feature = religion_feature_zun
-					}
-					has_religion_feature = religion_temporal_head
+					religion_has_holy_family_trigger = yes
+					religion_has_temporal_head_trigger = yes
 				}
 
 				set_high_god_name = string_reformer_god
 			}
 			else_if = { # Religion is Patriarchal
-				limit = { has_religion_feature = religion_patriarchal }
+				limit = { religion_is_patriarchal_trigger = yes }
 
 				trigger_switch = {
 					on_trigger = religion
@@ -3992,7 +3986,7 @@ narrative_event = {
 								has_flag = greek_reformation
 							}
 							if = { # Poseidon finally gets his due
-								limit = { has_religion_feature = religion_seafaring }
+								limit = { religion_is_seafaring_trigger = yes }
 								set_high_god_name = GOD_POSEIDON
 							}
 							else = {
@@ -4001,7 +3995,7 @@ narrative_event = {
 						}
 						else = {
 							if = { # Poseidon finally gets his due
-								limit = { has_religion_feature = religion_seafaring }
+								limit = { religion_is_seafaring_trigger = yes}
 								set_high_god_name = GOD_NEPTUNE
 							}
 							else = {
@@ -4017,7 +4011,7 @@ narrative_event = {
 				}
 			}
 			else_if = { # Religion is Matriarchal
-				limit = { has_religion_feature = religion_matriarchal }
+				limit = { religion_is_matriarchal_trigger = yes }
 
 				trigger_switch = {
 					on_trigger = religion
@@ -4052,7 +4046,7 @@ narrative_event = {
 
 					aztec_pagan_reformed        = {
 						if = {
-							limit = { has_religion_feature = religion_proselytizing }
+							limit = { religion_is_proselytizing_trigger = yes }
 							set_high_god_name = GOD_QUETZALCOATL
 						}
 						else = {
@@ -4068,7 +4062,7 @@ narrative_event = {
 								has_flag = greek_reformation
 							}
 							if = { # Poseidon finally gets his due
-								limit = { has_religion_feature = religion_seafaring }
+								limit = { religion_is_seafaring_trigger = yes }
 								set_high_god_name = GOD_POSEIDON
 							}
 							else = {
@@ -4077,7 +4071,7 @@ narrative_event = {
 						}
 						else = {
 							if = { # Poseidon finally gets his due
-								limit = { has_religion_feature = religion_seafaring }
+								limit = { religion_is_seafaring_trigger = yes }
 								set_high_god_name = GOD_NEPTUNE
 							}
 							else = {
@@ -4140,191 +4134,165 @@ narrative_event = {
 		}
 
 		# Modifier not applied correctly by pagan reformation screen.
-		trigger_switch = {
-			on_trigger = has_religion_feature
+		if = {
+			limit = { religion_is_cosmopolitan_trigger = yes }
 
-			religion_cosmopolitan = {
-				religion_authority = {
-					name = cosmopolitan_religion
-					years = 1000
-				}
+			religion_authority = {
+				name = cosmopolitan_religion
+				years = 1000
+			}
 
-				any_playable_ruler = {
-					limit = {
-						distance_from_realm = {
-							who = ROOT
-							value < 200
-						}
+			any_playable_ruler = {
+				limit = {
+					distance_from_realm = {
+						who = ROOT
+						value < 200
 					}
-
-					add_intermarry = ROOT
-					ROOT = { add_intermarry = PREV }
 				}
 
-				any_neighbor_independent_ruler = {
-					add_intermarry = ROOT
-					ROOT = { add_intermarry = PREV }
-				}
+				add_intermarry = ROOT
+				ROOT = { add_intermarry = PREV }
 			}
 
-			religion_dogmatic = {
-				religion_authority = {
-					name = dogmatic_religion
-					years = 1000
-				}
-
-				remove_intermarry = christian
-				remove_intermarry = muslim
-				remove_intermarry = pagan_group
-				remove_intermarry = zoroastrian_group
-				remove_intermarry = indian_group
-				remove_intermarry = jewish_group
+			any_neighbor_independent_ruler = {
+				add_intermarry = ROOT
+				ROOT = { add_intermarry = PREV }
 			}
+		}
+		else_if = {
+			limit = { religion_is_dogmatic_trigger = yes }
+
+			religion_authority = {
+				name = dogmatic_religion
+				years = 1000
+			}
+
+			remove_intermarry = christian
+			remove_intermarry = muslim
+			remove_intermarry = pagan_group
+			remove_intermarry = zoroastrian_group
+			remove_intermarry = indian_group
+			remove_intermarry = jewish_group
 		}
 
 		# Gender Doctrines
-		trigger_switch = {
-			on_trigger = has_religion_feature
+		if = {
+			limit = { religion_is_matriarchal_trigger = yes }
 
-			religion_matriarchal = {
-				primary_title = {
-					add_law = {
-						law = status_of_women_4
-						cooldown = no
-						opinion_effect = no
-					}
-				}
-
-				any_demesne_title = {
-					limit = {
-						title = succ_law_title
-						is_law_potential = enatic_succession
-					}
-
-					add_law = {
-						law = enatic_succession
-						cooldown = no
-						opinion_effect = no
-					}
-				}
-
-				recalc_succession = yes
-
-				any_close_relative = {
-					limit = { is_female = no }
-
-					opinion = {
-						name = bad_succ_law_change
-						who = ROOT
-						years = 100
-					}
-				}
-
-				any_close_relative = {
-					limit = { is_female = yes }
-
-					opinion = {
-						name = good_succ_law_change
-						who = ROOT
-						years = 100
-					}
+			primary_title = {
+				add_law = {
+					law = status_of_women_4
+					cooldown = no
+					opinion_effect = no
 				}
 			}
 
-			religion_patriarchal = {
-				primary_title = {
-					add_law = {
-						law = status_of_women_0
-						cooldown = no
-						opinion_effect = no
-					}
+			any_demesne_title = {
+				limit = {
+					title = succ_law_title
+					is_law_potential = enatic_succession
 				}
 
-				any_demesne_title = {
-					limit = {
-						title = succ_law_title
-						is_law_potential = agnatic_succession
-					}
-
-					add_law = {
-						law = agnatic_succession
-						cooldown = no
-						opinion_effect = no
-					}
-				}
-
-				recalc_succession = yes
-
-				any_close_relative = {
-					limit = { is_female = yes }
-
-					opinion = {
-						name = bad_succ_law_change
-						who = ROOT
-						years = 100
-					}
-				}
-
-				any_close_relative = {
-					limit = { is_female = no }
-
-					opinion = {
-						name = good_succ_law_change
-						who = ROOT
-						years = 100
-					}
+				add_law = {
+					law = enatic_succession
+					cooldown = no
+					opinion_effect = no
 				}
 			}
 
-			religion_equal = {
-				primary_title = {
-					add_law = {
-						law = status_of_women_4
-						cooldown = no
-						opinion_effect = no
-					}
+			recalc_succession = yes
+
+			any_close_relative = {
+				limit = { is_female = no }
+
+				opinion = {
+					name = bad_succ_law_change
+					who = ROOT
+					years = 100
 				}
-
-				any_demesne_title = {
-					limit = {
-						title = succ_law_title
-						is_law_potential = true_cognatic_succession
-					}
-
-					add_law = {
-						law = true_cognatic_succession
-						cooldown = no
-						opinion_effect = no
-					}
-				}
-
-				recalc_succession = yes
 			}
 
-			religion_feature_bon = {
-				primary_title = {
-					add_law = {
-						law = status_of_women_4
-						cooldown = no
-						opinion_effect = no
-					}
+			any_close_relative = {
+				limit = { is_female = yes }
+
+				opinion = {
+					name = good_succ_law_change
+					who = ROOT
+					years = 100
 				}
-
-				any_demesne_title = {
-					limit = {
-						title = succ_law_title
-						is_law_potential = true_cognatic_succession
-					}
-
-					add_law = {
-						law = true_cognatic_succession
-						cooldown = no
-						opinion_effect = no
-					}
-				}
-
-				recalc_succession = yes
 			}
+		}
+		else_if = {
+			limit = { religion_is_patriarchal_trigger = yes }
+
+			primary_title = {
+				add_law = {
+					law = status_of_women_0
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			any_demesne_title = {
+				limit = {
+					title = succ_law_title
+					is_law_potential = agnatic_succession
+				}
+
+				add_law = {
+					law = agnatic_succession
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			recalc_succession = yes
+
+			any_close_relative = {
+				limit = { is_female = yes }
+
+				opinion = {
+					name = bad_succ_law_change
+					who = ROOT
+					years = 100
+				}
+			}
+
+			any_close_relative = {
+				limit = { is_female = no }
+
+				opinion = {
+					name = good_succ_law_change
+					who = ROOT
+					years = 100
+				}
+			}
+		}
+		else_if = {
+			limit = { religion_is_equal_trigger = yes }
+
+			primary_title = {
+				add_law = {
+					law = status_of_women_4
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			any_demesne_title = {
+				limit = {
+					title = succ_law_title
+					is_law_potential = true_cognatic_succession
+				}
+
+				add_law = {
+					law = true_cognatic_succession
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			recalc_succession = yes
 		}
 
 		# Activate Astrology
@@ -4585,7 +4553,7 @@ narrative_event = {
 			add_artifact = crown_fylkir
 		}
 		else_if = {
-			limit = { has_religion_feature = religion_temporal_head }
+			limit = { religion_has_temporal_head_trigger = yes }
 
 			trigger_switch = {
 				on_trigger = religion
@@ -4629,8 +4597,8 @@ narrative_event = {
 				has_dlc = "Holy Fury"
 
 				OR = {
-					has_religion_feature = religion_theocratic_head
-					has_religion_feature = religion_autocephaly
+					religion_has_theocratic_head_trigger = yes
+					religion_has_autocephaly_trigger = yes
 				}
 			}
 
@@ -4854,12 +4822,12 @@ narrative_event = {
 			show_scope_change = no
 
 			if = {
-				limit = { has_religion_feature = religion_no_leader }
+				limit = { religion_has_no_leader_trigger = yes }
 
 				PREV = {
 					if = {
 						limit = {
-							has_religion_feature = religion_no_leader
+							religion_has_no_leader_trigger = yes
 							ai = yes
 						}
 
@@ -4874,127 +4842,96 @@ narrative_event = {
 				}
 			}
 
-			trigger_switch = {
-				on_trigger = has_religion_feature
+			if = {
+				limit = { religion_is_matriarchal_trigger = yes }
 
-				religion_matriarchal = {
-					custom_tooltip = {
-						text = tooltip_HF23014_A
+				custom_tooltip = {
+					text = tooltip_HF23014_A
 
-						PREV = {
-							primary_title = {
-								add_law = {
-									law = status_of_women_4
-									cooldown = no
-									opinion_effect = no
-								}
+					PREV = {
+						primary_title = {
+							add_law = {
+								law = status_of_women_4
+								cooldown = no
+								opinion_effect = no
 							}
-
-							any_demesne_title = {
-								limit = { title = succ_law_title }
-
-								add_law = {
-									law = enatic_succession
-									cooldown = no
-									opinion_effect = no
-								}
-							}
-
-							recalc_succession = yes
 						}
+
+						any_demesne_title = {
+							limit = { title = succ_law_title }
+
+							add_law = {
+								law = enatic_succession
+								cooldown = no
+								opinion_effect = no
+							}
+						}
+
+						recalc_succession = yes
 					}
 				}
+			}
+			else_if = {
+				limit = { religion_is_patriarchal_trigger = yes }
 
-				religion_patriarchal = {
-					custom_tooltip = {
-						text = tooltip_HF23015_A
+				custom_tooltip = {
+					text = tooltip_HF23015_A
 
-						PREV = {
-							primary_title = {
-								add_law = {
-									law = status_of_women_0
-									cooldown = no
-									opinion_effect = no
-								}
+					PREV = {
+						primary_title = {
+							add_law = {
+								law = status_of_women_0
+								cooldown = no
+								opinion_effect = no
 							}
-
-							any_demesne_title = {
-								limit = {
-									title = succ_law_title
-									is_law_potential = agnatic_succession
-								}
-
-								add_law = {
-									law = agnatic_succession
-									cooldown = no
-									opinion_effect = no
-								}
-							}
-
-							recalc_succession = yes
 						}
+
+						any_demesne_title = {
+							limit = {
+								title = succ_law_title
+								is_law_potential = agnatic_succession
+							}
+
+							add_law = {
+								law = agnatic_succession
+								cooldown = no
+								opinion_effect = no
+							}
+						}
+
+						recalc_succession = yes
 					}
 				}
+			}
+			else_if = {
+				limit = { religion_is_equal_trigger = yes }
 
-				religion_equal = {
-					custom_tooltip = {
-						text = tooltip_HF23016_A
+				custom_tooltip = {
+					text = tooltip_HF23016_A
 
-						PREV = {
-							primary_title = {
-								add_law = {
-									law = status_of_women_4
-									cooldown = no
-									opinion_effect = no
-								}
+					PREV = {
+						primary_title = {
+							add_law = {
+								law = status_of_women_4
+								cooldown = no
+								opinion_effect = no
 							}
-
-							any_demesne_title = {
-								limit = {
-									title = succ_law_title
-									is_law_potential = true_cognatic_succession
-								}
-
-								add_law = {
-									law = true_cognatic_succession
-									cooldown = no
-									opinion_effect = no
-								}
-							}
-
-							recalc_succession = yes
 						}
-					}
-				}
 
-				religion_feature_bon = {
-					custom_tooltip = {
-						text = tooltip_HF23016_A
-
-						PREV = {
-							primary_title = {
-								add_law = {
-									law = status_of_women_4
-									cooldown = no
-									opinion_effect = no
-								}
+						any_demesne_title = {
+							limit = {
+								title = succ_law_title
+								is_law_potential = true_cognatic_succession
 							}
 
-							any_demesne_title = {
-								limit = {
-									title = succ_law_title
-									is_law_potential = true_cognatic_succession
-								}
-
-								add_law = {
-									law = true_cognatic_succession
-									cooldown = no
-									opinion_effect = no
-								}
+							add_law = {
+								law = true_cognatic_succession
+								cooldown = no
+								opinion_effect = no
 							}
-
-							recalc_succession = yes
 						}
+
+						recalc_succession = yes
 					}
 				}
 			}
@@ -6044,8 +5981,8 @@ character_event = {
 		is_save_game = yes
 		controls_religion = yes
 		OR = {
-			has_religion_feature = religion_theocratic_head
-			has_religion_feature = religion_autocephaly
+			religion_has_theocratic_head_trigger = yes
+			religion_has_autocephaly_trigger = yes
 			AND = {
 				is_reformed_religion = yes
 				has_religion_features = no
