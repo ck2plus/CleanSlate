@@ -2118,6 +2118,22 @@ religious = {
 				piety >= 100
 			}
 		}
+
+		FROM = {
+			trigger_if = {
+				limit = {
+					religion_group = muslim
+					religion_group = ROOT
+				}
+
+				# Not fighting religious enemies
+				NOT = {
+					any_current_enemy = {
+						NOT = { religion_group = muslim }
+					}
+				}
+			}
+		}
 	}
 
 	can_use = {
@@ -2131,7 +2147,7 @@ religious = {
 
 			trigger_if = {
 				limit = { religion_group = indian_group }
-				NOT = { religion = taoist }
+				has_dharmic_religion_trigger = yes
 			}
 			trigger_else_if = {
 				limit = { religion_group = pagan_group }
@@ -2161,24 +2177,14 @@ religious = {
 
 					# Dharmics can fight Taoists
 					trigger_if = {
-						limit = {
-							religion_group = indian_group # Not strictly necessary, but I like the consistency
-							has_dharmic_religion_trigger = yes
-						}
+						limit = { religion_group = indian_group }
 						FROM = { religion = taoist }
 					}
 
 					# Muslims fight amongst themselves
 					trigger_else_if = {
 						limit = { religion_group = muslim }
-						NOR = {
-							religion = FROM
-							FROM = { # Not fighting religious enemies
-								any_current_enemy = {
-									NOT = { religion_group = muslim }
-								}
-							}
-						}
+						NOT = {	religion = FROM	}
 					}
 
 					# Pagans also fight amongst themselves
@@ -2209,22 +2215,21 @@ religious = {
 				top_liege = {
 					religion_group = ROOT
 
-					# Religion must match, or neither is a heretic
+					# Religion must match, or neither is a heretic of the other
 					trigger_if = {
 						limit = {
 							NOT = { religion = ROOT }
 						}
 
 						NOR = {
-							religion_group = pagan_group
-							is_heretic = yes
-							ROOT = { is_heretic = yes }
+							is_heresy_of = ROOT
+							is_parent_religion = ROOT
 						}
 					}
 
-					# Can holy war known devil worshippers of top liege's religion
+					# Can holy war known devil worshippers of top liege's religion group
 					trigger_if = {
-						limit = { religion = FROM }
+						limit = { religion_group = FROM }
 
 						FROM = { has_character_modifier = known_satanist }
 						NOT = { has_character_modifier = known_satanist }
@@ -2232,6 +2237,12 @@ religious = {
 						ROOT = {
 							NOT = { has_character_modifier = known_satanist }
 						}
+					}
+
+					# Can't attack outside of your liege's pagan branch
+					trigger_else_if = {
+						limit = { religion_group = pagan }
+						religion = ROOT
 					}
 				}
 			}
@@ -2328,6 +2339,10 @@ religious = {
 			NOT = { same_realm = FROM }
 
 			trigger_if = {
+				limit = { religion_group = indian_group }
+				has_dharmic_religion_trigger = yes
+			}
+			trigger_else_if = {
 				limit = { religion_group = pagan_group }
 
 				OR = {
@@ -2335,8 +2350,6 @@ religious = {
 					religion = aztec_pagan
 				}
 			}
-
-			pacifist = no
 
 			# Requirements for holy war in same religion group
 			trigger_if = {
@@ -2346,9 +2359,17 @@ religious = {
 					is_heresy_of = FROM
 					is_parent_religion = FROM
 
+					# Can holy war known demon worshippers in the same religion group
+					trigger_if = {
+						limit = {
+							NOT = { has_character_modifier = known_satanist }
+						}
+						FROM = { has_character_modifier = known_satanist }
+					}
+
 					# Dharmics can fight Taoists
 					trigger_if = {
-						limit = { has_dharmic_religion_trigger = yes }
+						limit = { religion_group = indian_group }
 						FROM = { religion = taoist }
 					}
 
@@ -2358,23 +2379,48 @@ religious = {
 						NOT = { religion = FROM }
 					}
 
-					# Can holy war known demon worshippers in the same religion group
-					AND = {
-						FROM = { has_character_modifier = known_satanist }
-						NOT = { has_character_modifier = known_satanist }
+					# Pagans also fight amongst themselves
+					trigger_else_if = {
+						limit = { religion_group = pagan }
+						NOT = { religion = FROM }
 					}
 				}
 			}
 
-			top_liege = {
-				trigger_if = {
-					limit = { religion = FROM }
+			trigger_if = {
+				limit = { independent = no }
 
-					FROM = { has_character_modifier = known_satanist }
-					NOT = { has_character_modifier = known_satanist }
+				top_liege = {
+					religion_group = ROOT
 
-					ROOT = {
+					# Religion must match, or neither is a heretic of the other
+					trigger_if = {
+						limit = {
+							NOT = { religion = ROOT }
+						}
+
+						NOR = {
+							is_heresy_of = ROOT
+							is_parent_religion = ROOT
+						}
+					}
+
+					# Can holy war known devil worshippers of top liege's religion group
+					trigger_if = {
+						limit = { religion_group = FROM }
+
+						FROM = { has_character_modifier = known_satanist }
 						NOT = { has_character_modifier = known_satanist }
+
+						ROOT = {
+							NOT = { has_character_modifier = known_satanist }
+						}
+					}
+
+					# Can't attack outside of your liege's pagan branch
+					trigger_else_if = {
+						limit = { religion_group = pagan }
+						religion = ROOT
 					}
 				}
 			}
