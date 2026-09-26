@@ -333,62 +333,8 @@ pagan_county_conquest = {
 		factor = 1
 
 		trigger = {
-			trigger_if = {
-				limit = {
-					ROOT = {
-						is_tribal = yes
-					}
-
-					FROM = {
-						is_nomadic = yes
-					}
-				}
-
-				any_direct_de_jure_vassal_title = {
-					any_direct_de_jure_vassal_title = {
-						OR = {
-							holding_type = castle
-							holding_type = city
-							holding_type = tribal
-						}
-					}
-				}
-			}
-			trigger_else_if = {
-				limit = {
-					ROOT = {
-						is_nomadic = no
-						is_tribal = no
-					}
-
-					FROM = {
-						is_nomadic = yes
-					}
-				}
-
-				any_direct_de_jure_vassal_title = {
-					any_direct_de_jure_vassal_title = {
-						OR = {
-							holding_type = castle
-							holding_type = city
-						}
-					}
-				}
-			}
-
-			trigger_if = {
-				limit = {
-					ROOT = {
-						has_character_flag = is_temujin
-						has_landed_title = e_mongol_empire
-						is_landed = yes
-					}
-				}
-
-				FROM = {
-					NOT = { has_landed_title = e_china_west_governor }
-				}
-			}
+			suitable_holdings_trigger = yes
+			temujin_avoid_china_trigger = yes
 		}
 
 		mult_modifier = {
@@ -399,8 +345,8 @@ pagan_county_conquest = {
 			}
 
 			OR = {
-				empire = { title = e_scandinavia }
-				kingdom = { title = k_novgorod }
+				region = world_europe_north
+				region = custom_novgorod
 			}
 		}
 
@@ -414,15 +360,9 @@ pagan_county_conquest = {
 			has_global_flag = viking_age_started
 
 			OR = {
-				empire = { title = e_britannia }
-
-				kingdom = {
-					OR = {
-						title = k_brittany
-						title = k_france
-						title = k_frisia
-					}
-				}
+				region = world_europe_west_british_isles
+				region = world_europe_west_gaul
+				region = custom_frisia
 			}
 		}
 
@@ -727,12 +667,10 @@ viking_invasion = {
 	}
 
 	is_valid_title = {
-		# Defender
-		FROM = {
-			num_of_realm_counties = {
-				value >= 1
-				title = PREV
-			}
+		# Defender must have at least 1 county within the target kingdom
+		num_title_realm_provs = {
+			value >= 1
+			who = FROM
 		}
 	}
 
@@ -1072,12 +1010,10 @@ tribal_invasion = {
 	}
 
 	is_valid_title = {
-		# Defender
-		FROM = {
-			num_of_realm_counties = {
-				value >= 1
-				title = PREV
-			}
+		# Defender must have at least 1 county within the target kingdom
+		num_title_realm_provs = {
+			value >= 1
+			who = FROM
 		}
 	}
 
@@ -1380,171 +1316,13 @@ tribal_invasion = {
 		factor = 0.9 # Prefer using CB's without on_add costs
 
 		trigger = {
-			trigger_if = {
-				limit = {
-					ROOT = {
-						is_tribal = yes
-					}
-
-					FROM = {
-						is_nomadic = yes
-					}
-				}
-
-				any_direct_de_jure_vassal_title = {
-					any_direct_de_jure_vassal_title = {
-						OR = {
-							holding_type = castle
-							holding_type = city
-							holding_type = tribal
-						}
-					}
-				}
-			}
-			trigger_else_if = {
-				limit = {
-					ROOT = {
-						is_nomadic = no
-						is_tribal = no
-					}
-
-					FROM = {
-						is_nomadic = yes
-					}
-
-				}
-
-				any_direct_de_jure_vassal_title = {
-					any_direct_de_jure_vassal_title = {
-						OR = {
-							holding_type = castle
-							holding_type = city
-						}
-					}
-				}
-			}
-
-			trigger_if = {
-				limit = {
-					ROOT = {
-						has_character_flag = is_temujin
-						has_landed_title = e_mongol_empire
-						is_landed = yes
-					}
-				}
-
-				FROM = {
-					NOT = { has_landed_title = e_china_west_governor }
-				}
-			}
-
-			# This ensures that the AI doesn't declare this type of war against someone who only holds a few counties within the targeted title.
-			trigger_if = {
-				limit = {
-					# Attacker
-					ROOT = {
-						OR = {
-							has_landed_title = e_mongol_empire
-							has_landed_title = e_aztec_empire
-						}
-					}
-				}
-
-				# Defender
-				FROM = {
-					num_of_realm_counties = {
-						value >= 3
-						title = PREV
-					}
-				}
-			}
+			suitable_holdings_trigger = yes
+			temujin_avoid_china_trigger = yes
+			defender_controls_enough_land_trigger = yes
 		}
 
 		coronation_factor = yes
-
-		# Try to guide the Hordes in the right direction
-		mult_modifier = {
-			factor = 0.1
-
-			ROOT = {
-				OR = {
-					dynasty = 613 # Seljuks
-					dynasty = 800 # Timurids
-
-					primary_title = {
-						title = e_ilkhanate
-					}
-				}
-			}
-
-			OR = {
-				empire = {
-					NOR = {
-						title = e_persia
-						title = e_byzantium
-						title = e_arabia
-					}
-				}
-
-				FROM = {
-					primary_title = {
-						title = e_golden_horde
-					}
-
-					year < 1300
-				}
-			}
-		}
-
-		mult_modifier = {
-			factor = 0.1
-
-			ROOT = {
-				primary_title = {
-					title = e_golden_horde
-				}
-			}
-
-			OR = {
-				empire = {
-					OR = {
-						title = e_persia
-						title = e_byzantium
-						title = e_arabia
-					}
-				}
-
-				FROM = {
-					primary_title = {
-						title = e_ilkhanate
-					}
-
-					year < 1300
-				}
-			}
-		}
-
-		mult_modifier = {
-			factor = 0.1
-
-			ROOT = {
-				culture = hungarian
-
-				primary_title = {
-					OR = {
-						title = k_hungary
-						title = e_carpathia
-					}
-				}
-			}
-
-			empire = {
-				OR = {
-					title = e_tartaria
-					title = e_rus
-				}
-			}
-		}
+		horde_guidance_factor = yes
 	}
 }
 
