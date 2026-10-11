@@ -2800,42 +2800,60 @@ liberate_religion = {
 						is_vassal_or_below_of = FROM
 					}
 				}
+			}
 
-				location = {
-					any_neighbor_province = { # bordering province
-						trigger_if = {
-							limit = { has_owner = yes }
+			location = {
+				any_neighbor_province = { # bordering province
+					trigger_if = {
+						limit = { has_owner = yes }
 
-							owner = { # part of attacker's realm
-								OR = {
-									character = ROOT
-									is_vassal_or_below_of = ROOT
-								}
+						owner = { # part of attacker's realm
+							OR = {
+								character = ROOT
+								is_vassal_or_below_of = ROOT
 							}
 						}
-						trigger_else = {
-							is_land = no # first sea zone
+					}
+					trigger_else = {
+						is_land = no # first sea zone
 
-							any_neighbor_province = {
-								trigger_if = {
-									limit = { has_owner = yes }
+						OR = { # religion requirements for attack across sea zones
+							ROOT = { religion_group = muslim }
+							FROM = { religion_group = muslim }
 
+							trigger_if = {
+								limit = { ROOT = { religion_group = pagan_group } }
+								has_global_flag = pagan_ghws_unlocked
+							}
+							trigger_else_if = {
+								limit = { ROOT = { religion_group = christian } }
+								has_global_flag = christian_crusades_unlocked
+							}
+							trigger_else = {
+								ROOT = { religion_group = muslim }
+								has_global_flag = muslim_jihads_unlocked
+							}
+						}
+
+						any_neighbor_province = {
+							trigger_if = {
+								limit = { has_owner = yes }
+
+								owner = { # part of attacker's realm
+									OR = {
+										character = ROOT
+										is_vassal_or_below_of = ROOT
+									}
+								}
+							}
+							trigger_else = {
+								is_land = no # second sea zone
+
+								any_neighbor_province = {
 									owner = { # part of attacker's realm
 										OR = {
 											character = ROOT
 											is_vassal_or_below_of = ROOT
-										}
-									}
-								}
-								trigger_else = {
-									is_land = no # second sea zone
-
-									any_neighbor_province = {
-										owner = { # part of attacker's realm
-											OR = {
-												character = ROOT
-												is_vassal_or_below_of = ROOT
-											}
 										}
 									}
 								}
