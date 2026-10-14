@@ -331,6 +331,15 @@ character_event = {
 		is_theocracy = no
 		is_inaccessible_trigger = no
 
+		trigger_if = { # Can only convert once per lifetime between these three
+			limit = {
+				has_dharmic_religion_trigger = yes
+				location = { has_dharmic_religion_trigger = yes }
+			}
+
+			NOT = { has_character_flag = india_converted }
+		}
+
 		NOR = {
 			religion_group = pagan_group
 			religion = location
@@ -424,6 +433,7 @@ character_event = {
 
 	immediate = {
 		save_event_target_as = converting_courtier
+		religion_scope = { save_event_target_as = old_religion }
 
 		location = {
 			religion_scope = {
@@ -449,14 +459,18 @@ character_event = {
 			}
 		}
 
-		# Workaround for automatic usuraption of theocratic characters
+		# Workaround for automatic usurpation of theocratic characters
 		convert_religion_failsafe_effect = yes
 
 		if = {
 			limit = { has_dharmic_religion_trigger = yes }
 
-			set_character_flag = india_converted
-			character_event = { id = RoI.30120 } # Set religious branch randomly
+			add_random_dharmic_branch_effect = yes
+
+			if = { # Can only convert once per lifetime between these three
+				limit = { event_target:old_religion = { has_dharmic_religion_trigger = yes } }
+				set_character_flag = india_converted
+			}
 		}
 	}
 
@@ -1005,13 +1019,19 @@ character_event = {
 			}
 		}
 
+		religion_scope = { save_event_target_as = old_religion }
 		convert_religion_failsafe_effect = yes
 
 		if = {
 			limit = { has_dharmic_religion_trigger = yes }
 
-			set_character_flag = india_converted
-			character_event = { id = RoI.30122 }
+			event_target:converting_courtier = { save_event_target_as = religious_branch_target }
+			copy_religious_branch_from_target_effect = yes
+
+			if = { # Can only convert once per lifetime between these three
+				limit = { event_target:old_religion = { has_dharmic_religion_trigger = yes } }
+				set_character_flag = india_converted
+			}
 		}
 
 		ai_chance = {

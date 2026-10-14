@@ -4131,6 +4131,126 @@ add_religious_pilgrim_trait = {
 	}
 }
 
+copy_religious_branch_from_target_effect = {
+	event_target:religious_branch_target = {
+		show_scope_change = no
+
+		trigger_switch = {
+			on_trigger = trait
+
+			# Hindu
+			shaivist_hindu     = { PREV = { show_scope_change = no add_trait = shaivist_hindu } }
+			vaishnavist_hindu  = { PREV = { show_scope_change = no add_trait = vaishnavist_hindu } }
+			shaktist_hindu     = { PREV = { show_scope_change = no add_trait = shaktist_hindu } }
+			smartist_hindu     = { PREV = { show_scope_change = no add_trait = smartist_hindu } }
+			# Buddhist
+			mahayana_buddhist  = { PREV = { show_scope_change = no add_trait = mahayana_buddhist } }
+			vajrayana_buddhist = { PREV = { show_scope_change = no add_trait = vajrayana_buddhist } }
+			theravada_buddhist = { PREV = { show_scope_change = no add_trait = theravada_buddhist } }
+			# Jain
+			digambara_jain     = { PREV = { show_scope_change = no add_trait = digambara_jain } }
+			svetambara_jain    = { PREV = { show_scope_change = no add_trait = svetambara_jain } }
+			# Pagan
+			pagan_branch_1     = { PREV = { show_scope_change = no add_trait = pagan_branch_1 } }
+			pagan_branch_2     = { PREV = { show_scope_change = no add_trait = pagan_branch_2 } }
+			pagan_branch_3     = { PREV = { show_scope_change = no add_trait = pagan_branch_3 } }
+			pagan_branch_4     = { PREV = { show_scope_change = no add_trait = pagan_branch_4 } }
+		}
+	}
+}
+
+copy_religious_branch_from_liege_effect = {
+	if = { # Only copy if we are the same religion
+		limit = { religion = liege }
+
+		liege = { save_event_target_as = religious_branch_target }
+		copy_religious_branch_from_target_effect = yes
+	}
+	else_if = { # otherwise just randomise as a fallback
+		limit = { has_dharmic_religion_trigger = yes }
+		add_random_dharmic_branch_effect = yes
+	}
+	else = {
+		add_random_pagan_branch_effect = yes
+	}
+}
+
+add_random_dharmic_branch_effect = {
+	if = {
+		limit = { religion = hindu }
+
+		random_list = {
+			25 = { add_trait = shaivist_hindu }
+			25 = { add_trait = vaishnavist_hindu }
+			25 = { add_trait = shaktist_hindu }
+			25 = { add_trait = smartist_hindu }
+		}
+	}
+	else_if = {
+		limit = { religion = buddhist }
+
+		random_list = {
+			33 = { add_trait = mahayana_buddhist }
+			33 = { add_trait = vajrayana_buddhist }
+			33 = { add_trait = theravada_buddhist }
+		}
+	}
+	else_if = {
+		limit = { religion = jain }
+
+		random_list = {
+			50 = { add_trait = digambara_jain }
+			50 = { add_trait = svetambara_jain }
+		}
+	}
+}
+
+copy_caste_to_target_effect = {
+	trigger_switch = {
+		on_trigger = trait
+
+		brahmin   = { event_target:caste_target = { show_scope_change = no add_trait = brahmin } }
+		kshatriya = { event_target:caste_target = { show_scope_change = no add_trait = kshatriya } }
+		vaishya   = { event_target:caste_target = { show_scope_change = no add_trait = vaishya } }
+	}
+}
+
+copy_caste_from_target_effect = {
+	event_target:caste_target = {
+		show_scope_change = no
+
+		trigger_switch = {
+			on_trigger = trait
+
+			brahmin   = { PREV = { show_scope_change = no add_trait = brahmin } }
+			kshatriya = { PREV = { show_scope_change = no add_trait = kshatriya } }
+			vaishya   = { PREV = { show_scope_change = no add_trait = vaishya } }
+		}
+	}
+}
+
+add_random_pagan_branch_effect = {
+	if = {
+		limit = {
+			religion_group = pagan_group
+			religion_has_no_leader_trigger = yes
+		}
+
+		random_list = {
+			25 = { add_trait = pagan_branch_1 }
+			25 = { add_trait = pagan_branch_2 }
+			25 = { add_trait = pagan_branch_3 }
+			25 = { add_trait = pagan_branch_4 }
+		}
+	}
+}
+
+add_religious_traits = {
+	copy_religious_branch_from_liege_effect = yes
+	add_western_zodiac_trait_effect = yes
+	add_animistic_face_paint_effect = yes
+}
+
 upgrade_education_effect = {
 	trigger_switch = {
 		on_trigger = trait
@@ -5489,89 +5609,93 @@ add_random_tattoo_effect = {
 # Used on_startup and for newly generated characters, normally applied on adulthood (HF.23775)
 add_animistic_face_paint_effect = {
 	if = {
-		limit = { is_adult = yes }
+		limit = { religion_has_astrology_trigger = yes }
 
-		random_list = {
-			25 = { } # Nothing
-			15 = { add_trait = african_tattoo_1 }
-			15 = { add_trait = african_tattoo_2 }
-			15 = { add_trait = african_tattoo_3 }
-			15 = { add_trait = african_tattoo_4 }
-			5 = { add_trait = african_tattoo_5 }
-			4 = { add_trait = african_tattoo_6 }
-			3 = { add_trait = african_tattoo_7 }
-			2 = { add_trait = african_tattoo_8 }
-			10 = { add_trait = african_tattoo_9 }
-			10 = { add_trait = african_tattoo_10 }
-			10 = { add_trait = african_tattoo_11 }
-			10 = { add_trait = african_tattoo_12 }
+		if = {
+			limit = { is_adult = yes }
+
+			random_list = {
+				25 = { } # Nothing
+				15 = { add_trait = african_tattoo_1 }
+				15 = { add_trait = african_tattoo_2 }
+				15 = { add_trait = african_tattoo_3 }
+				15 = { add_trait = african_tattoo_4 }
+				5 = { add_trait = african_tattoo_5 }
+				4 = { add_trait = african_tattoo_6 }
+				3 = { add_trait = african_tattoo_7 }
+				2 = { add_trait = african_tattoo_8 }
+				10 = { add_trait = african_tattoo_9 }
+				10 = { add_trait = african_tattoo_10 }
+				10 = { add_trait = african_tattoo_11 }
+				10 = { add_trait = african_tattoo_12 }
+			}
 		}
-	}
 
-	if = {
-		limit = { age < 23 }
+		if = {
+			limit = { age < 23 }
 
-		# Modifier, if young enough
-		random_list = {
-			10 = { } # Nothing
+			# Modifier, if young enough
+			random_list = {
+				10 = { } # Nothing
 
-			25 = {
-				trigger = {
-					OR = {
-						trait = african_tattoo_12
-						trait = african_tattoo_8
-						trait = african_tattoo_2
+				25 = {
+					trigger = {
+						OR = {
+							trait = african_tattoo_12
+							trait = african_tattoo_8
+							trait = african_tattoo_2
+						}
+					}
+
+					add_character_modifier = {
+						name = african_adulthood_rites_1
+						years = 6
 					}
 				}
 
-				add_character_modifier = {
-					name = african_adulthood_rites_1
-					years = 6
-				}
-			}
+				25 = {
+					trigger = {
+						OR = {
+							trait = african_tattoo_10
+							trait = african_tattoo_7
+							trait = african_tattoo_1
+						}
+					}
 
-			25 = {
-				trigger = {
-					OR = {
-						trait = african_tattoo_10
-						trait = african_tattoo_7
-						trait = african_tattoo_1
+					add_character_modifier = {
+						name = african_adulthood_rites_2
+						years = 6
 					}
 				}
 
-				add_character_modifier = {
-					name = african_adulthood_rites_2
-					years = 6
-				}
-			}
+				25 = {
+					trigger = {
+						OR = {
+							trait = african_tattoo_9
+							trait = african_tattoo_6
+							trait = african_tattoo_3
+						}
+					}
 
-			25 = {
-				trigger = {
-					OR = {
-						trait = african_tattoo_9
-						trait = african_tattoo_6
-						trait = african_tattoo_3
+					add_character_modifier = {
+						name = african_adulthood_rites_3
+						years = 6
 					}
 				}
 
-				add_character_modifier = {
-					name = african_adulthood_rites_3
-					years = 6
-				}
-			}
-
-			25 = {
-				trigger = {
-					OR = {
-						trait = african_tattoo_11
-						trait = african_tattoo_5
-						trait = african_tattoo_4
+				25 = {
+					trigger = {
+						OR = {
+							trait = african_tattoo_11
+							trait = african_tattoo_5
+							trait = african_tattoo_4
+						}
 					}
-				}
 
-				add_character_modifier = {
-					name = african_adulthood_rites_4
-					years = 6
+					add_character_modifier = {
+						name = african_adulthood_rites_4
+						years = 6
+					}
 				}
 			}
 		}
