@@ -767,7 +767,91 @@ character_event = {
 				}
 			}
 
-			narrative_event = { id = HFP.40036 }
+			narrative_event = { id = HFP.40034 }
+		}
+	}
+}
+
+# Narrative Event - Papal States usurped
+narrative_event = {
+	id = HFP.40034
+	title = EVTTITLE_HFP_40034
+	desc = EVTDESC_HFP_40034
+	picture = GFX_evt_magnificent_castle
+
+	is_triggered_only = yes
+	major = yes
+
+	major_trigger = {
+		any_demesne_province = {
+			region = world_europe_south_italy
+			owned_by = PREV
+		}
+	}
+
+	option = {
+		name = {
+			text = EVTOPTA_HFP_40034
+			trigger = {
+				NOT = { character = ROOT }
+			}
+		}
+		name = {
+			text = EVTOPTB_HFP_40034
+			trigger = { character = ROOT }
+		}
+	}
+}
+
+# Pope loses all lands, k_papal_state turns into k_romagna
+character_event = {
+	id = HFP.44036
+
+	is_triggered_only = yes # on_new_holder(_inheritance/usurpation)
+	hide_window = yes
+
+	trigger = {
+		FROMFROM = {
+			trigger_if = {
+				limit = { has_landed_title = k_papacy }
+				num_of_count_titles_in_realm == 0
+			}
+			trigger_else = {
+				top_liege = {
+					has_landed_title = k_papacy
+					num_of_count_titles_in_realm == 0
+				}
+			}
+		}
+
+		catholic = { is_name_randomized = no }
+	}
+
+	immediate = {
+		k_papacy = {
+			holder_scope = {
+				k_papal_state = {
+					any_direct_de_jure_vassal_title = {
+						de_jure_liege = k_romagna
+					}
+
+					empire = {
+						k_romagna = {
+							de_jure_liege = PREV
+						}
+					}
+				}
+
+				destroy_landed_title = k_papal_state
+				unsafe_destroy_landed_title = d_papal_guards
+
+				activate_title = {
+					title = d_papal_guards
+					status = no
+				}
+
+				narrative_event = { id = HFP.40037 } # Papal States becomes Romagna when the Pope holds no lands in Italy
+			}
 		}
 	}
 }
@@ -779,6 +863,7 @@ narrative_event = {
 	title = EVTTITLE_HFP_40037
 	desc = EVTDESC_HFP_40037
 	picture = GFX_evt_magnificent_castle
+	portrait = k_papacy
 
 	is_triggered_only = yes
 	major = yes
@@ -792,37 +877,6 @@ narrative_event = {
 
 	option = {
 		name = INTERESTING
-	}
-}
-
-# Narrative Event - Papal States usurped
-narrative_event = {
-	id = HFP.40036
-	title = EVTTITLE_HFP_40036
-	desc = EVTDESC_HFP_40036
-	picture = GFX_evt_magnificent_castle
-
-	is_triggered_only = yes
-	major = yes
-
-	major_trigger = {
-		any_demesne_province = {
-			region = world_europe_south_italy
-			owned_by = PREV
-		}
-	}
-
-	option = {
-		name = {
-			text = EVTOPTA_HFP_40036
-			trigger = {
-				NOT = { character = ROOT }
-			}
-		}
-		name = {
-			text = EVTOPTB_HFP_40036
-			trigger = { character = ROOT }
-		}
 	}
 }
 
