@@ -3,12 +3,176 @@ namespace = HFP
 # Written by Joachim
 # HFP.44000 - HFP.44999
 
+character_event = {
+	id = HFP.44000
+
+	is_triggered_only = yes # on_new_holder(_inheritance/usurpation)
+	hide_window = yes
+
+	trigger = {
+		FROM = {
+			# Checking if it is an island the Hospitallers could be interested in
+			OR = {
+				title = d_corsica
+				title = d_sardinia
+				title = d_cephalonia
+				title = d_krete
+				title = d_cyprus
+				title = c_malta
+				title = c_lesbos
+				title = c_rhodos
+				title = c_chios
+				title = c_naxos
+			}
+		}
+
+		d_knights_hospitaller = {
+			is_title_active = THIS
+
+			holder_scope = {
+				religion = ROOT
+
+				# Don't ask yourself for the title
+				NOR = {
+					character = ROOT
+					is_liege_or_above_of = ROOT
+				}
+
+				# Don't have an appropriate island yet
+				c_malta = {
+					holder_scope = {
+						NOR = {
+							character = PREVPREV
+							is_vassal_or_below_of = PREVPREV
+						}
+					}
+				}
+
+				c_lesbos = {
+					holder_scope = {
+						NOR = {
+							character = PREVPREV
+							is_vassal_or_below_of = PREVPREV
+						}
+					}
+				}
+
+				c_rhodos = {
+					holder_scope = {
+						NOR = {
+							character = PREVPREV
+							is_vassal_or_below_of = PREVPREV
+						}
+					}
+				}
+
+				c_chios = {
+					holder_scope = {
+						NOR = {
+							character = PREVPREV
+							is_vassal_or_below_of = PREVPREV
+						}
+					}
+				}
+
+				c_naxos = {
+					holder_scope = {
+						NOR = {
+							character = PREVPREV
+							is_vassal_or_below_of = PREVPREV
+						}
+					}
+				}
+
+				d_sardinia = {
+					NOT = {
+						any_direct_de_jure_vassal_title = {
+							holder_scope = {
+								character = PREVPREVPREV
+								is_vassal_or_below_of = PREVPREVPREV
+							}
+						}
+					}
+				}
+
+				d_cyprus = {
+					NOT = {
+						any_direct_de_jure_vassal_title = {
+							holder_scope = {
+								character = PREVPREVPREV
+								is_vassal_or_below_of = PREVPREVPREV
+							}
+						}
+					}
+				}
+
+				d_corsica = {
+					NOT = {
+						any_direct_de_jure_vassal_title = {
+							holder_scope = {
+								character = PREVPREVPREV
+								is_vassal_or_below_of = PREVPREVPREV
+							}
+						}
+					}
+				}
+
+				d_krete = {
+					NOT = {
+						any_direct_de_jure_vassal_title = {
+							holder_scope = {
+								character = PREVPREVPREV
+								is_vassal_or_below_of = PREVPREVPREV
+							}
+						}
+					}
+				}
+
+				d_cephalonia = {
+					NOT = {
+						any_direct_de_jure_vassal_title = {
+							holder_scope = {
+								character = PREVPREVPREV
+								is_vassal_or_below_of = PREVPREVPREV
+							}
+						}
+					}
+				}
+			}
+		}
+
+		has_alternate_start_parameter = {
+			key = religion_names
+			value = historical
+		}
+
+		has_alternate_start_parameter = {
+			key = religion_features
+			value = historical
+		}
+
+		is_heretic = no
+		NOT = { has_character_flag = refused_to_give_island_to_knights }
+	}
+
+	immediate = {
+		FROM = {
+			save_event_target_as = potential_title
+		}
+
+		letter_event = {
+			id = HFP.44001
+			days = 1
+		}
+	}
+}
+
 # Knights Hospitaller asks to receive an island
 letter_event = {
 	id = HFP.44001
 	desc = EVTDESC_HFP_44001
 
-	is_triggered_only = yes # check_holy_order_donation_effect
+	is_triggered_only = yes
 
 	immediate = {
 		d_knights_hospitaller = {
@@ -260,6 +424,133 @@ letter_event = {
 		name = EVTOPTA_HFP_44003
 
 		piety = -50
+	}
+}
+
+character_event = {
+	id = HFP.44005
+
+	is_triggered_only = yes # on_new_holder(_inheritance/usurpation)
+	hide_window = yes
+
+	trigger = {
+		# Checking that the Teutonics are active
+		d_teutonic_order = {
+			is_title_active = THIS
+
+			holder_scope = {
+				religion = ROOT
+				is_landed = no
+
+				NOR = {
+					# Don't ask yourself for the title
+					character = ROOT
+					is_liege_or_above_of = ROOT
+
+					# Not already warring for suitable land themselves
+					any_war = {
+						using_cb = northern_crusade_war
+					}
+				}
+			}
+		}
+
+		is_heretic = no
+		year >= 1150
+		NOR = {
+			has_character_flag = refused_to_give_land_to_teutonics
+			has_global_flag = teutons_asked_for_land
+		}
+
+		FROM = {
+			# Checking if it is a Duchy the Teutonics could be interested in
+			real_tier = DUKE
+
+			# Somewhere in the north
+			OR = {
+				region = world_europe_north
+				region = custom_eastern_baltic
+				region = custom_russia
+			}
+
+			# Checking that ROOT owns the whole Duchy
+			ROOT = {
+				completely_controls = PREV
+			}
+
+			# Checking that ROOT doesn't already own the associated Kingdom of that title
+			kingdom = {
+				trigger_if = {
+					limit = { has_holder = yes }
+					NOT = { holder = ROOT }
+				}
+			}
+
+			OR = {
+				# Is by water
+				any_direct_de_jure_vassal_title = {
+					location = {
+						is_coastal = yes
+					}
+
+					holder_scope = {
+						OR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
+					}
+				}
+
+				# Is the neighbor to another Catholic realm
+				any_direct_de_jure_vassal_title = {
+					location = {
+						any_neighbor_province = {
+							OR = {
+								religion = ROOT
+
+								holder_scope = {
+									OR = {
+										religion = ROOT
+
+										any_liege = {
+											religion = ROOT
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			# Is adjacent to infidels
+			any_direct_de_jure_vassal_title = {
+				location = {
+					any_neighbor_province = {
+						owner = {
+							OR = {
+								NOT = { religion_group = ROOT }
+
+								any_liege = {
+									NOT = { religion_group = ROOT }
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {
+		FROM = {
+			save_event_target_as = holy_order_potential_title
+		}
+
+		letter_event = {
+			id = HFP.44006
+			days = 1
+		}
 	}
 }
 
