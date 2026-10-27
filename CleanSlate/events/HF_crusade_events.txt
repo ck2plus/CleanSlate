@@ -12,6 +12,7 @@ character_event = {
 	is_triggered_only = yes # on_crusade_preparation_starts
 	hide_window = yes
 
+	has_global_flag = first_crusade_complete
 	has_dlc = "Holy Fury"
 
 	trigger = {
@@ -22,7 +23,6 @@ character_event = {
 			value = on
 		}
 
-		has_global_flag = first_crusade_complete
 		NOT = { has_global_flag = fourth_crusade_launched }
 
 		e_byzantium = {
@@ -404,10 +404,10 @@ character_event = {
 	is_triggered_only = yes # on_crusade_launches
 	hide_window = yes
 
+	has_global_flag = 4th_crusade_official
 	has_dlc = "Holy Fury"
 
 	trigger = {
-		has_global_flag = 4th_crusade_official
 
 		crusade_target_title = {
 			title = k_thrace
@@ -686,6 +686,7 @@ character_event = {
 	is_triggered_only = yes # on_yearly_pulse
 	hide_window = yes
 
+	only_playable = yes
 	has_dlc = "Holy Fury"
 
 	trigger = {
@@ -1669,13 +1670,9 @@ character_event = {
 				tier = DUKE
 			}
 
-			location = {
-				save_event_target_as = current_location
-			}
-
 			spawn_unit = {
-				province = event_target:current_location
-				home = event_target:current_location
+				province = location
+				home = location
 				owner = ROOT
 				attrition = 0
 				merge = yes
@@ -1690,8 +1687,8 @@ character_event = {
 			}
 
 			spawn_unit = {
-				province = event_target:current_location
-				home = event_target:current_location
+				province = location
+				home = location
 				owner = ROOT
 				match_character = event_target:northern_crusade_target_character
 				match_mult = 0.5
@@ -1718,12 +1715,8 @@ character_event = {
 			}
 		}
 
-		any_war = {
-			limit = { using_cb = northern_crusade_war }
-
-			event_target:northern_crusade_asker = {
-				join_attacker_wars = PREV
-			}
+		event_target:northern_crusade_asker = {
+			join_attacker_wars = ROOT
 		}
 
 		character_event = { id = HF.49111 }
@@ -1775,6 +1768,8 @@ character_event = {
 			limit = {
 				religion = ROOT
 				higher_real_tier_than = BARON
+				ai = yes
+				war = no
 
 				any_demesne_province = {
 					owned_by = PREV
@@ -1785,27 +1780,13 @@ character_event = {
 						region = custom_russia
 					}
 				}
-
-				NOT = {
-					any_war = {
-						using_cb = northern_crusade_war
-					}
-				}
 			}
 
 			preferred_limit = { real_tier = KING }
 			preferred_limit = { real_tier = DUKE }
 			preferred_limit = { real_tier = COUNT }
 
-			save_event_target_as = northern_crusade_support
-		}
-
-		any_war = {
-			limit = { using_cb = northern_crusade_war }
-
-			event_target:northern_crusade_support = {
-				join_attacker_wars = PREV
-			}
+			join_attacker_wars = ROOT
 		}
 	}
 }
@@ -2005,36 +1986,34 @@ character_event = {
 	is_triggered_only = yes # on_yearly_pulse
 	hide_window = yes
 
+	only_playable = yes # In case the Order/State ends up vassalised somehow
+	has_global_flag = northern_crusades_active
+
 	trigger = {
 		OR = {
 			has_landed_title = d_teutonic_order
 			has_landed_title = k_teutonic_state
 		}
-		has_global_flag = northern_crusades_active
-	}
 
-	immediate = {
-		if = {
-			limit = {
-				event_target:northern_crusade_kingdom_title = {
-					NOT = {
-						any_de_jure_vassal_title = {
-							holder_scope = {
-								NOT = { religion_group = christian }
-							}
-						}
+		event_target:northern_crusade_kingdom_title = {
+			NOT = {
+				any_de_jure_vassal_title = {
+					holder_scope = {
+						NOT = { religion_group = christian }
 					}
 				}
 			}
-
-			religion_authority = {
-				name = northern_crusade_won
-			}
-
-			narrative_event = { id = HF.49115 }
-			set_global_flag = northern_crusade_success
-			clr_global_flag = northern_crusades_active
 		}
+	}
+
+	immediate = {
+		religion_authority = {
+			name = northern_crusade_won
+		}
+
+		narrative_event = { id = HF.49115 }
+		set_global_flag = northern_crusade_success
+		clr_global_flag = northern_crusades_active
 	}
 }
 
