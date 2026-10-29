@@ -23,7 +23,7 @@ claim = {
 		not_fellow_crusader_trigger = yes
 	}
 
-	can_use_title = {
+	can_use = {
 		# Attacker
 		ROOT = {
 			# Gender requirements
@@ -34,7 +34,13 @@ claim = {
 			trigger_else = {
 				religion_is_matriarchal_trigger = no
 			}
+		}
+	}
 
+	can_use_title = {
+		# Attacker
+		ROOT = {
+			# Claimant requirements
 			OR = {
 				has_strong_claim = PREV
 				has_character_flag = claimant_adventurer
@@ -48,7 +54,7 @@ claim = {
 							is_contested = yes # Already being contested in some war
 							holder_scope = { has_regent = yes }
 
-							# A female ruler without full equality cannot be ousted by another female ruler without full equality
+							# A female ruler without full equality can be ousted by another female ruler with full equality
 							trigger_if = {
 								limit = {
 									NOT = {
@@ -57,7 +63,9 @@ claim = {
 											value = all
 										}
 									}
+
 									ROOT = { is_female = yes }
+
 									holder_scope = {
 										is_female = yes
 										religion_is_matriarchal_trigger = no
@@ -65,6 +73,7 @@ claim = {
 										NOT = { has_law = status_of_women_4 }
 									}
 								}
+
 								ROOT = {
 									OR = {
 										has_law = status_of_women_4
@@ -613,6 +622,20 @@ claim_on_liege = {
 		not_fellow_crusader_trigger = yes
 	}
 
+	can_use = {
+		# Attacker
+		ROOT = {
+			# Gender requirements
+			trigger_if = {
+				limit = { is_female = yes }
+				religion_is_patriarchal_trigger = no
+			}
+			trigger_else = {
+				religion_is_matriarchal_trigger = no
+			}
+		}
+	}
+
 	can_use_title = {
 		# Attacker
 		ROOT = {
@@ -629,24 +652,31 @@ claim_on_liege = {
 							is_contested = yes # Already being contested in some war
 							holder_scope = { has_regent = yes }
 
-							AND = {
-								ROOT = { # attacking claimant
-									trigger_if = {
-										limit = { is_female = yes }
-										has_law = status_of_women_4
-									}
-								}
-
-								holder_scope = { # title holder
-									is_female = yes
-
-									NOR = {
-										has_law = status_of_women_4
-
-										has_game_rule = {
+							# A female ruler without full equality can be ousted by another female ruler with full equality
+							trigger_if = {
+								limit = {
+									NOT = {
+										has_game_rule = { # Makes the below moot
 											name = gender
 											value = all
 										}
+									}
+
+									ROOT = { is_female = yes }
+
+									holder_scope = {
+										is_female = yes
+										religion_is_matriarchal_trigger = no
+										religion_is_equal_trigger = no
+										NOT = { has_law = status_of_women_4 }
+									}
+								}
+
+								ROOT = {
+									OR = {
+										has_law = status_of_women_4
+										religion_is_matriarchal_trigger = yes
+										religion_is_equal_trigger = yes
 									}
 								}
 							}
@@ -1347,39 +1377,35 @@ other_claim = {
 
 		# Claimant
 		ROOT = {
-			# gender requirements
+			# Gender requirements
 			trigger_if = {
 				limit = { is_female = yes }
 
-				NOR = {
-					has_law = agnatic_succession
-					FROMFROM = { has_law = agnatic_succession }
+				religion_is_patriarchal_trigger = no
+
+				trigger_if = { # Requirements to land courtiers
+					limit = { is_ruler = no }
 
 					PREV = { # Claimed Title
-						succ_law_title = { has_law = agnatic_succession }
+						succ_law_title = { NOT = { has_law = agnatic_succession } }
 					}
-
-					religion_is_patriarchal_trigger = yes
 				}
 			}
 			trigger_else = {
-				NOR = {
-					has_law = enatic_succession
-					FROMFROM = { has_law = enatic_succession }
+				religion_is_matriarchal_trigger = no
 
-					PREV = {
-						succ_law_title = { has_law = enatic_succession }
+				trigger_if = { # Requirements to land courtiers
+					limit = { is_ruler = no }
+
+					PREV = { # Claimed Title
+						succ_law_title = { NOT = { has_law = enatic_succession } }
 					}
-
-					religion_is_matriarchal_trigger = yes
 				}
 			}
 
-			# claimant requirements
+			# Claimant requirements
 			trigger_if = {
-				limit = {
-					NOT = { has_strong_claim = PREV }
-				}
+				limit = { NOT = { has_strong_claim = PREV } }
 
 				has_weak_claim = PREV
 
@@ -1389,24 +1415,31 @@ other_claim = {
 						is_contested = yes # Already being contested in some war
 						holder_scope = { has_regent = yes }
 
-						AND = {
-							ROOT = { # claimant
-								trigger_if = {
-									limit = { is_female = yes }
-									has_law = status_of_women_4
-								}
-							}
-
-							holder_scope = { # title holder
-								is_female = yes
-
-								NOR = {
-									has_law = status_of_women_4
-
-									has_game_rule = {
+						# A female ruler without full equality can be ousted by a female claimant with full equality
+						trigger_if = {
+							limit = {
+								NOT = {
+									has_game_rule = { # Makes the below moot
 										name = gender
 										value = all
 									}
+								}
+
+								ROOT = { is_female = yes }
+
+								holder_scope = {
+									is_female = yes
+									religion_is_matriarchal_trigger = no
+									religion_is_equal_trigger = no
+									NOT = { has_law = status_of_women_4 }
+								}
+							}
+
+							ROOT = {
+								OR = {
+									has_law = status_of_women_4
+									religion_is_matriarchal_trigger = yes
+									religion_is_equal_trigger = yes
 								}
 							}
 						}
@@ -1836,57 +1869,87 @@ other_claim_on_liege = {
 		is_vice_royalty = no
 
 		OR = {
-			# Third-party claimant
-			ROOT = { is_female = no }
-			NOT = { succ_law_title = { has_law = agnatic_succession } }
-
-			AND = {
-				lower_real_tier_than = KING
-				is_primary_holder_title = no
-			}
-
 			# Attacker
-			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken } # Faction war. Ignore title requirements.
-		}
+			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken } # Faction war. Ignore requirements.
 
-		OR = {
 			# Third-party claimant
-			ROOT = { has_strong_claim = PREV }
+			ROOT = {
+				# Gender requirements
+				trigger_if = {
+					limit = { is_female = yes }
 
-			# Attacker
-			FROMFROM = { has_character_flag = faction_claimant_ultimatum_taken } # Faction war. Ignore claim strength.
+					religion_is_patriarchal_trigger = no
 
-			AND = {
-				# Third-party claimant
-				ROOT = { has_weak_claim = PREV }
+					trigger_if = { # Requirements to land courtiers
+						limit = { is_ruler = no }
 
-				OR = {
-					is_pretender = yes # Checks vs ROOT character
-					is_contested = yes # Is already being contested in some form of Claim or Succession War
-					holder_scope = { has_regent = yes }
-
-					AND = {
-						# Claimant
-						ROOT = {
-							trigger_if = {
-								limit = { is_female = yes }
-								has_law = status_of_women_4
-							}
+						PREV = { # Claimed Title
+							succ_law_title = { NOT = { has_law = enatic_succession } }
 						}
+					}
+				}
+				trigger_else = {
+					religion_is_matriarchal_trigger = no
 
-						holder_scope = {
-							is_female = yes
+					trigger_if = { # Requirements to land courtiers
+						limit = { is_ruler = no }
 
-							NOR = {
-								has_law = status_of_women_4
+						PREV = { # Claimed Title
+							succ_law_title = { NOT = { has_law = enatic_succession } }
+						}
+					}
+				}
 
-								has_game_rule = {
-									name = gender
-									value = all
+				# Claimant requirements
+				trigger_if = {
+					limit = { NOT = { has_strong_claim = PREV } }
+
+					has_weak_claim = PREV
+
+					PREV = { # Claimed Title
+						OR = {
+							is_pretender = yes # Checks vs ROOT character
+							is_contested = yes # Is already being contested in some form of Claim or Succession War
+							holder_scope = { has_regent = yes }
+
+							# A female ruler without full equality can be ousted by a female claimant with full equality
+							trigger_if = {
+								limit = {
+									NOT = {
+										has_game_rule = { # Makes the below moot
+											name = gender
+											value = all
+										}
+									}
+
+									ROOT = { is_female = yes }
+
+									holder_scope = {
+										is_female = yes
+										religion_is_matriarchal_trigger = no
+										religion_is_equal_trigger = no
+										NOT = { has_law = status_of_women_4 }
+									}
+								}
+
+								ROOT = {
+									OR = {
+										has_law = status_of_women_4
+										religion_is_matriarchal_trigger = yes
+										religion_is_equal_trigger = yes
+									}
 								}
 							}
 						}
 					}
+				}
+			}
+		}
+
+		NOT = { # claimant isn't already attacking for the same claim
+			any_war = { # when used in title scope, checks all wars for that title
+				attacker = {
+					character = ROOT
 				}
 			}
 		}
@@ -1930,14 +1993,6 @@ other_claim_on_liege = {
 			claimed_by = ROOT
 			has_law = succ_feudal_elective
 			has_law = succ_hre_elective
-		}
-
-		NOT = { # claimant isn't already attacking for the same claim
-			any_war = { # when used in title scope, checks all wars for that title
-				attacker = {
-					character = ROOT
-				}
-			}
 		}
 	}
 
