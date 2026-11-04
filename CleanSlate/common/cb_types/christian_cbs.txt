@@ -20,6 +20,16 @@ excommunicated_ruler = {
 
 	can_use_gui = {
 		not_fellow_crusader_trigger = yes
+
+		# Defender
+		FROM = {
+			# Not fighting religious enemies
+			NOT = {
+				any_current_enemy = {
+					NOT = { religion_group = ROOT }
+				}
+			}
+		}
 	}
 
 	can_use = {
@@ -33,31 +43,21 @@ excommunicated_ruler = {
 		FROM = {
 			excommunicated_for = ROOT
 			in_revolt = no
-
-			# Not fighting religious enemies
-			NOT = {
-				any_current_enemy = {
-					NOT = { religion_group = ROOT }
-				}
-			}
 		}
 	}
 
 	is_valid = {
 		# Attacker
 		ROOT = {
-			OR = {
-				NOT = { excommunicated_for = ROOT }
+			trigger_if = {
+				limit = { excommunicated_for = ROOT }
 				has_character_flag = flag_excommunicated_for_coronation
 			}
 		}
 
 		# Defender
 		FROM = {
-			custom_tooltip = {
-				text = tooltip_is_excommunicated_for
-				excommunicated_for = ROOT
-			}
+			excommunicated_for = ROOT
 		}
 	}
 
@@ -171,11 +171,8 @@ excommunicated_ruler = {
 			piety = -50
 			prestige = -100
 
-			hidden_effect = { # Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever
-				attacker = {
-					clr_character_flag = flag_excommunicated_for_coronation
-				}
-			}
+			# Coronation request locks cleared on invalidation or loss, to avoid locking the player in the middle of the negotiation forever
+			clr_character_flag = flag_excommunicated_for_coronation
 		}
 	}
 
@@ -197,7 +194,6 @@ excommunicated_ruler = {
 
 		defender = {
 			show_scope_change = no
-
 			prestige = 200
 		}
 	}
@@ -306,50 +302,51 @@ depose_antipope = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_piety = 500
-			participation_scaled_prestige = 250
-
-			religion_authority = {
-				name = deposed_antipope
-				years = 50
-			}
-
 			if = {
-				limit = {
-					rightful_religious_head_scope = {
-						attacker = {
-							excommunicated_for = PREV
-						}
-					}
-				}
+				limit = { character = attacker }
 
-				excommunicate = no
-			}
-
-			if = {
-				limit = { has_character_flag = flag_antipope_for_coronation }
-				character_event = { id = HF.20220 } # Papal Coronation may proceed
-			}
-
-			rightful_religious_head_scope = {
-				show_scope_change = no
-
-				opinion = {
-					name = opinion_deposed_antipope
-					who = attacker
-				}
-			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-
-			hidden_effect = {
 				participation_scaled_piety = 500
 				participation_scaled_prestige = 250
+
+				religion_authority = {
+					name = deposed_antipope
+					years = 50
+				}
+
+				if = {
+					limit = {
+						rightful_religious_head_scope = {
+							attacker = {
+								excommunicated_for = PREV
+							}
+						}
+					}
+
+					excommunicate = no
+				}
+
+				if = {
+					limit = { has_character_flag = flag_antipope_for_coronation }
+					character_event = { id = HF.20220 } # Papal Coronation may proceed
+				}
+
+				rightful_religious_head_scope = {
+					show_scope_change = no
+
+					opinion = {
+						name = opinion_deposed_antipope
+						who = attacker
+					}
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_piety = 500
+					participation_scaled_prestige = 250
+				}
 			}
 		}
 
@@ -461,49 +458,48 @@ shepherds_crusade_invasion = {
 		}
 	}
 
-	on_success_title = {
-		save_event_target_as = shepherds_kingdom
-
-		if = {
-			limit = {
-				OR = {
-					has_holder = no
-					holder = defender
-
-					holder_scope = {
-						top_liege = {
-							character = defender
-						}
-					}
-				}
-			}
-
-			gain_title = attacker
-		}
-		else = {
-			create_title = {
-				tier = KING
-				name = KINGDOM_OF_THE_SHEPHERDS
-				holder = attacker
-				culture = attacker
-				base_title = event_target:shepherds_kingdom
-			}
-
-			add_claim = attacker
-		}
-
+	on_success = {
 		attacker = {
 			show_scope_change = no
 
+			if = {
+				limit = {
+					thirdparty_title_scope = {
+						trigger_if = {
+							limit = { has_holder = yes }
+
+							holder_scope = {
+								top_liege = {
+									character = defender
+								}
+							}
+						}
+					}
+				}
+
+				gain_title = thirdparty_title_scope
+			}
+			else = {
+				create_title = {
+					tier = KING
+					name = KINGDOM_OF_THE_SHEPHERDS
+					holder = attacker
+					culture = attacker
+					base_title = thirdparty_title_scope
+				}
+
+				add_claim = thirdparty_title_scope
+			}
+
 			gain_settlements_under_title = {
-				title = PREV
+				title = thirdparty_title_scope
 				enemy = defender
 				is_crusade = yes # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
 				type = holy_war
 			}
 
 			clr_character_flag = shepherds_leader
-			set_defacto_liege = attacker
+			set_defacto_liege = THIS
 
 			hidden_effect = {
 				dynasty = father_bastard
@@ -528,7 +524,7 @@ shepherds_crusade_invasion = {
 
 				set_bloodline_founder_religion_flag_effect = yes
 
-				event_target:shepherds_kingdom = {
+				thirdparty_title_scope = {
 					capital_scope = {
 						attacker = {
 							capital = PREV
@@ -562,8 +558,15 @@ shepherds_crusade_invasion = {
 					}
 
 					if = {
-						limit = { has_dlc = "Conclave" }
+						limit = { is_law_potential = crown_authority_0 }
 
+						add_law = {
+							law = crown_authority_3
+							cooldown = no
+							opinion_effect = no
+						}
+					}
+					else = {
 						add_law = {
 							law = ze_administration_laws_1
 							cooldown = no
@@ -572,13 +575,6 @@ shepherds_crusade_invasion = {
 
 						add_law = {
 							law = out_of_realm_inheritance_law_1
-							cooldown = no
-							opinion_effect = no
-						}
-					}
-					else = {
-						add_law = {
-							law = crown_authority_3
 							cooldown = no
 							opinion_effect = no
 						}
@@ -649,9 +645,9 @@ shepherds_crusade_invasion = {
 					}
 				}
 
-				event_target:shepherds_kingdom = {
-					any_direct_de_jure_vassal_title = {
-						random_direct_de_jure_vassal_title = {
+				thirdparty_title_scope = { # Kingdom
+					any_direct_de_jure_vassal_title = { # Duchy
+						random_direct_de_jure_vassal_title = { # County
 							limit = {
 								holder_scope = {
 									top_liege = {
@@ -661,7 +657,7 @@ shepherds_crusade_invasion = {
 							}
 
 							holder_scope = {
-								gain_title = PREVPREV
+								gain_title = PREVPREV # Duchy
 
 								primary_title = {
 									any_direct_de_jure_vassal_title = {
@@ -674,7 +670,7 @@ shepherds_crusade_invasion = {
 										}
 
 										holder_scope = {
-											set_defacto_liege = PREVPREVPREV
+											set_defacto_liege = PREVPREVPREV # New duke
 										}
 									}
 								}
@@ -718,6 +714,7 @@ shepherds_crusade_invasion = {
 				to = defender
 				value = 1.0
 			}
+
 			piety = -100
 		}
 
@@ -801,266 +798,266 @@ northern_crusade_war = {
 	}
 
 	on_success = {
+		thirdparty_title_scope = { save_event_target_as = northern_crusade_title } # For localisation
+
 		any_attacker = {
-			limit = {
-				NOR = {
-					has_landed_title = d_teutonic_order
-					has_landed_title = k_teutonic_state
-				}
-			}
-
-			piety = 150
-		}
-
-		any_defender = {
-			piety = -100
-		}
-	}
-
-	on_success_title = {
-		save_event_target_as = northern_crusade_title # For localisation
-
-		# Attacker
-		attacker = {
 			show_scope_change = no
 
-			vassalize_or_take_under_title = {
-				title = PREV
-				enemy = defender
-				same_religion = yes # Only vassalize rulers of my religion
-				is_religious = yes
-				type = holy_war
-			}
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				# If the Teutonic Order don't have a base to work out from, get one
-				if = {
-					limit = {
-						capital_scope = {
-							duchy = {
-								title = event_target:northern_crusade_title
-							}
-						}
-					}
-
-					teutonic_order_upgrade_capital_effect = yes
-					holy_order_distribute_titles_effect = yes
-					character_event = { id = HFP.41090 days = 1 } # Refill the levy, and remove the negative modifiers
-					character_event = { id = HFP.41090 days = 3 } # Refill the levy, and remove the negative modifiers
+				vassalize_or_take_under_title = {
+					title = thirdparty_title_scope
+					enemy = defender
+					same_religion = yes # Only vassalize rulers of my religion
+					type = holy_war
 				}
 
-				# Become the Teutonic State, if they aren't already
-				if = {
-					limit = {
-						NOT = { has_landed_title = k_teutonic_state }
-					}
-
-					k_teutonic_state = {
-						copy_title_history = d_teutonic_order
-						copy_title_laws = d_teutonic_order
-					}
-
-					grant_title_no_opinion = k_teutonic_state
-					unsafe_destroy_landed_title = d_teutonic_order
-
-					activate_title = {
-						title = d_teutonic_order
-						status = no
-					}
-				}
-
-				## Rewards
-				# Check who to give artifacts
-				any_attacker = {
-					limit = {
-						NOT = { character = attacker }
-
-						any_war = {
-							using_cb = northern_crusade_war
-
-							war_participation = {
-								who = PREV
-								score > 40
-							}
-						}
-					}
-
-					set_character_flag = northern_crusade_artifact_reward
-				}
-
-				# Check who to give money
-				any_attacker = {
-					limit = {
-						NOT = { character = attacker }
-
-						any_war = {
-							using_cb = northern_crusade_war
-
-							war_participation = {
-								who = PREV
-								score > 20
-							}
-						}
-					}
-
-					set_character_flag = northern_crusade_gold_reward
-				}
-
-				# Check who to give artifacts
-				any_attacker = {
-					limit = {
-						NOT = { character = attacker }
-
-						any_war = {
-							using_cb = northern_crusade_war
-
-							war_participation = {
-								who = PREV
-								score > 0.01
-							}
-						}
-					}
-
-					letter_event = {
-						id = HF.49112 # Reward letter from Teutons after the war
-						days = 1
-					}
-				}
-
-				# Checking for Bloodline
-				most_participating_attacker = {
+				hidden_effect = {
+					# If the Teutonic Order don't have a base to work out from, get one
 					if = {
+						limit = {
+							capital_scope = {
+								duchy = {
+									title = thirdparty_title_scope
+								}
+							}
+						}
+
+						teutonic_order_upgrade_capital_effect = yes
+						holy_order_distribute_titles_effect = yes
+						character_event = { id = HFP.41090 days = 1 } # Refill the levy, and remove the negative modifiers
+						character_event = { id = HFP.41090 days = 3 } # Refill the levy, and remove the negative modifiers
+					}
+
+					# Become the Teutonic State, if they aren't already
+					if = {
+						limit = {
+							NOT = { has_landed_title = k_teutonic_state }
+						}
+
+						k_teutonic_state = {
+							copy_title_history = d_teutonic_order
+							copy_title_laws = d_teutonic_order
+						}
+
+						grant_title_no_opinion = k_teutonic_state
+						unsafe_destroy_landed_title = d_teutonic_order
+
+						activate_title = {
+							title = d_teutonic_order
+							status = no
+						}
+					}
+
+					## Rewards
+					any_attacker = {
 						limit = {
 							NOT = { character = attacker }
 						}
 
+						# Check who to give artifacts
 						if = {
 							limit = {
-								check_variable = {
-									which = northern_crusade_ally
-									value >= 1
+								any_war = {
+									using_cb = northern_crusade_war
+
+									war_participation = {
+										who = PREV
+										score > 40
+									}
 								}
 							}
 
-							change_variable = {
-								which = northern_crusade_ally
-								value = 1
-							}
-						}
-						else = {
-							set_variable = {
-								which = northern_crusade_ally
-								value = 1
-							}
+							set_character_flag = northern_crusade_artifact_reward
 						}
 
+						# Check who to give money
 						if = {
 							limit = {
-								check_variable = {
-									which = northern_crusade_ally
-									value >= 3
+								any_war = {
+									using_cb = northern_crusade_war
+
+									war_participation = {
+										who = PREV
+										score > 20
+									}
 								}
 							}
 
-							narrative_event = { id = HF.49114 } # Northern Crusade Bloodline
+							set_character_flag = northern_crusade_gold_reward
 						}
 
+						# Check who to give artifacts
+						if = {
+							limit = {
+								any_war = {
+									using_cb = northern_crusade_war
+
+									war_participation = {
+										who = PREV
+										score > 0.01
+									}
+								}
+							}
+
+							letter_event = {
+								id = HF.49112 # Reward letter from Teutons after the war
+								days = 1
+							}
+						}
 					}
-				}
 
-				## Misc
-				# Check if the Northern Crusade is over
-				if = {
-					limit = {
-						PREV = {
-							kingdom = {
-								title = event_target:northern_crusade_kingdom_title
+					# Checking for Bloodline
+					most_participating_attacker = {
+						if = {
+							limit = {
+								NOT = { character = attacker }
+							}
 
-								NOT = {
-									any_direct_de_jure_vassal_title = {
+							if = {
+								limit = {
+									check_variable = {
+										which = northern_crusade_ally
+										value >= 1
+									}
+								}
+
+								change_variable = {
+									which = northern_crusade_ally
+									value = 1
+								}
+							}
+							else = {
+								set_variable = {
+									which = northern_crusade_ally
+									value = 1
+								}
+							}
+
+							if = {
+								limit = {
+									check_variable = {
+										which = northern_crusade_ally
+										value >= 3
+									}
+								}
+
+								narrative_event = { id = HF.49114 } # Northern Crusade Bloodline
+							}
+
+						}
+					}
+
+					## Misc
+					# Check if the Northern Crusade is over
+					if = {
+						limit = {
+							thirdparty_title_scope = {
+								kingdom = {
+									title = event_target:northern_crusade_kingdom_title
+
+									NOT = {
 										any_direct_de_jure_vassal_title = {
-											holder_scope = {
-												NOT = { religion_group = christian }
+											any_direct_de_jure_vassal_title = {
+												holder_scope = {
+													NOT = { religion_group = christian }
+												}
 											}
 										}
 									}
 								}
 							}
 						}
-					}
 
-					clear_global_event_target = northern_crusade_kingdom_title
+						clear_global_event_target = northern_crusade_kingdom_title
 
-					religion_authority = {
-						name = northern_crusade_won
-					}
+						religion_authority = {
+							name = northern_crusade_won
+						}
 
-					attacker = {
 						narrative_event = { id = HF.49115 } # Northern Crusade Successful
+						set_global_flag = northern_crusade_success
+						clr_global_flag = northern_crusades_active
 					}
-
-					set_global_flag = northern_crusade_success
-					clr_global_flag = northern_crusades_active
 				}
+			}
+			else = {
+				hidden_effect = { piety = 150 }
+			}
+		}
+
+		any_defender = {
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+				piety = -100
+			}
+			else = {
+				hidden_effect = { piety = -100 }
 			}
 		}
 	}
 
 	on_reverse_demand = {
 		# Attacker
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			hidden_effect = {
-				if = {
-					limit = {
-						check_variable = {
+			if = {
+				limit = { character = attacker }
+
+				piety = -100
+
+				hidden_effect = {
+					if = {
+						limit = {
+							check_variable = {
+								which = global_northernCrusadeValue
+								value >= 1
+							}
+						}
+
+						change_variable = {
 							which = global_northernCrusadeValue
-							value >= 1
+							value = 1
+						}
+					}
+					else = {
+						set_variable = {
+							which = global_northernCrusadeValue
+							value = 1
 						}
 					}
 
-					change_variable = {
-						which = global_northernCrusadeValue
-						value = 1
-					}
-				}
-				else = {
-					set_variable = {
-						which = global_northernCrusadeValue
-						value = 1
-					}
-				}
-
-				if = {
-					limit = {
-						check_variable = {
-							which = global_northernCrusadeValue
-							value >= 3
+					if = {
+						limit = {
+							check_variable = {
+								which = global_northernCrusadeValue
+								value >= 3
+							}
 						}
-					}
 
-					attacker = {
-						narrative_event = { id = HF.49113 } # The Northern Crusades has failed
-					}
-
-					defender = {
-						narrative_event = { id = HF.49113 } # The Northern Crusades has failed
-					}
-
-					any_playable_ruler = {
 						narrative_event = { id = HF.49113 } # The Northern Crusades has failed
 					}
 				}
 			}
-		}
-
-		any_attacker = {
-			piety = -100
+			else = {
+				hidden_effect = { piety = -100 }
+			}
 		}
 
 		any_defender = {
-			piety = 150
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+				piety = 150
+			}
+			else = {
+				hidden_effect = { piety = 150 }
+			}
 		}
 	}
 
@@ -1222,7 +1219,7 @@ childrens_crusade = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
+	on_success = {
 		k_jerusalem = {
 			show_scope_change = no
 
@@ -1281,184 +1278,192 @@ childrens_crusade = {
 		attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 500
-			participation_scaled_piety = 1000
+			if = {
+				limit = { character = attacker }
 
-			religion_authority = {
-				name = won_crusade
-				years = 20
-			}
+				participation_scaled_prestige = 500
+				participation_scaled_piety = 1000
 
-			hidden_effect = {
-				clr_character_flag = flag_childrens_crusade_leader
-				remove_character_modifier = children_crusade_morale_0
-				remove_character_modifier = children_crusade_morale_1
-				remove_character_modifier = children_crusade_morale_2
-				remove_character_modifier = children_crusade_morale_3
-				remove_character_modifier = children_crusade_morale_4
-				remove_character_modifier = voice_of_jesus # Your work here is dones
-
-				if = {
-					limit = { is_female = no }
-
-					create_bloodline = {
-						type = crusader_kid_bloodline
-					}
-				}
-				else = {
-					create_bloodline = {
-						type = crusader_kid_bloodline
-						inheritance = matrilineal
-					}
+				religion_authority = {
+					name = won_crusade
+					years = 20
 				}
 
-				set_bloodline_founder_religion_flag_effect = yes
+				hidden_effect = {
+					clr_character_flag = flag_childrens_crusade_leader
+					remove_character_modifier = children_crusade_morale_0
+					remove_character_modifier = children_crusade_morale_1
+					remove_character_modifier = children_crusade_morale_2
+					remove_character_modifier = children_crusade_morale_3
+					remove_character_modifier = children_crusade_morale_4
+					remove_character_modifier = voice_of_jesus # Your work here is dones
 
-				any_player = {
-					limit = {
-						religion_group = christian
-						NOT = { character = attacker }
-					}
+					if = {
+						limit = { is_female = no }
 
-					narrative_event = { id = HF.25828 } # Notify everyone that the crusade has succeeded
-				}
-
-				# Vassalize and convert all infidels under the title
-				vassalize_or_take_under_title = {
-					title = PREV
-					enemy = defender
-					is_religious = yes
-					type = holy_war
-				}
-
-				if = {
-					limit = {
-						primary_title = { is_primary_type_title = no } # Mercs, the Pope, Holy Orders, etc
-
-						PREV = {
-							OR = {
-								has_holder = no
-
-								holder_scope = {
-									top_liege = { character = defender }
-								}
-							}
+						create_bloodline = {
+							type = crusader_kid_bloodline
 						}
-
-						NOT = { character = attacker }
-
-						OR = {
-							independent = yes
-
-							liege = {
-								real_tier = EMPEROR
-							}
+					}
+					else = {
+						create_bloodline = {
+							type = crusader_kid_bloodline
+							inheritance = matrilineal
 						}
 					}
 
-					usurp_title_only = {
-						target = PREV
+					set_bloodline_founder_religion_flag_effect = yes
+
+					any_player = {
+						limit = {
+							religion_group = christian
+							NOT = { character = attacker }
+						}
+
+						narrative_event = { id = HF.25828 } # Notify everyone that the crusade has succeeded
+					}
+
+					# Vassalize and convert all infidels under the title
+					vassalize_or_take_under_title = {
+						title = thirdparty_title_scope
+						enemy = defender
+						is_religious = yes
 						type = holy_war
 					}
 
 					if = {
 						limit = {
-							NOT = { culture = PREV }
+							mercenary = no
+							holy_order = no
+
+							trigger_if = {
+								limit = { controls_religion = yes }
+								is_theocracy = no
+							}
+
+							thirdparty_title_scope = {
+								OR = {
+									has_holder = no
+
+									holder_scope = {
+										top_liege = { character = defender }
+									}
+								}
+							}
+
+							NOT = { character = attacker }
+
+							OR = {
+								independent = yes
+
+								liege = {
+									real_tier = EMPEROR
+								}
+							}
 						}
 
-						save_event_target_as = winning_crusader
-						PREV = { conquest_culture = event_target:winning_crusader }
-					}
-				}
-
-				remove_trait = disinherited
-
-				any_courtier = {
-					remove_trait = disinherited
-					clr_character_flag = no_court_invites
-				}
-
-				if = {
-					limit = { is_female = no }
-
-					remove_trait = crusader
-					add_trait = crusader_king
-				}
-
-				else = {
-					remove_trait = crusader
-					add_trait = crusader_queen
-				}
-
-				if = {
-					limit = { can_apply_cool_nickname_trigger = yes }
-
-					random_list = {
-						20 = {
-							trigger = { can_apply_super_cool_nickname_trigger = yes }
-							give_nickname = nick_the_angel_of_jerusalem
+						usurp_title_only = {
+							target = thirdparty_title_scope
+							type = holy_war
 						}
 
-						15 = {
-							trigger = { can_apply_super_cool_nickname_trigger = yes }
-							give_nickname = nick_the_chosen_of_gabriel
-						}
-
-						15 = {
-							trigger = { can_apply_super_cool_nickname_trigger = yes }
-
+						hidden_effect = {
 							if = {
-								limit = { is_female = no }
-								give_nickname = nick_the_page_of_lord
-							}
-							else = {
-								give_nickname = nick_the_maid_of_virgin
+								limit = {
+									NOT = { culture = thirdparty_title_scope }
+								}
+	
+								thirdparty_title_scope = { conquest_culture = PREV }
 							}
 						}
+					}
 
-						15 = {
-							trigger = { can_apply_super_cool_nickname_trigger = yes }
-							give_nickname = nick_the_messenger_of_christ
+					remove_trait = disinherited
+
+					any_courtier = {
+						remove_trait = disinherited
+						clr_character_flag = no_court_invites
+					}
+
+					if = {
+						limit = { is_female = no }
+
+						remove_trait = crusader
+						add_trait = crusader_king
+					}
+
+					else = {
+						remove_trait = crusader
+						add_trait = crusader_queen
+					}
+
+					if = {
+						limit = { can_apply_cool_nickname_trigger = yes }
+
+						random_list = {
+							20 = {
+								trigger = { can_apply_super_cool_nickname_trigger = yes }
+								give_nickname = nick_the_angel_of_jerusalem
+							}
+
+							15 = {
+								trigger = { can_apply_super_cool_nickname_trigger = yes }
+								give_nickname = nick_the_chosen_of_gabriel
+							}
+
+							15 = {
+								trigger = { can_apply_super_cool_nickname_trigger = yes }
+
+								if = {
+									limit = { is_female = no }
+									give_nickname = nick_the_page_of_lord
+								}
+								else = {
+									give_nickname = nick_the_maid_of_virgin
+								}
+							}
+
+							15 = {
+								trigger = { can_apply_super_cool_nickname_trigger = yes }
+								give_nickname = nick_the_messenger_of_christ
+							}
+
+							5 = { give_nickname = nick_the_sword_of_god }
 						}
+					}
+				}
 
-						5 = { give_nickname = nick_the_sword_of_god }
+				any_playable_ruler = {
+					limit = {
+						religion_group = defender
+						is_within_diplo_range = defender
+						NOT = { character = attacker }
+					}
+
+					narrative_event = { id = HF.25827 } # Notify all infidels that the crusade has succeeded. Offer chance of conversion/vassalization if within k_jerusalem
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 500
+					participation_scaled_piety = 1000
+
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -100
 					}
 				}
 			}
 
-			any_playable_ruler = {
+			if = {
 				limit = {
-					religion_group = defender
-					is_within_diplo_range = defender
-					NOT = { character = attacker }
+					ai = no
+					is_ironman = yes
+					NOT = { has_character_flag = achievement_crusader }
 				}
 
-				narrative_event = { id = HF.25827 } # Notify all infidels that the crusade has succeeded. Offer chance of conversion/vassalization if within k_jerusalem
+				set_character_flag = achievement_crusader
 			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-
-			hidden_effect = {
-				participation_scaled_prestige = 500
-				participation_scaled_piety = 1000
-
-				if = {
-					limit = { uses_decadence = yes }
-					participation_scaled_decadence = -100
-				}
-			}
-		}
-
-		any_attacker = {
-			limit = {
-				ai = no
-				is_ironman = yes
-				NOT = { has_character_flag = achievement_crusader }
-			}
-
-			set_character_flag = achievement_crusader
 		}
 
 		defender = {
@@ -1474,129 +1479,129 @@ childrens_crusade = {
 	}
 
 	on_reverse_demand = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			piety = -200
-
-			transfer_scaled_wealth = {
-				to = defender
-				value = 4.0
-			}
-
 			if = {
-				limit = {
-					uses_decadence = yes
+				limit = { character = attacker }
 
-					NOT = {
-						any_liege = {
-							dynasty = PREV
+				piety = -200
+
+				transfer_scaled_wealth = {
+					to = defender
+					value = 4.0
+				}
+
+				if = {
+					limit = {
+						uses_decadence = yes
+
+						NOT = {
+							any_liege = {
+								dynasty = PREV
+							}
 						}
 					}
+
+					participation_scaled_decadence = 35
 				}
 
-				participation_scaled_decadence = 35
-			}
-
-			religion_authority = {
-				name = lost_crusade
-				years = 20
-			}
-
-			any_courtier = {
-				limit = {
-					is_ruler = no
-					is_landed = no
-					vassal_of = attacker
+				religion_authority = {
+					name = lost_crusade
+					years = 20
 				}
 
-				death = { death_reason = death_slavery }
-			}
-
-			activate_title = {
-				title = primary_title
-				status = no
-			}
-
-			destroy_landed_title = primary_title
-			death = { death_reason = death_slavery }
-
-			hidden_effect = {
-				clr_character_flag = flag_childrens_crusade_leader
-				remove_character_modifier = children_crusade_morale_0
-				remove_character_modifier = children_crusade_morale_1
-				remove_character_modifier = children_crusade_morale_2
-				remove_character_modifier = children_crusade_morale_3
-				remove_character_modifier = children_crusade_morale_4
-			}
-		}
-
-		any_attacker = {
-			limit = {
-				uses_decadence = yes
-
-				NOR = {
-					any_liege = {
-						dynasty = PREV
+				any_courtier = {
+					limit = {
+						is_ruler = no
+						is_landed = no
+						vassal_of = attacker
 					}
 
-					character = attacker
+					death = { death_reason = death_slavery }
+				}
+
+				activate_title = {
+					title = primary_title
+					status = no
+				}
+
+				destroy_landed_title = primary_title
+				death = { death_reason = death_slavery }
+
+				hidden_effect = {
+					clr_character_flag = flag_childrens_crusade_leader
+					remove_character_modifier = children_crusade_morale_0
+					remove_character_modifier = children_crusade_morale_1
+					remove_character_modifier = children_crusade_morale_2
+					remove_character_modifier = children_crusade_morale_3
+					remove_character_modifier = children_crusade_morale_4
 				}
 			}
 
 			hidden_effect = {
-				participation_scaled_decadence = 35
-			}
-		}
+				if = {
+					limit = {
+						uses_decadence = yes
 
-		defender = {
-			show_scope_change = no
+						NOR = {
+							any_liege = {
+								dynasty = PREV
+							}
 
-			piety = 100
-			participation_scaled_piety = 300
-			participation_scaled_prestige = 150
+							character = attacker
+						}
+					}
 
-			religion_authority = {
-				name = won_crusade
-				years = 20
-			}
-
-			if = {
-				limit = { uses_decadence = yes }
-				participation_scaled_decadence = -100
+					participation_scaled_decadence = 35
+				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = defender }
+
+				piety = 100
 				participation_scaled_piety = 300
 				participation_scaled_prestige = 150
+
+				religion_authority = {
+					name = won_crusade
+					years = 20
+				}
 
 				if = {
 					limit = { uses_decadence = yes }
 					participation_scaled_decadence = -100
 				}
 			}
+			else = {
+				hidden_effect = {
+					participation_scaled_piety = 300
+					participation_scaled_prestige = 150
+
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -100
+					}
+				}
+			}
 		}
 
 		any_player = {
-			limit = {
-				religion_group = christian
-				NOT = { character = attacker }
+			limit = { NOT = { character = attacker } }
+
+			if = {
+				limit = { religion_group = christian }
+				narrative_event = { id = HF.25825 } # Notify everyone that the crusade has failed
 			}
-
-			narrative_event = { id = HF.25825 } # Notify everyone that the crusade has failed
-		}
-
-		any_player = {
-			limit = {
-				religion_group = defender
-				NOT = { character = attacker }
+			else_if = {
+				limit = { religion_group = defender }
+				narrative_event = { id = HF.25826 } # Notify every pagan that the crusade has failed
 			}
-
-			narrative_event = { id = HF.25826 } # Notify every pagan that the crusade has failed
 		}
 	}
 
@@ -1777,124 +1782,140 @@ pepin_religious = {
 	}
 
 	on_success = {
-		# Attackers
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_piety = 150
-			participation_scaled_prestige = 75
-
-			rightful_religious_head_scope = {
-				show_scope_change = no
-
-				opinion = {
-					name = opinion_papal_land_donation
-					who = attacker
-				}
-			}
-
-			religion_authority = {
-				name = won_holy_war
-				years = 20
-			}
-
-			hidden_effect = {
-				if = {
-					limit = { has_ambition = obj_strengthen_religion }
-
-					change_variable = {
-						which = strengthen_religion
-						value = 1
-					}
-				}
-			}
-
 			if = {
-				limit = {
+				limit = { character = attacker }
+
+				custom_tooltip = {
+					text = pepin_religious_cb_succ_tip
+
 					religion_head = {
-						any_artifact = {
-							has_artifact_flag = christian
-
-							NOR = {
-								has_artifact_flag = very_rare
-								has_artifact_flag = unique # Won't give the holiest ones away
-							}
+						vassalize_or_take_under_title = {
+							title = thirdparty_title_scope
+							enemy = defender
+							same_religion = yes # Only vassalize rulers of my religion
+							type = holy_war
 						}
 					}
 				}
 
-				random_list = {
-					20 = {
-						trigger = {
-							religion_head = {
-								opinion = {
-									who = attacker
-									value >= 30
+				participation_scaled_piety = 150
+				participation_scaled_prestige = 75
+
+				rightful_religious_head_scope = {
+					show_scope_change = no
+
+					opinion = {
+						name = opinion_papal_land_donation
+						who = attacker
+					}
+				}
+
+				religion_authority = {
+					name = won_holy_war
+					years = 20
+				}
+
+				hidden_effect = {
+					if = {
+						limit = { has_ambition = obj_strengthen_religion }
+
+						change_variable = {
+							which = strengthen_religion
+							value = 1
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						religion_head = {
+							any_artifact = {
+								has_artifact_flag = christian
+
+								NOR = {
+									has_artifact_flag = very_rare
+									has_artifact_flag = unique # Won't give the holiest ones away
 								}
 							}
 						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							religion_head = {
-								opinion = {
-									who = attacker
-									value >= 50
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							religion_head = {
-								opinion = {
-									who = attacker
-									value >= 70
-								}
-							}
-						}
-
-						mult_modifier = {
-							factor = 1.5
-
-							religion_head = {
-								opinion = {
-									who = attacker
-									value >= 90
-								}
-							}
-						}
-
-						set_character_flag = flag_pope_gifts_artifact # Effect happens in event
 					}
 
-					80 = { } # Nothing happens
+					random_list = {
+						20 = {
+							trigger = {
+								religion_head = {
+									opinion = {
+										who = attacker
+										value >= 30
+									}
+								}
+							}
+
+							mult_modifier = {
+								factor = 1.5
+
+								religion_head = {
+									opinion = {
+										who = attacker
+										value >= 50
+									}
+								}
+							}
+
+							mult_modifier = {
+								factor = 1.5
+
+								religion_head = {
+									opinion = {
+										who = attacker
+										value >= 70
+									}
+								}
+							}
+
+							mult_modifier = {
+								factor = 1.5
+
+								religion_head = {
+									opinion = {
+										who = attacker
+										value >= 90
+									}
+								}
+							}
+
+							set_character_flag = flag_pope_gifts_artifact # Effect happens in event
+						}
+
+						80 = { } # Nothing happens
+					}
 				}
+
+				character_event = { id = HF.20224 } # Congratulations! Papal Coronation may proceed if flagged
 			}
+			else = {
+				hidden_effect = {
+					participation_scaled_piety = 75
+					participation_scaled_prestige = 50
 
-			character_event = { id = HF.20224 } # Congratulations! Papal Coronation may proceed if flagged
-		}
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -10
+					}
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
+					if = {
+						limit = {
+							has_ambition = obj_strengthen_religion
+							NOT = { religion = defender }
+						}
 
-			hidden_effect = {
-				participation_scaled_piety = 75
-				participation_scaled_prestige = 50
-
-				if = {
-					limit = { uses_decadence = yes }
-					participation_scaled_decadence = -10
-				}
-
-				if = {
-					limit = { has_ambition = obj_strengthen_religion }
-
-					change_variable = {
-						which = strengthen_religion
-						value = 1
+						change_variable = {
+							which = strengthen_religion
+							value = 1
+						}
 					}
 				}
 			}
@@ -1919,24 +1940,6 @@ pepin_religious = {
 		}
 	}
 
-	on_success_title = {
-		custom_tooltip = {
-			text = pepin_religious_cb_succ_tip
-
-			attacker = {
-				religion_head = {
-					vassalize_or_take_under_title = {
-						title = PREVPREV
-						enemy = defender
-						same_religion = yes # Only vassalize rulers of my religion
-						is_religious = yes
-						type = holy_war
-					}
-				}
-			}
-		}
-	}
-
 	on_fail = {
 		attacker = {
 			show_scope_change = no
@@ -1948,86 +1951,56 @@ pepin_religious = {
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			transfer_scaled_wealth = {
-				to = defender
-				value = 4.0
-			}
-
-			piety = -75
-			prestige = -150
-
-			if = {
-				limit = {
-					NOT = { religion = attacker }
-				}
-
-				religion_authority = {
-					name = lost_holy_war
-					years = 20
-				}
-			}
-
-			if = {
-				limit = { uses_decadence = yes }
-				participation_scaled_decadence = 20
-			}
-
-			clr_character_flag = flag_pepin_for_coronation
-		}
-
 		any_attacker = {
-			limit = {
-				NOT = { character = attacker }
-				uses_decadence = yes
-			}
-
-			hidden_effect = {
-				participation_scaled_decadence = 20
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_piety = 100
-			participation_scaled_prestige = 75
-
 			if = {
-				limit = { uses_decadence = yes }
-				participation_scaled_decadence = -10
+				limit = { character = attacker }
+
+				transfer_scaled_wealth = {
+					to = defender
+					value = 4.0
+				}
+
+				piety = -75
+				prestige = -150
+
+				if = {
+					limit = {
+						NOT = { religion = defender }
+					}
+
+					religion_authority = {
+						name = lost_holy_war
+						years = 20
+					}
+				}
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = 20
+				}
+
+				clr_character_flag = flag_pepin_for_coronation
 			}
-
-			if = {
-				limit = {
-					NOT = { religion = attacker }
-				}
-
-				religion_authority = {
-					name = lost_holy_war
-					years = 20
-				}
-
+			else = {
 				hidden_effect = {
 					if = {
-						limit = { has_ambition = obj_strengthen_religion }
-
-						change_variable = {
-							which = strengthen_religion
-							value = 1
-						}
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = 20
 					}
 				}
 			}
 		}
-		any_defender = {
-			limit = { NOT = { character = defender } }
 
-			hidden_effect = {
-				participation_scaled_piety = 75
-				participation_scaled_prestige = 50
+		any_defender = {
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 75
 
 				if = {
 					limit = { uses_decadence = yes }
@@ -2036,8 +2009,32 @@ pepin_religious = {
 
 				if = {
 					limit = {
+						NOT = { religion = attacker }
+					}
+
+					religion_authority = {
+						name = lost_holy_war
+						years = 20
+					}
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_piety = 75
+					participation_scaled_prestige = 50
+
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -10
+					}
+				}
+			}
+
+			hidden_effect = {
+				if = {
+					limit = {
 						has_ambition = obj_strengthen_religion
-						NOT = { religion = ROOT }
+						NOT = { religion = attacker }
 					}
 
 					change_variable = {
@@ -2251,7 +2248,7 @@ depose_impious_pope = {
 	truce_days = 0
 	sort_priority = 750
 
-	is_permanent = no
+	is_permanent = yes
 	allow_whitepeace = no
 	defender_unoccupied_warscore = yes
 	allowed_to_target_tributaries = no
@@ -2259,25 +2256,28 @@ depose_impious_pope = {
 	can_use = {
 		# Attacker
 		ROOT = {
-			religion = FROM
+			religion = catholic
+			religion_head = { character = FROM }
 		}
 
 		# Defender
 		FROM = {
-			has_landed_title = k_papacy
 			trait = bad_priest_christian
 			independent = yes
-			religion = catholic
 		}
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			religion = catholic
+			religion_head = { character = FROM }
+		}
+
 		# Defender
 		FROM = {
-			has_landed_title = k_papacy
 			trait = bad_priest_christian
 			independent = yes
-			religion = catholic
 		}
 	}
 
@@ -2285,48 +2285,42 @@ depose_impious_pope = {
 		custom_tooltip = {
 			text = depose_impious_pope_cb_win_TT
 
+			defender = {
+				current_heir = { save_event_target_as = new_pope }
+			}
+
 			any_attacker = {
 				piety = 100
+
+				reverse_opinion = {
+					name = opinion_grateful
+					who = event_target:new_pope
+					years = 10
+				}
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			abdicate = yes
+			set_character_flag = impious_papal_defender
 
-			religion_authority = {
-				name = depose_impious_pope_modifier
+			if = {
+				limit = { character = defender }
+
+				abdicate = yes
+				imprison = event_target:new_pope
+				hidden_effect = { move_character = event_target:new_pope }
+
+				religion_authority = {
+					name = depose_impious_pope_modifier
+				}
 			}
 		}
 
 		hidden_effect = {
-			any_defender = {
-				set_character_flag = impious_papal_defender
-			}
-
-			any_playable_ruler = {
-				limit = { religion = catholic }
+			event_target:new_pope = {
 				narrative_event = { id = HF.40094 } # The Pope loses and has to abdicate
-			}
-
-			attacker = {
-				narrative_event = { id = HF.40094 } # The Pope loses and has to abdicate
-			}
-
-			k_papacy = {
-				holder_scope = {
-					save_event_target_as = current_pope
-					reverse_imprison = defender
-				}
-			}
-
-			any_attacker = {
-				reverse_opinion = {
-					name = opinion_grateful
-					who = event_target:current_pope
-					years = 10
-				}
 			}
 		}
 	}
@@ -2341,25 +2335,18 @@ depose_impious_pope = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			religion_authority = {
-				name = failed_to_depose_impious_pope_modifier
-			}
-		}
+			set_character_flag = impious_papal_defender
+			
+			if = {
+				limit = { character = defender }
 
-		hidden_effect = {
-			any_defender = {
-				set_character_flag = impious_papal_defender
-			}
+				religion_authority = {
+					name = failed_to_depose_impious_pope_modifier
+				}
 
-			any_playable_ruler = {
-				limit = { religion = catholic }
-				narrative_event = { id = HF.40095 } # The Pope wins
-			}
-
-			attacker = {
 				narrative_event = { id = HF.40095 } # The Pope wins
 			}
 		}

@@ -70,86 +70,89 @@ muslim_county_conquest = {
 	on_add = {
 		attacker = {
 			show_scope_change = no
-
 			piety = -50
 		}
 
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		if = { # Vassalise one county counts
-			limit = {
-				holder_scope = {
-					real_tier = COUNT
-					num_of_count_titles == 1
-					lower_real_tier_than = attacker
-					is_patrician = no
-				}
-			}
+	on_success = {
+		thirdparty_title_scope = {
+			show_scope_change = no
 
-			holder_scope = {
-				show_scope_change = no
-
-				set_defacto_liege = attacker
-			}
-		}
-
-		else = { # Usurp title under other circumstances
-			usurp_title_plus_barony_if_unlanded = {
-				target = attacker
-				type = invasion
-			}
-
-			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
-				show_scope_change = no
-
+			if = { # Vassalise one county counts
 				limit = {
-					NOT = { de_facto_liege = PREV }
-
 					holder_scope = {
-						OR = {
-							character = defender
-							is_vassal_or_below_of = defender
-						}
+						real_tier = COUNT
+						num_of_count_titles == 1
+						lower_real_tier_than = attacker
+						is_patrician = no
 					}
 				}
 
+				holder_scope = {
+					show_scope_change = no
+					set_defacto_liege = attacker
+				}
+			}
+
+			else = { # Usurp title under other circumstances
 				usurp_title_plus_barony_if_unlanded = {
 					target = attacker
 					type = invasion
 				}
+
+				any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
+					show_scope_change = no
+
+					limit = {
+						NOT = { de_facto_liege = PREV }
+
+						holder_scope = {
+							OR = {
+								character = defender
+								is_vassal_or_below_of = defender
+							}
+						}
+					}
+
+					usurp_title_plus_barony_if_unlanded = {
+						target = attacker
+						type = invasion
+					}
+				}
 			}
 		}
 
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
-	on_fail_title = {
+	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -165,15 +168,16 @@ muslim_county_conquest = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -306,7 +310,6 @@ muslim_invasion = {
 	on_add = {
 		attacker = {
 			show_scope_change = no
-
 			piety = -1000
 		}
 
@@ -314,37 +317,24 @@ muslim_invasion = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = 200
-			participation_scaled_prestige = 200
-
 			if = {
-				limit = {
-					uses_decadence = yes
-					defender = { uses_decadence = no }
-				}
+				limit = { character = attacker }
 
-				participation_scaled_decadence = -20
-			}
+				custom_tooltip = {
+					text = other_invasion_succ_tip
 
-			hidden_effect = {
-				if = {
-					limit = { has_ambition = obj_strengthen_religion }
-
-					change_variable = {
-						which = strengthen_religion
-						value = 1
+					vassalize_or_take_under_title_destroy_duchies = {
+						title = thirdparty_title_scope
+						enemy = defender
+						is_crusade = no # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
+						type = invasion
 					}
 				}
-			}
-		}
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-
-			hidden_effect = {
+				prestige = 200
 				participation_scaled_prestige = 200
 
 				if = {
@@ -356,8 +346,42 @@ muslim_invasion = {
 					participation_scaled_decadence = -20
 				}
 
+				hidden_effect = {
+					if = {
+						limit = { can_apply_cool_nickname_trigger = yes }
+
+						random_list = {
+							10 = { give_nickname = nick_the_holy }
+							10 = { give_nickname = nick_the_glorious }
+							10 = { give_nickname = nick_the_lionheart }
+							10 = { give_nickname = nick_the_great }
+							10 = { give_nickname = nick_the_hammer }
+							10 = { give_nickname = nick_the_magnificent }
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 200
+
+					if = {
+						limit = {
+							uses_decadence = yes
+							defender = { uses_decadence = no }
+						}
+
+						participation_scaled_decadence = -20
+					}
+				}
+			}
+
+			hidden_effect = {
 				if = {
-					limit = { has_ambition = obj_strengthen_religion }
+					limit = {
+						has_ambition = obj_strengthen_religion
+						NOT = { religion = defender }
+					}
 
 					change_variable = {
 						which = strengthen_religion
@@ -369,80 +393,44 @@ muslim_invasion = {
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = other_invasion_succ_tip
-
-			attacker = {
-				vassalize_or_take_under_title_destroy_duchies = {
-					title = PREV
-					enemy = defender
-					is_crusade = no # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
-					type = invasion
-				}
-
-				if = {
-					limit = { can_apply_cool_nickname_trigger = yes }
-
-					random_list = {
-						10 = { give_nickname = nick_the_holy }
-						10 = { give_nickname = nick_the_glorious }
-						10 = { give_nickname = nick_the_lionheart }
-						10 = { give_nickname = nick_the_great }
-						10 = { give_nickname = nick_the_hammer }
-						10 = { give_nickname = nick_the_magnificent }
-					}
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -200
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 100
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				if = {
-					limit = { can_apply_cool_nickname_trigger = yes }
+				prestige = 100
+				participation_scaled_prestige = 100
 
-					random_list = {
-						10 = { give_nickname = nick_the_holy }
-						10 = { give_nickname = nick_the_glorious }
-						10 = { give_nickname = nick_the_lionheart }
-						10 = { give_nickname = nick_the_great }
-						10 = { give_nickname = nick_the_hammer }
-						10 = { give_nickname = nick_the_magnificent }
-						10 = { give_nickname = nick_the_avenger }
+				hidden_effect = {
+					if = {
+						limit = { can_apply_cool_nickname_trigger = yes }
+
+						random_list = {
+							10 = { give_nickname = nick_the_holy }
+							10 = { give_nickname = nick_the_glorious }
+							10 = { give_nickname = nick_the_lionheart }
+							10 = { give_nickname = nick_the_great }
+							10 = { give_nickname = nick_the_hammer }
+							10 = { give_nickname = nick_the_magnificent }
+							10 = { give_nickname = nick_the_avenger }
+						}
 					}
 				}
 			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
-		}
-	}
-
-	on_invalidation = {
-		attacker = {
-			show_scope_change = no
-
-			piety = 1000
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -451,6 +439,7 @@ muslim_invasion = {
 			show_scope_change = no
 
 			prestige = -200
+
 			transfer_scaled_wealth = {
 				to = defender
 				value = 4.0
@@ -469,53 +458,55 @@ muslim_invasion = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 200
-			participation_scaled_prestige = 200
+			if = {
+				limit = { character = defender }
+
+				prestige = 200
+				participation_scaled_prestige = 200
+
+				hidden_effect = {
+					if = {
+						limit = { can_apply_cool_nickname_trigger = yes }
+
+						random_list = {
+							10 = { give_nickname = nick_the_holy }
+							10 = { give_nickname = nick_the_glorious }
+							10 = { give_nickname = nick_the_lionheart }
+							10 = { give_nickname = nick_the_great }
+							10 = { give_nickname = nick_the_hammer }
+							10 = { give_nickname = nick_the_magnificent }
+							10 = { give_nickname = nick_the_avenger }
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 
 			hidden_effect = {
 				if = {
-					limit = { has_ambition = obj_strengthen_religion }
+					limit = {
+						has_ambition = obj_strengthen_religion
+						NOT = { religion = attacker }
+					}
 
 					change_variable = {
 						which = strengthen_religion
 						value = 1
-					}
-				}
-
-				if = {
-					limit = { can_apply_cool_nickname_trigger = yes }
-
-					random_list = {
-						10 = { give_nickname = nick_the_holy }
-						10 = { give_nickname = nick_the_glorious }
-						10 = { give_nickname = nick_the_lionheart }
-						10 = { give_nickname = nick_the_great }
-						10 = { give_nickname = nick_the_hammer }
-						10 = { give_nickname = nick_the_magnificent }
-						10 = { give_nickname = nick_the_avenger }
 					}
 				}
 			}
 		}
+	}
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
-				participation_scaled_prestige = 200
-
-				if = {
-					limit = { has_ambition = obj_strengthen_religion }
-
-					change_variable = {
-						which = strengthen_religion
-						value = 1
-					}
-				}
-			}
+	on_invalidation = {
+		attacker = {
+			show_scope_change = no
+			piety = 1000
 		}
 	}
 
@@ -586,33 +577,28 @@ cb_decadence_usurption = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_piety = 500
-			participation_scaled_prestige = 250
-		}
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
+				usurp_title_plus_barony_if_unlanded = {
+					target = thirdparty_title_scope
+					type = invasion
+				}
+
+				reverse_imprison = attacker
 				participation_scaled_piety = 500
 				participation_scaled_prestige = 250
 			}
-		}
-
-		defender = {
-			show_scope_change = no
-
-			imprison = attacker
-		}
-	}
-
-	on_success_title = {
-		usurp_title_plus_barony_if_unlanded = {
-			target = attacker
-			type = invasion
+			else = {
+				hidden_effect = {
+					participation_scaled_piety = 500
+					participation_scaled_prestige = 250
+				}
+			}
 		}
 	}
 
@@ -761,56 +747,54 @@ caliphal_subjugation = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = 100
-			participation_scaled_prestige = 100
-			decadence = -5
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+				custom_tooltip = {
+					text = pagan_subjugation_tip
+
+					subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
+						title = thirdparty_title_scope
+						enemy = defender
+					}
+				}
+
+				prestige = 100
+				participation_scaled_prestige = 100
+				decadence = -5
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = pagan_subjugation_tip
-
-			attacker = {
-				subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
-					title = PREV
-					enemy = defender
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 50
-			participation_scaled_prestige = 50
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+				prestige = 50
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -826,16 +810,18 @@ caliphal_subjugation = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 100
-			participation_scaled_prestige = 100
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+				prestige = 100
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -881,34 +867,34 @@ decadence_invasion = {
 	}
 
 	on_success = {
-		# Attackers
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = 200
-			piety = 100
-			occupy_minors_of_occupied_settlements = defender
+			if = {
+				limit = { character = attacker }
 
-			gain_all_occupied_titles = {
-				who = defender
-				type = revolt
-			}
+				prestige = 200
+				piety = 100
+				occupy_minors_of_occupied_settlements = defender
 
-			give_nickname = nick_the_conqueror
-			participation_scaled_prestige = 200
-			participation_scaled_piety = 100
+				gain_all_occupied_titles = {
+					who = defender
+					type = revolt
+				}
 
-			hidden_effect = {
-				disband_event_forces = decadence_revolters
-			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-
-			hidden_effect = {
+				give_nickname = nick_the_conqueror
 				participation_scaled_prestige = 200
 				participation_scaled_piety = 100
+
+				hidden_effect = {
+					disband_event_forces = decadence_revolters
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 200
+					participation_scaled_piety = 100
+				}
 			}
 		}
 
@@ -918,53 +904,49 @@ decadence_invasion = {
 
 			prestige = -200
 
-			if = { # reset crown authority to minimum
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Reset crown authority to minimum
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
-					add_law = crown_authority_0
+				add_law = crown_authority_0
+			}
+
+			any_demesne_title = { # eligible duke and king tier titles usurped
+				show_scope_change = no
+
+				limit = {
+					higher_real_tier_than = COUNT
+					is_primary_holder_title_tier = no
+				}
+
+				usurp_title_plus_barony_if_unlanded = {
+					target = attacker
+					type = revolt
+				}
+
+				hidden_effect = {
+					if = {
+						limit = {
+							NOT = { culture = attacker }
+						}
+
+						conquest_culture = attacker
+					}
 				}
 			}
 
-			primary_title = {
+			any_demesne_title = { # top titles destroyed
 				show_scope_change = no
 
-				holder_scope = {
-					show_scope_change = no
-
-					any_demesne_title = { # eligible duke and king tier titles usurped
-						show_scope_change = no
-
-						limit = {
-							higher_real_tier_than = COUNT
-							NOT = { real_tier = PREVPREV }
-						}
-
-						usurp_title_plus_barony_if_unlanded = {
-							target = attacker
-							type = revolt
-						}
-
-						hidden_effect = {
-							if = {
-								limit = {
-									NOT = { culture = attacker }
-								}
-
-								conquest_culture = attacker
-							}
-						}
-					}
-
-					any_demesne_title = { # top titles destroyed
-						show_scope_change = no
-
-						limit = { real_tier = PREVPREV }
-
-						destroy_landed_title = THIS
-					}
+				limit = { 
+					higher_real_tier_than = DUKE
+					is_primary_holder_title_tier = yes
 				}
+
+				destroy_landed_title = THIS
 			}
 
 			set_defacto_liege = attacker
@@ -998,17 +980,7 @@ decadence_invasion = {
 						}
 
 						# Unless the player borders them
-						any_realm_province = {
-							held_under_PREV = yes
-
-							any_neighbor_province = {
-								owner = {
-									any_liege = {
-										character = defender
-									}
-								}
-							}
-						}
+						shares_realm_border_with = attacker # Defender's new liege
 					}
 				}
 
@@ -1027,16 +999,18 @@ decadence_invasion = {
 			hidden_effect = { disband_event_forces = decadence_revolters }
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 100
-			participation_scaled_prestige = 100
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+				prestige = 100
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1044,6 +1018,7 @@ decadence_invasion = {
 		attacker = {
 			show_scope_change = no
 
+			remove_claim = thirdparty_title_scope
 			prestige = -200
 			set_defacto_liege = defender
 			imprison = defender
@@ -1060,6 +1035,7 @@ decadence_invasion = {
 			show_scope_change = no
 
 			prestige = 200
+
 			if = {
 				limit = {
 					ai = no
@@ -1069,14 +1045,6 @@ decadence_invasion = {
 
 				set_character_flag = achievement_decadent_warrior
 			}
-		}
-	}
-
-	on_reverse_demand_title = {
-		attacker = {
-			show_scope_change = no
-
-			remove_claim = PREV
 		}
 	}
 
@@ -1142,53 +1110,31 @@ shia_caliphate_rising = {
 		attacker = {
 			show_scope_change = no
 
-			piety = 500
+			custom_tooltip = {
+				text = tribal_invasion_succ_tip
 
-			religion_authority = {
-				name = rise_of_the_shia_caliphate
-			}
-
-			clr_character_flag = shia_caliphate_pretender
-		}
-
-		defender = {
-			show_scope_change = no
-
-			piety = -500
-		}
-
-		clr_global_flag = shia_caliphate_revolt_ongoing
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = tribal_invasion_succ_tip
-
-			d_shiite = {
 				usurp_title = {
-					target = attacker
+					target = d_shiite
 					type = holy_war
 				}
-			}
 
-			defender = {
-				while = {
-					count = 5
+				defender = {
+					while = {
+						count = 5
 
-					random_realm_province = {
-						limit = {
-							de_jure_liege_or_above = PREVPREV
-							religion_group = muslim
-							NOT = { religion = attacker }
-							held_under_PREV = yes
+						random_realm_province = {
+							limit = {
+								de_jure_liege_or_above = thirdparty_title_scope
+								religion_group = muslim
+								NOT = { religion = attacker }
+								held_under_PREV = yes
+							}
+
+							religion = attacker
 						}
-
-						religion = attacker
 					}
 				}
-			}
 
-			attacker = {
 				occupy_minors_of_occupied_settlements = defender
 
 				gain_all_occupied_titles = {
@@ -1198,7 +1144,7 @@ shia_caliphate_rising = {
 
 				if = {
 					limit = {
-						PREV = {
+						thirdparty_title_scope = {
 							trigger_if = {
 								limit = { has_holder = yes }
 								holder = defender
@@ -1207,7 +1153,7 @@ shia_caliphate_rising = {
 					}
 
 					usurp_title = {
-						target = PREV
+						target = thirdparty_title_scope
 						type = revolt
 					}
 				}
@@ -1221,13 +1167,13 @@ shia_caliphate_rising = {
 						culture = attacker
 						holder = attacker
 						name = SHIA_CUSTOM_FALLBACK
-						base_title = PREV
+						base_title = thirdparty_title_scope
 						copy_title_laws = yes
 					}
 				}
 
 				vassalize_or_take_under_title = {
-					title = PREV
+					title = thirdparty_title_scope
 					enemy = defender
 					is_religious = yes
 					type = revolt
@@ -1241,15 +1187,25 @@ shia_caliphate_rising = {
 				}
 
 				wealth = 500
-			}
 
-			defender = {
 				if = {
-					limit = { is_vassal_or_below_of = attacker }
-
-					imprison = attacker
+					limit = { is_liege_or_above_of = attacker }
+					reverse_imprison = attacker
 				}
 			}
+
+			piety = 500
+			clr_character_flag = shia_caliphate_pretender
+			clr_global_flag = shia_caliphate_revolt_ongoing
+
+			religion_authority = {
+				name = rise_of_the_shia_caliphate
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+			piety = -500
 		}
 	}
 
@@ -1259,15 +1215,13 @@ shia_caliphate_rising = {
 
 			piety = -250
 			clr_character_flag = shia_caliphate_pretender
+			clr_global_flag = shia_caliphate_revolt_ongoing
 		}
 
 		defender = {
 			show_scope_change = no
-
 			piety = 250
 		}
-
-		clr_global_flag = shia_caliphate_revolt_ongoing
 	}
 
 	on_reverse_demand = {
@@ -1276,29 +1230,26 @@ shia_caliphate_rising = {
 
 			piety = -500
 			clr_character_flag = shia_caliphate_pretender
+			clr_global_flag = shia_caliphate_revolt_ongoing
 			imprison = defender
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			piety = 250
-			participation_scaled_piety = 250
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_piety = 250 }
+				piety = 250
+				participation_scaled_piety = 250
+			}
+			else = {
+				hidden_effect = { participation_scaled_piety = 250 }
+			}
 		}
-
-		clr_global_flag = shia_caliphate_revolt_ongoing
 	}
 
 	on_attacker_leader_death = {
-		attacker = {
-			clr_character_flag = shia_caliphate_pretender
-		}
-
 		clr_global_flag = shia_caliphate_revolt_ongoing
 		end_war = invalid
 	}

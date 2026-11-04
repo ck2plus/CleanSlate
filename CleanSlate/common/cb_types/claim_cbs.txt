@@ -129,70 +129,65 @@ claim = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with [Root.GetHerHis] Claim war on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
+	on_success = {
+		any_attacker = {
+			show_scope_change = no
 
-		hidden_effect = {
 			if = {
-				limit = {
-					NOT = {
-						any_previous_holder = { character = attacker }
+				limit = { character = attacker }
+
+				hidden_effect = {
+					clr_character_flag = claimant_adventurer
+
+					thirdparty_title_scope = {
+						if = {
+							limit = {
+								higher_real_tier_than = BARON
+								NOT = { culture = attacker }
+							}
+
+							conquest_culture = attacker
+						}
 					}
 
-					attacker = {
-						can_apply_average_nickname_trigger = yes
-						lower_real_tier_than = PREV
-					}
-				}
+					if = {
+						limit = {
+							thirdparty_title_scope = {
+								NOT = {
+									any_previous_holder = { character = attacker }
+								}
+							}
 
-				attacker = {
+							can_apply_average_nickname_trigger = yes
+							lower_real_tier_than = thirdparty_title_scope
+						}
+					}
+
 					random = {
 						chance = 50
 						give_nickname = nick_the_usurper
 					}
 				}
+
+				usurp_title_plus_barony_if_unlanded = {
+					target = thirdparty_title_scope
+					type = claim
+				}
+
+				participation_scaled_prestige = 100
 			}
-		}
-
-		usurp_title_plus_barony_if_unlanded = {
-			target = attacker
-			type = claim
-		}
-
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -100
-		}
-
-		hidden_effect = {
-			attacker = {
-				clr_character_flag = claimant_adventurer
-			}
-
-			if = {
-				limit = {
-					higher_real_tier_than = BARON
-					NOT = { culture = attacker }
-				}
-
-				conquest_culture = attacker
-			}
 		}
 	}
 
-	on_fail_title = {
+	on_fail = {
 		attacker = {
 			show_scope_change = no
 
@@ -204,15 +199,16 @@ claim = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -220,6 +216,7 @@ claim = {
 		attacker = {
 			show_scope_change = no
 
+			remove_claim = thirdparty_title_scope
 			prestige = -150
 
 			transfer_scaled_wealth = {
@@ -229,25 +226,15 @@ claim = {
 
 			if = {
 				limit = { has_character_flag = claimant_adventurer }
+
 				imprison = defender
+				clr_character_flag = claimant_adventurer
 			}
-		}
 
-		defender = {
-			show_scope_change = no
+			hidden_effect = {
+				disband_event_forces = yes
 
-			participation_scaled_prestige = 150
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 150 }
-		}
-
-		# China stuff
-		hidden_effect = {
-			# Attacker
-			attacker = {
+				# China stuff
 				if = {
 					limit = { has_landed_title = e_china_west_governor }
 
@@ -255,7 +242,7 @@ claim = {
 
 					if = { # Makes China have a chance of leaving Expanionist policy...
 						limit = {
-							offmap_china = {
+							offmap_power = {
 								has_policy = china_expansionist
 							}
 						}
@@ -275,35 +262,24 @@ claim = {
 				}
 			}
 		}
-	}
 
-	on_reverse_demand_title = {
-		attacker = {
+		any_defender = {
 			show_scope_change = no
 
-			remove_claim = PREV
-
-			hidden_effect = {
-				disband_event_forces = yes
-				clr_character_flag = claimant_adventurer
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 150
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 150 }
 			}
 		}
 	}
 
 	on_attacker_leader_death = {
-		if = {
-			limit = {
-				attacker = {
-					has_character_flag = EoD_prophet_attacker
-				}
-			}
-
-			defender = {
-				narrative_event = { id = RIP.15116 }
-			}
-		}
-
 		attacker = {
+			show_scope_change = no
+
 			if = {
 				limit = {
 					OR = {
@@ -313,18 +289,22 @@ claim = {
 				}
 
 				hidden_effect = {
+					if = {
+						limit = { has_character_flag = EoD_prophet_attacker }
+
+						defender = {
+							narrative_event = { id = RIP.15116 }
+						}
+					}
+
 					disband_event_forces = yes
 					clr_character_flag = claimant_adventurer
 					clr_character_flag = EoD_prophet_attacker
 				}
 
-				PREV = { end_war = invalid }
+				end_war = invalid
 			}
 		}
-	}
-
-	on_invalidation = {
-		log = "CB(claim): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
 	}
 
 	attacker_ai_victory_worth = {
@@ -410,91 +390,118 @@ claim_all = {
 	on_success = {
 		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with [Root.GetHerHis] Claim All war against [From.GetBestName] (ID: [From.GetID])"
 
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			any_claim = {
-				show_scope_change = no
+				participation_scaled_prestige = 100
 
-				limit = {
-					holder_scope = {
-						OR = {
-							character = defender
-							is_vassal_or_below_of = defender
+				any_claim = {
+					show_scope_change = no
+
+					limit = {
+						holder_scope = {
+							OR = {
+								character = defender
+								is_vassal_or_below_of = defender
+							}
+						}
+
+						attacker = { has_strong_claim = PREV }
+					}
+
+					hidden_effect = {
+						if = {
+							limit = {
+								NOT = {
+									any_previous_holder = { character = attacker }
+								}
+
+								attacker = {
+									can_apply_average_nickname_trigger = yes
+									lower_real_tier_than = PREV
+								}
+							}
+
+							attacker = {
+								random = {
+									chance = 50
+									give_nickname = nick_the_usurper
+								}
+							}
 						}
 					}
 
-					attacker = { has_strong_claim = PREV }
-				}
+					usurp_title_plus_barony_if_unlanded = {
+						target = attacker
+						type = claim
+					}
 
-				usurp_title_plus_barony_if_unlanded = {
-					target = attacker
-					type = claim
+					hidden_effect = {
+						if = {
+							limit = {
+								higher_real_tier_than = BARON
+								NOT = { culture = attacker }
+							}
+
+							conquest_culture = attacker
+						}
+					}
 				}
 
 				hidden_effect = {
+					if = { # China with no land calculates what to do with nomad provinces
+						limit = {
+							is_offmap_governor = yes
+							offmap_power = { is_offmap_tag = offmap_china }
+							offmap_china = { has_offmap_tmp_flag = WP_is_not_on_map }
+							wealth < 2500 # unless already rich from tributes
+						}
+
+						set_variable = {
+							which = local_WP_nomad_gold_from_china
+							value = 0
+						}
+
+						any_realm_province = {
+							limit = {
+								has_province_modifier = nomad_agitation
+								has_settlement_construction = no
+								held_under_PREV = yes
+							}
+
+							change_variable = { which = local_WP_nomad_gold_from_china value = 1 }
+						}
+
+						character_event = {
+							id = JD.60101 # calculate gold sent from china for building holdings
+							days = 1
+						}
+					}
+
 					if = {
 						limit = {
-							higher_real_tier_than = BARON
-							NOT = { culture = attacker }
+							has_character_flag = is_otto
+
+							defender = {
+								has_character_flag = is_giselbert
+							}
 						}
 
-						conquest_culture = attacker
+						reverse_imprison = defender
 					}
 				}
 			}
-
-			hidden_effect = {
-				if = { # China with no land calculates what to do with nomad provinces
-					limit = {
-						is_offmap_governor = yes
-						offmap_power = { is_offmap_tag = offmap_china }
-						offmap_china = { has_offmap_tmp_flag = WP_is_not_on_map }
-						wealth < 2500 # unless already rich from tributes
-					}
-
-					set_variable = {
-						which = local_WP_nomad_gold_from_china
-						value = 0
-					}
-
-					any_realm_province = {
-						limit = {
-							has_province_modifier = nomad_agitation
-							has_settlement_construction = no
-							held_under_PREV = yes
-						}
-
-						change_variable = { which = local_WP_nomad_gold_from_china value = 1 }
-					}
-
-					character_event = {
-						id = JD.60101 # calculate gold sent from china for building holdings
-						days = 1
-					}
-				}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
 			}
 		}
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
-		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					has_character_flag = is_otto
-
-					defender = {
-						has_character_flag = is_giselbert
-					}
-				}
-
-				reverse_imprison = defender
-			}
+		defender = {
+			show_scope_change = no
+			prestige = -100
 		}
 	}
 
@@ -505,15 +512,16 @@ claim_all = {
 			prestige = -150
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 75
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 75 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 75
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 75 }
+			}
 		}
 	}
 
@@ -542,11 +550,7 @@ claim_all = {
 					attacker = { has_strong_claim = PREV }
 				}
 
-				attacker = {
-					show_scope_change = no
-
-					remove_claim = PREV
-				}
+				remove_claim = attacker
 			}
 
 			hidden_effect = {
@@ -578,15 +582,16 @@ claim_all = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 200
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 200 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 200
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 	}
 
@@ -744,6 +749,33 @@ claim_on_liege = {
 		attacker = {
 			show_scope_change = no
 
+			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
+
+			hidden_effect = {
+				if = {
+					limit = {
+						thirdparty_title_scope = {
+							NOT = {
+								any_previous_holder = { character = attacker }
+							}
+						}
+
+						can_apply_average_nickname_trigger = yes
+						lower_real_tier_than = PREV
+					}
+
+					random = {
+						chance = 50
+						give_nickname = nick_the_usurper
+					}
+				}
+			}
+
+			usurp_title_plus_barony_if_unlanded_and_vassals_no_adj = {
+				target = thirdparty_title_scope
+				type = claim
+			}
+
 			participation_scaled_prestige = 100
 
 			# Attacker (ROOT) is freed from Defender (FROM)
@@ -769,59 +801,12 @@ claim_on_liege = {
 		}
 
 		defender = {
-			hidden_effect = { disband_event_forces = faction_loyalists }
-
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
-
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
-
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
-				}
-			}
-		}
-	}
-
-	on_success_title = {
-		hidden_effect = {
-			if = {
-				limit = {
-					NOT = {
-						any_previous_holder = { character = attacker }
-					}
-
-					attacker = {
-						can_apply_average_nickname_trigger = yes
-						lower_real_tier_than = PREV
-					}
-				}
-
-				attacker = {
-					random = {
-						chance = 50
-						give_nickname = nick_the_usurper
-					}
-				}
-			}
-		}
-
-		attacker = {
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
-		}
-
-		defender = {
 			show_scope_change = no
 
+			prestige = -100
+
 			if = {
-				limit = { primary_title = { title = PREVPREV } }
+				limit = { primary_title = { title = thirdparty_title_scope } }
 
 				imprison = attacker
 
@@ -841,32 +826,48 @@ claim_on_liege = {
 					}
 				}
 			}
-		}
 
-		usurp_title_plus_barony_if_unlanded_and_vassals_no_adj = {
-			target = attacker
-			type = claim
+			hidden_effect = { disband_event_forces = faction_loyalists }
+
+			# Lower crown authority
+			any_demesne_title = {
+				limit = { 
+					is_crown_law_title = yes 
+					is_law_potential = crown_authority_0
+				}
+
+				trigger_switch = {
+					on_trigger = has_law
+
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
+				}
+			}
 		}
 
 		hidden_effect = {
-			# Conquest Culture
-			if = {
-				limit = {
-					higher_real_tier_than = BARON
-					NOT = { culture = attacker }
-				}
+			thirdparty_title_scope = {
+				# Conquest Culture
+				if = {
+					limit = {
+						higher_real_tier_than = BARON
+						NOT = { culture = attacker }
+					}
 
-				conquest_culture = attacker
+					conquest_culture = attacker
+				}
 			}
 		}
 	}
 
-	on_fail_title = {
+	on_fail = {
 		attacker = {
 			show_scope_change = no
 
 			prestige = -100
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
+			clr_character_flag = faction_claimant_ultimatum_taken_@thirdparty_title_scope
 			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
@@ -888,12 +889,12 @@ claim_on_liege = {
 		}
 	}
 
-	on_reverse_demand_title = {
+	on_reverse_demand = {
 		attacker = {
 			show_scope_change = no
 
 			prestige = -150
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
+			clr_character_flag = faction_claimant_ultimatum_taken_@thirdparty_title_scope
 			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
@@ -906,38 +907,39 @@ claim_on_liege = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
 							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
 						}
 					}
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
-					}
+					disband_event_forces = faction_loyalists
 				}
-
-				disband_event_forces = faction_loyalists
 			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
-				participation_scaled_prestige = 100
-				disband_event_forces = faction_loyalists
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 100
+					disband_event_forces = faction_loyalists
+				}
 			}
 		}
 	}
@@ -950,9 +952,9 @@ claim_on_liege = {
 		end_war = invalid
 	}
 
-	on_invalidation_title = {
+	on_invalidation = {
 		attacker = {
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
+			clr_character_flag = faction_claimant_ultimatum_taken_@thirdparty_title_scope
 		}
 	}
 
@@ -1035,104 +1037,93 @@ claim_on_liege_plot = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
+				usurp_title_plus_barony_if_unlanded = {
+					target = thirdparty_title_scope
+					type = claim
+				}
 
-			hidden_effect = {
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
+				plot_succeeds = yes
+				hidden_effect = { disband_event_forces = faction_revolters }
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 100
+					disband_event_forces = faction_revolters
+				}
 			}
 		}
 
 		defender = {
+			show_scope_change = no
+
+			prestige = -100
 			hidden_effect = { disband_event_forces = faction_loyalists }
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+					NOT = { title = thirdparty_title_scope }
+				}
 
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
-		}
-	}
-
-	on_success_title = {
-		log = "CB(claim_on_liege_plot): VICTORY: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
-
-		# Attacker
-		usurp_title_plus_barony_if_unlanded = {
-			target = attacker
-			type = claim
 		}
 
 		hidden_effect = {
-			if = {
-				limit = {
-					higher_real_tier_than = BARON
-					NOT = { culture = attacker }
+			thirdparty_title_scope = {
+				if = {
+					limit = {
+						higher_real_tier_than = BARON
+						NOT = { culture = attacker }
+					}
+
+					conquest_culture = attacker
 				}
-
-				conquest_culture = attacker
 			}
-		}
-
-		attacker = {
-			show_scope_change = no
-
-			plot_succeeds = yes
 		}
 	}
 
 	on_fail = {
-		log = "CB(claim_on_liege_plot): WHITEPEACE: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
-
 		attacker = {
 			show_scope_change = no
 
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				disband_event_forces = faction_revolters
-				disband_event_forces = faction_loyalists
-			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
 				participation_scaled_prestige = 50
-				disband_event_forces = faction_revolters
+				hidden_effect = { disband_event_forces = faction_loyalists }
 			}
+			else = {
+				hidden_effect = {participation_scaled_prestige = 50 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 	}
 
 	on_reverse_demand = {
-		log = "CB(claim_on_liege_plot): DEFEAT: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
-
 		attacker = {
 			show_scope_change = no
 
@@ -1140,38 +1131,41 @@ claim_on_liege_plot = {
 			imprison = defender
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				disband_event_forces = faction_revolters
-				disband_event_forces = faction_loyalists
+				participation_scaled_prestige = 100
 
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
 							}
 						}
-					}
 
-					opinion = {
-						who = attacker
-						name = opinion_traitor
+						opinion = {
+							who = attacker
+							name = opinion_traitor
+						}
 					}
 				}
 			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 100
+				}
+			}
 
 			hidden_effect = {
-				participation_scaled_prestige = 100
 				disband_event_forces = faction_revolters
 			}
 		}
@@ -1183,10 +1177,6 @@ claim_on_liege_plot = {
 		}
 
 		end_war = invalid
-	}
-
-	on_invalidation = {
-		log = "CB(claim_on_liege_plot): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
 	}
 
 	attacker_ai_victory_worth = {
@@ -1248,21 +1238,18 @@ claim_on_vassal_plot = {
 		attacker = {
 			show_scope_change = no
 
+			usurp_title_plus_barony_if_unlanded = {
+				target = thirdparty_title_scope
+				type = claim
+			}
+
 			prestige = 50
-		}
-	}
-
-	on_success_title = {
-		# Attacker
-		usurp_title_plus_barony_if_unlanded = {
-			target = attacker
-			type = claim
-		}
-
-		attacker = {
-			show_scope_change = no
-
 			plot_succeeds = yes
+		}
+
+		defender = {
+			show_scope_change = no
+			prestige = -50
 		}
 	}
 
@@ -1274,23 +1261,16 @@ claim_on_vassal_plot = {
 			cancel_plot = plot_gain_vassal_title
 		}
 
-		defender = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 50
-		}
-
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
-		}
-	}
-
-	on_invalidation = {
-		attacker = {
 			show_scope_change = no
 
-			cancel_plot = plot_gain_vassal_title
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -1302,15 +1282,16 @@ claim_on_vassal_plot = {
 			cancel_plot = plot_gain_vassal_title
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1325,7 +1306,13 @@ claim_on_vassal_plot = {
 	on_defender_leader_death = {
 		attacker = {
 			show_scope_change = no
+			cancel_plot = plot_gain_vassal_title
+		}
+	}
 
+	on_invalidation = {
+		attacker = {
+			show_scope_change = no
 			cancel_plot = plot_gain_vassal_title
 		}
 	}
@@ -1539,230 +1526,199 @@ other_claim = {
 	# Starting scope is attacker
 	# ROOT is third-party claimant
 	# FROM is defender
-	# FROMFROM is attacker
+	# FROMFROM is title
 	on_success = {
-		ROOT = {
-			show_scope_change = no
+		save_event_target_as = attacker
+		participation_scaled_prestige = 100
+		ROOT = { save_event_target_as = claimant }
 
-			participation_scaled_prestige = 100
+		event_target:claimant = {
+			show_scope_change = no
 
 			hidden_effect = {
-				opinion = {
-					name = pressed_my_claim
-					who = PREV
-					multiplier = 2
+				if = {
+					limit = {
+						thirdparty_title_scope = {
+							NOT = {
+								any_previous_holder = { character = event_target:claimant }
+							}
+						}
+
+						can_apply_average_nickname_trigger = yes
+						lower_real_tier_than = thirdparty_title_scope
+					}
+				}
+
+				random = {
+					chance = 50
+					give_nickname = nick_the_usurper
 				}
 			}
-		}
 
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_effect = { participation_scaled_prestige = 100 }
-		}
-
-		defender = {
-			show_scope_change = no
-
-			prestige = -100
-		}
-	}
-
-	# Starting scope is claimed title
-	# ROOT is third-party claimant
-	# FROM is defender
-	# FROMFROM is attacker
-	on_success_title = {
-		log = "[FromFrom.GetBestName] (ID: [FromFrom.GetID]) succeeded with [FromFrom.GetHerHis] war for [Root.GetBestName]'s (ID: [Root.GetID]) claim on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
-
-		hidden_effect = {
+			# Popes vassalized by attacker
 			if = {
 				limit = {
-					NOT = {
-						any_previous_holder = { character = ROOT }
-					}
-
-					ROOT = {
-						can_apply_average_nickname_trigger = yes
-						lower_real_tier_than = PREV
+					thirdparty_title_scope = {
+						is_papacy = yes
 					}
 				}
 
-				ROOT = {
-					random = {
-						chance = 50
-						give_nickname = nick_the_usurper
-					}
-				}
-			}
-
-			# Anti-Popes take all the gold of the Vatican
-			if = {
-				limit = { is_papacy = yes }
-
-				defender = {
-					show_scope_change = no
-
-					transfer_scaled_wealth = {
-						to = ROOT
-						value = all
-					}
-				}
-			}
-		}
-
-		# Popes vassalized by third party
-		if = {
-			limit = {
-				controls_religion = yes
-
-				holder_scope = {
-					OR = {
-						religion = catholic
-						religion = fraticelli
-					}
-				}
-			}
-
-			holder_scope = {
-				show_scope_change = no
-
-				abdicate_to = ROOT
-			}
-
-			ROOT = {
-				show_scope_change = no
+				inherit = thirdparty_title_scope
 
 				if = {
-					limit = { lower_real_tier_than = FROMFROM }
-					set_defacto_liege = FROMFROM
+					limit = { thirdparty_title_scope = { lower_real_tier_than = event_target:attacker } }
+					set_defacto_liege = event_target:attacker
 				}
 				else = {
 					set_defacto_liege = THIS
 				}
 			}
-		}
 
-		# Vassalize to attacker
-		else_if = {
-			limit = {
-				lower_real_tier_than = FROMFROM
+			# Vassalize to attacker
+			else_if = {
+				limit = {
+					lower_real_tier_than = event_target:attacker
 
-				ROOT = {
 					OR = {
-						PREV = {
-							de_jure_liege_or_above = FROMFROM
+						thirdparty_title_scope = {
+							de_jure_liege_or_above = event_target:attacker
 						}
 
-						dynasty = FROMFROM
+						dynasty = event_target:attacker
 
 						trigger_if = {
 							limit = { is_ruler = yes }
-							is_vassal_or_below_of = FROMFROM
+							is_vassal_or_below_of = event_target:attacker
 						}
+					}
+				}
+
+				usurp_title_plus_barony_if_unlanded = {
+					target = thirdparty_title_scope
+					type = claim
+				}
+
+				if = {
+					limit = { NOT = { vassal_of = event_target:attacker } }
+					set_defacto_liege = event_target:attacker
+				}
+			}
+
+			# Retain vassalage to title's current liege
+			else_if = {
+				limit = {
+					event_target:attacker = {
+						independent = no
+						same_realm = defender
+					}
+				}
+
+				usurp_title_plus_barony_if_unlanded = {
+					target = thirdparty_title_scope
+					type = claim
+				}
+
+				event_target:attacker = {
+					show_scope_change = no
+
+					liege = {
+						show_scope_change = no
+
+						set_defacto_vassal = event_target:claimant
 					}
 				}
 			}
 
-			usurp_title_plus_barony_if_unlanded = {
-				target = ROOT
-				type = claim
-			}
-
-			ROOT = {
-				show_scope_change = no
-
-				if = {
-					limit = { NOT = { vassal_of = FROMFROM } }
-					set_defacto_liege = FROMFROM
+			# FREEDOM!
+			else = {
+				usurp_title_plus_barony_if_unlanded = {
+					target = thirdparty_title_scope
+					type = claim
 				}
-			}
-		}
-
-		# Retain vassalage to title's current liege
-		else_if = {
-			limit = {
-				FROMFROM = {
-					independent = no
-					same_realm = defender
-				}
-			}
-
-			usurp_title_plus_barony_if_unlanded = {
-				target = ROOT
-				type = claim
-			}
-
-			FROMFROM = {
-				show_scope_change = no
-
-				liege = {
-					show_scope_change = no
-
-					set_defacto_vassal = ROOT
-				}
-			}
-		}
-
-		# FREEDOM!
-		else = {
-			usurp_title_plus_barony_if_unlanded = {
-				target = ROOT
-				type = claim
-			}
-
-			ROOT = {
-				show_scope_change = no
 
 				set_defacto_liege = THIS
 			}
-		}
 
-		# Keep the family together
-		hidden_effect = {
-			ROOT = {
+			participation_scaled_prestige = 100
+
+			# Anti-Popes take all the gold of the Vatican
+			if = {
+				limit = { thirdparty_title_scope = { is_papacy = yes } }
+
+				transfer_scaled_wealth = {
+					from = defender
+					value = all
+				}
+			}
+
+			hidden_effect = {
+				opinion = {
+					name = pressed_my_claim
+					who = event_target:attacker
+					multiplier = 2
+				}
+
+				# Keep the family together
 				any_child = {
 					limit = {
 						is_ruler = no
 						is_married = no
 						prisoner = no
 						is_adult = no
-						is_within_diplo_range = ROOT
+						is_within_diplo_range = event_target:claimant
 					}
 
-					move_character = ROOT
+					move_character = event_target:claimant
 				}
 
 				any_spouse = {
 					limit = {
 						is_ruler = no
 						prisoner = no
-						is_within_diplo_range = ROOT
+						is_within_diplo_range = event_target:claimant
 					}
 
-					move_character = ROOT
+					move_character = event_target:claimant
 				}
 
 				any_consort = {
 					limit = {
 						is_ruler = no
 						prisoner = no
-						is_within_diplo_range = ROOT
+						is_within_diplo_range = event_target:claimant
 					}
 
-					move_character = ROOT
+					move_character = event_target:claimant
 				}
 			}
 		}
 
-		hidden_effect = {
-			# Conquest Culture
-			if = {
-				limit = {
-					higher_real_tier_than = BARON
-					NOT = { culture = ROOT }
+		any_attacker = {
+			limit = {
+				NOR = {
+					character = event_target:claimant
+					character = event_target:attacker
 				}
+			}
 
-				conquest_culture = ROOT
+			hidden_effect = { participation_scaled_prestige = 100 }
+		}
+
+		defender = {
+			show_scope_change = no
+			prestige = -100
+		}
+
+		hidden_effect = {
+			thirdparty_title_scope = {
+				if = {
+					limit = {
+						higher_real_tier_than = BARON
+						NOT = { culture = event_target:claimant }
+					}
+
+					conquest_culture = event_target:claimant
+				}
 			}
 		}
 	}
@@ -1774,34 +1730,33 @@ other_claim = {
 	on_fail = {
 		# Attacker
 		prestige = -100
+		ROOT = { save_event_target_as = claimant }
 
-		ROOT = {
+		event_target:claimant = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
-		}
-	}
-
-	on_invalidation = {
-		log = "CB(other_claim): INVALIDATED: [Root.GetTitledFirstName] of [Root.PrimaryTitle.GetBaseName] (ID: [Root.GetID]) vs. [From.GetTitledFirstName] of [From.PrimaryTitle.GetBaseName] (ID: [From.GetID])"
 	}
 
 	# Starting scope is attacker
 	# ROOT is third-party claimant
 	# FROM is defender
-	# FROMFROM is attacker
+	# FROMFROM is title
 	on_reverse_demand = {
+		ROOT = { save_event_target_as = claimant }
+
 		# Attacker
 		prestige = -150
 
@@ -1810,34 +1765,24 @@ other_claim = {
 			value = 4.0
 		}
 
-		ROOT = {
+		event_target:claimant = {
 			show_scope_change = no
 
+			remove_claim = thirdparty_title_scope
 			prestige = -150
 			imprison = defender
 		}
 
-		defender = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 150
-		}
-
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 150 }
-		}
-	}
-
-	# Starting scope is claimed title
-	# ROOT is third-party claimant
-	# FROM is defender
-	# FROMFROM is attacker
-	on_reverse_demand_title = {
-		ROOT = {
 			show_scope_change = no
 
-			remove_claim = PREV
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 150
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 150 }
+			}
 		}
 	}
 
@@ -2024,23 +1969,111 @@ other_claim_on_liege = {
 	# Starting scope is attacker
 	# ROOT is third-party claimant
 	# FROM is defender
-	# FROMFROM is attacker
+	# FROMFROM is title
 	on_success = {
 		# Attacker
+		save_event_target_as = attacker
 		participation_scaled_prestige = 100
+		clr_character_flag = faction_claimant_ultimatum_taken_@thirdparty_title_scope
 		hidden_effect = { disband_event_forces = faction_revolters }
+		ROOT = { save_event_target_as = claimant }
 
-		# Claimant
-		ROOT = {
+		# Find new liege for claimant
+		if = {
+			limit = { higher_real_tier_than = thirdparty_title_scope }
+			save_event_target_as = new_liege
+		}
+		else_if = {
+			limit = {
+				liege_before_war = {
+					higher_real_tier_than = thirdparty_title_scope
+				}
+			}
+
+			liege_before_war = {
+				save_event_target_as = new_liege
+			}
+		}
+		else_if = {
+			limit = {
+				liege_before_war = {
+					any_liege = {
+						higher_real_tier_than = thirdparty_title_scope
+					}
+				}
+			}
+
+			liege_before_war = {
+				any_liege = {
+					limit = { higher_real_tier_than = thirdparty_title_scope }
+
+					score_value = {
+						value = 1
+
+						additive_modifier = {
+							value = 2
+							real_tier = DUKE
+						}
+
+						additive_modifier = {
+							value = 2
+							real_tier = KING
+						}
+					}
+
+					save_event_target_as = new_liege
+				}
+			}
+		}
+		else = {
+			event_target:claimant = { save_event_target_as = new_liege }
+		}
+
+		event_target:claimant = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
+			hidden_effect = {
+				disband_event_forces = faction_revolters
 
-			opinion = {
-				name = pressed_my_claim
-				who = PREV
+				if = {
+					limit = {
+						thirdparty_title_scope = {
+							NOT = {
+								any_previous_holder = { character = event_target:claimant }
+							}
+						}
+
+						can_apply_average_nickname_trigger = yes
+						lower_real_tier_than = thirdparty_title_scope
+					}
+
+					random = {
+						chance = 50
+						give_nickname = nick_the_usurper
+					}
+				}
+
+				# If the claimant has the wrong government type, take care of that first.
+				if = {
+					limit = {
+						is_ruler = yes
+
+						OR = {
+							is_theocracy = yes
+							is_republic = yes
+						}
+
+						thirdparty_title_scope = {
+							higher_real_tier_than = event_target:claimant
+							holder_scope = { is_feudal = yes }
+						}
+					}
+
+					abdicate = { move = no }
+				}
 			}
+
+			participation_scaled_prestige = 100
 
 			if = {
 				limit = {
@@ -2050,31 +2083,21 @@ other_claim_on_liege = {
 
 				imprison = no
 			}
-		}
 
-		any_attacker = {
-			limit = {
-				NOR = {
-					character = ROOT
-					character = PREV
-				}
+			usurp_title_plus_barony_if_unlanded_and_vassals_no_adj = {
+				target = thirdparty_title_scope
+				type = claim
 			}
 
-			hidden_effect = {
-				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
-			}
-		}
+			set_defacto_liege = event_target:new_liege
 
-		# Defender
-		defender = {
-			hidden_effect = { disband_event_forces = faction_loyalists }
-
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
-
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
+			# Lower crown authority
+			thirdparty_title_scope = {
+				if = {
+					limit = {
+						is_crown_law_title = yes
+						is_law_potential = crown_authority_0
+					}
 
 					trigger_switch = {
 						on_trigger = has_law
@@ -2086,223 +2109,144 @@ other_claim_on_liege = {
 					}
 				}
 			}
-		}
-	}
 
-	# Starting scope is claimed title
-	# ROOT is third-party claimant
-	# FROM is defender
-	# FROMFROM is attacker
-	on_success_title = {
-		attacker = {
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
+			opinion = {
+				name = pressed_my_claim
+				who = event_target:attacker
+			}
 		}
 
-		if = {
+		any_attacker = {
 			limit = {
-				is_primary_holder_title = yes
-
-				defender = { # Will be unlanded or a vassal of claimant
-					NOT = {
-						any_demesne_title = {
-							is_primary_holder_title_tier = yes
-							is_primary_holder_title = no
-						}
-					}
+				NOR = {
+					character = event_target:claimant
+					character = event_target:attacker
 				}
 			}
-
-			defender = {
-				show_scope_change = no
-				tooltip = { imprison = ROOT } # Can't imprison before claimants takes the title
-				set_character_flag = temp_other_claim_on_liege_prison
-			}
-		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					NOT = {
-						any_previous_holder = { character = ROOT }
-					}
-
-					ROOT = {
-						can_apply_average_nickname_trigger = yes
-						lower_real_tier_than = PREV
-					}
-				}
-
-				ROOT = {
-					random = {
-						chance = 50
-						give_nickname = nick_the_usurper
-					}
-				}
-			}
-
-			# If the claimant has the wrong government type, take care of that first.
-			if = {
-				limit = {
-					higher_real_tier_than = ROOT
-
-					holder_scope = {
-						is_feudal = yes
-					}
-
-					ROOT = {
-						is_ruler = yes
-
-						OR = {
-							is_theocracy = yes
-							is_republic = yes
-						}
-					}
-				}
-
-				ROOT = {
-					abdicate = { move = no }
-				}
-			}
-		}
-
-		usurp_title_plus_barony_if_unlanded_and_vassals_no_adj = {
-			target = ROOT
-			type = claim
-		}
-
-		hidden_effect = {
-			if = {
-				limit = {
-					higher_real_tier_than = BARON
-					NOT = { culture = ROOT }
-				}
-
-				conquest_culture = ROOT
-			}
-		}
-	}
-
-	# Starting scope is attacker
-	# ROOT is claimant
-	# FROM is defender
-	# FROMFROM is attacker
-	on_success_posttitle = {
-		hidden_effect = {
-			if = {
-				limit = { higher_real_tier_than = ROOT }
-				set_defacto_vassal = ROOT
-			}
-			else_if = {
-				limit = {
-					liege = {
-						higher_real_tier_than = ROOT
-						independent = no
-					}
-				}
-
-				liege = {
-					set_defacto_vassal = ROOT
-				}
-			}
-			else_if = {
-				limit = {
-					top_liege = {
-						higher_real_tier_than = ROOT
-					}
-				}
-
-				top_liege = {
-					set_defacto_vassal = ROOT
-				}
-			}
-			else = {
-				ROOT = {
-					set_defacto_liege = ROOT
-				}
-			}
-
-			defender = {
-				if = {
-					limit = { has_character_flag = temp_other_claim_on_liege_prison }
-
-					imprison = ROOT # Can imprison now
-					clr_character_flag = temp_other_claim_on_liege_prison
-				}
-			}
-		}
-	}
-
-	# Starting scope is attacker
-	# ROOT is claimant
-	# FROM is defender
-	# FROMFROM is attacker
-	on_fail = {
-		# Third-party claimant
-		prestige = -100
-		imprison = defender
-
-		defender = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 50
-		}
-
-		hidden_effect = {
-			any_attacker = {
-				disband_event_forces = faction_revolters
-			}
-
-			defender = {
-				disband_event_forces = faction_loyalists
-			}
-
-			any_defender = {
-				limit = { NOT = { character = defender } }
-				participation_scaled_prestige = 50
-			}
-		}
-	}
-
-	on_fail_title = {
-		attacker = {
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
-		}
-	}
-
-	# Starting scope is attacker
-	# ROOT is claimant
-	# FROM is defender
-	# FROMFROM is attacker
-	on_reverse_demand = {
-		# Claimant
-		prestige = -200
-		imprison = defender
-		clr_character_flag = faction_claimant_ultimatum_taken
-
-		defender = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
 
 			hidden_effect = {
-				disband_event_forces = faction_loyalists
+				participation_scaled_prestige = 100
+				disband_event_forces = faction_revolters
+			}
+		}
 
-				if = { # Allow free revocation of a title
-					limit = {
+		# Defender
+		defender = {
+			show_scope_change = no
+
+			prestige = -100
+			hidden_effect = { disband_event_forces = faction_loyalists }
+
+			if = {
+				limit = {
+					# For tooltip, since no title transfer has happened yet
+					trigger_if = {
+						limit = { has_landed_title = thirdparty_title_scope }
+
+						# Will be a subject of claimant
 						NOT = {
-							has_opinion_modifier = {
-								name = opinion_traitor
-								who = ROOT
+							any_demesne_title = {
+								NOT = {
+									title = thirdparty_title_scope
+									lower_real_tier_than = thirdparty_title_scope
+								}
 							}
 						}
 					}
-
-					opinion = {
-						name = opinion_traitor
-						who = ROOT
+					# The actual check we need
+					trigger_else = {
+						lower_real_tier_than = event_target:claimant
 					}
 				}
+
+				imprison = event_target:claimant
 			}
+
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+					NOT = { title = thirdparty_title_scope } # For the tooltip, this title changes hands
+				}
+
+				trigger_switch = {
+					on_trigger = has_law
+
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
+				}
+			}
+		}
+
+		hidden_effect = {
+			thirdparty_title_scope = {
+				if = {
+					limit = {
+						higher_real_tier_than = BARON
+						NOT = { culture = event_target:claimant }
+					}
+
+					conquest_culture = event_target:claimant
+				}
+			}
+		}
+	}
+
+	# Starting scope is attacker
+	# ROOT is claimant
+	# FROM is defender
+	# FROMFROM is title
+	on_fail = {
+		# Attacker
+		prestige = -100
+		imprison = defender
+		clr_character_flag = faction_claimant_ultimatum_taken_@PREV
+		disband_event_forces = faction_revolters
+		ROOT = { save_event_target_as = claimant }
+
+		event_target:claimant = {
+			show_scope_change = no
+			prestige = -100
+		}
+
+		any_attacker = {
+			show_scope_change = no
+
+			hidden_effect = {
+				disband_event_forces = faction_revolters
+			}
+		}
+
+		any_defender = {
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 50
+				hidden_effect = { disband_event_forces = faction_loyalists }
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
+		}
+	}
+
+	# Starting scope is attacker
+	# ROOT is claimant
+	# FROM is defender
+	# FROMFROM is title
+	on_reverse_demand = {
+		# Atacker
+		prestige = -200
+		imprison = defender
+		clr_character_flag = faction_claimant_ultimatum_taken_@thirdparty_title_scope
+		ROOT = { save_event_target_as = claimant }
+
+		event_target:claimant = {
+			show_scope_change = no
+			prestige = -200
 		}
 
 		hidden_effect = {
@@ -2312,25 +2256,44 @@ other_claim_on_liege = {
 				disband_event_forces = faction_revolters
 				imprison = defender
 			}
+		}
 
-			any_defender = {
-				limit = { NOT = { character = defender } }
+		any_defender = {
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
 				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = { # Allow free revocation of a title
+						limit = {
+							NOT = {
+								has_opinion_modifier = {
+									name = opinion_traitor
+									who = event_target:claimant
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = event_target:claimant
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
 			}
 		}
 	}
 
-	on_reverse_demand_title = {
-		attacker = {
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
-		}
-	}
-
-
-	on_invalidation_title = {
-		attacker = {
-			clr_character_flag = faction_claimant_ultimatum_taken_@PREV
-		}
+	on_invalidation = {
+		clr_character_flag = faction_claimant_ultimatum_taken_@thirdparty_title_scope
 	}
 
 	attacker_ai_victory_worth = {

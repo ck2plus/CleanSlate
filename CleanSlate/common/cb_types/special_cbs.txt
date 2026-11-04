@@ -46,206 +46,196 @@ invasion = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = 200
-			participation_scaled_prestige = 200
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 200 }
+				custom_tooltip = {
+					text = invasion_succ_tip
+
+					occupy_minors_of_occupied_settlements = defender
+					gain_all_occupied_titles = defender
+
+					usurp_title_plus_barony_if_unlanded = {
+						target = thirdparty_title_scope
+						type = invasion
+					}
+
+					defender = {
+						if = {
+							limit = { lower_real_tier_than = attacker }
+
+							set_defacto_liege = attacker
+							imprison = attacker
+						}
+					}
+
+					thirdparty_title_scope = {
+						if = {
+							limit = {
+								higher_real_tier_than = BARON
+								NOT = { culture = attacker }
+							}
+	
+							conquest_culture = attacker
+						}
+					}
+
+					if = {
+						limit = {
+							character = c_140 # William 'the Conqueror'
+							thirdparty_title_scope = { title = k_england }
+						}
+
+						if = {
+							limit = {
+								has_dlc = "Holy Fury"
+
+								NOT = {
+									any_owned_bloodline = {
+										has_bloodline_flag = william_the_conqueror_bloodline
+									}
+								}
+							}
+
+							create_bloodline = {
+								type = william_the_conqueror
+							}
+						}
+
+						hidden_effect = {
+							thirdparty_title_scope = { add_law = succ_primogeniture }
+
+							any_vassal = {
+								limit = { culture = anglo_saxon }
+
+								opinion = {
+									name = opinion_subjugated
+									who = attacker
+								}
+							}
+
+							# Help AI William by usurping extra land
+							if = {
+								limit = { ai = no }
+
+								thirdparty_title_scope = {
+									any_direct_de_jure_vassal_title = {
+										limit = {
+											OR = {
+												title = d_essex
+												title = d_kent
+												title = d_cornwall
+												title = d_somerset
+												title = d_hwicce
+												title = d_east_anglia
+											}
+										}
+										
+										if = {
+											limit = { has_holder = yes }
+	
+											usurp_title_plus_barony_if_unlanded = {
+												target = attacker
+												type = invasion
+											}
+										}
+	
+										any_de_jure_vassal_title = {
+											limit = {
+												holder_scope = {
+													culture = anglo_saxon
+													ai = yes # But not from players
+													same_realm = attacker
+												}
+											}
+	
+											usurp_title_plus_barony_if_unlanded = {
+												target = attacker
+												type = invasion
+											}
+										}
+									}
+								}
+							}
+
+							c_middlesex = {
+								if = {
+									limit = { holder = attacker }
+
+									capital_holding = {
+										attacker = { capital = PREV }
+									}
+								}
+							}
+						}
+					}
+				}
+
+				prestige = 200
+				participation_scaled_prestige = 200
+				
+				hidden_effect = {
+					if = {
+						limit = { has_nickname = nick_the_bastard }
+						give_nickname = nick_the_conqueror
+					}
+					else = {
+						random_list = {
+							10 = {
+								trigger = { can_apply_cool_nickname_trigger = yes }
+								give_nickname = nick_the_great
+							}
+	
+							10 = {
+								trigger = { can_apply_cool_nickname_trigger = yes }
+								give_nickname = nick_the_victorious
+							}
+	
+							10 = {
+								trigger = { can_apply_average_nickname_trigger = yes }
+								give_nickname = nick_the_bold
+							}
+	
+							10 = {
+								trigger = { can_apply_cool_nickname_trigger = yes }
+								give_nickname = nick_the_conqueror
+							}
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-
-		hidden_effect = {
-			defender = {
-				any_vassal = {
-					set_character_flag = preserve_vassal_structure_@attacker
-				}
-			}
-
-			attacker = {
-				occupy_minors_of_occupied_settlements = defender
-				gain_all_occupied_titles = defender
-
-				if = {
-					limit = { has_nickname = nick_the_bastard }
-					give_nickname = nick_the_conqueror
-				}
-				else = {
-					random_list = {
-						10 = {
-							trigger = { can_apply_cool_nickname_trigger = yes }
-							give_nickname = nick_the_great
-						}
-
-						10 = {
-							trigger = { can_apply_cool_nickname_trigger = yes }
-							give_nickname = nick_the_victorious
-						}
-
-						10 = {
-							trigger = { can_apply_average_nickname_trigger = yes }
-							give_nickname = nick_the_bold
-						}
-
-						10 = {
-							trigger = { can_apply_cool_nickname_trigger = yes }
-							give_nickname = nick_the_conqueror
-						}
-					}
-				}
-			}
-		}
-	}
-
-	on_success_title = {
-		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with [Root.GetHerHis] Invasion CB of [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
-
-		custom_tooltip = {
-			text = invasion_succ_tip
-
-			usurp_title_plus_barony_if_unlanded = {
-				target = attacker
-				type = invasion
-			}
-
-			defender = {
-				set_defacto_liege = attacker
-
-				if = {
-					limit = { is_vassal_or_below_of = attacker }
-					imprison = attacker
-				}
-			}
-
-			any_independent_ruler = {
-				limit = { has_character_flag = preserve_vassal_structure_@attacker }
-
-				set_defacto_liege = attacker
-				clr_character_flag = preserve_vassal_structure_@attacker
-			}
-
-			if = {
-				limit = {
-					higher_real_tier_than = BARON
-					NOT = { culture = attacker }
-				}
-
-				conquest_culture = attacker
-			}
-		}
-
-		attacker = {
-			show_scope_change = no
-
-			if = {
-				limit = { character = c_140 } # William 'the Conqueror'
-
-				if = {
-					limit = {
-						has_dlc = "Holy Fury"
-
-						NOT = {
-							any_owned_bloodline = {
-								has_bloodline_flag = william_the_conqueror_bloodline
-							}
-						}
-					}
-
-					create_bloodline = {
-						type = william_the_conqueror
-					}
-				}
-
-				hidden_effect = {
-					PREV = { add_law = succ_primogeniture }
-
-					any_vassal = {
-						limit = { culture = anglo_saxon }
-
-						opinion = {
-							name = opinion_subjugated
-							who = attacker
-						}
-					}
-
-					# Help AI William by usurping extra land
-					if = {
-						limit = { ai = yes }
-
-						any_de_jure_vassal_title = {
-							limit = {
-								OR = {
-									title = d_essex
-									title = d_kent
-									title = d_cornwall
-									title = d_somerset
-									title = d_hwicce
-									title = d_east_anglia
-								}
-							}
-
-							usurp_title_plus_barony_if_unlanded = {
-								target = attacker
-								type = invasion
-							}
-
-							any_de_jure_vassal_title = {
-								limit = {
-									holder_scope = {
-										culture = anglo_saxon
-										ai = yes # But not from players
-										same_realm = attacker
-									}
-								}
-
-								usurp_title_plus_barony_if_unlanded = {
-									target = attacker
-									type = invasion
-								}
-							}
-						}
-					}
-
-					c_middlesex = {
-						if = {
-							limit = { holder = attacker }
-
-							capital_holding = {
-								attacker = { capital = PREV }
-							}
-						}
-					}
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -200
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 100
-			participation_scaled_prestige = 100
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+				prestige = 100
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -253,6 +243,7 @@ invasion = {
 		attacker = {
 			show_scope_change = no
 
+			remove_claim = thirdparty_title_scope
 			prestige = -200
 
 			transfer_scaled_wealth = {
@@ -261,24 +252,18 @@ invasion = {
 			}
 		}
 
-		defender = {
-			show_scope_change = no
-
-			prestige = 200
-			participation_scaled_prestige = 200
-		}
-
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 200 }
-		}
-	}
-
-	on_reverse_demand_title = {
-		attacker = {
 			show_scope_change = no
 
-			remove_claim = PREV
+			if = {
+				limit = { character = defender }
+
+				prestige = 200
+				participation_scaled_prestige = 200
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 	}
 
@@ -336,8 +321,6 @@ imperial_reconquest = {
 		# Attacker
 		ROOT = {
 			has_landed_title = e_roman_empire
-			independent = yes
-			mercenary = no
 			NOT = { same_realm = FROM }
 
 			OR = {
@@ -407,7 +390,7 @@ imperial_reconquest = {
 	is_valid = {
 		# Attacker
 		ROOT = {
-			independent = yes
+			has_landed_title = e_roman_empire
 			NOT = { same_realm = FROM }
 
 			OR = {
@@ -422,51 +405,56 @@ imperial_reconquest = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-		}
-
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+			
+			if = {
+				limit = { character = attacker } 
+			
+				custom_tooltip = {
+					text = other_invasion_succ_tip
+		
+					vassalize_or_take_under_title = {
+						title = thirdparty_title_scope
+						enemy = defender
+						type = invasion
+					}
+				}
+	
+				if = {
+					limit = { 
+						thirdparty_title_scope = {
+							holder_scope = {
+								OR = {
+									character = defender 
+									is_vassal_or_below_of = defender
+								}
+							}
+						}
+					}
+		
+					usurp_title_only = {
+						target = thirdparty_title_scope
+						type = invasion
+					}
+				}
+				
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -100
-		}
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = other_invasion_succ_tip
-
-			attacker = {
-				vassalize_or_take_under_title = {
-					title = PREV
-					enemy = defender
-					type = invasion
-				}
-			}
-		}
-
-		if = {
-			limit = { holder = defender }
-
-			usurp_title_only = {
-				target = attacker
-				type = invasion
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -150
 		}
 	}
@@ -483,28 +471,29 @@ imperial_reconquest = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_piety = 100
-			participation_scaled_prestige = 200
-
 			if = {
-				limit = { uses_decadence = yes }
-				participation_scaled_decadence = -10
-			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
+				limit = { character = defender } 
+				
 				participation_scaled_piety = 100
 				participation_scaled_prestige = 200
-
+	
 				if = {
 					limit = { uses_decadence = yes }
 					participation_scaled_decadence = -10
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_piety = 100
+					participation_scaled_prestige = 200
+	
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -10
+					}
 				}
 			}
 		}
@@ -554,16 +543,47 @@ roman_christian_revolt = {
 	on_success = {
 		attacker = {
 			show_scope_change = no
-
-			prestige = 200
-			piety = 100
+			
 			occupy_minors_of_occupied_settlements = defender
-			clr_character_flag = roman_christian_revolter
 
 			gain_all_occupied_titles = {
 				who = defender
 				type = revolt
 			}
+			
+			vassalize_or_take_under_title = {
+				title = thirdparty_title_scope
+				enemy = defender
+				same_religion = yes # Only vassalize rulers of my religion
+				is_religious = yes
+				type = holy_war
+			}
+
+			if = {
+				limit = {
+					thirdparty_title_scope = {
+						trigger_if = {
+							limit = { has_holder = yes }
+		
+							holder_scope = {
+								OR = {
+									character = defender
+									is_vassal_or_below_of = defender
+								}
+							}
+						}
+					}
+				}
+	
+				usurp_title = {
+					target = thirdparty_title_scope
+					type = holy_war
+				}
+			}
+
+			prestige = 200
+			piety = 100
+			clr_character_flag = roman_christian_revolter
 		}
 
 		defender = {
@@ -575,40 +595,6 @@ roman_christian_revolt = {
 
 			religion_authority = {
 				name = lost_religious_revolt
-			}
-		}
-	}
-
-	on_success_title = {
-		attacker = {
-			vassalize_or_take_under_title = {
-				title = PREV
-				enemy = defender
-				same_religion = yes # Only vassalize rulers of my religion
-				is_religious = yes
-				type = holy_war
-			}
-		}
-
-		if = {
-			limit = {
-				trigger_if = {
-					limit = { has_holder = yes }
-
-					controls_religion = no
-
-					holder_scope = {
-						OR = {
-							character = defender
-							is_vassal_or_below_of = defender
-						}
-					}
-				}
-			}
-
-			usurp_title = {
-				target = attacker
-				type = holy_war
 			}
 		}
 	}
@@ -725,9 +711,12 @@ abrahamic_antihellenic_revolt = {
 	}
 
 	on_success = {
-		hidden_effect = {
-			attacker = {
-				clr_character_flag = flag_abrahamic_revolter
+		attacker = {
+			show_scope_change = no
+			
+			if = {
+				limit = { character = attacker }
+				
 				prestige = 100
 				piety = 100
 				participation_scaled_prestige = 100
@@ -737,22 +726,25 @@ abrahamic_antihellenic_revolt = {
 					name = won_holy_war
 					years = 20
 				}
-
-				any_demesne_title = {
-					add_pressed_claim = defender
+				
+				hidden_effect = {	
+					any_demesne_title = {
+						add_pressed_claim = defender
+					}
 				}
 			}
-
-			any_attacker = {
-				limit = { NOT = { character = attacker } }
-
-				participation_scaled_prestige = 100
-				participation_scaled_piety = 100
-				clr_character_flag = flag_abrahamic_revolter
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 100
+					participation_scaled_piety = 100
+				}
 			}
+			
+			clr_character_flag = flag_abrahamic_revolter
 		}
 
 		defender = {
+			show_scope_change = no
 
 			if = {
 				limit = {
@@ -785,23 +777,27 @@ abrahamic_antihellenic_revolt = {
 
 		attacker = {
 			show_scope_change = no
+			
+			if = {
+				limit = { character = attacker }
 
-			imprison = defender
-
-			hidden_effect = {
+				imprison = defender
+				participation_scaled_prestige = -100
+				participation_scaled_piety = -100
+	
 				religion_authority = {
 					name = lost_holy_war
 					years = 20
 				}
 			}
-		}
-
-		any_attacker = {
-			hidden_effect = {
-				participation_scaled_prestige = -100
-				participation_scaled_piety = -100
-				clr_character_flag = flag_abrahamic_revolter
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = -100
+					participation_scaled_piety = -100
+				}
 			}
+			
+			clr_character_flag = flag_abrahamic_revolter
 		}
 
 		defender = {
@@ -809,6 +805,11 @@ abrahamic_antihellenic_revolt = {
 
 			prestige = 100
 			piety = 100
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
 
 			hidden_effect = {
 				if = { # Allow free revocation of a title
@@ -827,14 +828,8 @@ abrahamic_antihellenic_revolt = {
 					}
 				}
 
-				religion_authority = {
-					name = won_holy_war
-					years = 20
-				}
-
 				if = {
 					limit = { ai = yes }
-
 					narrative_event = { id = HF.23117 } # The Hellenic Emperor won, ensuring the rebirth of the faith
 				}
 			}
@@ -904,7 +899,8 @@ thankmars_rebellion = {
 
 	on_invalidation = {
 		any_attacker = {
-			set_defacto_liege = FROM
+			show_scope_change = no
+			set_defacto_liege = defender
 		}
 
 		if = {
@@ -919,7 +915,8 @@ thankmars_rebellion = {
 			}
 
 			any_attacker = {
-				imprison = attacker
+				show_scope_change = no
+				imprison = defender
 			}
 		}
 	}
@@ -969,8 +966,6 @@ thankmars_rebellion = {
 
 		defender = {
 			show_scope_change = no
-
-			reverse_imprison = attacker
 			narrative_event = { id = LT.40011 } # Otto won against rebellion
 		}
 	}

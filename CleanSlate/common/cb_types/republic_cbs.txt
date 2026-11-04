@@ -140,67 +140,70 @@ coastal_republic = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		# owner of trade post takes city
-		if = {
-			limit = {
-				location = {
-					trade_post_owner = {
-						is_vassal_or_below_of = attacker
+	on_success = {
+		thirdparty_title_scope = {
+			# owner of trade post takes city
+			if = {
+				limit = {
+					location = {
+						trade_post_owner = {
+							is_vassal_or_below_of = attacker
+						}
 					}
 				}
-			}
 
-			location = {
-				show_scope_change = no
-
-				trade_post_owner = {
+				location = {
 					show_scope_change = no
 
-					usurp_title = {
-						target = PREVPREV
-						type = invasion
+					trade_post_owner = {
+							show_scope_change = no
+
+						usurp_title = {
+							target = PREVPREV
+							type = invasion
+						}
 					}
 				}
 			}
-		}
 
-		# attacker takes city instead
-		else = {
-			usurp_title = {
-				target = attacker
-				type = invasion
+			# attacker takes city instead
+			else = {
+				usurp_title = {
+					target = attacker
+					type = invasion
+				}
 			}
-		}
-
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -216,15 +219,16 @@ coastal_republic = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -389,21 +393,22 @@ coastal_county_republic = {
 				holder_scope = {
 					show_scope_change = no
 
-					usurp_title = PREVPREV
+					usurp_title = thirdparty_title_scope
 					set_defacto_liege = attacker
 				}
 			}
 		}
 
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -414,15 +419,16 @@ coastal_county_republic = {
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -438,15 +444,16 @@ coastal_county_republic = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -546,83 +553,82 @@ embargo_cb = {
 	}
 
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			if = { # only lose prestige if not instigated by another merchant republic
-				limit = {
-					NOT = {
-						any_attacker = {
-							is_merchant_republic = yes
-							NOT = { character = attacker }
+			if = {
+				limit = { character = attacker }
+
+				if = { # only lose prestige if not instigated by another merchant republic
+					limit = {
+						NOT = {
+							any_attacker = {
+								is_merchant_republic = yes
+								NOT = { character = attacker }
+							}
 						}
 					}
+
+					prestige = -100
 				}
-
-				prestige = -100
 			}
-		}
-
-		any_attacker = { # attacking merchant republics pay dearly for not winning
-			show_scope_change = no
-
-			limit = {
-				is_merchant_republic = yes
-				NOT = { character = attacker }
+			else = {
+				# Attacking merchant republics pay dearly for not winning
+				if = {
+					limit = { is_merchant_republic = yes }
+					prestige = -100
+				}
 			}
-
-			prestige = -100
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = 50
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			if = { # only lose prestige and pay reparations if not instigated by another merchant republic
-				limit = {
-					NOT = {
-						any_attacker = {
-							is_merchant_republic = yes
-							NOT = { character = attacker }
+			if = {
+				limit = { character = attacker }
+
+				if = { # only lose prestige if not instigated by another merchant republic
+					limit = {
+						NOT = {
+							any_attacker = {
+								is_merchant_republic = yes
+								NOT = { character = attacker }
+							}
 						}
 					}
-				}
 
-				prestige = -200
+					prestige = -200
 
-				transfer_scaled_wealth = {
-					to = defender
-					value = 4.0
+					transfer_scaled_wealth = {
+						to = defender
+						value = 4.0
+					}
 				}
 			}
-		}
+			else = {
+				# Attacking merchant republics pay dearly for not winning
+				if = {
+					limit = { is_merchant_republic = yes }
 
-		any_attacker = { # attacking merchant republics also pay dearly
-			show_scope_change = no
+					prestige = -200
 
-			limit = {
-				is_merchant_republic = yes
-				NOT = { character = attacker }
-			}
-
-			prestige = -200
-
-			transfer_scaled_wealth = {
-				to = defender
-				value = 4.0
+					transfer_scaled_wealth = {
+						to = defender
+						value = 4.0
+					}
+				}
 			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = 100
 		}
 	}
@@ -784,37 +790,41 @@ seize_trade_post = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		seize_trade_post = attacker
-
-		attacker = {
+	on_success = {
+		thirdparty_title_scope = {
 			show_scope_change = no
-
-			participation_scaled_prestige = 50
+			seize_trade_post = attacker
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -50
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 25
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 25 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 25
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 25 }
+			}
 		}
 	}
 
@@ -830,15 +840,16 @@ seize_trade_post = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 

@@ -167,34 +167,37 @@ force_vassalization = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+				set_defacto_vassal = attacker
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -100
-			set_defacto_liege = ROOT
 		}
 	}
 
 	on_fail = {
-		defender = {
-			show_scope_change = no
-			participation_scaled_prestige = 50
-		}
-
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -208,15 +211,16 @@ force_vassalization = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -381,6 +385,8 @@ great_realm_conflict = {
 
 	on_add = {
 		attacker = {
+			show_scope_change = no
+
 			prestige = -3000
 			piety = -1500
 		}
@@ -390,43 +396,49 @@ great_realm_conflict = {
 
 	on_invalidation = {
 		attacker = {
+			show_scope_change = no
+
 			prestige = 3000
 			piety = 1500
 		}
 	}
 
-	on_success_title = {
-		if = { # Claim the targeted Kingdom if it is held by the target
-			limit = {
-				controls_religion = no
-
-				holder_scope = {
-					OR = {
-						character = defender
-						is_vassal_or_below_of = defender
-					}
-				}
-			}
-
-			usurp_title = {
-				target = attacker
-				type = invasion
-			}
-		}
-
+	on_success = {
 		attacker = {
 			show_scope_change = no
 
-			vassalize_or_take_under_title = {
-				title = PREV
-				enemy = defender
-				type = invasion
-			}
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+				if = { # Claim the targeted Kingdom if it is held by the target
+					limit = {
+						thirdparty_title_scope = {
+							controls_religion = no
+
+							holder_scope = {
+								OR = {
+									character = defender
+									is_vassal_or_below_of = defender
+								}
+							}
+						}
+					}
+
+					usurp_title = {
+						target = thirdparty_title_scope
+						type = invasion
+					}
+				}
+
+				vassalize_or_take_under_title = {
+					title = thirdparty_title_scope
+					enemy = defender
+					type = invasion
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -437,14 +449,16 @@ great_realm_conflict = {
 			piety = -750
 		}
 
-		defender = {
-			show_scope_change = no
-			participation_scaled_prestige = 50
-		}
-
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -461,14 +475,16 @@ great_realm_conflict = {
 			}
 		}
 
-		defender = {
-			show_scope_change = no
-			participation_scaled_prestige = 3000
-		}
-
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 1500 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 3000
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 1500 }
+			}
 		}
 	}
 
@@ -609,88 +625,80 @@ ducal_county_conquest = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		if = { # If the attacker is a duke, and the target is a one-county ruler, vassalize them
-			limit = {
-				attacker = {
-					real_tier = DUKE
-				}
+	on_success = {
+		thirdparty_title_scope = {
+			show_scope_change = no
 
-				holder_scope = {
-					real_tier = COUNT
-					num_of_count_titles < 2
-					lower_real_tier_than = attacker
-					is_patrician = no
-				}
-			}
-
-			holder_scope = {
-				set_defacto_liege = ROOT
-			}
-		}
-
-		if = {
-			limit = {
-				holder_scope = {
-					OR = {
-						attacker = {
-							real_tier = COUNT
-						}
-
-						higher_real_tier_than = COUNT
-						num_of_count_titles >= 2
-						is_patrician = yes
-					}
-				}
-			}
-
-			usurp_title_plus_barony_if_unlanded = {
-				target = attacker
-				type = claim
-			}
-
-			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
+			if = { # If the attacker is a duke, and the target is a one-county ruler, vassalize them
 				limit = {
-					has_holder = yes
-					NOT = { de_facto_liege = PREV }
-
 					holder_scope = {
-						OR = {
-							character = FROM
-							is_vassal_or_below_of = FROM
-						}
+						real_tier = COUNT
+						num_of_count_titles < 2
+						lower_real_tier_than = attacker
+						is_patrician = no
 					}
 				}
 
+				holder_scope = {
+					show_scope_change = no
+					set_defacto_liege = attacker
+				}
+			}
+			else = {
 				usurp_title_plus_barony_if_unlanded = {
 					target = attacker
 					type = claim
+				}
+
+				any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
+					limit = {
+						NOT = { de_facto_liege = PREV }
+
+						holder_scope = {
+							OR = {
+								character = defender
+								is_vassal_or_below_of = defender
+							}
+						}
+					}
+
+					usurp_title_plus_barony_if_unlanded = {
+						target = attacker
+						type = claim
+					}
 				}
 			}
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
 	on_fail_title = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -706,15 +714,16 @@ ducal_county_conquest = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1193,80 +1202,82 @@ unjust_conquest = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		if = { # Vassalise single county counts
-			limit = {
-				holder_scope = {
-					real_tier = COUNT
-					num_of_count_titles == 1
-					lower_real_tier_than = attacker
-					is_patrician = no
-				}
-			}
+	on_success = {
+		thirdparty_title_scope = {
+			show_scope_change = no
 
-			holder_scope = {
-				show_scope_change = no
-
-				set_defacto_liege = attacker
-			}
-		}
-
-		else = { # Usurp target title otherwise
-			usurp_title_plus_barony_if_unlanded = {
-				target = attacker
-				type = invasion
-			}
-
-			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
+			if = { # Vassalise single county counts
 				limit = {
-					has_holder = yes
-					NOT = { de_facto_liege = PREV }
-
 					holder_scope = {
-						OR = {
-							character = defender
-							is_vassal_or_below_of = defender
-						}
+						real_tier = COUNT
+						num_of_count_titles == 1
+						lower_real_tier_than = attacker
+						is_patrician = no
 					}
 				}
 
+				holder_scope = {
+					show_scope_change = no
+					set_defacto_liege = attacker
+				}
+			}
+			else = { # Usurp target title otherwise
 				usurp_title_plus_barony_if_unlanded = {
 					target = attacker
 					type = invasion
 				}
-			}
-		}
 
-		add_pressed_claim = FROM
+				any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
+					limit = {
+						NOT = { de_facto_liege = PREV }
+
+						holder_scope = {
+							OR = {
+								character = defender
+								is_vassal_or_below_of = defender
+							}
+						}
+					}
+
+					usurp_title_plus_barony_if_unlanded = {
+						target = attacker
+						type = invasion
+					}
+				}
+			}
+
+			add_pressed_claim = defender
+		}
 
 		attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
 	on_fail_title = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -1282,15 +1293,16 @@ unjust_conquest = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 

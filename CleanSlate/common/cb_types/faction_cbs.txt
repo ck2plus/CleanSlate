@@ -60,20 +60,22 @@ change_seniority_succession_law = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
+		thirdparty_title_scope = {
+			succession_w_cooldown = seniority
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
@@ -81,37 +83,34 @@ change_seniority_succession_law = {
 
 			hidden_effect = { disband_event_forces = faction_loyalists }
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = { # All titles
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
 		}
 	}
 
-	on_success_title = {
-		succession_w_cooldown = seniority
-	}
-
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -123,71 +122,79 @@ change_seniority_succession_law = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			hidden_effect = { disband_event_forces = faction_loyalists }
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_succ_seniority_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
+				prestige = -200
+				imprison = defender
+			}
 
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+			if = {
+				limit = { vassal_of = defender }
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_succ_seniority_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -258,20 +265,22 @@ change_primogeniture_succession_law = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
+		thirdparty_title_scope = {
+			succession_w_cooldown = primogeniture
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
@@ -279,37 +288,34 @@ change_primogeniture_succession_law = {
 
 			hidden_effect = { disband_event_forces = faction_loyalists }
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = { # All titles
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
 		}
 	}
 
-	on_success_title = {
-		succession_w_cooldown = primogeniture
-	}
-
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -321,71 +327,79 @@ change_primogeniture_succession_law = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			hidden_effect = { disband_event_forces = faction_loyalists }
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_succ_primogeniture_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
+				prestige = -200
+				imprison = defender
+			}
 
-				if = { # Allow free revocation of a title
-					limit = {
-						NOT = {
-							has_opinion_modifier = {
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+			if = {
+				limit = { vassal_of = defender }
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_succ_primogeniture_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = { # Allow free revocation of a title
+						limit = {
+							NOT = {
+								has_opinion_modifier = {
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -456,20 +470,22 @@ change_ultimogeniture_succession_law = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
+		thirdparty_title_scope = {
+			succession_w_cooldown = ultimogeniture
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
@@ -477,37 +493,34 @@ change_ultimogeniture_succession_law = {
 
 			hidden_effect = { disband_event_forces = faction_loyalists }
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = { # All titles
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
 		}
 	}
 
-	on_success_title = {
-		succession_w_cooldown = ultimogeniture
-	}
-
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -519,71 +532,79 @@ change_ultimogeniture_succession_law = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+				participation_scaled_prestige = 50
+				hidden_effect = { disband_event_forces = faction_loyalists }
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_succ_ultimogeniture_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
+				prestige = -200
+				imprison = defender
+			}
 
-				if = { # Allow free revocation of a title
-					limit = {
-						NOT = {
-							has_opinion_modifier = {
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+			if = {
+				limit = { vassal_of = defender }
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_succ_ultimogeniture_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = { # Allow free revocation of a title
+						limit = {
+							NOT = {
+								has_opinion_modifier = {
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -655,20 +676,32 @@ change_feudal_elective_succession_law = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
+		thirdparty_title_scope = {
+			if = {
+				limit = { is_law_potential = succ_byzantine_elective }
+				add_law_w_cooldown = succ_byzantine_elective
+			}
+			else_if = {
+				limit = { is_law_potential = succ_hre_elective }
+				add_law_w_cooldown = succ_hre_elective
+			}
+			else = {
+				add_law_w_cooldown = succ_feudal_elective
+			}
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
@@ -676,47 +709,34 @@ change_feudal_elective_succession_law = {
 
 			hidden_effect = { disband_event_forces = faction_loyalists }
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = { # All titles
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
-		}
-	}
-
-	on_success_title = {
-		if = {
-			limit = { is_law_potential = succ_byzantine_elective }
-			add_law_w_cooldown = succ_byzantine_elective
-		}
-		else_if = {
-			limit = { is_law_potential = succ_hre_elective }
-			add_law_w_cooldown = succ_hre_elective
-		}
-		else = {
-			add_law_w_cooldown = succ_feudal_elective
 		}
 	}
 
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -728,72 +748,79 @@ change_feudal_elective_succession_law = {
 			}
 		}
 
-		# Defenders
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+				participation_scaled_prestige = 50
+				hidden_effect = { disband_event_forces = faction_loyalists }
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_succ_feudal_elective_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
+				prestige = -200
+				imprison = defender
+			}
 
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+			if = {
+				limit = { vassal_of = defender }
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_succ_feudal_elective_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -867,20 +894,23 @@ change_gavelkind_succession_law = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
+		thirdparty_title_scope = {
+			succession_w_cooldown = gavelkind
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
+
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
@@ -888,37 +918,34 @@ change_gavelkind_succession_law = {
 
 			hidden_effect = { disband_event_forces = faction_loyalists }
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
 		}
 	}
 
-	on_success_title = {
-		succession_w_cooldown = gavelkind
-	}
-
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -930,71 +957,79 @@ change_gavelkind_succession_law = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+				participation_scaled_prestige = 50
+				hidden_effect = { disband_event_forces = faction_loyalists }
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_succ_gavelkind_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+				prestige = -200
+				imprison = defender
+			}
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+			if = {
+				limit = { vassal_of = defender }
+
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_succ_gavelkind_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
-
-				disband_event_forces = faction_loyalists
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			participation_scaled_prestige = 100
+
+			if = {
+				limit = { character = defender }
+
+				hidden_effect = {
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+
+					disband_event_forces = faction_loyalists
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1034,12 +1069,11 @@ lower_crown_authority_law = {
 		ROOT = {
 			vassal_of = FROM
 		}
-
-		NOT = { has_dlc = "Conclave" }
 	}
 
 	can_use_title = {
 		is_crown_law_title = yes
+		is_law_potential = crown_authority_0
 		holder_scope = { independent = yes }
 
 		OR = {
@@ -1077,57 +1111,53 @@ lower_crown_authority_law = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
+		thirdparty_title_scope = {
+			# Lower crown authority
+			trigger_switch = {
+				on_trigger = has_law
 
-			participation_scaled_prestige = 100
-
-			opinion = {
-				name = opinion_lowered_crown_authority
-				who = defender
-				years = 1
-			}
-
-			hidden_effect = {
-				disband_event_forces = faction_revolters
+				crown_authority_1 = { add_law_w_cooldown = crown_authority_0 }
+				crown_authority_2 = { add_law_w_cooldown = crown_authority_1 }
+				crown_authority_3 = { add_law_w_cooldown = crown_authority_2 }
+				crown_authority_4 = { add_law_w_cooldown = crown_authority_3 }
 			}
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
+
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
+
+				opinion = {
+					name = opinion_lowered_crown_authority
+					who = defender
+					years = 1
+				}
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
-			}
-		}
-	}
-
-	on_success_title = {
-		trigger_switch = { # lower crown authority
-			on_trigger = has_law
-
-			crown_authority_1 = { add_law_w_cooldown = crown_authority_0 }
-			crown_authority_2 = { add_law_w_cooldown = crown_authority_1 }
-			crown_authority_3 = { add_law_w_cooldown = crown_authority_2 }
-			crown_authority_4 = { add_law_w_cooldown = crown_authority_3 }
+			hidden_effect = { disband_event_forces = faction_loyalists }
 		}
 	}
 
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -1139,71 +1169,79 @@ lower_crown_authority_law = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+				participation_scaled_prestige = 50
+				hidden_effect = { disband_event_forces = faction_loyalists }
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_lower_CA_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
+				prestige = -200
+				imprison = defender
+			}
 
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+			if = {
+				limit = { vassal_of = defender }
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_lower_CA_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1285,57 +1323,53 @@ lower_tribal_organization_law = {
 	}
 
 	on_success = {
-		attacker = {
-			show_scope_change = no
+		thirdparty_title_scope = {
+			# Lower tribal organization
+			trigger_switch = {
+				on_trigger = has_law
 
-			participation_scaled_prestige = 100
-
-			opinion = {
-				name = opinion_lowered_tribal_organization
-				who = defender
-				years = 1
-			}
-
-			hidden_effect = {
-				disband_event_forces = faction_revolters
+				tribal_organization_1 = { add_law_w_cooldown = tribal_organization_0 }
+				tribal_organization_2 = { add_law_w_cooldown = tribal_organization_1 }
+				tribal_organization_3 = { add_law_w_cooldown = tribal_organization_2 }
+				tribal_organization_4 = { add_law_w_cooldown = tribal_organization_3 }
 			}
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
+
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
+
+				opinion = {
+					name = opinion_lowered_tribal_organization
+					who = defender
+					years = 1
+				}
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
-			}
-		}
-	}
-
-	on_success_title = {
-		trigger_switch = { # lower tribal organization
-			on_trigger = has_law
-
-			tribal_organization_1 = { add_law_w_cooldown = tribal_organization_0 }
-			tribal_organization_2 = { add_law_w_cooldown = tribal_organization_1 }
-			tribal_organization_3 = { add_law_w_cooldown = tribal_organization_2 }
-			tribal_organization_4 = { add_law_w_cooldown = tribal_organization_3 }
+			hidden_effect = { disband_event_forces = faction_loyalists }
 		}
 	}
 
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -1347,71 +1381,80 @@ lower_tribal_organization_law = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+				participation_scaled_prestige = 50
+				hidden_effect = { disband_event_forces = faction_loyalists }
+			}
+
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_lower_TO_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
+				prestige = -200
+				imprison = defender
+			}
 
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+			if = {
+				limit = { vassal_of = defender }
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_lower_TO_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1494,27 +1537,32 @@ increase_council_power_war = {
 		anger_china_effect = yes
 	}
 
+
 	on_success = {
-		attacker = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_increased_council_power
-				who = defender
-				years = 1
-			}
-
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
+		thirdparty_title_scope = {
+			increase_council_power_effect = yes
+			increase_vassal_freedom_effect = yes
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
+
+				opinion = {
+					name = opinion_increased_council_power
+					who = defender
+					years = 1
+				}
+
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
@@ -1522,19 +1570,15 @@ increase_council_power_war = {
 		}
 	}
 
-	on_success_title = {
-		increase_council_power_effect = yes
-		increase_vassal_freedom_effect = yes
-	}
-
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
 
-		any_attacker = {
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -1546,70 +1590,79 @@ increase_council_power_war = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+				participation_scaled_prestige = 50
+				hidden_effect = { disband_event_forces = faction_loyalists }
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_council_power_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+				prestige = -200
+				imprison = defender
+			}
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+			if = {
+				limit = { vassal_of = defender }
+
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_council_power_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1676,56 +1729,51 @@ cb_faction_independence = {
 		any_attacker = {
 			show_scope_change = no
 
-			limit = {
-				OR = {
-					vassal_of = defender
+			if = {
+				limit = {
+					OR = {
+						vassal_of = defender
 
-					liege_before_war = {
-						character = defender
-					}
-				}
-			}
-
-			set_defacto_liege = THIS
-
-			hidden_effect = {
-				prestige = 100
-
-				any_demesne_title = {
-					limit = {
-						higher_real_tier_than = BARON
-						controls_religion = no
-
-						defender = {
-							# If the old liege can use the subjugation CB, give no claims
-							trigger_if = {
-								limit = { religion_group = pagan_group }
-								NOT = { culture_group = PREVPREV }
-							}
+						liege_before_war = {
+							character = defender
 						}
 					}
-
-					add_weak_pressed_claim = defender
 				}
 
-				set_character_flag = ai_flag_never_transfer
+				set_defacto_liege = THIS
+
+				hidden_effect = {
+					prestige = 100
+					set_character_flag = ai_flag_never_transfer
+
+					any_demesne_title = {
+						limit = {
+							higher_real_tier_than = BARON
+							controls_religion = no
+
+							defender = {
+								# If the old liege can use the subjugation CB, give no claims
+								trigger_if = {
+									limit = { religion_group = pagan_group }
+									NOT = { culture_group = PREVPREV }
+								}
+							}
+						}
+
+						add_weak_pressed_claim = defender
+					}
+				}
 			}
-		}
 
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
 				participation_scaled_prestige = 100
-				disband_event_forces = faction_revolters
 			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = { disband_event_forces = faction_revolters }
 		}
 
 		defender = {
@@ -1733,54 +1781,46 @@ cb_faction_independence = {
 
 			hidden_effect = { disband_event_forces = faction_loyalists }
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
 		}
 	}
 
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -50
-			participation_scaled_prestige = -50
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				add_character_modifier = {
-					name = faction_independence_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-
-				disband_event_forces = faction_revolters
-			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-
-			hidden_effect = {
-				add_character_modifier = {
-					name = faction_independence_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-
+				prestige = -50
 				participation_scaled_prestige = -50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = -50 }
+			}
+
+			hidden_effect = {
+				add_character_modifier = {
+					name = faction_independence_ultimatum_timer
+					years = 10
+					hidden = yes
+				}
+
 				disband_event_forces = faction_revolters
 			}
 		}
@@ -1791,42 +1831,30 @@ cb_faction_independence = {
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -100
-			participation_scaled_prestige = -100
-			imprison = defender
-
-			hidden_effect = {
-				add_character_modifier = {
-					name = faction_independence_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-
-				disband_event_forces = faction_revolters
-			}
-		}
-
 		any_attacker = {
 			show_scope_change = no
 
-			limit = {
-				vassal_of = defender
-				NOT = { character = attacker }
+			if = {
+				limit = { character = attacker }
+
+				prestige = -100
+				participation_scaled_prestige = -100
+				imprison = defender
 			}
 
-			imprison = defender
-			participation_scaled_prestige = -100
+			if = {
+				limit = { vassal_of = defender }
 
-			hidden_effect = {
-				disband_event_forces = faction_revolters
+				hidden_effect = {
+					imprison = defender
+					participation_scaled_prestige = -100
+					disband_event_forces = faction_revolters
 
-				add_character_modifier = {
-					name = faction_independence_ultimatum_timer
-					years = 10
-					hidden = yes
+					add_character_modifier = {
+						name = faction_independence_ultimatum_timer
+						years = 10
+						hidden = yes
+					}
 				}
 			}
 		}
@@ -1932,33 +1960,48 @@ cb_install_antiking = {
 	}
 
 	on_success = {
-		attacker = {
+		thirdparty_title_scope = {
 			show_scope_change = no
 
-			participation_scaled_piety = 500
-			participation_scaled_prestige = 250
-
-			religion_authority = {
-				name = deposed_antipope
-				years = 50
+			usurp_title = {
+				target = attacker
+				type = revolt
 			}
 
-			rightful_religious_head_scope = {
-				show_scope_change = no
-
-				opinion = {
-					name = opinion_deposed_antipope
-					who = attacker
-				}
+			if = {
+				limit = { has_law = investiture_law_1 }
+				add_law_w_cooldown = investiture_law_0
 			}
 		}
 
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			show_scope_change = no
 
-			hidden_effect = {
+			if = {
+				limit = { character = attacker }
+
 				participation_scaled_piety = 500
 				participation_scaled_prestige = 250
+
+				religion_authority = {
+					name = deposed_antipope
+					years = 50
+				}
+
+				rightful_religious_head_scope = {
+					show_scope_change = no
+
+					opinion = {
+						name = opinion_deposed_antipope
+						who = attacker
+					}
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_piety = 500
+					participation_scaled_prestige = 250
+				}
 			}
 		}
 
@@ -1972,20 +2015,6 @@ cb_install_antiking = {
 				rightful_religious_head_scope = {
 					remove_claim = k_papacy
 					remove_claim = d_fraticelli
-				}
-			}
-
-			primary_title = {
-				show_scope_change = no
-
-				usurp_title = {
-					target = attacker
-					type = revolt
-				}
-
-				if = {
-					limit = { has_law = investiture_law_1 }
-					add_law_w_cooldown = investiture_law_0
 				}
 			}
 		}
@@ -2129,127 +2158,42 @@ powerful_vassal_takeover_war = {
 	}
 
 	on_success = {
-		# Attackers
-		any_attacker = {
-			participation_scaled_prestige = 100
-			hidden_effect = { disband_event_forces = faction_revolters }
-		}
-
-		# Defender
 		defender = {
-			hidden_effect = { disband_event_forces = faction_loyalists }
-		}
-	}
-
-	on_success_title = {
-		increase_council_power_effect = yes
-		increase_vassal_freedom_effect = yes
-		increase_vassal_freedom_effect = yes
-
-		if = {
-			limit = { has_law = succession_voting_power_0 }
-			add_law_w_cooldown = succession_voting_power_1
-		}
-
-		if = {
-			limit = { # Should not be changed from Imperial Elective
-				NOT = {	has_law = succ_byzantine_elective }
-			}
-
-			custom_tooltip = {
-				text = overthrow_text
-
-				if = {
-					limit = {
-						OR = {
-							title = e_hre
-							title = event_target:alternate_hre
-						}
-
-						has_law = law_voting_power_1
-						has_law = banish_voting_power_1
-						has_law = execution_voting_power_1
-						has_law = revoke_title_voting_power_1
-						has_law = grant_title_voting_power_1
-						has_law = imprison_voting_power_1
-						has_law = war_voting_power_1
-
-						NOR = {
-							has_law = succ_feudal_elective
-							has_law = succ_hre_elective
-						}
-					}
-
-					add_law_w_cooldown = succ_hre_elective
-				}
-				else_if = {
-					limit = {
-						NOR = {
-							title = e_hre
-							title = event_target:alternate_hre
-							has_law = succ_feudal_elective
-							has_law = succ_hre_elective
-						}
-
-						has_law = law_voting_power_1
-						has_law = banish_voting_power_1
-						has_law = execution_voting_power_1
-						has_law = revoke_title_voting_power_1
-						has_law = grant_title_voting_power_1
-						has_law = imprison_voting_power_1
-						has_law = war_voting_power_1
-					}
-
-					add_law_w_cooldown = succ_feudal_elective
-				}
-				else_if = {
-					limit = {
-						NOR = {
-							has_law = succ_gavelkind
-							has_law = succ_feudal_elective
-							has_law = succ_hre_elective
-						}
-
-						NAND = {
-							has_law = succ_feudal_elective
-							has_law = law_voting_power_1
-							has_law = banish_voting_power_1
-							has_law = execution_voting_power_1
-							has_law = revoke_title_voting_power_1
-							has_law = grant_title_voting_power_1
-							has_law = imprison_voting_power_1
-							has_law = war_voting_power_1
-						}
-					}
-
-					add_law_w_cooldown = succ_gavelkind
-				}
-			}
-		}
-
-		holder_scope = {
 			show_scope_change = no
 
-			clr_character_flag = powerful_vassal_takeover_target
-
 			most_popular_vassal = {
+				show_scope_change = no
+
 				limit = {
 					higher_real_tier_than = BARON
 					is_feudal = yes
-					is_adult = yes
-					prisoner = no
-					is_inaccessible_trigger = yes
-					is_incapable = no
-					NOT = { trait = eunuch }
+					block_general_event_trigger = no
+					has_inheritance_blocker = no
 
 					trigger_if = {
 						limit = { is_female = yes }
-						attacker = { has_law = true_cognatic_succession }
+	
+						ROOT = {
+							OR = {
+								has_law = true_cognatic_succession
+								has_law = enatic_cognatic_succession
+								has_law = enatic_succession
+							}
+						}
+					}
+					trigger_else = {
+						ROOT = {
+							OR = {
+								has_law = true_cognatic_succession
+								has_law = cognatic_succession
+								has_law = agnatic_succession
+							}
+						}
 					}
 				}
 
 				usurp_title = {
-					target = PREVPREV
+					target = thirdparty_title_scope
 					type = faction_demand
 				}
 
@@ -2268,16 +2212,116 @@ powerful_vassal_takeover_war = {
 				}
 			}
 		}
-	}
 
-	on_fail = {
-		attacker = {
-			show_scope_change = no
+		thirdparty_title_scope = {
+			increase_council_power_effect = yes
+			increase_vassal_freedom_effect = yes
+			increase_vassal_freedom_effect = yes
 
-			prestige = -100
+			if = {
+				limit = { has_law = succession_voting_power_0 }
+				add_law_w_cooldown = succession_voting_power_1
+			}
+
+			if = {
+				limit = { # Should not be changed from Imperial Elective
+					NOT = {	has_law = succ_byzantine_elective }
+				}
+
+				custom_tooltip = {
+					text = overthrow_text
+
+					if = {
+						limit = {
+							OR = {
+								title = e_hre
+								title = event_target:alternate_hre
+							}
+
+							has_law = law_voting_power_1
+							has_law = banish_voting_power_1
+							has_law = execution_voting_power_1
+							has_law = revoke_title_voting_power_1
+							has_law = grant_title_voting_power_1
+							has_law = imprison_voting_power_1
+							has_law = war_voting_power_1
+
+							NOR = {
+								has_law = succ_feudal_elective
+								has_law = succ_hre_elective
+							}
+						}
+
+						add_law_w_cooldown = succ_hre_elective
+					}
+					else_if = {
+						limit = {
+							NOR = {
+								title = e_hre
+								title = event_target:alternate_hre
+								has_law = succ_feudal_elective
+								has_law = succ_hre_elective
+							}
+
+							has_law = law_voting_power_1
+							has_law = banish_voting_power_1
+							has_law = execution_voting_power_1
+							has_law = revoke_title_voting_power_1
+							has_law = grant_title_voting_power_1
+							has_law = imprison_voting_power_1
+							has_law = war_voting_power_1
+						}
+
+						add_law_w_cooldown = succ_feudal_elective
+					}
+					else_if = {
+						limit = {
+							NOR = {
+								has_law = succ_gavelkind
+								has_law = succ_feudal_elective
+								has_law = succ_hre_elective
+							}
+
+							NAND = {
+								has_law = succ_feudal_elective
+								has_law = law_voting_power_1
+								has_law = banish_voting_power_1
+								has_law = execution_voting_power_1
+								has_law = revoke_title_voting_power_1
+								has_law = grant_title_voting_power_1
+								has_law = imprison_voting_power_1
+								has_law = war_voting_power_1
+							}
+						}
+
+						add_law_w_cooldown = succ_gavelkind
+					}
+				}
+			}
 		}
 
 		any_attacker = {
+			participation_scaled_prestige = 100
+			hidden_effect = { disband_event_forces = faction_revolters }
+		}
+		
+		defender = {
+			hidden_effect = {
+				disband_event_forces = faction_loyalists
+				clr_character_flag = powerful_vassal_takeover_target
+			}
+		}
+	}
+
+	on_fail = {
+		any_attacker = {
+			show_scope_change = no
+
+			if = {
+				limit = { character = attacker }
+				prestige = -100
+			}
+
 			hidden_effect = {
 				disband_event_forces = faction_revolters
 
@@ -2289,76 +2333,84 @@ powerful_vassal_takeover_war = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
-				clr_character_flag = powerful_vassal_takeover_target
+				participation_scaled_prestige = 50
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+					clr_character_flag = powerful_vassal_takeover_target
+				}
 			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_powerful_vassal_takeover_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				disband_event_forces = faction_loyalists
-				clr_character_flag = powerful_vassal_takeover_target
+				prestige = -200
+				imprison = defender
+			}
 
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+			if = {
+				limit = { vassal_of = defender }
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_powerful_vassal_takeover_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+
+				hidden_effect = {
+					disband_event_forces = faction_loyalists
+					clr_character_flag = powerful_vassal_takeover_target
+
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 

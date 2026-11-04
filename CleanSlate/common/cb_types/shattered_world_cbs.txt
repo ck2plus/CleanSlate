@@ -135,71 +135,85 @@ shattered_world_county_conquest = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		if = { # Vassalise one county counts
-			limit = {
-				holder_scope = {
-					real_tier = COUNT
-					num_of_count_titles == 1
-					lower_real_tier_than = attacker
-					is_patrician = no
-				}
-			}
+	on_success = {
+		thirdparty_title_scope = {
+			show_scope_change = no
 
-			holder_scope = {
-				set_defacto_liege = attacker
-			}
-		}
-		else = { # Usurp title under other circumstances
-			usurp_title_plus_barony_if_unlanded = {
-				target = attacker
-				type = invasion
-			}
-
-			# Take all baronies under the one we're fighting for
-			any_de_jure_vassal_title = {
-				show_scope_change = no
-
+			if = { # Vassalise one county counts
 				limit = {
-					has_holder = yes
-					NOT = { de_facto_liege = PREV }
-
 					holder_scope = {
-						is_vassal_or_below_of = defender
+						real_tier = COUNT
+						num_of_count_titles == 1
+						lower_real_tier_than = attacker
+						is_patrician = no
 					}
 				}
 
+				holder_scope = {
+					show_scope_change = no
+					set_defacto_liege = attacker
+				}
+			}
+			else = { # Usurp title under other circumstances
 				usurp_title_plus_barony_if_unlanded = {
 					target = attacker
 					type = invasion
 				}
+
+				# Take all baronies under the one we're fighting for
+				any_de_jure_vassal_title = {
+					show_scope_change = no
+
+					limit = {
+						NOT = { de_facto_liege = PREV }
+
+						holder_scope = {
+							OR = {
+								character = defender
+								is_vassal_or_below_of = defender
+							}
+						}
+					}
+
+					usurp_title_plus_barony_if_unlanded = {
+						target = attacker
+						type = invasion
+					}
+				}
 			}
+
+			add_pressed_claim = defender
 		}
 
-		add_pressed_claim = defender
-
 		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
 	on_fail_title = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -215,15 +229,16 @@ shattered_world_county_conquest = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -392,7 +407,6 @@ shattered_world_county_conquest = {
 #	on_add = {
 #		attacker = {
 #			show_scope_change = no
-#
 #			prestige = -500
 #		}
 #
@@ -401,34 +415,32 @@ shattered_world_county_conquest = {
 #
 #	on_success = {
 #		any_attacker = {
-#			limit = { NOT = { character = attacker } }
-#			hidden_effect = { participation_scaled_prestige = 100 }
+#			show_scope_change = no
+#
+#			if = {
+#				limit = { character = attacker }
+#
+#				vassalize_or_take_under_title = {
+#					title = thirdparty_title_scope
+#					enemy = defender
+#					anti_nomad = yes
+#					type = invasion
+#				}
+#			}
+#			else = {
+#				hidden_effect = { participation_scaled_prestige = 100 }
+#			}
 #		}
 #
 #		defender = {
 #			show_scope_change = no
-#
 #			prestige = -100
-#		}
-#	}
-#
-#	on_success_title = {
-#		attacker = {
-#			show_scope_change = no
-#
-#			vassalize_or_take_under_title = {
-#				title = PREV
-#				enemy = defender
-#				anti_nomad = yes
-#				type = invasion
-#			}
 #		}
 #	}
 #
 #	on_fail = {
 #		attacker = {
 #			show_scope_change = no
-#
 #			prestige = -200
 #		}
 #	}
@@ -445,15 +457,16 @@ shattered_world_county_conquest = {
 #			}
 #		}
 #
-#		defender = {
+#		any_defender = {
 #			show_scope_change = no
 #
-#			participation_scaled_prestige = 300
-#		}
-#
-#		any_defender = {
-#			limit = { NOT = { character = defender } }
-#			hidden_effect = { participation_scaled_prestige = 300 }
+#			if = {
+#				limit = { character = defender }
+#				participation_scaled_prestige = 300
+#			}
+#			else = {
+#				hidden_effect = { participation_scaled_prestige = 300 }
+#			}
 #		}
 #	}
 #
@@ -543,47 +556,45 @@ shattered_invasion = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = 200
-			participation_scaled_prestige = 200
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				occupy_minors_of_occupied_settlements = defender
+				custom_tooltip = {
+					text = tribal_invasion_succ_tip
 
-				gain_all_occupied_titles = {
-					who = defender
-					type = invasion
-				}
+					occupy_minors_of_occupied_settlements = defender
 
-				if = {
-					limit = { can_apply_cool_nickname_trigger = yes }
+					gain_all_occupied_titles = {
+						who = defender
+						type = invasion
+					}
 
-					random_list = {
-						10 = { give_nickname = nick_the_great }
-						10 = { give_nickname = nick_the_magnificent }
-						10 = { give_nickname = nick_the_glorious }
-						10 = { give_nickname = nick_the_conqueror }
+					vassalize_or_take_under_title_destroy_duchies = {
+						title = thirdparty_title_scope
+						enemy = defender
+						is_crusade = yes # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
+						type = invasion
 					}
 				}
-			}
 
-			if = {
-				limit = {
-					uses_decadence = yes
-					defender = { uses_decadence = no }
-				}
-
-				participation_scaled_decadence = -20
-			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-
-			hidden_effect = {
+				prestige = 200
 				participation_scaled_prestige = 200
+
+				hidden_effect = {
+					if = {
+						limit = { can_apply_cool_nickname_trigger = yes }
+
+						random_list = {
+							10 = { give_nickname = nick_the_great }
+							10 = { give_nickname = nick_the_magnificent }
+							10 = { give_nickname = nick_the_glorious }
+							10 = { give_nickname = nick_the_conqueror }
+						}
+					}
+				}
 
 				if = {
 					limit = {
@@ -594,47 +605,46 @@ shattered_invasion = {
 					participation_scaled_decadence = -20
 				}
 			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 200
+
+					if = {
+						limit = {
+							uses_decadence = yes
+							defender = { uses_decadence = no }
+						}
+
+						participation_scaled_decadence = -20
+					}
+				}
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = tribal_invasion_succ_tip
-
-			attacker = {
-				vassalize_or_take_under_title_destroy_duchies = {
-					title = PREV
-					enemy = defender
-					is_crusade = yes # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
-					type = invasion
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -200
 		}
 
-		defender = {
-			show_scope_change = no
-
-			prestige = 100
-			participation_scaled_prestige = 100
-		}
-
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			show_scope_change = no
+			
+			if = {
+				limit = { character = defender } 
+
+				prestige = 100
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -651,16 +661,18 @@ shattered_invasion = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 200
-			participation_scaled_prestige = 200
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 200 }
+			if = {
+				limit = { character = defender } 
+				
+				prestige = 200
+				participation_scaled_prestige = 200
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 	}
 

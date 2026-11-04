@@ -49,9 +49,16 @@ cb_install_khan = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
-			participation_scaled_prestige = 250
+
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 250
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 250 }
+			}
 		}
 
 		defender = {
@@ -73,17 +80,11 @@ cb_install_khan = {
 				killer = attacker
 			}
 		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 250 }
-		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 	}
@@ -96,33 +97,35 @@ cb_install_khan = {
 			imprison = defender
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
+				participation_scaled_prestige = 50
+
+				hidden_effect = {
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
 							}
 						}
-					}
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
 					}
 				}
 			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -207,25 +210,26 @@ nomad_dispute = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		usurp_title_plus_barony_if_unlanded = {
-			target = attacker
-			type = invasion
-		}
-
-		attacker = {
+	on_success = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-			participation_scaled_piety = 50
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
+				usurp_title_plus_barony_if_unlanded = {
+					target = thirdparty_title_scope
+					type = invasion
+				}
 
-			hidden_effect = {
 				participation_scaled_prestige = 100
 				participation_scaled_piety = 50
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 100
+					participation_scaled_piety = 50
+				}
 			}
 		}
 	}
@@ -233,19 +237,19 @@ nomad_dispute = {
 	on_fail_title = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -261,19 +265,20 @@ nomad_dispute = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-			participation_scaled_piety = 50
-		}
+			if = {
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
 				participation_scaled_prestige = 100
 				participation_scaled_piety = 50
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 100
+					participation_scaled_piety = 50
+				}
 			}
 		}
 	}
@@ -407,18 +412,20 @@ cb_liberate_nomad_duchy = {
 		attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 200
-
 			if = {
-				limit = { uses_decadence = yes }
-				participation_scaled_decadence = -10
-			}
-		}
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
+				custom_tooltip = {
+					text = liberate_nomad_cb_succ_tip
 
-			hidden_effect = {
+					vassalize_or_take_under_title = {
+						title = thirdparty_title_scope
+						enemy = defender
+						anti_nomad = yes # Vassalize non-nomadic rulers
+						type = invasion
+					}
+				}
+
 				participation_scaled_prestige = 200
 
 				if = {
@@ -426,34 +433,27 @@ cb_liberate_nomad_duchy = {
 					participation_scaled_decadence = -10
 				}
 			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 200
+
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -10
+					}
+				}
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = liberate_nomad_cb_succ_tip
-
-			attacker = {
-				vassalize_or_take_under_title = {
-					title = PREV
-					enemy = defender
-					anti_nomad = yes # Vassalize non-nomadic rulers
-					type = invasion
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -200
 		}
 	}
@@ -470,26 +470,27 @@ cb_liberate_nomad_duchy = {
 			prestige = -200
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 300
-
 			if = {
-				limit = { uses_decadence = yes }
-				participation_scaled_decadence = -10
-			}
-		}
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
 				participation_scaled_prestige = 300
 
 				if = {
 					limit = { uses_decadence = yes }
 					participation_scaled_decadence = -10
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 300
+
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -10
+					}
 				}
 			}
 		}
@@ -566,14 +567,14 @@ cb_minor_clan_revolt = {
 		anger_china_effect = yes
 	}
 
-	on_success_title = {
-		usurp_title_plus_barony_if_unlanded = {
-			target = attacker
-			type = revolt
-		}
-
+	on_success = {
 		attacker = {
 			show_scope_change = no
+
+			usurp_title_plus_barony_if_unlanded = {
+				target = thirdparty_title_scope
+				type = revolt
+			}
 
 			hidden_effect = {
 				set_title_nomad = {
@@ -583,7 +584,7 @@ cb_minor_clan_revolt = {
 			}
 
 			if = {
-				limit = { PREV = { location = { has_tribal = yes } } }
+				limit = { thirdparty_title_scope = { location = { has_tribal = yes } } }
 				set_government_type = tribal_government
 			}
 			else = {
@@ -602,7 +603,6 @@ cb_minor_clan_revolt = {
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 	}
@@ -712,48 +712,38 @@ nomad_subjugation = {
 
 			FROM = {
 				show_scope_change = no
-
 				lower_real_tier_than = EMPEROR
 			}
 		}
 
-		# Attacker
-		ROOT = {
-			OR = {
-				prestige >= 500
-
-				has_opinion_modifier = {
-					name = declared_independence_nomad
-					who = FROM
-				}
-			}
-		}
-
-		# Defender
-		FROM = {
-			is_nomadic = no
-
-			OR = {
-				AND = {
-					is_tribal = yes
-
-					ROOT = {
-						show_scope_change = no
-
-						population >= 2500
+		trigger_if = {
+			limit = {
+				ROOT = {
+					NOT = {
+						has_opinion_modifier = {
+							name = declared_independence_nomad
+							who = FROM
+						}
 					}
 				}
+			}
 
-				ROOT = {
-					show_scope_change = no
+			# Attacker
+			ROOT = {
+				prestige >= 500
 
+				trigger_if = {
+					limit = { FROM = { is_tribal = yes } }
+					population >= 2500
+				}
+				trigger_else = {
 					population >= 10000
 				}
+			}
 
-				has_opinion_modifier = {
-					name = declared_independence_nomad
-					who = FROM
-				}
+			# Defender
+			FROM = {
+				is_nomadic = no
 			}
 		}
 	}
@@ -836,55 +826,57 @@ nomad_subjugation = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			piety = 100
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				if = {
-					limit = { can_apply_cool_nickname_trigger = yes }
+				piety = 100
+				participation_scaled_prestige = 100
 
-					# Set event targets for dynamic nicknames
-					save_event_target_as = nickname_receiver
-					defender = { save_event_target_as = nickname_target }
+				hidden_effect = {
+					if = {
+						limit = { can_apply_cool_nickname_trigger = yes }
 
-					random_list = {
-						2 = { give_nickname = nick_the_eastern_wind }
-						5 = { give_nickname = nick_the_despoiler }
+						# Set event targets for dynamic nicknames
+						save_event_target_as = nickname_receiver
+						defender = { save_event_target_as = nickname_target }
 
-						5 = {
-							give_nickname = nick_the_bane_of_realm
+						random_list = {
+							2 = { give_nickname = nick_the_eastern_wind }
+							5 = { give_nickname = nick_the_despoiler }
 
-							trigger = {
-								event_target:nickname_target = {
-									is_nomadic = no
-									NOT = { culture = ROOT }
+							5 = {
+								give_nickname = nick_the_bane_of_realm
+
+								trigger = {
+									event_target:nickname_target = {
+										is_nomadic = no
+										NOT = { culture = ROOT }
+									}
 								}
 							}
-						}
 
-						5 = {
-							give_nickname = nick_the_culture_marauder
+							5 = {
+								give_nickname = nick_the_culture_marauder
 
-							trigger = {
-								event_target:nickname_target = {
-									is_nomadic = no
-									NOT = { culture = ROOT }
+								trigger = {
+									event_target:nickname_target = {
+										is_nomadic = no
+										NOT = { culture = ROOT }
+									}
 								}
 							}
-						}
 
-						100 = { }
+							100 = { }
+						}
 					}
 				}
 			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 
 		defender = {
@@ -893,13 +885,14 @@ nomad_subjugation = {
 			piety = -100
 			prestige = -100
 
+			# Reformed pagans are forced to convert back
 			if = {
 				limit = {
 					is_reformed_religion = attacker
 					controls_religion = no
 				}
 
-				religion = ROOT # Reformed pagans are forced to convert back
+				religion = attacker
 			}
 
 			custom_tooltip = {
@@ -923,14 +916,12 @@ nomad_subjugation = {
 						controls_religion = no
 					}
 
-					attacker = {
-						grant_title_no_opinion = {
-							target = PREV
-							type = invasion
-						}
+					grant_title_no_opinion = {
+						target = attacker
+						type = invasion
 					}
 
-					add_pressed_claim = PREV
+					add_pressed_claim = defender
 				}
 
 				any_demesne_title = {
@@ -939,19 +930,16 @@ nomad_subjugation = {
 						controls_religion = no
 					}
 
-					attacker = {
-						grant_title_no_opinion = {
-							target = PREV
-							type = invasion
-						}
+					grant_title_no_opinion = {
+						target = attacker
+						type = invasion
 					}
 
-					add_pressed_claim = PREV
+					add_pressed_claim = defender
 				}
 
 				if = {
 					limit = { controls_religion = no }
-
 					set_defacto_liege = attacker
 				}
 				else = {
@@ -962,11 +950,9 @@ nomad_subjugation = {
 					any_demesne_title = {
 						limit = { controls_religion = no }
 
-						attacker = {
-							grant_title_no_opinion = {
-								target = PREV
-								type = invasion
-							}
+						grant_title_no_opinion = {
+							target = attacker
+							type = invasion
 						}
 					}
 				}
@@ -977,20 +963,48 @@ nomad_subjugation = {
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			piety = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			piety = 50
-			participation_scaled_prestige = 50
+			if = {
+				limit = { character = defender }
+
+				piety = 50
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			piety = -200
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 2.0
+			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 100
+				piety = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1008,31 +1022,6 @@ nomad_subjugation = {
 			attacker = {
 				remove_character_modifier = launched_subjugation
 			}
-		}
-	}
-
-	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			piety = -200
-
-			transfer_scaled_wealth = {
-				to = defender
-				value = 2.0
-			}
-		}
-
-		defender = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-			piety = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
 		}
 	}
 
@@ -1121,7 +1110,6 @@ nomad_invasion = {
 	on_add = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
@@ -1129,201 +1117,201 @@ nomad_invasion = {
 	}
 
 	on_success = {
-		attacker = {
-			hidden_effect = {
-				# Set event targets for dynamic nicknames
-				save_event_target_as = nickname_receiver
-				defender = { save_event_target_as = nickname_target }
+		any_attacker = {
+			show_scope_change = no
 
-				random_list = {
-					5 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_great
+			if = {
+				limit = { character = attacker }
+
+				custom_tooltip = {
+					text = tribal_invasion_succ_tip
+
+					occupy_minors_of_occupied_settlements = defender
+
+					gain_all_occupied_titles = {
+						who = defender
+						type = invasion
 					}
 
-					5 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_victorious
+					vassalize_or_take_under_title_destroy_duchies = {
+						title = thirdparty_title_scope
+						enemy = defender
+						is_crusade = yes # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
+						type = invasion
 					}
+				}
 
-					5 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_conqueror
-					}
+				hidden_effect = {
+					# Set event targets for dynamic nicknames
+					save_event_target_as = nickname_receiver
+					defender = { save_event_target_as = nickname_target }
 
-					5 = {
-						trigger = { can_apply_average_nickname_trigger = yes }
-						give_nickname = nick_the_brave
-					}
-
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-
-						if = {
-							limit = { is_female = no }
-							give_nickname = nick_the_dragon
+					random_list = {
+						5 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_great
 						}
-						else = {
-							give_nickname = nick_the_dragoness
+
+						5 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_victorious
 						}
-					}
 
-					10 = {
-						trigger = { can_apply_average_nickname_trigger = yes }
-						give_nickname = nick_the_terrible
-					}
+						5 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_conqueror
+						}
 
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_eastern_wind
-					}
+						5 = {
+							trigger = { can_apply_average_nickname_trigger = yes }
+							give_nickname = nick_the_brave
+						}
 
-					25 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_despoiler
-					}
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
 
-					25 = {
-						give_nickname = nick_the_culture_marauder
-
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
-
-							event_target:nickname_target = {
-								is_nomadic = no
-								NOT = { culture = attacker }
+							if = {
+								limit = { is_female = no }
+								give_nickname = nick_the_dragon
+							}
+							else = {
+								give_nickname = nick_the_dragoness
 							}
 						}
-					}
 
-					50 = {
-						give_nickname = nick_the_bane_of_realm
+						10 = {
+							trigger = { can_apply_average_nickname_trigger = yes }
+							give_nickname = nick_the_terrible
+						}
 
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_eastern_wind
+						}
 
-							event_target:nickname_target = {
-								is_nomadic = no
-								NOT = { culture = attacker }
+						25 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_despoiler
+						}
+
+						25 = {
+							give_nickname = nick_the_culture_marauder
+
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
+
+								event_target:nickname_target = {
+									is_nomadic = no
+									NOT = { culture = attacker }
+								}
 							}
 						}
-					}
 
-					50 = {
-						give_nickname = nick_the_slayer_of_culture
+						50 = {
+							give_nickname = nick_the_bane_of_realm
 
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
 
-							event_target:nickname_target = {
-								NOT = { culture = attacker }
+								event_target:nickname_target = {
+									is_nomadic = no
+									NOT = { culture = attacker }
+								}
 							}
 						}
-					}
 
-					50 = {
-						give_nickname = nick_the_scourge_of_god
+						50 = {
+							give_nickname = nick_the_slayer_of_culture
 
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
 
-							event_target:nickname_target = {
-								is_nomadic = no
-								NOT = { religion = attacker }
+								event_target:nickname_target = {
+									NOT = { culture = attacker }
+								}
+							}
+						}
+
+						50 = {
+							give_nickname = nick_the_scourge_of_god
+
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
+
+								event_target:nickname_target = {
+									is_nomadic = no
+									NOT = { religion = attacker }
+								}
 							}
 						}
 					}
 				}
 			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 200 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = tribal_invasion_succ_tip
-
-			attacker = {
-				occupy_minors_of_occupied_settlements = defender
-
-				gain_all_occupied_titles = {
-					who = defender
-					type = invasion
-				}
-
-				vassalize_or_take_under_title_destroy_duchies = {
-					title = PREV
-					enemy = defender
-					is_crusade = yes # Even if the title holder is not participating in the war, gain holdings occupied by all Crusade participants
-					type = invasion
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -200
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 100
-			participation_scaled_prestige = 100
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				random_list = {
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_great
-					}
+				prestige = 100
+				participation_scaled_prestige = 100
 
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_hammer
-					}
-
-					10 = {
-						trigger = { can_apply_average_nickname_trigger = yes }
-						give_nickname = nick_the_avenger
-					}
-
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-
-						if = {
-							limit = { is_female = no }
-							give_nickname = nick_the_lion
+				hidden_effect = {
+					random_list = {
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_great
 						}
-						else = {
-							give_nickname = nick_the_lioness
-						}
-					}
 
-					10 = {
-						trigger = { can_apply_average_nickname_trigger = yes }
-						give_nickname = nick_the_bold
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_hammer
+						}
+
+						10 = {
+							trigger = { can_apply_average_nickname_trigger = yes }
+							give_nickname = nick_the_avenger
+						}
+
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+
+							if = {
+								limit = { is_female = no }
+								give_nickname = nick_the_lion
+							}
+							else = {
+								give_nickname = nick_the_lioness
+							}
+						}
+
+						10 = {
+							trigger = { can_apply_average_nickname_trigger = yes }
+							give_nickname = nick_the_bold
+						}
 					}
 				}
 			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -1339,52 +1327,54 @@ nomad_invasion = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			prestige = 200
-			participation_scaled_prestige = 200
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				random_list = {
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_great
-					}
+				prestige = 200
+				participation_scaled_prestige = 200
 
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_hammer
-					}
-
-					10 = {
-						trigger = { can_apply_average_nickname_trigger = yes }
-						give_nickname = nick_the_avenger
-					}
-
-					10 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-
-						if = {
-							limit = { is_female = no }
-							give_nickname = nick_the_lion
+				hidden_effect = {
+					random_list = {
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_great
 						}
-						else = {
-							give_nickname = nick_the_lioness
-						}
-					}
 
-					10 = {
-						trigger = { can_apply_average_nickname_trigger = yes }
-						give_nickname = nick_the_bold
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_hammer
+						}
+
+						10 = {
+							trigger = { can_apply_average_nickname_trigger = yes }
+							give_nickname = nick_the_avenger
+						}
+
+						10 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+
+							if = {
+								limit = { is_female = no }
+								give_nickname = nick_the_lion
+							}
+							else = {
+								give_nickname = nick_the_lioness
+							}
+						}
+
+						10 = {
+							trigger = { can_apply_average_nickname_trigger = yes }
+							give_nickname = nick_the_bold
+						}
 					}
 				}
 			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 200 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 	}
 
@@ -1435,29 +1425,15 @@ nomad_expansion = {
 			prestige >= 300
 			population_factor >= 0.5
 
-			# Defender
-			FROM = {
-				show_scope_change = no
+			trigger_if = {
+				limit = { FROM = { is_nomadic = no } } # Nomads no population requirement
 
 				trigger_if = {
-					limit = { is_nomadic = no } # Nomads no population requirement
-
-					trigger_if = {
-						limit = { is_tribal = yes }
-
-						ROOT = { # Tribals need 5k
-							show_scope_change = no
-
-							population >= 5000
-						}
-					}
-					trigger_else = {
-						ROOT = { # Everyone else needs 15k
-							show_scope_change = no
-
-							population >= 15000
-						}
-					}
+					limit = { FROM = { is_tribal = yes } }
+					population >= 5000 # Tribals need 5k
+				}
+				trigger_else = {
+					population >= 15000 # Everyone else needs 15k
 				}
 			}
 		}
@@ -1531,89 +1507,96 @@ nomad_expansion = {
 	}
 
 	on_success = {
-		attacker = {
-			hidden_effect = {
-				# Set event targets for dynamic nicknames
-				save_event_target_as = nickname_receiver
-				defender = { save_event_target_as = nickname_target }
+		any_attacker = {
+			show_scope_change = no
 
-				random_list = {
-					5 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_eastern_wind
+			if = {
+				limit = { character = attacker }
+
+				custom_tooltip = {
+					text = pagan_subjugation_tip
+
+					subjugate_or_take_under_title = {
+						title = thirdparty_title_scope
+						enemy = defender
 					}
-
-					5 = {
-						trigger = { can_apply_cool_nickname_trigger = yes }
-						give_nickname = nick_the_despoiler
-					}
-
-					5 = {
-						give_nickname = nick_the_culture_marauder
-
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
-
-							event_target:nickname_target = {
-								is_nomadic = no
-								NOT = { culture = attacker }
-							}
-						}
-					}
-
-					5 = {
-						give_nickname = nick_the_bane_of_realm
-
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
-
-							event_target:nickname_target = {
-								is_nomadic = no
-								NOT = { culture = attacker }
-							}
-						}
-					}
-
-					5 = {
-						give_nickname = nick_the_slayer_of_culture
-
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
-
-							event_target:nickname_target = {
-								NOT = { culture = attacker }
-							}
-						}
-					}
-
-					5 = {
-						give_nickname = nick_the_scourge_of_god
-
-						trigger = {
-							can_apply_cool_nickname_trigger = yes
-
-							event_target:nickname_target = {
-								NOT = { religion = attacker }
-							}
-						}
-					}
-
-					100 = { }
 				}
 
-				if = {
-					limit = { uses_decadence = yes }
-					participation_scaled_decadence = -10
+				hidden_effect = {
+					# Set event targets for dynamic nicknames
+					save_event_target_as = nickname_receiver
+					defender = { save_event_target_as = nickname_target }
+
+					random_list = {
+						5 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_eastern_wind
+						}
+
+						5 = {
+							trigger = { can_apply_cool_nickname_trigger = yes }
+							give_nickname = nick_the_despoiler
+						}
+
+						5 = {
+							give_nickname = nick_the_culture_marauder
+
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
+
+								event_target:nickname_target = {
+									is_nomadic = no
+									NOT = { culture = attacker }
+								}
+							}
+						}
+
+						5 = {
+							give_nickname = nick_the_bane_of_realm
+
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
+
+								event_target:nickname_target = {
+									is_nomadic = no
+									NOT = { culture = attacker }
+								}
+							}
+						}
+
+						5 = {
+							give_nickname = nick_the_slayer_of_culture
+
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
+
+								event_target:nickname_target = {
+									NOT = { culture = attacker }
+								}
+							}
+						}
+
+						5 = {
+							give_nickname = nick_the_scourge_of_god
+
+							trigger = {
+								can_apply_cool_nickname_trigger = yes
+
+								event_target:nickname_target = {
+									NOT = { religion = attacker }
+								}
+							}
+						}
+
+						100 = { }
+					}
 				}
 			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 
 			hidden_effect = {
-				participation_scaled_prestige = 200
-
 				if = {
 					limit = { uses_decadence = yes }
 					participation_scaled_decadence = -10
@@ -1623,28 +1606,13 @@ nomad_expansion = {
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-	}
-
-	on_success_title = {
-		custom_tooltip = {
-			text = pagan_subjugation_tip
-
-			attacker = {
-				subjugate_or_take_under_title = {
-					title = PREV
-					enemy = defender
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -200
 		}
 	}
@@ -1661,26 +1629,27 @@ nomad_expansion = {
 			prestige = -200
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 300
-
 			if = {
-				limit = { uses_decadence = yes }
-				participation_scaled_decadence = -10
-			}
-		}
+				limit = { character = defender }
 
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
 				participation_scaled_prestige = 300
 
 				if = {
 					limit = { uses_decadence = yes }
 					participation_scaled_decadence = -10
+				}
+			}
+			else = {
+				hidden_effect = {
+					participation_scaled_prestige = 300
+
+					if = {
+						limit = { uses_decadence = yes }
+						participation_scaled_decadence = -10
+					}
 				}
 			}
 		}
@@ -1816,7 +1785,6 @@ nomad_humiliate_cb = {
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -300
 		}
 	}
@@ -1824,13 +1792,11 @@ nomad_humiliate_cb = {
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = 100
 		}
 	}
@@ -1848,6 +1814,7 @@ nomad_humiliate_cb = {
 		}
 
 		defender = {
+			show_scope_change = no
 			prestige = 200
 		}
 	}

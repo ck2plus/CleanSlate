@@ -155,10 +155,68 @@ buddhist_holy_war = {
 	}
 
 	on_success = {
-		hidden_effect = {
-			any_attacker = {
+		thirdparty_title_scope = {
+			show_scope_change = no
+
+			if = { # Vassalise one county counts
+				limit = {
+					holder_scope = {
+						real_tier = COUNT
+						num_of_count_titles == 1
+						lower_real_tier_than = attacker
+						is_patrician = no
+					}
+				}
+
+				holder_scope = {
+					show_scope_change = no
+					set_defacto_liege = attacker
+				}
+			}
+
+			else = { # Usurp title in all other circumstances
+				usurp_title_plus_barony_if_unlanded = {
+					target = attacker
+					type = holy_war
+				}
+
+				any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
+					limit = {
+						NOT = { de_facto_liege = PREV }
+
+						holder_scope = {
+							OR = {
+								character = defender
+								is_vassal_or_below_of = defender
+							}
+						}
+					}
+
+					usurp_title_plus_barony_if_unlanded = {
+						target = attacker
+						type = holy_war
+					}
+				}
+			}
+		}
+
+		any_attacker = {
+			show_scope_change = no
+
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
+
+			hidden_effect = {
 				if = {
-					limit = { has_ambition = obj_strengthen_religion }
+					limit = {
+						has_ambition = obj_strengthen_religion
+						NOT = { religion = defender }
+					}
 
 					change_variable = {
 						which = strengthen_religion
@@ -169,76 +227,22 @@ buddhist_holy_war = {
 		}
 	}
 
-	on_success_title = {
-		if = { # Vassalise one county counts
-			limit = {
-				holder_scope = {
-					real_tier = COUNT
-					num_of_count_titles == 1
-					lower_real_tier_than = attacker
-					is_patrician = no
-				}
-			}
-
-			holder_scope = {
-				set_defacto_liege = attacker
-			}
-		}
-
-		else = { # Usurp title in all other circumstances
-			usurp_title_plus_barony_if_unlanded = {
-				target = attacker
-				type = holy_war
-			}
-
-			any_de_jure_vassal_title = { # take all baronies under the one we're fighting for
-				limit = {
-					has_holder = yes
-					NOT = { de_facto_liege = PREV }
-
-					holder_scope = {
-						OR = {
-							character = defender
-							is_vassal_or_below_of = defender
-						}
-					}
-				}
-
-				usurp_title_plus_barony_if_unlanded = {
-					target = attacker
-					type = holy_war
-				}
-			}
-		}
-
-		attacker = {
-			show_scope_change = no
-
-			participation_scaled_prestige = 100
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
-		}
-	}
-
 	on_fail_title = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -254,31 +258,23 @@ buddhist_holy_war = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-
-			hidden_effect = {
-				if = {
-					limit = { has_ambition = obj_strengthen_religion }
-
-					change_variable = {
-						which = strengthen_religion
-						value = 1
-					}
-				}
-			}
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-
-			hidden_effect = {
+			if = {
+				limit = { character = defender }
 				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = {participation_scaled_prestige = 100 }
+			}
 
+			hidden_effect = {
 				if = {
-					limit = { has_ambition = obj_strengthen_religion }
+					limit = {
+						has_ambition = obj_strengthen_religion
+						NOT = { religion = attacker }
+					}
 
 					change_variable = {
 						which = strengthen_religion
@@ -394,15 +390,8 @@ indian_subjugation = {
 	on_add = {
 		attacker = {
 			show_scope_change = no
+
 			piety = -500
-		}
-
-		anger_china_effect = yes
-	}
-
-	on_add_title = {
-		attacker = {
-			show_scope_change = no
 
 			if = {
 				limit = {
@@ -411,7 +400,7 @@ indian_subjugation = {
 
 						capital_scope = {
 							kingdom = {
-								NOT = { title = PREVPREVPREV }
+								NOT = { title = thirdparty_title_scope }
 							}
 						}
 					}
@@ -424,124 +413,110 @@ indian_subjugation = {
 				}
 			}
 		}
+
+		anger_china_effect = yes
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 200
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 200 }
+				if = {
+					limit = { independent = no }
+					liege = { save_event_target_as = old_liege }
+				}
+
+				# Usurp the target kingdom itself, if the enemy holds it
+				if = {
+					limit = {
+						lower_real_tier_than = EMPEROR
+						thirdparty_title_scope = { holder = defender }
+					}
+
+					usurp_title = {
+						target = thirdparty_title_scope
+						type = invasion
+					}
+				}
+
+				if = {
+					# Take the enemy's duchies within the target kingdom, if we are the same or lower tier
+					limit = { NOT = { higher_real_tier_than = defender } }
+
+					defender = {
+						show_scope_change = no
+
+						any_demesne_title = {
+							show_scope_change = no
+
+							limit = {
+								real_tier = DUKE
+								de_jure_liege_or_above = thirdparty_title_scope
+							}
+
+							usurp_title = {
+								target = attacker
+								type = invasion
+							}
+						}
+					}
+				}
+
+				# Have I become the vassal of the loser due to taking a duchy or kingdom?
+				if = {
+					limit = { is_vassal_or_below_of = defender }
+
+					if = {
+						limit = { lower_real_tier_than = event_target:old_liege }
+						set_defacto_liege = event_target:old_liege
+					}
+					else = {
+						set_defacto_liege = THIS
+					}
+				}
+
+				# Vassalize the rest
+				custom_tooltip = {
+					text = pagan_subjugation_tip
+
+					subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
+						title = thirdparty_title_scope
+						enemy = defender
+					}
+				}
+
+				participation_scaled_prestige = 200
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = -200
-		}
-	}
-
-	on_success_title = {
-		# Usurp the target kingdom itself, if the enemy holds it
-		if = {
-			limit = {
-				holder = defender
-
-				attacker = {
-					lower_real_tier_than = EMPEROR
-				}
-			}
-
-			attacker = {
-				show_scope_change = no
-
-				usurp_title = {
-					target = PREV
-					type = invasion
-				}
-			}
-		}
-
-		if = {
-			# Take the enemy's duchies within the target kingdom, if we are the same or lower tier
-			limit = {
-				attacker = {
-					NOT = { higher_real_tier_than = defender }
-				}
-			}
-
-			defender = {
-				show_scope_change = no
-
-				any_demesne_title = {
-					limit = {
-						real_tier = DUKE
-
-						OR = {
-							title = PREVPREV
-							de_jure_liege_or_above = PREVPREV
-						}
-					}
-
-					attacker = {
-						show_scope_change = no
-
-						usurp_title = {
-							target = PREV
-							type = invasion
-						}
-					}
-				}
-			}
-		}
-
-		# Have I become the vassal of the loser due to taking a duchy or kingdom?
-		# TODO: Ensure vassals using this CB can't become independent!
-		if = {
-			limit = {
-				attacker = {
-					is_vassal_or_below_of = defender
-				}
-			}
-
-			attacker = {
-				set_defacto_liege = THIS
-			}
-		}
-
-		# Vassalize the rest
-		custom_tooltip = {
-			text = pagan_subjugation_tip
-
-			attacker = {
-				subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
-					title = PREV
-					enemy = defender
-				}
-			}
 		}
 	}
 
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 100
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 100 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
+			}
 		}
 	}
 
@@ -557,15 +532,16 @@ indian_subjugation = {
 			}
 		}
 
-		defender = {
+		any_defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 200
-		}
-
-		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 200 }
+			if = {
+				limit = { character = defender }
+				participation_scaled_prestige = 200
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 200 }
+			}
 		}
 	}
 

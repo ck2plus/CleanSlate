@@ -126,97 +126,74 @@ bid_for_independence = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			defender = {
-				show_scope_change = no
+			if = {
+				limit = { character = attacker }
 
-				if = {
-					limit = { independent = yes }
-
-					attacker = {
-						show_scope_change = no
-
-						set_defacto_liege = ROOT
+				defender = {
+					if = {
+						limit = { independent = yes }
+						attacker = { save_event_target_as = new_liege }
+					}
+					else = {
+						liege_before_war = { save_event_target_as = new_liege }
 					}
 				}
-				else_if = {
-					limit = { in_revolt = yes }
 
-					liege_before_war = { # attacker becomes vassal of defender's liege
-						show_scope_change = no
+				set_defacto_liege = event_target:new_liege
+				prestige = 100
+				participation_scaled_prestige = 100
 
-						attacker = {
-							show_scope_change = no
-
-							set_defacto_liege = PREV
-						}
+				hidden_effect = {
+					any_demesne_title = {
+						add_pressed_claim = defender
 					}
-				}
-				else = {
-					liege = { # attacker becomes vassal of defender's liege
-						show_scope_change = no
 
-						attacker = {
-							show_scope_change = no
-
-							set_defacto_liege = PREV
-						}
-					}
+					set_character_flag = ai_flag_never_transfer
 				}
 			}
-
-			prestige = 100
-			participation_scaled_prestige = 100
-
-			hidden_effect = {
-				any_demesne_title = {
-					add_pressed_claim = defender
-				}
-
-				set_character_flag = ai_flag_never_transfer
+			else = {
+				hidden_effect = { participation_scaled_prestige = 100 }
 			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 100 }
 		}
 
 		defender = {
 			show_scope_change = no
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = { # All titles
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
 		}
 	}
 
 	on_fail = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			prestige = -50
-			participation_scaled_prestige = -50
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = -50 }
+				prestige = -50
+				participation_scaled_prestige = -50
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = -50 }
+			}
 		}
 	}
 
@@ -224,19 +201,20 @@ bid_for_independence = {
 		attacker = {
 			show_scope_change = no
 
-			prestige = -100
-			imprison = defender
-			participation_scaled_prestige = -100
-		}
+			if = {
+				limit = { character = attacker }
 
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = -100 }
+				imprison = defender
+				prestige = -100
+				participation_scaled_prestige = -100
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = -100 }
+			}
 		}
 
 		defender = {
 			show_scope_change = no
-
 			prestige = 50
 		}
 	}
@@ -348,15 +326,16 @@ depose_liege = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 250
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 250 }
+			if = {
+				limit = { character = attacker }
+				participation_scaled_prestige = 250
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 250 }
+			}
 		}
 
 		defender = {
@@ -364,20 +343,20 @@ depose_liege = {
 
 			prestige = -500
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
+			# Lower crown authority
+			any_demesne_title = {
+				limit = {
+					is_crown_law_title = yes
+					is_law_potential = crown_authority_0
+				}
 
-				any_demesne_title = { # All titles
-					limit = { is_crown_law_title = yes }
+				trigger_switch = {
+					on_trigger = has_law
 
-					trigger_switch = {
-						on_trigger = has_law
-
-						crown_authority_1 = { add_law = crown_authority_0 }
-						crown_authority_2 = { add_law = crown_authority_1 }
-						crown_authority_3 = { add_law = crown_authority_2 }
-						crown_authority_4 = { add_law = crown_authority_3 }
-					}
+					crown_authority_1 = { add_law = crown_authority_0 }
+					crown_authority_2 = { add_law = crown_authority_1 }
+					crown_authority_3 = { add_law = crown_authority_2 }
+					crown_authority_4 = { add_law = crown_authority_3 }
 				}
 			}
 
@@ -388,13 +367,12 @@ depose_liege = {
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 	}
 
 	on_reverse_demand = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
 			prestige = -200
@@ -402,31 +380,33 @@ depose_liege = {
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
+			if = {
+				limit = { character = defender }
 
-			hidden_effect = {
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
+				participation_scaled_prestige = 50
+
+				hidden_effect = {
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
 							}
 						}
-					}
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
 					}
 				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
 			}
 		}
 	}
@@ -487,21 +467,22 @@ overthrow_ruler = {
 	}
 
 	on_success = {
-		attacker = {
+		any_attacker = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 250
+			if = {
+				limit = { character = attacker }
 
-			primary_title = {
-				show_scope_change = no
+				participation_scaled_prestige = 250
 
-				add_pressed_claim = FROM
+				primary_title = {
+					show_scope_change = no
+					add_pressed_claim = defender
+				}
 			}
-		}
-
-		any_attacker = {
-			limit = { NOT = { character = attacker } }
-			hidden_effect = { participation_scaled_prestige = 250 }
+			else = {
+				hidden_effect = { participation_scaled_prestige = 250 }
+			}
 		}
 
 		defender = {
@@ -514,26 +495,12 @@ overthrow_ruler = {
 				who = attacker
 			}
 
-			if = { # lower title revocation
-				limit = { has_dlc = "Conclave" }
-
-				any_demesne_title = {
+			any_demesne_title = {
+				if = { # lower crown authority
 					limit = {
-						higher_real_tier_than = COUNT
-
-						OR = {
-							has_law = revoke_title_law_1
-							has_law = revoke_title_law_2
-						}
+						is_crown_law_title = yes
+						is_law_potential = crown_authority_0
 					}
-
-					add_law = revoke_title_law_0
-				}
-			}
-
-			else = { # lower crown authority
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
 
 					trigger_switch = {
 						on_trigger = has_law
@@ -544,6 +511,15 @@ overthrow_ruler = {
 						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
+				else_if = { # lower title revocation
+					limit = {
+						is_primary_holder_title = yes
+						is_law_potential = revoke_title_law_0
+						NOT = { has_law = revoke_title_law_0 }
+					}
+
+					add_law = revoke_title_law_0
+				}
 			}
 
 			abdicate = yes
@@ -553,7 +529,6 @@ overthrow_ruler = {
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
@@ -568,55 +543,61 @@ overthrow_ruler = {
 	}
 
 	on_reverse_demand = {
-		attacker = {
-			show_scope_change = no
-
-			prestige = -200
-			imprison = defender
-		}
-
 		any_attacker = {
-			limit = { vassal_of = defender }
-
-			hidden_effect = {
-				imprison = defender
-				disband_event_forces = faction_revolters
-
-				add_character_modifier = {
-					name = faction_council_power_ultimatum_timer
-					years = 10
-					hidden = yes
-				}
-			}
-		}
-
-		defender = {
 			show_scope_change = no
 
-			participation_scaled_prestige = 50
+			if = {
+				limit = { character = attacker }
 
-			hidden_effect = {
-				if = {
-					limit = {
-						NOT = {
-							has_opinion_modifier = { # Allow free revocation of a title
-								name = opinion_traitor
-								who = attacker
-							}
-						}
-					}
+				prestige = -200
+				imprison = defender
+			}
 
-					opinion = {
-						name = opinion_traitor
-						who = attacker
+			if = {
+				limit = { vassal_of = defender }
+
+				hidden_effect = {
+					imprison = defender
+					disband_event_forces = faction_revolters
+
+					add_character_modifier = {
+						name = faction_council_power_ultimatum_timer
+						years = 10
+						hidden = yes
 					}
 				}
 			}
 		}
 
 		any_defender = {
-			limit = { NOT = { character = defender } }
-			hidden_effect = { participation_scaled_prestige = 50 }
+			show_scope_change = no
+
+			if = {
+				limit = { character = defender }
+
+				participation_scaled_prestige = 50
+
+				hidden_effect = {
+					if = {
+						limit = {
+							NOT = {
+								has_opinion_modifier = { # Allow free revocation of a title
+									name = opinion_traitor
+									who = attacker
+								}
+							}
+						}
+
+						opinion = {
+							name = opinion_traitor
+							who = attacker
+						}
+					}
+				}
+			}
+			else = {
+				hidden_effect = { participation_scaled_prestige = 50 }
+			}
 		}
 	}
 
@@ -688,7 +669,6 @@ overthrow_ruler_no_calls = {
 
 			primary_title = {
 				show_scope_change = no
-
 				add_pressed_claim = defender
 			}
 		}
@@ -703,11 +683,12 @@ overthrow_ruler_no_calls = {
 				who = attacker
 			}
 
-			if = { # lower crown authority
-				limit = { NOT = { has_dlc = "Conclave" } }
-
-				any_demesne_title = {
-					limit = { is_crown_law_title = yes }
+			any_demesne_title = {
+				if = { # lower crown authority
+					limit = {
+						is_crown_law_title = yes
+						is_law_potential = crown_authority_0
+					}
 
 					trigger_switch = {
 						on_trigger = has_law
@@ -718,6 +699,15 @@ overthrow_ruler_no_calls = {
 						crown_authority_4 = { add_law = crown_authority_3 }
 					}
 				}
+				else_if = { # lower title revocation
+					limit = {
+						is_primary_holder_title = yes
+						is_law_potential = revoke_title_law_0
+						NOT = { has_law = revoke_title_law_0 }
+					}
+
+					add_law = revoke_title_law_0
+				}
 			}
 
 			abdicate = yes
@@ -727,7 +717,6 @@ overthrow_ruler_no_calls = {
 	on_fail = {
 		attacker = {
 			show_scope_change = no
-
 			prestige = -100
 		}
 
@@ -827,41 +816,9 @@ overthrow_ruler_no_calls = {
 #	}
 #
 #	on_success = {
-#		attacker = {
-#			show_scope_change = no
-#
-#			participation_scaled_prestige = 100
-#		}
-#
-#		any_attacker = {
-#			limit = { NOT = { character = attacker } }
-#			hidden_effect = { participation_scaled_prestige = 100 }
-#		}
-#
 #		defender = {
 #			show_scope_change = no
 #
-#			if = { # lower crown authority
-#				limit = { NOT = { has_dlc = "Conclave" } }
-#
-#				any_demesne_title = { # All titles
-#					limit = { is_crown_law_title = yes }
-#
-#					trigger_switch = {
-#						on_trigger = has_law
-#
-#						crown_authority_1 = { add_law = crown_authority_0 }
-#						crown_authority_2 = { add_law = crown_authority_1 }
-#						crown_authority_3 = { add_law = crown_authority_2 }
-#						crown_authority_4 = { add_law = crown_authority_3 }
-#					}
-#				}
-#			}
-#		}
-#	}
-#
-#	on_success_title = {
-#		defender = {
 #			random_vassal = { # give title to a count vassal who holds a title that is de jure part of contested title
 #				show_scope_change = no
 #
@@ -872,16 +829,51 @@ overthrow_ruler_no_calls = {
 #						real_tier = COUNT
 #
 #						dejure_liege_title = {
-#							attacker = {
-#								plot_target_title = {
-#									title = PREVPREV
-#								}
-#							}
+#							title = thirdparty_title_scope
 #						}
 #					}
 #				}
 #
-#				grant_title = PREVPREV
+#				grant_title = thirdparty_title_scope
+#			}
+#
+#			any_demesne_title = {
+#				if = { # lower crown authority
+#					limit = {
+#						is_crown_law_title = yes
+#						is_law_potential = crown_authority_0
+#					}
+#
+#					trigger_switch = {
+#						on_trigger = has_law
+#
+#						crown_authority_1 = { add_law = crown_authority_0 }
+#						crown_authority_2 = { add_law = crown_authority_1 }
+#						crown_authority_3 = { add_law = crown_authority_2 }
+#						crown_authority_4 = { add_law = crown_authority_3 }
+#					}
+#				}
+#				else_if = { # lower title revocation
+#					limit = {
+#						is_primary_holder_title = yes
+#						is_law_potential = revoke_title_law_0
+#						NOT = { has_law = revoke_title_law_0 }
+#					}
+#
+#					add_law = revoke_title_law_0
+#				}
+#			}
+#		}
+#
+#		any_attacker = {
+#			show_scope_change = no
+#
+#			if = {
+#				limit = { character = attacker }
+#				participation_scaled_prestige = 100
+#			}
+#			else = {
+#				hidden_effect = { participation_scaled_prestige = 100 }
 #			}
 #		}
 #	}
@@ -894,25 +886,24 @@ overthrow_ruler_no_calls = {
 #			cancel_plot = plot_weaken_fellow_vassal
 #		}
 #
-#		defender = {
+#		any_defender = {
 #			show_scope_change = no
 #
-#			participation_scaled_prestige = 50
-#		}
-#
-#		any_defender = {
-#			limit = { NOT = { character = defender } }
-#			hidden_effect = { participation_scaled_prestige = 50 }
+#			if = {
+#				limit = { character = defender }
+#				participation_scaled_prestige = 50
+#			}
+#			else = {
+#				hidden_effect = { participation_scaled_prestige = 50 }
+#			}
 #		}
 #	}
 #
 #	on_invalidation = {
 #		attacker = {
 #			show_scope_change = no
-#
 #			cancel_plot = plot_weaken_fellow_vassal
 #		}
-#
 #	}
 #
 #	on_reverse_demand = {
@@ -924,15 +915,16 @@ overthrow_ruler_no_calls = {
 #			cancel_plot = plot_weaken_fellow_vassal
 #		}
 #
-#		defender = {
+#		any_defender = {
 #			show_scope_change = no
 #
-#			participation_scaled_prestige = 100
-#		}
-#
-#		any_defender = {
-#			limit = { NOT = { character = defender } }
-#			hidden_effect = { participation_scaled_prestige = 100 }
+#			if = {
+#				limit = { character = defender } 
+#				participation_scaled_prestige = 100
+#			}
+#			else = {
+#				hidden_effect = { participation_scaled_prestige = 100 }
+#			}
 #		}
 #	}
 #
