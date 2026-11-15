@@ -14729,20 +14729,21 @@ character_event = {
 
 		FROM = {
 			save_event_target_as = scoped_improvement_target
+			change_variable = {
+				which = burnout_count
+				value = 1
+			}
 			clr_character_flag = flag_training_diplomacy_attribute
 			clr_character_flag = flag_training_martial_attribute
 			clr_character_flag = flag_training_combat_rating
 			clr_character_flag = flag_training_stewardship_attribute
 			clr_character_flag = flag_training_intrigue_attribute
 			clr_character_flag = flag_training_learning_attribute
+			clr_character_flag = no_burnout
 		}
 	}
 
-	# Statemanship (Diplomacy/Stewardship)
-	# War (Martial/Combat Rating)
-	# Knowledge (Intrigue/Learning)
-	# Cancel
-
+	#Statemanship (Diplomacy/Stewardship)
 	option = {
 		name = EVTOPTAHF23760
 
@@ -14754,18 +14755,27 @@ character_event = {
 			}
 		}
 
-		if = {
-			limit = { character = event_target:scoped_improvement_target }
+		event_target:scoped_improvement_target = {
+			show_scope_change = no
 
 			random_list = {
 				50 = {
+					trigger = {
+						OR = {
+							diplomacy < event_target:scoped_improvement_ruler
+							character = event_target:scoped_improvement_ruler
+						}
+					}
 					change_diplomacy = 1
 					set_character_flag = flag_training_diplomacy_attribute
 
 					if = {
 						limit = {
-							has_education_diplomacy_trigger = yes
-
+							OR = {
+								trait = naive_appeaser
+								trait = underhanded_rogue
+								trait = charismatic_negotiator
+							}
 							OR = {
 								religion_is_meritocratic_trigger = yes
 								religion_is_patriarchal_trigger = yes
@@ -14773,18 +14783,71 @@ character_event = {
 							}
 						}
 
-						custom_tooltip = { text = tooltip_synergic_education_ugrade }
+						custom_tooltip = {
+							text = tooltip_synergic_education_ugrade
+							
+							random = {
+								chance = 17
+								
+								character_event = {
+									id = HF.23761
+									days = 15
+									random = 15
+								}
+								set_character_flag = no_burnout
+								
+								mult_modifier = {
+									factor = 1.5
+
+									attribute_diff = {
+										attribute = diplomacy
+										character = event_target:scoped_improvement_target
+										value <= 3
+									}
+								}
+
+								mult_modifier = {
+									factor = 1.5
+
+									attribute_diff = {
+										attribute = diplomacy
+										character = event_target:scoped_improvement_target
+										value <= 6
+									}
+								}
+
+								mult_modifier = {
+									factor = 1.75
+
+									attribute_diff = {
+										attribute = diplomacy
+										character = event_target:scoped_improvement_target
+										value <= 9
+									}
+								}
+							}
+						}
 					}
+					
 				}
 
 				50 = {
+					trigger = {
+						OR = {
+							stewardship < event_target:scoped_improvement_ruler
+							character = event_target:scoped_improvement_ruler
+						}
+					}
 					change_stewardship = 1
 					set_character_flag = flag_training_stewardship_attribute
 
 					if = {
 						limit = {
-							has_education_stewardship_trigger = yes
-
+							OR = {
+								trait = indulgent_wastrel
+								trait = thrifty_clerk
+								trait = fortune_builder
+							}
 							OR = {
 								religion_is_meritocratic_trigger = yes
 								religion_is_patriarchal_trigger = yes
@@ -14792,73 +14855,51 @@ character_event = {
 							}
 						}
 
-						custom_tooltip = { text = tooltip_synergic_education_ugrade }
-					}
-				}
-			}
-		}
-		else = {
-			event_target:scoped_improvement_target = {
-				show_scope_change = no
+						custom_tooltip = {
+							text = tooltip_synergic_education_ugrade
+							random = {
+								chance = 17
+								
+								character_event = {
+									id = HF.23761
+									days = 15
+									random = 15
+								}
+								set_character_flag = no_burnout
+								
+								mult_modifier = {
+									factor = 1.5
 
-				random_list = {
-					50 = {
-						trigger = { diplomacy < event_target:scoped_improvement_ruler }
+									attribute_diff = {
+										attribute = stewardship
+										character = event_target:scoped_improvement_target
+										value <= 3
+									}
+								}
 
-						change_diplomacy = 1
-						set_character_flag = flag_training_diplomacy_attribute
+								mult_modifier = {
+									factor = 1.5
 
-						if = {
-							limit = {
-								has_education_diplomacy_trigger = yes
+									attribute_diff = {
+										attribute = stewardship
+										character = event_target:scoped_improvement_target
+										value <= 6
+									}
+								}
 
-								event_target:scoped_improvement_ruler = {
-									OR = {
-										religion_is_meritocratic_trigger = yes
-										religion_is_patriarchal_trigger = yes
-										religion_is_matriarchal_trigger = yes
+								mult_modifier = {
+									factor = 1.75
+
+									attribute_diff = {
+										attribute = stewardship
+										character = event_target:scoped_improvement_target
+										value <= 9
 									}
 								}
 							}
-
-							custom_tooltip = { text = tooltip_synergic_education_ugrade }
-						}
-					}
-
-					50 = {
-						trigger = { stewardship < event_target:scoped_improvement_ruler }
-
-						change_stewardship = 1
-						set_character_flag = flag_training_stewardship_attribute
-
-						if = {
-							limit = {
-								has_education_stewardship_trigger = yes
-
-								event_target:scoped_improvement_ruler = {
-									OR = {
-										religion_is_meritocratic_trigger = yes
-										religion_is_patriarchal_trigger = yes
-										religion_is_matriarchal_trigger = yes
-									}
-								}
-							}
-
-							custom_tooltip = { text = tooltip_synergic_education_ugrade }
 						}
 					}
 				}
-			}
-		}
-
-		hidden_effect = {
-			event_target:scoped_improvement_target = {
-				change_variable = {
-					which = burnout_count
-					value = 1
-				}
-
-				stable_attribute_improvement_effect = yes
 			}
 		}
 
@@ -14877,6 +14918,7 @@ character_event = {
 		}
 	}
 
+	#War (Martial/Combat Rating)
 	option = {
 		name = EVTOPTBHF23760
 
@@ -14888,67 +14930,92 @@ character_event = {
 			}
 		}
 
-		if = {
-			limit = { character = event_target:scoped_improvement_target }
-
+		event_target:scoped_improvement_target = {
+			show_scope_change = no
+			
 			random_list = {
 				50 = {
+					trigger = {
+						OR = {
+							martial < event_target:scoped_improvement_ruler
+							character = event_target:scoped_improvement_ruler
+						}
+					}
 					change_martial = 1
 					set_character_flag = flag_training_martial_attribute
 				}
 
 				50 = {
+					trigger = {
+						OR = {
+							combat_rating < event_target:scoped_improvement_ruler
+							character = event_target:scoped_improvement_ruler
+						}
+					}
+
 					add_one_duel_experience_modifier = yes
 					set_character_flag = flag_training_combat_rating
-				}
-			}
-		}
-		else = {
-			event_target:scoped_improvement_target = {
-				random_list = {
-					50 = {
-						trigger = { martial < event_target:scoped_improvement_ruler }
-
-						change_martial = 1
-						set_character_flag = flag_training_martial_attribute
-					}
-
-					50 = {
-						trigger = { combat_rating < event_target:scoped_improvement_ruler }
-
-						add_one_duel_experience_modifier = yes
-						set_character_flag = flag_training_combat_rating
-					}
 				}
 			}
 		}
 
 		if = {
 			limit = {
-				event_target:scoped_improvement_target = {
-					has_education_martial_trigger = yes
+				OR = {
+					trait = misguided_warrior
+					trait = tough_soldier
+					trait = skilled_tactician
 				}
-
-				event_target:scoped_improvement_ruler = {
-					OR = {
-						religion_is_meritocratic_trigger = yes
-						religion_is_patriarchal_trigger = yes
-						religion_is_matriarchal_trigger = yes
-					}
+				OR = {
+					religion_is_meritocratic_trigger = yes
+					religion_is_patriarchal_trigger = yes
+					religion_is_matriarchal_trigger = yes
 				}
 			}
 
-			custom_tooltip = { text = tooltip_synergic_education_ugrade }
-		}
+			custom_tooltip = {
+				text = tooltip_synergic_education_ugrade
+				
+				random = {
+					chance = 17
+					
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
+					}
+					set_character_flag = no_burnout
+					
+					mult_modifier = {
+						factor = 1.5
 
-		hidden_effect = {
-			event_target:scoped_improvement_target = {
-				change_variable = {
-					which = burnout_count
-					value = 1
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_target
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_target
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_target
+							value <= 9
+						}
+					}
 				}
-
-				stable_attribute_improvement_effect = yes
 			}
 		}
 
@@ -14962,6 +15029,7 @@ character_event = {
 		}
 	}
 
+	#Knowledge (Intrigue/Learning)
 	option = {
 		name = EVTOPTCHF23760
 
@@ -14973,18 +15041,28 @@ character_event = {
 			}
 		}
 
-		if = {
-			limit = { character = event_target:scoped_improvement_target }
+		event_target:scoped_improvement_target = {
+			show_scope_change = no
 
 			random_list = {
 				50 = {
+					trigger = {
+						OR = {
+							intrigue < event_target:scoped_improvement_ruler
+							character = event_target:scoped_improvement_ruler
+						}
+					}
+					
 					change_intrigue = 1
 					set_character_flag = flag_training_intrigue_attribute
 
 					if = {
 						limit = {
-							has_education_intrigue_trigger = yes
-
+							OR = {
+								trait = amateurish_plotter
+								trait = flamboyant_schemer
+								trait = intricate_webweaver
+							}
 							OR = {
 								religion_is_meritocratic_trigger = yes
 								religion_is_patriarchal_trigger = yes
@@ -14992,18 +15070,71 @@ character_event = {
 							}
 						}
 
-						custom_tooltip = { text = tooltip_synergic_education_ugrade }
+						custom_tooltip = {
+							text = tooltip_synergic_education_ugrade
+							
+							random = {
+								chance = 17
+								
+								character_event = {
+									id = HF.23761
+									days = 15
+									random = 15
+								}
+								set_character_flag = no_burnout
+								
+								mult_modifier = {
+									factor = 1.5
+
+									attribute_diff = {
+										attribute = intrigue
+										character = event_target:scoped_improvement_target
+										value <= 3
+									}
+								}
+
+								mult_modifier = {
+									factor = 1.5
+
+									attribute_diff = {
+										attribute = intrigue
+										character = event_target:scoped_improvement_target
+										value <= 6
+									}
+								}
+
+								mult_modifier = {
+									factor = 1.75
+
+									attribute_diff = {
+										attribute = intrigue
+										character = event_target:scoped_improvement_target
+										value <= 9
+									}
+								}
+							}
+						}
 					}
 				}
 
 				50 = {
+					trigger = {
+						OR = {
+							learning < event_target:scoped_improvement_ruler
+							character = event_target:scoped_improvement_target
+						}
+					}
+
 					change_learning = 1
 					set_character_flag = flag_training_learning_attribute
 
 					if = {
 						limit = {
-							has_education_learning_trigger = yes
-
+							OR = {
+								trait = detached_priest
+								trait = dutiful_cleric
+								trait = scholarly_theologian
+							}
 							OR = {
 								religion_is_meritocratic_trigger = yes
 								religion_is_patriarchal_trigger = yes
@@ -15011,73 +15142,52 @@ character_event = {
 							}
 						}
 
-						custom_tooltip = { text = tooltip_synergic_education_ugrade }
-					}
-				}
-			}
-		}
-		else = {
-			event_target:scoped_improvement_target = {
-				show_scope_change = no
+						custom_tooltip = {
+							text = tooltip_synergic_education_ugrade
+							
+							random = {
+								chance = 17
+								
+								character_event = {
+									id = HF.23761
+									days = 15
+									random = 15
+								}
+								set_character_flag = no_burnout
+								
+								mult_modifier = {
+									factor = 1.5
 
-				random_list = {
-					50 = {
-						trigger = { intrigue < event_target:scoped_improvement_ruler }
+									attribute_diff = {
+										attribute = learning
+										character = event_target:scoped_improvement_target
+										value <= 3
+									}
+								}
 
-						change_intrigue = 1
-						set_character_flag = flag_training_intrigue_attribute
+								mult_modifier = {
+									factor = 1.5
 
-						if = {
-							limit = {
-								has_education_intrigue_trigger = yes
+									attribute_diff = {
+										attribute = learning
+										character = event_target:scoped_improvement_target
+										value <= 6
+									}
+								}
 
-								event_target:scoped_improvement_ruler = {
-									OR = {
-										religion_is_meritocratic_trigger = yes
-										religion_is_patriarchal_trigger = yes
-										religion_is_matriarchal_trigger = yes
+								mult_modifier = {
+									factor = 1.75
+
+									attribute_diff = {
+										attribute = learning
+										character = event_target:scoped_improvement_target
+										value <= 9
 									}
 								}
 							}
-
-							custom_tooltip = { text = tooltip_synergic_education_ugrade }
-						}
-					}
-
-					50 = {
-						trigger = { learning < event_target:scoped_improvement_ruler }
-
-						change_learning = 1
-						set_character_flag = flag_training_learning_attribute
-
-						if = {
-							limit = {
-								has_education_learning_trigger = yes
-
-								event_target:scoped_improvement_ruler = {
-									OR = {
-										religion_is_meritocratic_trigger = yes
-										religion_is_patriarchal_trigger = yes
-										religion_is_matriarchal_trigger = yes
-									}
-								}
-							}
-
-							custom_tooltip = { text = tooltip_synergic_education_ugrade }
 						}
 					}
 				}
-			}
-		}
-
-		hidden_effect = {
-			event_target:scoped_improvement_target = {
-				change_variable = {
-					which = burnout_count
-					value = 1
-				}
-
-				stable_attribute_improvement_effect = yes
 			}
 		}
 
@@ -15096,6 +15206,7 @@ character_event = {
 		}
 	}
 
+	#Cancel
 	option = {
 		name = EVTOPTDHF23760
 
@@ -15103,7 +15214,7 @@ character_event = {
 			piety = 150 # Refund
 
 			if = {
-				limit = { character = FROM } # Used on yourself
+				limit = { character = event_target:scoped_improvement_ruler } # Used on yourself
 				prestige = 500
 			}
 
@@ -15111,6 +15222,110 @@ character_event = {
 
 			event_target:scoped_improvement_target = {
 				remove_character_modifier = stable_attribute_improvement_target_cooldown
+				subtract_variable = {
+					which = burnout_count
+					value = 1
+				}
+			}
+		}
+	}
+	
+	after = {
+		random = { #Chance for burnout, won't trigger if cancelled or education improved
+			chance = 17
+			
+			character_event = {
+				id = HF.23762
+				days = 15
+				random = 15
+			}
+
+			mult_modifier = { #Don't trigger if its the first time
+				factor = 0
+				
+				check_variable = {
+					which = burnout_count
+					value == 1
+				}
+			}
+			
+			mult_modifier = {
+				factor = 1.5
+
+				check_variable = {
+					which = burnout_count
+					value > 2
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.5
+
+				check_variable = {
+					which = burnout_count
+					value > 3
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.5
+
+				check_variable = {
+					which = burnout_count
+					value > 4
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.75
+
+				check_variable = {
+					which = burnout_count
+					value > 5
+				}
+			}
+
+			mult_modifier = {
+				factor = 2
+
+				check_variable = {
+					which = burnout_count
+					value > 8
+				}
+			}
+
+			mult_modifier = {
+				factor = 2
+
+				check_variable = {
+					which = burnout_count
+					value > 12
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = slothful
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = stressed
+			}
+
+			mult_modifier = {
+				factor = 1.75
+				trait = depressed
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				is_ill = yes
+			}
+
+			mult_modifier = {
+				factor = 0.75
+				trait = diligent
 			}
 		}
 	}
@@ -15239,13 +15454,13 @@ character_event = {
 		}
 	}
 
-	is_triggered_only = yes # stable_attribute_improvement_effect
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTAHF23761
 
 		if = {
-			limit = { character = event_target:scoped_improvement_target }
+			limit = { NOT = { character = event_target:scoped_improvement_ruler } }
 
 			opinion = {
 				who = event_target:scoped_improvement_ruler
@@ -15253,138 +15468,16 @@ character_event = {
 				years = 5
 			}
 		}
+		
+		upgrade_education_trait_effect = yes
 
-		if = {
-			limit = { has_character_flag = flag_training_diplomacy_attribute }
-
-			trigger_switch = {
-				on_trigger = trait
-
-				### Diplomacy ###
-				naive_appeaser = {
-					remove_trait = naive_appeaser
-					add_trait = underhanded_rogue
-				}
-
-				underhanded_rogue = {
-					remove_trait = underhanded_rogue
-					add_trait = charismatic_negotiator
-				}
-
-				charismatic_negotiator = {
-					remove_trait = charismatic_negotiator
-					add_trait = grey_eminence
-				}
-			}
-
-			clr_character_flag = flag_training_diplomacy_attribute
-		}
-		else_if = {
-			limit = {
-				OR = {
-					has_character_flag = flag_training_martial_attribute
-					has_character_flag = flag_training_combat_rating
-				}
-			}
-
-			trigger_switch = {
-				on_trigger = trait
-
-				### Martial ###
-				misguided_warrior = {
-					remove_trait = misguided_warrior
-					add_trait = tough_soldier
-				}
-
-				tough_soldier = {
-					remove_trait = tough_soldier
-					add_trait = skilled_tactician
-				}
-
-				skilled_tactician = {
-					remove_trait = skilled_tactician
-					add_trait = brilliant_strategist
-				}
-			}
-
-			clr_character_flag = flag_training_martial_attribute
-			clr_character_flag = flag_training_combat_rating
-		}
-		else_if = {
-			limit = { has_character_flag = flag_training_stewardship_attribute }
-
-			trigger_switch = {
-				on_trigger = trait
-
-				### Stewardship ###
-				indulgent_wastrel = {
-					remove_trait = indulgent_wastrel
-					add_trait = thrifty_clerk
-				}
-
-				thrifty_clerk = {
-					remove_trait = thrifty_clerk
-					add_trait = fortune_builder
-				}
-
-				fortune_builder = {
-					remove_trait = fortune_builder
-					add_trait = midas_touched
-				}
-			}
-
-			clr_character_flag = flag_training_stewardship_attribute
-		}
-		else_if = {
-			limit = { has_character_flag = flag_training_intrigue_attribute }
-
-			trigger_switch = {
-				on_trigger = trait
-
-				### Intrigue ###
-				amateurish_plotter = {
-					remove_trait = amateurish_plotter
-					add_trait = flamboyant_schemer
-				}
-
-				flamboyant_schemer = {
-					remove_trait = flamboyant_schemer
-					add_trait = intricate_webweaver
-				}
-
-				intricate_webweaver = {
-					remove_trait = intricate_webweaver
-					add_trait = elusive_shadow
-				}
-			}
-
-			clr_character_flag = flag_training_intrigue_attribute
-		}
-		else_if = {
-			limit = { has_character_flag = flag_training_learning_attribute }
-
-			trigger_switch = {
-				on_trigger = trait
-
-				### Learning ###
-				detached_priest = {
-					remove_trait = detached_priest
-					add_trait = dutiful_cleric
-				}
-
-				dutiful_cleric = {
-					remove_trait = dutiful_cleric
-					add_trait = scholarly_theologian
-				}
-
-				scholarly_theologian = {
-					remove_trait = scholarly_theologian
-					add_trait = mastermind_theologian
-				}
-			}
-
-			clr_character_flag = flag_training_learning_attribute
-		}
+		clr_character_flag = flag_training_diplomacy_attribute
+		clr_character_flag = flag_training_martial_attribute
+		clr_character_flag = flag_training_combat_rating
+		clr_character_flag = flag_training_stewardship_attribute
+		clr_character_flag = flag_training_intrigue_attribute
+		clr_character_flag = flag_training_learning_attribute
+		clr_character_flag = no_burnout
 	}
 }
 
@@ -15489,6 +15582,11 @@ character_event = {
 	}
 
 	is_triggered_only = yes
+	
+	trigger = {
+		NOT = { has_character_flag = no_burnout }
+		has_character_modifier = stable_attribute_improvement_target_cooldown
+	}
 
 	option = {
 		name = EVTOPTAHF23762
@@ -15909,28 +16007,10 @@ character_event = {
 			}
 		}
 
-		trigger_switch = {
+		trigger_switch = { #Downgrade Education
 			on_trigger = trait
 
 			### Intrigue ###
-			amateurish_plotter = {
-				if = {
-					limit = { trait = shrewd }
-					remove_trait = shrewd
-				}
-				else_if = {
-					limit = { NOT = { trait = dull } }
-					add_trait = dull
-				}
-				else_if = {
-					limit = { NOT = { trait = depressed } }
-					add_trait = depressed
-				}
-				else = {
-					health = -0.75
-				}
-			}
-
 			flamboyant_schemer = {
 				remove_trait = flamboyant_schemer
 				add_trait = amateurish_plotter
@@ -15947,24 +16027,6 @@ character_event = {
 			}
 
 			### Diplomacy ###
-			naive_appeaser = {
-				if = {
-					limit = { trait = shrewd }
-					remove_trait = shrewd
-				}
-				else_if = {
-					limit = { NOT = { trait = dull } }
-					add_trait = dull
-				}
-				else_if = {
-					limit = { NOT = { trait = depressed } }
-					add_trait = depressed
-				}
-				else = {
-					health = -0.75
-				}
-			}
-
 			underhanded_rogue = {
 				remove_trait = underhanded_rogue
 				add_trait = naive_appeaser
@@ -15981,24 +16043,6 @@ character_event = {
 			}
 
 			### Stewardship ###
-			indulgent_wastrel = {
-				if = {
-					limit = { trait = shrewd }
-					remove_trait = shrewd
-				}
-				else_if = {
-					limit = { NOT = { trait = dull } }
-					add_trait = dull
-				}
-				else_if = {
-					limit = { NOT = { trait = depressed } }
-					add_trait = depressed
-				}
-				else = {
-					health = -0.75
-				}
-			}
-
 			thrifty_clerk = {
 				remove_trait = thrifty_clerk
 				add_trait = indulgent_wastrel
@@ -16015,24 +16059,6 @@ character_event = {
 			}
 
 			### Martial ###
-			misguided_warrior = {
-				if = {
-					limit = { trait = shrewd }
-					remove_trait = shrewd
-				}
-				else_if = {
-					limit = { NOT = { trait = dull } }
-					add_trait = dull
-				}
-				else_if = {
-					limit = { NOT = { trait = depressed } }
-					add_trait = depressed
-				}
-				else = {
-					health = -0.75
-				}
-			}
-
 			tough_soldier = {
 				remove_trait = tough_soldier
 				add_trait = misguided_warrior
@@ -16049,7 +16075,22 @@ character_event = {
 			}
 
 			### Learning ###
-			detached_priest = {
+			dutiful_cleric = {
+				remove_trait = dutiful_cleric
+				add_trait = detached_priest
+			}
+
+			scholarly_theologian = {
+				remove_trait = scholarly_theologian
+				add_trait = dutiful_cleric
+			}
+
+			mastermind_theologian = {
+				remove_trait = mastermind_theologian
+				add_trait = scholarly_theologian
+			}
+			
+			fallback = { #Has a level 1 education trait
 				if = {
 					limit = { trait = shrewd }
 					remove_trait = shrewd
@@ -16065,21 +16106,7 @@ character_event = {
 				else = {
 					health = -0.75
 				}
-			}
-
-			dutiful_cleric = {
-				remove_trait = dutiful_cleric
-				add_trait = detached_priest
-			}
-
-			scholarly_theologian = {
-				remove_trait = scholarly_theologian
-				add_trait = dutiful_cleric
-			}
-
-			mastermind_theologian = {
-				remove_trait = mastermind_theologian
-				add_trait = scholarly_theologian
+			
 			}
 		}
 	}
@@ -16091,6 +16118,7 @@ character_event = {
 		clr_character_flag = flag_training_stewardship_attribute
 		clr_character_flag = flag_training_intrigue_attribute
 		clr_character_flag = flag_training_learning_attribute
+		clr_character_flag = no_burnout
 	}
 }
 
@@ -16496,6 +16524,7 @@ character_event = {
 		clr_character_flag = flag_training_stewardship_attribute
 		clr_character_flag = flag_training_intrigue_attribute
 		clr_character_flag = flag_training_learning_attribute
+		clr_character_flag = no_burnout
 	}
 }
 
